@@ -12,7 +12,7 @@
            
   HISTORY: DD18: customFilter added.
            DD18: customDump moved here instead of having its own .p
-           DD19: customFilter added.
+           DD20: customShowField added
 
  *************************************************************************/
 
@@ -22,6 +22,31 @@
 /* [QAD]
 define new global shared variable global_domain as character.
 */
+
+PROCEDURE customShowField:
+  /*
+   * Name: customShowField
+   * Desc: Change the visibility for a field
+   *
+   * This hook enables you to change the default visibility of a field.
+   *
+   * This is handy if you have some fields in your database that
+   * you never want to select, for example fields that have been added by
+   * your framework to all tables but which do not hold value for you.
+   *
+   * Note that this is just the default visibility. During run-time you
+   * can always change the visibility.
+   */
+  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
+
+  /* Example, hide the cust-num field except on the customer table
+  IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
+  */
+END PROCEDURE. /* customShowField */
+
 
 PROCEDURE customFormat:
   /*
@@ -174,4 +199,3 @@ PROCEDURE customQuery:
     pcQuery = DYNAMIC-FUNCTION("getQuery", pcDatabase, pcTable, 1).
 
 END PROCEDURE. /* customQuery */
-

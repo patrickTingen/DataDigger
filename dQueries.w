@@ -164,7 +164,7 @@ DEFINE FRAME Dialog-Frame
      btDelQuery-5 AT Y 305 X 420 WIDGET-ID 64
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 560 BY 412
+         SIZE-PIXELS 560 BY 420
          TITLE "Select query"
          DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
 
@@ -894,3 +894,4 @@ end procedure. /* startDiggerLib */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

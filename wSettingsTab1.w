@@ -81,7 +81,7 @@ DEFINE VARIABLE fiPreCacheInterval AS INTEGER FORMAT ">>>,>>9":U INITIAL 0
 
 DEFINE RECTANGLE RECT-21
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 330 BY 85.
+     SIZE-PIXELS 330 BY 110.
 
 DEFINE VARIABLE tgCacheFieldDefs AS LOGICAL INITIAL no 
      LABEL "Field Definitions" 
@@ -99,9 +99,9 @@ DEFINE VARIABLE tgCacheUserSettings AS LOGICAL INITIAL no
      SIZE-PIXELS 150 BY 17 TOOLTIP "cache user settings" NO-UNDO.
 
 DEFINE VARIABLE tgPreCache AS LOGICAL INITIAL no 
-     LABEL "Background Pre-Caching" 
+     LABEL "Background caching" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 155 BY 17 TOOLTIP "use pre-caching for tables and fields" NO-UNDO.
+     SIZE-PIXELS 155 BY 17 TOOLTIP "use background caching for tables and fields" NO-UNDO.
 
 DEFINE VARIABLE fiMaxFilterHistory AS INTEGER FORMAT ">>9":U INITIAL 0 
      LABEL "Maximum nr data filter history to save" 
@@ -114,9 +114,9 @@ DEFINE VARIABLE tgAutoExpandQueryEditor AS LOGICAL INITIAL no
      SIZE-PIXELS 270 BY 17 NO-UNDO.
 
 DEFINE VARIABLE tgShowHiddenTables AS LOGICAL INITIAL no 
-     LABEL "Show &Hidden Tables In Table Browse" 
+     LABEL "Show &Hidden Schema Tables In Table Browse" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 215 BY 17 NO-UNDO.
+     SIZE-PIXELS 295 BY 17 NO-UNDO.
 
 DEFINE VARIABLE fiMaxColumns AS INTEGER FORMAT ">,>>>,>>9":U INITIAL 0 
      LABEL "Maximum nr of &columns in Data Browse" 
@@ -150,7 +150,7 @@ DEFINE VARIABLE cbViewType AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE tgKeepAlive AS LOGICAL INITIAL no 
      LABEL "&Keep DB Connections Alive" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 170 BY 17 TOOLTIP "poll every 5 minutes on each DB to ensure the connection stays alive" NO-UNDO.
+     SIZE-PIXELS 170 BY 17 TOOLTIP "periodically poll all databases to ensure the connection stays alive" NO-UNDO.
 
 DEFINE VARIABLE tgStartOnPrimaryMonitor AS LOGICAL INITIAL no 
      LABEL "&Always start on primary monitor" 
@@ -172,47 +172,6 @@ DEFINE VARIABLE fiMaxExtent AS INTEGER FORMAT ">,>>>,>>9":U INITIAL 0
      VIEW-AS FILL-IN 
      SIZE-PIXELS 30 BY 21 NO-UNDO.
 
-DEFINE BUTTON btnCheckNow 
-     LABEL "Check Now" 
-     SIZE-PIXELS 80 BY 24 TOOLTIP "check on the latest version of DataDigger".
-
-DEFINE VARIABLE cbCheckForNewVersion AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0 
-     LABEL "&Check" 
-     VIEW-AS COMBO-BOX INNER-LINES 5
-     LIST-ITEM-PAIRS "Never",0,
-                     "Daily",1,
-                     "Weekly",2,
-                     "Monthly",3
-     DROP-DOWN-LIST
-     SIZE-PIXELS 80 BY 21 TOOLTIP "set how often DataDigger should check on newer versions" NO-UNDO.
-
-DEFINE VARIABLE cbUpdateChannel AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0 
-     LABEL "Channel" 
-     VIEW-AS COMBO-BOX INNER-LINES 5
-     LIST-ITEM-PAIRS "Stable",0,
-                     "Beta",1
-     DROP-DOWN-LIST
-     SIZE-PIXELS 70 BY 21 TOOLTIP "updates to normal versions or to bleeding edge beta" NO-UNDO.
-
-DEFINE VARIABLE fiCurrentBuild AS CHARACTER FORMAT "X(256)":U 
-     LABEL "Build" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 80 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiCurrentVersion AS CHARACTER FORMAT "X(256)":U 
-     LABEL "Current Version" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 25 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiLastcheck AS CHARACTER FORMAT "X(16)":U 
-     LABEL "Last check" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 100 BY 21 NO-UNDO.
-
-DEFINE RECTANGLE RECT-19
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 325 BY 88.
-
 
 /* ************************  Frame Definitions  *********************** */
 
@@ -228,8 +187,8 @@ DEFINE FRAME FRAME-Y
           SIZE-PIXELS 85 BY 13 AT Y 5 X 245 WIDGET-ID 100
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 785
-         SIZE-PIXELS 340 BY 45
+         AT X 10 Y 660
+         SIZE-PIXELS 390 BY 45
          TITLE "1" WIDGET-ID 3400.
 
 DEFINE FRAME FRAME-AB
@@ -239,15 +198,15 @@ DEFINE FRAME FRAME-AB
      fiPreCacheInterval AT Y 63 X 240 COLON-ALIGNED WIDGET-ID 66
      tgPreCache AT Y 65 X 25 WIDGET-ID 198
      tgCacheUserSettings AT Y 95 X 25 WIDGET-ID 192
-     "Table and Field Caching" VIEW-AS TEXT
-          SIZE-PIXELS 125 BY 13 AT Y 0 X 15 WIDGET-ID 184
+     "Caching" VIEW-AS TEXT
+          SIZE-PIXELS 55 BY 13 AT Y 0 X 15 WIDGET-ID 184
      "sec" VIEW-AS TEXT
           SIZE-PIXELS 35 BY 13 AT Y 67 X 285 WIDGET-ID 100
      RECT-21 AT Y 5 X 5 WIDGET-ID 102
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 410
-         SIZE-PIXELS 400 BY 160
+         AT X 10 Y 280
+         SIZE-PIXELS 390 BY 150
          TITLE "1" WIDGET-ID 3300.
 
 DEFINE FRAME FRAME-W
@@ -255,33 +214,17 @@ DEFINE FRAME FRAME-W
      tgUseDeleteTriggers AT Y 1 X 10 WIDGET-ID 94
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 630
-         SIZE-PIXELS 340 BY 42
+         AT X 10 Y 500
+         SIZE-PIXELS 390 BY 42
          TITLE "1" WIDGET-ID 3200.
 
 DEFINE FRAME FRAME-U
      tgKeepAlive AT Y 1 X 10 WIDGET-ID 94
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 350
+         AT X 10 Y 225
          SIZE-PIXELS 340 BY 42
          TITLE "1" WIDGET-ID 3000.
-
-DEFINE FRAME frUpdate
-     fiCurrentVersion AT Y 15 X 86 COLON-ALIGNED WIDGET-ID 188
-     fiCurrentBuild AT Y 15 X 227 COLON-ALIGNED WIDGET-ID 186
-     cbUpdateChannel AT Y 40 X 86 COLON-ALIGNED WIDGET-ID 190
-     cbCheckForNewVersion AT Y 40 X 227 COLON-ALIGNED WIDGET-ID 104
-     btnCheckNow AT Y 65 X 237 WIDGET-ID 180
-     fiLastcheck AT Y 66 X 86 COLON-ALIGNED WIDGET-ID 192
-     "Auto Update" VIEW-AS TEXT
-          SIZE-PIXELS 70 BY 13 AT Y 0 X 15 WIDGET-ID 184
-     RECT-19 AT Y 7 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 220
-         SIZE-PIXELS 340 BY 121
-         TITLE "1" WIDGET-ID 2900.
 
 DEFINE FRAME FRAME-D
      tgAutoExpandQueryEditor AT Y 0 X 10 WIDGET-ID 64
@@ -323,16 +266,16 @@ DEFINE FRAME FRAME-C
           SIZE-PIXELS 85 BY 13 AT Y 7 X 245 WIDGET-ID 100
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 680
-         SIZE-PIXELS 340 BY 55
+         AT X 10 Y 550
+         SIZE-PIXELS 390 BY 55
          TITLE "1" WIDGET-ID 500.
 
 DEFINE FRAME FRAME-F
      fiMaxColumns AT Y 0 X 200 COLON-ALIGNED WIDGET-ID 62
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 740
-         SIZE-PIXELS 340 BY 45
+         AT X 10 Y 610
+         SIZE-PIXELS 390 BY 45
          TITLE "1" WIDGET-ID 800.
 
 DEFINE FRAME FRAME-I
@@ -340,7 +283,7 @@ DEFINE FRAME FRAME-I
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 872
-         SIZE-PIXELS 340 BY 45
+         SIZE-PIXELS 390 BY 45
          TITLE "1" WIDGET-ID 1100.
 
 DEFINE FRAME FRAME-S
@@ -348,15 +291,15 @@ DEFINE FRAME FRAME-S
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 830
-         SIZE-PIXELS 340 BY 45
+         SIZE-PIXELS 390 BY 45
          TITLE "1" WIDGET-ID 1900.
 
 DEFINE FRAME FRAME-V
      tgStartOnPrimaryMonitor AT Y 1 X 10 WIDGET-ID 94
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 580
-         SIZE-PIXELS 340 BY 42
+         AT X 10 Y 445
+         SIZE-PIXELS 390 BY 42
          TITLE "1" WIDGET-ID 3100.
 
 
@@ -377,12 +320,12 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "<insert window title>"
-         HEIGHT-P           = 980
+         HEIGHT-P           = 956
          WIDTH-P            = 843
          MAX-HEIGHT-P       = 980
-         MAX-WIDTH-P        = 843
+         MAX-WIDTH-P        = 1600
          VIRTUAL-HEIGHT-P   = 980
-         VIRTUAL-WIDTH-P    = 843
+         VIRTUAL-WIDTH-P    = 1600
          RESIZE             = yes
          SCROLL-BARS        = no
          STATUS-AREA        = no
@@ -416,8 +359,7 @@ ASSIGN FRAME FRAME-AB:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-U:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-V:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-W:FRAME = FRAME DEFAULT-FRAME:HANDLE
-       FRAME FRAME-Y:FRAME = FRAME DEFAULT-FRAME:HANDLE
-       FRAME frUpdate:FRAME = FRAME DEFAULT-FRAME:HANDLE.
+       FRAME FRAME-Y:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
@@ -432,8 +374,7 @@ ASSIGN XXTABVALXX = FRAME FRAME-S:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-I:HANDLE)
        XXTABVALXX = FRAME FRAME-V:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-W:HANDLE)
        XXTABVALXX = FRAME FRAME-AB:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-V:HANDLE)
        XXTABVALXX = FRAME FRAME-U:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-AB:HANDLE)
-       XXTABVALXX = FRAME frUpdate:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-U:HANDLE)
-       XXTABVALXX = FRAME FRAME-H:MOVE-BEFORE-TAB-ITEM (FRAME frUpdate:HANDLE)
+       XXTABVALXX = FRAME FRAME-H:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-U:HANDLE)
        XXTABVALXX = FRAME FRAME-G:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-H:HANDLE)
        XXTABVALXX = FRAME FRAME-E:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-G:HANDLE)
        XXTABVALXX = FRAME FRAME-D:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-E:HANDLE)
@@ -579,34 +520,6 @@ ASSIGN
        fiMaxExtent:PRIVATE-DATA IN FRAME FRAME-Y     = 
                 "DataDigger,MaxExtent".
 
-/* SETTINGS FOR FRAME frUpdate
-   NOT-VISIBLE                                                          */
-ASSIGN 
-       FRAME frUpdate:HIDDEN           = TRUE.
-
-ASSIGN 
-       cbCheckForNewVersion:PRIVATE-DATA IN FRAME frUpdate     = 
-                "DataDigger:Update,UpdateCheck".
-
-ASSIGN 
-       cbUpdateChannel:PRIVATE-DATA IN FRAME frUpdate     = 
-                "DataDigger:Update,UpdateChannel".
-
-ASSIGN 
-       fiCurrentBuild:READ-ONLY IN FRAME frUpdate        = TRUE
-       fiCurrentBuild:PRIVATE-DATA IN FRAME frUpdate     = 
-                "DataDigger,Build".
-
-ASSIGN 
-       fiCurrentVersion:READ-ONLY IN FRAME frUpdate        = TRUE
-       fiCurrentVersion:PRIVATE-DATA IN FRAME frUpdate     = 
-                "DataDigger,Version".
-
-ASSIGN 
-       fiLastcheck:READ-ONLY IN FRAME frUpdate        = TRUE
-       fiLastcheck:PRIVATE-DATA IN FRAME frUpdate     = 
-                "DataDigger:update,UpdateLastCheck".
-
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
 THEN C-Win:HIDDEN = yes.
 
@@ -645,20 +558,6 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frUpdate
-&Scoped-define SELF-NAME btnCheckNow
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnCheckNow C-Win
-ON CHOOSE OF btnCheckNow IN FRAME frUpdate /* Check Now */
-DO:
-
-  run btnCheckUpgrade.
-      
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define FRAME-NAME FRAME-AB
 &Scoped-define SELF-NAME btnClearCache
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearCache C-Win
@@ -690,7 +589,7 @@ END.
 
 &Scoped-define SELF-NAME tgPreCache
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgPreCache C-Win
-ON VALUE-CHANGED OF tgPreCache IN FRAME FRAME-AB /* Background Pre-Caching */
+ON VALUE-CHANGED OF tgPreCache IN FRAME FRAME-AB /* Background caching */
 DO:
 
   fiPreCacheInterval:SENSITIVE = (tgPreCache:SENSITIVE AND tgPreCache:CHECKED).
@@ -736,32 +635,6 @@ END.
 
 
 /* **********************  Internal Procedures  *********************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCheckUpgrade C-Win 
-PROCEDURE btnCheckUpgrade :
-/*------------------------------------------------------------------------
-  Name         : btnCheckUpgrade
-  Description  : Check for an upgrade of DD on OE Hive
-  ----------------------------------------------------------------------*/
-  
-  define variable iChannel          as integer   no-undo.
-  define variable lUpdated          as logical   no-undo.
-
-  iChannel = integer(cbUpdateChannel:screen-value in frame frUpdate).
-  
-  run getNewVersion.p
-    ( input iChannel
-    , input true
-    , output lUpdated
-    ).
-    
-  if lUpdated then
-    message "Please restart DataDigger to proceed installation" view-as alert-box info.
-
-end procedure. /* btnCheckUpgrade */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI C-Win  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
@@ -815,13 +688,6 @@ PROCEDURE enable_UI :
   ENABLE fiQueryTimeOut 
       WITH FRAME FRAME-H IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-H}
-  DISPLAY fiCurrentVersion fiCurrentBuild cbUpdateChannel cbCheckForNewVersion 
-          fiLastcheck 
-      WITH FRAME frUpdate IN WINDOW C-Win.
-  ENABLE RECT-19 fiCurrentVersion fiCurrentBuild cbUpdateChannel 
-         cbCheckForNewVersion btnCheckNow fiLastcheck 
-      WITH FRAME frUpdate IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-frUpdate}
   DISPLAY tgKeepAlive 
       WITH FRAME FRAME-U IN WINDOW C-Win.
   ENABLE tgKeepAlive 
@@ -869,22 +735,6 @@ PROCEDURE enable_UI :
   ENABLE cbDoubleClick 
       WITH FRAME FRAME-I IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-I}
-END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE localInitialize C-Win 
-PROCEDURE localInitialize :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
-  fiCurrentVersion:font in frame frUpdate = getFont("Fixed").
-  fiCurrentBuild:font   in frame frUpdate = getFont("Fixed").
-
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
