@@ -100,8 +100,8 @@ DEFINE TEMP-TABLE ttData NO-UNDO RCODE-INFORMATION
 /* Definitions for FRAME frMain                                         */
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS brRecord fiNumRecords btnDecrease btnOk ~
-btnIncrease btnClose btnDatePicker tgWriteTrigger btnEditor btnEncode ~
+&Scoped-Define ENABLED-OBJECTS brRecord fiNumRecords btnOk btnDecrease ~
+btnClose tgWriteTrigger btnIncrease btnDatePicker btnEditor btnEncode ~
 btnListEdit btnLowerCase btnUpperCase btnWordCase 
 &Scoped-Define DISPLAYED-OBJECTS fiNumRecords tgWriteTrigger 
 
@@ -213,12 +213,12 @@ DEFINE BROWSE brRecord
 DEFINE FRAME frMain
      brRecord AT Y 25 X 0 WIDGET-ID 200
      fiNumRecords AT Y 425 X 95 COLON-ALIGNED WIDGET-ID 10
-     btnDecrease AT Y 0 X 210 WIDGET-ID 26
      btnOk AT Y 425 X 505 WIDGET-ID 6
-     btnIncrease AT Y 0 X 180 WIDGET-ID 24
+     btnDecrease AT Y 0 X 210 WIDGET-ID 26
      btnClose AT Y 425 X 585 WIDGET-ID 4
-     btnDatePicker AT Y 0 X 240 WIDGET-ID 34
      tgWriteTrigger AT Y 427 X 159 WIDGET-ID 16
+     btnIncrease AT Y 0 X 180 WIDGET-ID 24
+     btnDatePicker AT Y 0 X 240 WIDGET-ID 34
      btnEditor AT Y 0 X 0 WIDGET-ID 36
      btnEncode AT Y 0 X 60 WIDGET-ID 12
      btnListEdit AT Y 0 X 30 WIDGET-ID 14
@@ -680,11 +680,11 @@ END.
 &Scoped-define SELF-NAME btnOk
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnOk wEdit
 ON CHOOSE OF btnOk IN FRAME frMain /* Ok */
-do:
-  run btnGoChoose(output polSuccess).
-  if not polSuccess then return no-apply.
-  else apply 'close' to this-procedure.
-end.
+DO:
+  RUN btnGoChoose(OUTPUT polSuccess).
+  IF NOT polSuccess THEN RETURN NO-APPLY.
+  ELSE APPLY 'close' TO THIS-PROCEDURE.
+END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1196,9 +1196,9 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY fiNumRecords tgWriteTrigger 
       WITH FRAME frMain IN WINDOW wEdit.
-  ENABLE brRecord fiNumRecords btnDecrease btnOk btnIncrease btnClose 
-         btnDatePicker tgWriteTrigger btnEditor btnEncode btnListEdit 
-         btnLowerCase btnUpperCase btnWordCase 
+  ENABLE brRecord fiNumRecords btnOk btnDecrease btnClose tgWriteTrigger 
+         btnIncrease btnDatePicker btnEditor btnEncode btnListEdit btnLowerCase 
+         btnUpperCase btnWordCase 
       WITH FRAME frMain IN WINDOW wEdit.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
 END PROCEDURE.

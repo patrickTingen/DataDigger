@@ -42,8 +42,6 @@ DEFINE INPUT PARAMETER plReadOnlyDigger AS LOGICAL NO-UNDO.
 
 DEFINE VARIABLE giNumDiggers  AS INTEGER   NO-UNDO.
 DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
-DEFINE VARIABLE glUpdated     AS LOGICAL   NO-UNDO.
-DEFINE VARIABLE ghCustomSuper AS HANDLE    NO-UNDO.
 
 DEFINE TEMP-TABLE ttOsFile NO-UNDO RCODE-INFORMATION
   FIELD cFileName     AS CHARACTER FORMAT 'x(30)'
@@ -207,11 +205,12 @@ DO:
     
     /* Kill the library */
     PUBLISH 'DataDiggerLib' (OUTPUT hDiggerLib).
-    APPLY 'close' TO hDiggerLib.
-    DELETE OBJECT hDiggerLib NO-ERROR.
+    IF VALID-HANDLE(hDiggerLib) THEN
+    DO:
+      APPLY 'close' TO hDiggerLib.
+      DELETE OBJECT hDiggerLib NO-ERROR.
+    END.
     
-    /* Kill custom super */
-    /* delete object ghCustomSuper no-error. */
     RETURN.
   END.
 END.
@@ -334,12 +333,9 @@ PROCEDURE initializeObject :
   END.
 
   /* Where are we running from? */
-  FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"datadigger2.p","datadigger2.r").
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
-    FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"datadigger2.r","datadigger2.p").
-
-  gcProgramDir = SUBSTRING(REPLACE(FILE-INFO:FULL-PATHNAME,"\","/"),1,R-INDEX(FILE-INFO:FULL-PATHNAME,'/')).
-  /* gcProgramDir = SUBSTRING(REPLACE(THIS-PROCEDURE:FILE-NAME,"\","/"),1,R-INDEX(THIS-PROCEDURE:FILE-NAME,'/')). */
+  gcProgramDir = THIS-PROCEDURE:FILE-NAME.
+  gcProgramDir = REPLACE(gcProgramDir,"\","/").
+  gcProgramDir = SUBSTRING(gcProgramDir,1,R-INDEX(gcProgramDir,'/')).
 
   /* Add program dir to propath (if not already in) */
   IF SEARCH('datadigger.txt') = ? THEN

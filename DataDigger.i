@@ -19,7 +19,7 @@
 /* ***************************  Definitions  ************************** */
 
 &GLOBAL-DEFINE version 20
-&GLOBAL-DEFINE edition Straight A's
+&GLOBAL-DEFINE edition Coffee Version
 &GLOBAL-DEFINE build {build.i}
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 &GLOBAL-DEFINE timerStart PUBLISH "timerCommand" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).

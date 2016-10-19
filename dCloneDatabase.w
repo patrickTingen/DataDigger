@@ -187,6 +187,9 @@ DO:
   setRegistry("DataDigger","CloneDB:dir" ,fiDir:screen-value).
   setRegistry("DataDigger","CloneDB:connect",string(tgConnect:checked)).
 
+  /* Create full folder structure */
+  RUN createFolder(fiDir:SCREEN-VALUE). 
+
   RUN cloneDatabase
     ( pcDatabase          /* database to clone */
     , fiDir:SCREEN-VALUE  /* target folder */

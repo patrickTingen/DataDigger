@@ -43,7 +43,7 @@ DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnDefaults cbTableNameShow cbTableNameHide ~
+&Scoped-Define ENABLED-OBJECTS btnReset cbTableNameShow cbTableNameHide ~
 tgShowSchema tgShowVst tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow ~
 cbTableFieldHide Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 ~
 RECT-2 RECT-3 
@@ -64,9 +64,9 @@ cbTableFieldHide tgShowOther tgShowNormalTables
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnDefaults 
-     LABEL "&Defaults" 
-     SIZE-PIXELS 75 BY 24 TOOLTIP "clear all filters".
+DEFINE BUTTON btnReset 
+     LABEL "&Reset" 
+     SIZE-PIXELS 75 BY 24 TOOLTIP "reset all filters to the default value".
 
 DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
      LABEL "Cancel" 
@@ -149,7 +149,7 @@ DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnDefaults AT Y 423 X 15 WIDGET-ID 46
+     btnReset AT Y 423 X 15 WIDGET-ID 46
      cbTableNameShow AT Y 50 X 15 COLON-ALIGNED NO-LABEL WIDGET-ID 14
      cbTableNameHide AT Y 95 X 15 COLON-ALIGNED NO-LABEL WIDGET-ID 18
      tgShowSchema AT Y 193 X 25 WIDGET-ID 24
@@ -228,13 +228,14 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btnDefaults
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDefaults Dialog-Frame
-ON CHOOSE OF btnDefaults IN FRAME Dialog-Frame /* Defaults */
+&Scoped-define SELF-NAME btnReset
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnReset Dialog-Frame
+ON CHOOSE OF btnReset IN FRAME Dialog-Frame /* Reset */
 DO:
 
   RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
   RUN initializeObject.
+  APPLY 'CHOOSE' TO Btn_OK IN FRAME Dialog-Frame.
 
 END.
 
@@ -339,7 +340,7 @@ PROCEDURE enable_UI :
           tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide 
           tgShowOther tgShowNormalTables 
       WITH FRAME Dialog-Frame.
-  ENABLE btnDefaults cbTableNameShow cbTableNameHide tgShowSchema tgShowVst 
+  ENABLE btnReset cbTableNameShow cbTableNameHide tgShowSchema tgShowVst 
          tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide 
          Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 RECT-2 RECT-3 
       WITH FRAME Dialog-Frame.

@@ -170,6 +170,7 @@ PROCEDURE CustomDump:
       , NO            /* WriteSchema    */
       , NO            /* MinSchema      */
       ).
+    plContinue = TRUE.
   END.
 
 END PROCEDURE. /* CustomDump */
@@ -200,4 +201,3 @@ PROCEDURE customQuery:
     pcQuery = DYNAMIC-FUNCTION("getQuery", pcDatabase, pcTable, 1).
 */
 END PROCEDURE. /* customQuery */
-

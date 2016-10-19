@@ -1530,6 +1530,9 @@ PROCEDURE getDumpFileName :
   /* Get rid of annoying slashes */
   pcFileName = TRIM(pcFileName,'/\').
   
+  /* Get rid of double slashes (except at the beginning for UNC paths) */
+  pcFileName = SUBSTRING(pcFileName,1,1) + REPLACE(SUBSTRING(pcFileName,2),'\\','\').
+  
   /* Sequences */
   pcFileName = resolveSequence(pcFileName).
 
@@ -5205,4 +5208,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

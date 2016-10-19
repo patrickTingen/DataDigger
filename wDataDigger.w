@@ -175,10 +175,10 @@ DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTime
 cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnNextQuery ~
-btnWhere btnClear btnQueries btnClipboard ficWhere btnPrevQuery btnDump ~
-btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools ~
-btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
+btnQueries btnNextQuery btnClipboard ficWhere btnPrevQuery btnDump btnLoad ~
+btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools btnDelete ~
+btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
 fiFeedback 
@@ -918,15 +918,15 @@ DEFINE FRAME frMain
      btnMoveDown AT Y 94 X 760 WIDGET-ID 194
      btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
      fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -950,6 +950,53 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1443 BY 675 DROP-TARGET.
+
+DEFINE FRAME frSettings
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 12 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 5 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 241
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnAnd AT Y 98 X 15 WIDGET-ID 22
@@ -983,53 +1030,6 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 625 BY 260
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 241
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 5 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frSettings
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 12 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1389,7 +1389,7 @@ END.
 ON CTRL-F OF C-Win /* DataDigger */
 ANYWHERE
 DO:
-  RUN setTableView(TRUE,NO).
+  RUN setPage({&PAGE-FAVOURITES}).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1400,7 +1400,7 @@ END.
 ON CTRL-T OF C-Win /* DataDigger */
 ANYWHERE
 DO:
-  RUN setTableView(FALSE,NO).
+  RUN setPage({&PAGE-TABLES}).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2594,7 +2594,8 @@ DO:
   /* If we are in the favo-view then refresh the browse to get rid of this table */
   IF glShowFavourites THEN RUN reopenTableBrowse(?).
 
-  RUN showFavourite(bTable.lFavourite).
+  IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
+    RUN showFavourite(bTable.lFavourite).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3035,10 +3036,24 @@ END.
 &Scoped-define SELF-NAME btnTableFilter
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTableFilter C-Win
 ON CHOOSE OF btnTableFilter IN FRAME frMain /* Y */
+OR "CTRL-CURSOR-DOWN" OF fiTableFilter
+  OR "CTRL-CURSOR-DOWN" OF cbDatabaseFilter
+  OR "CTRL-CURSOR-DOWN" OF brTables
+  OR "CTRL-CURSOR-DOWN" OF btnClearTableFilter
+  OR "CTRL-CURSOR-DOWN" OF btnTableFilter
+  OR "ALT-CURSOR-DOWN" OF fiTableFilter
+  OR "ALT-CURSOR-DOWN" OF brTables
+  OR "ALT-CURSOR-DOWN" OF btnClearTableFilter
+  OR "ALT-CURSOR-DOWN" OF btnTableFilter
 DO:
 
-  RUN setTableFilterOptions.
-  APPLY 'ENTRY' TO brTables IN FRAME frMain. 
+  /* Filter options only available on normal table page */
+  IF giCurrentPage <> {&PAGE-FAVOURITES} 
+    AND btnTableFilter:SENSITIVE THEN 
+  DO:
+    RUN setTableFilterOptions.
+    APPLY 'ENTRY' TO brTables IN FRAME frMain. 
+  END. 
 
 END.
 
@@ -3481,26 +3496,6 @@ END.
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME fiTableFilter
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
-ON CTRL-CURSOR-DOWN OF fiTableFilter IN FRAME frMain
-OR "CTRL-CURSOR-DOWN" OF fiTableFilter
-OR "CTRL-CURSOR-DOWN" OF cbDatabaseFilter
-OR "CTRL-CURSOR-DOWN" OF brTables
-OR "CTRL-CURSOR-DOWN" OF btnClearTableFilter
-OR "CTRL-CURSOR-DOWN" OF btnTableFilter
-OR "ALT-CURSOR-DOWN" OF fiTableFilter
-OR "ALT-CURSOR-DOWN" OF brTables
-OR "ALT-CURSOR-DOWN" OF btnClearTableFilter
-OR "ALT-CURSOR-DOWN" OF btnTableFilter
-DO:
-  /* Filter options only available on normal table page */
-  IF giCurrentPage = {&PAGE-TABLES} THEN RUN setTableFilterOptions.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
 ON CURSOR-DOWN OF fiTableFilter IN FRAME frMain
 DO:
   setFilterFieldColor(SELF:handle).
@@ -3611,66 +3606,7 @@ END.
 ON CHOOSE OF MENU-ITEM m_Disconnect /* Disconnect */
 OR "-",DELETE-CHARACTER OF cbDatabaseFilter
 DO:
-  DEFINE VARIABLE cDatabases  AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cCurrentDb  AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lDisconnect AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE hBuffer     AS HANDLE    NO-UNDO.
-
-  DO WITH FRAME {&FRAME-NAME}:
-    hBuffer = brTables:QUERY:GET-BUFFER-HANDLE(1).
-    IF hBuffer:AVAILABLE THEN 
-      cCurrentDb = hBuffer::cDatabase.
-    ELSE 
-      RETURN.
-  END.
-
-  /* Cannot disconnect "all" */
-  IF cCurrentDb = "" OR cCurrentDb = ? THEN RETURN. 
-
-  /* Confirm by user */
-  RUN showHelp("Disconnect", cCurrentDb).
-  IF getRegistry("DataDigger:help", "Disconnect:answer") <> "1" THEN RETURN.
-
-  DISCONNECT VALUE(cCurrentDb).
-
-  ASSIGN 
-    gcCurrentDatabase = ""
-    gcCurrentTable    = "".
-
-  /* Remove all tables of this db from the "tables" table */
-  FOR EACH ttTable WHERE ttTable.cDatabase = cCurrentDb:
-    DELETE ttTable. 
-  END.
-  RUN reopenTableBrowse(?).
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-  cbDatabaseFilter:LIST-ITEMS = "," + cDatabases.
-
-  /* Wipe database filter when it's the one that was just disconnected */
-  IF cbDatabaseFilter:SCREEN-VALUE = cCurrentDb THEN
-    cbDatabaseFilter:SCREEN-VALUE = "".
-
-  /* If we have no db connected, kill the fields tt */
-  IF NUM-DBS = 0 THEN 
-  DO: 
-    RUN deleteDataFilters(ghDataBrowse).
-    IF VALID-HANDLE(ghDataBrowse) AND VALID-HANDLE(ghDataBrowse:QUERY) THEN DELETE OBJECT ghDataBrowse:QUERY NO-ERROR.
-    IF VALID-HANDLE(ghDataBrowse) THEN DELETE OBJECT ghDataBrowse NO-ERROR.
-    IF VALID-HANDLE(ghLockTable)  THEN DELETE OBJECT ghLockTable  NO-ERROR.
-    IF VALID-HANDLE(ghDataBuffer) THEN DELETE OBJECT ghDataBuffer NO-ERROR.
-
-    EMPTY TEMP-TABLE ttField. 
-    EMPTY TEMP-TABLE ttIndex.
-
-    /* Reopen the queries on Fields and Indexes */
-    RUN reopenFieldBrowse(?,?).
-    RUN reopenIndexBrowse(?,?).
-    setUpdatePanel(?). /* Refresh sensitivity of buttons if needed */
-  END.
-
-  APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
-  RUN filterTables.
+  RUN disconnectDatabase.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4404,8 +4340,8 @@ PROCEDURE btnLoadChoose :
   /* Keep track of user behaviour */
   PUBLISH "setUsage" ("LoadData").
 
-  /* In read-only mode, return */
-  IF plReadOnlyDigger THEN RETURN. 
+/*   /* In read-only mode, return */  */
+/*   IF plReadOnlyDigger THEN RETURN. */
 
   RUN VALUE(getProgramDir() + 'wImportSel.w')
     ( INPUT plReadOnlyDigger
@@ -5176,6 +5112,8 @@ PROCEDURE convertSettings :
       /* Obsolete files */
       OS-DELETE getNewVersion.p.
       OS-DELETE getNewVersion.r.
+      OS-DELETE frLoadMapping.w.
+      OS-DELETE frLoadMapping.r.
       OS-DELETE DataDigger.chm.
       OS-DELETE images/default_ReleaseNotes.gif.
       OS-DELETE images/default_FilterCombo.gif.
@@ -5196,9 +5134,6 @@ PROCEDURE convertSettings :
       setRegistry('DataDigger','ColumnWidth:cTableName',?).
       setRegistry('DataDigger','ColumnWidth:cDatabase',?).
       setRegistry('DataDigger','ColumnWidth:iNumQueries',?).
-
-      /* Not in the context menu of the table browse anymore */
-      setRegistry("DataDigger", "ShowHiddenTables",?).
 
       /* Setting for last active page not used anymore */
       setRegistry("DataDigger", "ActivePage",?).
@@ -5709,6 +5644,79 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disconnectDatabase C-Win 
+PROCEDURE disconnectDatabase :
+/* 
+ * Disconnect the current database and rebuild table table
+ */
+ DEFINE VARIABLE cDatabases  AS CHARACTER NO-UNDO.
+ DEFINE VARIABLE cCurrentDb  AS CHARACTER NO-UNDO.
+ DEFINE VARIABLE lDisconnect AS LOGICAL   NO-UNDO.
+ DEFINE VARIABLE hBuffer     AS HANDLE    NO-UNDO.
+
+ DO WITH FRAME {&FRAME-NAME}:
+   hBuffer = brTables:QUERY:GET-BUFFER-HANDLE(1).
+   IF hBuffer:AVAILABLE THEN 
+     cCurrentDb = hBuffer::cDatabase.
+   ELSE 
+     RETURN.
+ END.
+
+ /* Cannot disconnect "all" */
+ IF cCurrentDb = "" OR cCurrentDb = ? THEN RETURN. 
+
+ /* Confirm by user */
+ RUN showHelp("Disconnect", cCurrentDb).
+ IF getRegistry("DataDigger:help", "Disconnect:answer") <> "1" THEN RETURN.
+
+ DISCONNECT VALUE(cCurrentDb).
+
+ ASSIGN 
+   gcCurrentDatabase = ""
+   gcCurrentTable    = "".
+
+ /* Get list of all tables of all databases */
+ RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+/*  /* Remove all tables of this db from the "tables" table */ */
+/*  FOR EACH ttTable WHERE ttTable.cDatabase = cCurrentDb:     */
+/*    DELETE ttTable.                                          */
+/*  END.                                                       */
+/*  RUN reopenTableBrowse(?). */
+
+ /* Get all connected databases */
+ cDatabases = getDatabaseList().
+ cbDatabaseFilter:LIST-ITEMS = "," + cDatabases.
+
+ /* Wipe database filter when it's the one that was just disconnected */
+ IF cbDatabaseFilter:SCREEN-VALUE = cCurrentDb THEN
+   cbDatabaseFilter:SCREEN-VALUE = "".
+
+ /* If we have no db connected, kill the fields tt */
+ IF NUM-DBS = 0 THEN 
+ DO: 
+   RUN deleteDataFilters(ghDataBrowse).
+   IF VALID-HANDLE(ghDataBrowse) AND VALID-HANDLE(ghDataBrowse:QUERY) THEN DELETE OBJECT ghDataBrowse:QUERY NO-ERROR.
+   IF VALID-HANDLE(ghDataBrowse) THEN DELETE OBJECT ghDataBrowse NO-ERROR.
+   IF VALID-HANDLE(ghLockTable)  THEN DELETE OBJECT ghLockTable  NO-ERROR.
+   IF VALID-HANDLE(ghDataBuffer) THEN DELETE OBJECT ghDataBuffer NO-ERROR.
+
+   EMPTY TEMP-TABLE ttField. 
+   EMPTY TEMP-TABLE ttIndex.
+
+   /* Reopen the queries on Fields and Indexes */
+   RUN reopenFieldBrowse(?,?).
+   RUN reopenIndexBrowse(?,?).
+   setUpdatePanel(?). /* Refresh sensitivity of buttons if needed */
+ END.
+
+ APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
+ RUN filterTables.
+
+END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE doNothing C-Win 
 PROCEDURE doNothing :
 /* Wait for an amount of msec
@@ -5838,8 +5846,8 @@ PROCEDURE enable_UI :
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom fiTableDesc btnNextQuery btnWhere btnClear 
-         btnQueries btnClipboard ficWhere btnPrevQuery btnDump btnLoad 
+         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
+         btnNextQuery btnClipboard ficWhere btnPrevQuery btnDump btnLoad 
          btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools 
          btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
@@ -6993,8 +7001,8 @@ PROCEDURE initializeObjects :
     gcIndexBrowseColumnHANDLEs = TRIM(gcIndexBrowseColumnHANDLEs,",").
 
     /* Init on Fields-page and table-page */
-    RUN setPage({&PAGE-TABLES}). 
     RUN setPage({&PAGE-FIELDS}).
+    RUN setPage({&PAGE-TABLES}). 
 
     /* Move index browse and associated filter fields TO the left.
      * Just throw "em ON a stack, the resize event will take care OF it.
@@ -7223,6 +7231,9 @@ PROCEDURE initializeSettingsFile :
 
   /* Column label template */
   IF getRegistry("DataDigger", "ColumnLabelTemplate") = ? THEN setRegistry("DataDigger", "ColumnLabelTemplate","&1").
+
+  /* Show hidden tables */
+  IF getRegistry("DataDigger", "ShowHiddenTables") = ? THEN setRegistry("DataDigger", "ShowHiddenTables","FALSE").
 
   /* Enable WRITE and DELETE triggers by default */
   IF getRegistry("DataDigger","EnableWriteTriggers")  = ? THEN setRegistry("DataDigger","EnableWriteTriggers", "true").

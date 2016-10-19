@@ -190,7 +190,7 @@ DO:
   DEFINE VARIABLE cDumpSource AS CHARACTER   NO-UNDO.
 
   /* Create full folder structure */
-  RUN createFolder(fiDir:SCREEN-VALUE).
+  RUN createFolder(fiDir:SCREEN-VALUE). 
 
   cDumpFile = SUBSTITUTE('&1\&2.df'
                         , RIGHT-TRIM(fiDir:SCREEN-VALUE,"\")
