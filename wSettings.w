@@ -38,7 +38,7 @@ CREATE WIDGET-POOL.
 &if '{&file-name}' matches '*.ab' &then 
   define variable pcSettingsFile as character   no-undo.
   define variable plSuccess      as logical     no-undo.
-  pcSettingsFile = 'd:\Data\Progress\DataDigger\DataDigger-nljrpti.ini'.
+  pcSettingsFile = 'd:\Data\DropBox\DataDigger\DataDigger-nljrpti.ini'.
 &else 
   define input  parameter pcSettingsFile as character   no-undo.
   define output parameter plSuccess      as logical     no-undo.
@@ -270,14 +270,16 @@ END.
 &Scoped-define SELF-NAME BtnOK
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL BtnOK wSettings
 ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
-or go of wSettings anywhere
+OR GO OF wSettings ANYWHERE
 DO:
-  session:set-wait-state("general").
-  run saveSettings.
-  session:set-wait-state("").
+  SESSION:SET-WAIT-STATE("general").
+  RUN saveSettings.
+  SESSION:SET-WAIT-STATE("").
 
-  plSuccess = true.
-  apply "CLOSE" to THIS-PROCEDURE.
+  RUN saveConfigFileSorted.
+
+  plSuccess = TRUE.
+  APPLY "CLOSE" TO THIS-PROCEDURE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -827,66 +829,64 @@ PROCEDURE saveSettings :
   Description  : Write settings back to the ini file
   ----------------------------------------------------------------------*/
 
-  define variable hWidget    as handle      no-undo.
-  define variable iColor     as integer     no-undo.
-  define variable cSection   as character   no-undo. 
-  define variable cSetting   as character   no-undo.
-  define variable cValue     as character   no-undo.
+  DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iColor   AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cSection AS CHARACTER NO-UNDO. 
+  DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
 
-  for each ttFrame:
+  FOR EACH ttFrame:
 
-    hWidget = ttFrame.hFrame:first-child:first-child.
+    hWidget = ttFrame.hFrame:FIRST-CHILD:FIRST-CHILD.
 
-    do while valid-handle(hWidget):
+    DO WHILE VALID-HANDLE(hWidget):
 
       /* Get value from INI file and set it in the widget */
-      if hWidget:private-data <> ? 
-        and num-entries(hWidget:private-data) = 2 then
-      do:
-        cSection = entry(1,hWidget:private-data).
-        cSetting = entry(2,hWidget:private-data).
+      IF hWidget:PRIVATE-DATA <> ? 
+        AND NUM-ENTRIES(hWidget:PRIVATE-DATA) = 2 THEN
+      DO:
+        cSection = ENTRY(1,hWidget:PRIVATE-DATA).
+        cSetting = ENTRY(2,hWidget:PRIVATE-DATA).
 
-        if hWidget:type = 'BUTTON' then 
-        do:
-          if cSection = 'DataDigger:fonts' then 
-            setRegistry(cSection, cSetting, string(hWidget:font)).
-        end.
+        IF hWidget:TYPE = 'BUTTON' THEN 
+        DO:
+          IF cSection = 'DataDigger:fonts' THEN 
+            setRegistry(cSection, cSetting, STRING(hWidget:FONT)).
+        END.
 
-        else 
-        if hWidget:type = 'TOGGLE-BOX' then 
-        do:
-          setRegistry(cSection, cSetting, string(hWidget:checked)).
-        end.
+        ELSE 
+        IF hWidget:TYPE = 'TOGGLE-BOX' THEN 
+        DO:
+          setRegistry(cSection, cSetting, STRING(hWidget:CHECKED)).
+        END.
 
-        else 
-        if hWidget:type = 'FILL-IN'
-          and cSection = 'DataDigger:colors' then 
-        do:
-          setRegistry(cSection, cSetting + ':FG', string(hWidget:fgcolor)).
-          setRegistry(cSection, cSetting + ':BG', string(hWidget:bgcolor)).
-        end.
+        ELSE 
+        IF hWidget:TYPE = 'FILL-IN'
+          AND cSection = 'DataDigger:colors' THEN 
+        DO:
+          setRegistry(cSection, cSetting + ':FG', STRING(hWidget:FGCOLOR)).
+          setRegistry(cSection, cSetting + ':BG', STRING(hWidget:BGCOLOR)).
+        END.
 
-        else
-        if hWidget:type = 'EDITOR'
-          and cSetting = 'CustomFilter:Fields' then
-        do:
-          cValue = hWidget:screen-value.
-          cValue = replace(cValue,chr(13),",").
-          cValue = replace(cValue,chr(10),",").
+        ELSE
+        IF hWidget:TYPE = 'EDITOR'
+          AND cSetting = 'CustomFilter:Fields' THEN
+        DO:
+          cValue = hWidget:SCREEN-VALUE.
+          cValue = REPLACE(cValue,CHR(13),",").
+          cValue = REPLACE(cValue,CHR(10),",").
           setRegistry(cSection, cSetting, cValue).
-        end.
+        END.
 
-        else
-          setRegistry(cSection, cSetting, hWidget:screen-value).
+        ELSE
+          setRegistry(cSection, cSetting, hWidget:SCREEN-VALUE).
+      END.
 
-      end.
+      hWidget = hWidget:NEXT-SIBLING.
+    END. /* f/e ttFrame */
+  END. /* while valid-handle */
 
-      hWidget = hWidget:next-sibling.
-    end. /* f/e ttFrame */
-
-  end. /* while valid-handle */
-
-end procedure. /* saveSettings */
+END PROCEDURE. /* saveSettings */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
