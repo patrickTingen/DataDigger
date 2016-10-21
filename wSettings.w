@@ -482,78 +482,7 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCheckUpgrade wSettings 
-PROCEDURE btnCheckUpgrade :
-/*------------------------------------------------------------------------
-  Name         : btnCheckUpgrade
-  Description  : Check for an upgrade of DD on OE Hive
-  ----------------------------------------------------------------------*/
-  
-  define variable cLatestVersion    as character no-undo. 
-  define variable cDownloadLocation as character no-undo. 
-  define variable cError            as character no-undo. 
-  define variable lUpgrade          as logical   no-undo.
-
-  session:set-wait-state('general').
-
-  run checkForUpgrade
-    ( output cLatestVersion
-    , output cDownloadLocation
-    , output cError
-    ).
-
-  /* debug */
-  cLatestVersion = '18'.
-
-  session:set-wait-state('').
-
-  if cError <> '' then 
-  do:
-    message cError view-as alert-box info buttons ok.
-    return.
-  end.
-
-  if cLatestVersion > '{&build}' then
-  do:
-    message 'Your version  : {&build} ' skip
-            'Latest version:' cLatestVersion skip(1)
-            'Would you like to upgrade?'
-      view-as alert-box info buttons yes-no-cancel update lUpgrade.
-
-    if lUpgrade = true then
-    do:
-      run upgradeDataDigger(input cDownloadLocation, output cError).
-
-      if cError <> '' then 
-      do:
-        message cError view-as alert-box info buttons ok.
-        return.
-      end.
-
-    end.
-  end.
-  
-  else
-  if cLatestVersion = '{&build}' then
-  do: 
-    message 'Your are running the latest version of DataDigger'
-      view-as alert-box info buttons ok.
-  end.
-
-  else
-  if cLatestVersion < '{&build}' then
-  do: 
-    message 'Your version is newer than the one on OEHive, ' skip
-            'you are probably in the beta program.'
-      view-as alert-box info buttons ok.
-  end.
-
-END PROCEDURE. /* btnCheckUpgrade */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFrames wSettings 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFrames wSettings
 PROCEDURE collectFrames :
 /*------------------------------------------------------------------------
   Name         : collectFrames
@@ -1022,4 +951,3 @@ END PROCEDURE. /* ShowScrollbars */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

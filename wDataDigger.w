@@ -175,10 +175,10 @@ DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTime
 cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
-btnQueries btnNextQuery btnClipboard ficWhere btnPrevQuery btnDump btnLoad ~
-btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools btnDelete ~
-btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere ~
+btnNextQuery btnClear btnQueries btnClipboard ficWhere btnPrevQuery btnDump ~
+btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools ~
+btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
 fiFeedback 
@@ -919,10 +919,10 @@ DEFINE FRAME frMain
      btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
      fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
      btnWhere AT Y 265 X 653 WIDGET-ID 236
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
@@ -1062,7 +1062,6 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          FGCOLOR            = ?
          KEEP-FRAME-Z-ORDER = yes
          THREE-D            = yes
-         CONTEXT-HELP-FILE  = "datadigger.chm":U
          MESSAGE-AREA       = no
          SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
@@ -5154,7 +5153,11 @@ PROCEDURE convertSettings :
         PUT-KEY-VALUE SECTION "DataDigger:Update" KEY ""                VALUE ? NO-ERROR.
       END. 
       USE "".
-
+    END. /* 19 */
+    
+    WHEN 20 THEN
+    DO:
+      OS-DELETE wEdit.wrx.
     END.
   END CASE. /* old version */
   
@@ -5846,8 +5849,8 @@ PROCEDURE enable_UI :
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
-         btnNextQuery btnClipboard ficWhere btnPrevQuery btnDump btnLoad 
+         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnNextQuery btnClear 
+         btnQueries btnClipboard ficWhere btnPrevQuery btnDump btnLoad 
          btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools 
          btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
@@ -6398,8 +6401,9 @@ PROCEDURE getDataQuery :
   cWhere = cNewWhere.
 
   /* Extract the sort-by part */
-  IF INDEX(cWhere, 'BY ') > 0 THEN
-    ASSIGN cSort  = SUBSTRING(cWhere,INDEX(cWhere, 'BY '))
+  IF cWhere BEGINS 'BY ' THEN cWhere = ' ' + cWhere.
+  IF INDEX(cWhere, ' BY ') > 0 THEN
+    ASSIGN cSort  = SUBSTRING(cWhere,INDEX(cWhere, ' BY '))
            cWhere = REPLACE(cWhere, cSort, '').
 
   /* Now, lets build it up. Start with the basics */
@@ -7288,8 +7292,11 @@ PROCEDURE initializeSettingsFile :
   DO:
     setRegistry("DataDigger:Backup","BackupFileTemplate", "<DB>.<TABLE>.<TIMESTAMP>.<#>.XML").
     setRegistry("DataDigger:Backup","BackupDir"         , "<PROGDIR>\Backup\").
-    setRegistry("DataDigger:Backup","BackupOnDelete"    , "YES").
   END.
+
+  /* Turn backups on by default */
+  setRegistry("DataDigger:Backup","BackupOnUpdate", "YES").
+  setRegistry("DataDigger:Backup","BackupOnDelete", "YES").
 
   IF   getRegistry("DumpAndLoad", "DumpDir") = ? 
     OR getRegistry("DumpAndLoad", "DumpDir") = '' THEN setRegistry("DumpAndLoad", "DumpDir", "<PROGDIR>\Dump\").
@@ -8252,6 +8259,7 @@ PROCEDURE reopenDataBrowse :
   END.
   
   RUN showNumRecords(iNumRecords,lCountComplete).
+  RUN showNumSelected.
 
   /* Show or hide red line around filters */
   rctDataFilter:VISIBLE IN FRAME frData = FALSE.
@@ -8670,8 +8678,10 @@ PROCEDURE reopenDataBrowse-create :
 
     bColumn.hColumn:WIDTH-PIXELS = iColumnWidth.
   END.
+
   /* Activate buttons */
   setUpdatePanel("no-record").
+  RUN showNumSelected.
 
   /* Adjust all filters */
   RUN dataScrollNotify(ghDataBrowse).
@@ -10002,7 +10012,7 @@ PROCEDURE setTimer :
    * the procedure immediately and exit */
   IF NOT glUseTimer THEN 
   DO:
-    RUN VALUE(pcTimerProc).
+    IF piInterval > 0 THEN RUN VALUE(pcTimerProc).
     RETURN.
   END.
 

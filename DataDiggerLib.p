@@ -3115,7 +3115,7 @@ END PROCEDURE. /* setUsage */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHelp Procedure 
 PROCEDURE showHelp :
-DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
+  DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcStrings AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cButtons       AS CHARACTER   NO-UNDO.
@@ -3125,7 +3125,6 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTitle         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cType          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUrl           AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cHlp           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cCanHide       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iButtonPressed AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lAnswer        AS LOGICAL     NO-UNDO.
@@ -3134,15 +3133,12 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lHidden        AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iString        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cUserString    AS CHARACTER   NO-UNDO EXTENT 9.
-  DEFINE VARIABLE cHelpfile    AS CHARACTER   NO-UNDO.
 
   /* If no message, then just return */
   cMessage = getRegistry('DataDigger:help', pcTopic + ':message').
-  cHelpfile = getProgramDir() + 'DataDigger.chm'.
 
   /* What to start? */
   cUrl = getRegistry('DataDigger:help', pcTopic + ':url').
-  cHlp = getRegistry('DataDigger:help', pcTopic + ':hlp').
   cPrg = getRegistry('DataDigger:help', pcTopic + ':program').
   cCanHide = getRegistry('DataDigger:help', pcTopic + ':canHide').
   cCanHide = TRIM(cCanHide).
@@ -3151,7 +3147,7 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
 
   IF cMessage = ? THEN 
   DO:
-    IF cUrl = ? AND cPrg = ? AND cHlp = ? THEN RETURN.
+    IF cUrl = ? AND cPrg = ? THEN RETURN.
     lHidden        = YES. /* suppress empty text window */
     iButtonPressed = 1.   /* forces to start the url or prog */
   END.
@@ -3220,7 +3216,6 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   /* Start external things if needed */                                            
   IF iButtonPressed = 1 THEN
   DO:
-    IF cHlp <> ? THEN SYSTEM-HELP cHelpfile CONTEXT INTEGER(cHlp).
     IF cUrl <> ? THEN OS-COMMAND NO-WAIT START (cUrl).
     IF cPrg <> ? THEN RUN VALUE(cPrg) NO-ERROR.
   END.
@@ -3281,60 +3276,6 @@ END PROCEDURE. /* ShowScrollbars */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-startWinHelp) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startWinHelp Procedure 
-PROCEDURE startWinHelp :
-/*------------------------------------------------------------------------
-  Name         : startWinHelp
-  Description  : Invoke help
-  ----------------------------------------------------------------------
-  16-03-2011 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE INPUT  PARAMETER phFocus AS HANDLE NO-UNDO.
-
-  DEFINE VARIABLE cHelpfile    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iHelpContext AS INTEGER     NO-UNDO. 
-  DEFINE VARIABLE cStartedFrom AS CHARACTER   NO-UNDO.
-
-  cHelpfile = getProgramDir() + 'DataDigger.chm'.
-
-  IF CAN-QUERY(phFocus,'context-help-id') THEN
-    iHelpContext = phFocus:CONTEXT-HELP-ID.
-
-  /* If no help available, find the help-id of the current window */
-  IF iHelpContext = 0 THEN
-  DO:
-    cStartedFrom = ENTRY(NUM-ENTRIES(PROGRAM-NAME(3),'\'), PROGRAM-NAME(3),'\').
-    cStartedFrom = ENTRY(1,cStartedFrom,'.').
-
-    CASE cStartedFrom:
-      WHEN 'dAbout'       THEN iHelpContext = 260.
-      WHEN 'dDump'        THEN iHelpContext = 160.
-      WHEN 'dFilter'      THEN iHelpContext = 260.
-      WHEN 'dQueries'     THEN iHelpContext = 140.
-      WHEN 'dQuestion'    THEN iHelpContext = 260.
-      WHEN 'dSettings'    THEN iHelpContext = 120.
-      WHEN 'wConnections' THEN iHelpContext = 130.
-      WHEN 'wEdit'        THEN iHelpContext = 170.
-      WHEN 'wDataDigger'  THEN iHelpContext = 260.
-      WHEN 'wLoadData'    THEN iHelpContext = 150.
-    END CASE.
-  END.
-
-  /* If still nothing found, show help about main window */
-  IF iHelpContext = 0 THEN 
-    iHelpContext = 260. /* page about main window */ 
-
-  SYSTEM-HELP cHelpfile CONTEXT iHelpContext.
-
-END PROCEDURE. /* startWinHelp */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
 
 &IF DEFINED(EXCLUDE-unlockWindow) = 0 &THEN
 
