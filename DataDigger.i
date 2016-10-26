@@ -18,7 +18,7 @@
 
 /* ***************************  Definitions  ************************** */
 
-&GLOBAL-DEFINE version 20
+&GLOBAL-DEFINE version {version.i}
 &GLOBAL-DEFINE edition Coffee Version
 &GLOBAL-DEFINE build {build.i}
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
