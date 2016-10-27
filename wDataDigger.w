@@ -23,13 +23,6 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 { resizable_dict.i } /* thanks to Sebastien Lacroix */
 
-/* Constants for the query counter */
-&GLOBAL-DEFINE numDigits   6
-&GLOBAL-DEFINE digitWidth  6
-&GLOBAL-DEFINE digitHeight 15
-&GLOBAL-DEFINE marginHor   3
-&GLOBAL-DEFINE marginVer   3
-
 &GLOBAL-DEFINE PAGE-TABLES     1
 &GLOBAL-DEFINE PAGE-FAVOURITES 2
 &GLOBAL-DEFINE PAGE-FIELDS     3
@@ -108,8 +101,6 @@ DEFINE VARIABLE giFixedFont                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxColumns               AS INTEGER     NO-UNDO. 
 DEFINE VARIABLE giMaxExtent                AS INTEGER     NO-UNDO. 
 DEFINE VARIABLE giMaxFilterHistory         AS INTEGER     NO-UNDO. 
-DEFINE VARIABLE ghNewDigit                 AS HANDLE      NO-UNDO EXTENT {&numDigits}.
-DEFINE VARIABLE ghOldDigit                 AS HANDLE      NO-UNDO EXTENT {&numDigits}.
 DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO INITIAL FALSE.
 DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
@@ -8295,6 +8286,7 @@ PROCEDURE reopenDataBrowse-create :
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcTable    AS CHARACTER   NO-UNDO.
 
+  DEFINE VARIABLE cCustomValue   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cColumnName    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFilterHistory AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFullTable     AS CHARACTER   NO-UNDO.
@@ -8640,7 +8632,11 @@ PROCEDURE reopenDataBrowse-create :
         bFilter.hColumn    = bColumn.hColumn
         bFilter.hBrowse    = ghDataBrowse
         .
-  
+
+      cCustomValue = hFilterField:SCREEN-VALUE.
+      PUBLISH "CustomGetFilterValue" (pcDatabase, pcTable, bField.cFieldName, INPUT-OUTPUT cCustomValue).
+      IF cCustomValue <> ? THEN hFilterField:SCREEN-VALUE = cCustomValue.
+
       /* Connect filter to field and set color */
       bColumn.hFilter = hFilterField.
       setFilterFieldColor(hFilterField).
@@ -9277,6 +9273,9 @@ PROCEDURE saveFilterValue :
   DEFINE VARIABLE iPos       AS INTEGER     NO-UNDO.
 
   IF pcNewValue = "" OR pcNewValue = ? THEN RETURN. 
+
+  /* PAT 2016-10-27 */
+  PUBLISH "customSaveFilterValue" (pcDatabase, pcTable, pcField, pcNewValue).
 
   cOldList = getRegistry( SUBSTITUTE("DB:&1",pcDatabase)
                         , SUBSTITUTE("&1.&2:FilterHistory",pcTable,pcField)
@@ -10711,12 +10710,13 @@ PROCEDURE startDiggerLib :
     RUN VALUE(cProgDir + 'myDataDigger.p') PERSISTENT SET hDiggerLib.
     SESSION:ADD-SUPER-PROCEDURE(hDiggerLib, SEARCH-TARGET).
 
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customFilter" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customDump"   ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
-  END.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "CustomGetFilterValue" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
 
+  END.
 END PROCEDURE. /* startDiggerLib */
 
 /* _UIB-CODE-BLOCK-END */
@@ -11534,4 +11534,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

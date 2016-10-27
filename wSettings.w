@@ -720,15 +720,6 @@ PROCEDURE loadSettings :
         end.
 
         else
-        if hWidget:type = 'EDITOR'
-          and cSetting = 'CustomFilter:Fields' then
-        do:
-          cValue = getRegistry(cSection, cSetting).
-          cValue = replace(cValue,",", "~n").
-          hWidget:screen-value = cValue.
-        end.
-        
-        else
           hWidget:screen-value = cValue.
 
         /* For some reason, applying "VALUE-CHANGED" toggles
@@ -795,16 +786,6 @@ PROCEDURE saveSettings :
         DO:
           setRegistry(cSection, cSetting + ':FG', STRING(hWidget:FGCOLOR)).
           setRegistry(cSection, cSetting + ':BG', STRING(hWidget:BGCOLOR)).
-        END.
-
-        ELSE
-        IF hWidget:TYPE = 'EDITOR'
-          AND cSetting = 'CustomFilter:Fields' THEN
-        DO:
-          cValue = hWidget:SCREEN-VALUE.
-          cValue = REPLACE(cValue,CHR(13),",").
-          cValue = REPLACE(cValue,CHR(10),",").
-          setRegistry(cSection, cSetting, cValue).
         END.
 
         ELSE

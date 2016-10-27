@@ -3397,33 +3397,6 @@ PROCEDURE updateFields :
     /* Keep track of highest nr */
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
 
-    /****
-    
-    /* Retrieve a formerly saved filter value */
-    bField.cFilterValue = "".
-
-    IF lSaveDataFilters THEN
-    DO:
-      bField.cFilterValue = getRegistry( SUBSTITUTE("DB:&1", pcDatabase)
-                                       , SUBSTITUTE("&1.&2:filter",pcTableName,bField.cFullName)
-                                       ).
-      IF bField.cFilterValue = ? THEN bField.cFilterValue = "".
-    END.
-    ****/
-    
-    /* Formerly saved filters take precedence over Custom
-     * filters, so only retrieve Custom Filter when there
-     * was no previously saved user filter
-     */
-    /*
-    IF bField.cFilterValue = "" THEN
-    DO:
-    */
-    PUBLISH "customFilter" (INPUT pcDataBase, INPUT pcTableName, INPUT bField.cFullName, OUTPUT bField.cFilterValue).
-    /*
-    END.
-    */
-    
     /* RECID / ROWID field visibility might be changed */
     IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN
       bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)).

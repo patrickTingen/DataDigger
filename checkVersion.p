@@ -40,14 +40,13 @@ DEFINE VARIABLE cRemote  AS CHARACTER   NO-UNDO.
 
 CASE pcChannel:
   WHEN 'prod' THEN 
-    ASSIGN cCurrent = '{version.i'}
+    ASSIGN cCurrent = '{version.i}'
            cRemote  = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/version.i').
 
   WHEN 'beta' THEN 
-    ASSIGN cCurrent = '{build.i'}
+    ASSIGN cCurrent = '{build.i}'
            cRemote  = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/build.i').
 
-  END.
 END CASE. /* pcChannel */
 
 IF cRemote <> '' AND cRemote > cCurrent THEN
@@ -56,4 +55,3 @@ DO:
     VIEW-AS ALERT-BOX INFO BUTTONS OK.
 
 END.
-
