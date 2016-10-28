@@ -433,6 +433,9 @@ PROCEDURE recompileSelf :
   DEFINE VARIABLE lCompileError      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lCoreFileError     AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE hWindow            AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cFile              AS CHARACTER   NO-UNDO.
   
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
@@ -528,7 +531,19 @@ PROCEDURE recompileSelf :
     OS-DELETE VALUE(bOsFile.cFullPathname).
   END.
 
-  /* Recompile */
+  /* Clean up obsolete source names from the ini */
+  cFileList = getRegistry("DataDigger:files", "").
+  DO iFile = 1 TO NUM-ENTRIES(cFileList):
+    cFile = gcProgramDir + ENTRY(iFile,cFileList).
+    IF SEARCH(cFile) = ? THEN 
+    DO:
+      USE "DataDigger".
+      PUT-KEY-VALUE SECTION "DataDigger:files" KEY bOsFile.cFileName VALUE ?.
+      USE "".
+    END.
+  END.
+
+  /* Recompile sources */
   PUT UNFORMATTED SKIP(1) "RECOMPILING".
 
   FOR EACH bOsFile 
