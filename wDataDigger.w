@@ -166,10 +166,10 @@ DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTime
 cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere ~
-btnNextQuery btnClear btnQueries btnClipboard ficWhere btnPrevQuery btnDump ~
-btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools ~
-btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
+btnQueries btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad ~
+btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools btnDelete ~
+btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
 fiFeedback 
@@ -910,12 +910,12 @@ DEFINE FRAME frMain
      btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
      fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
      btnWhere AT Y 265 X 653 WIDGET-ID 236
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
@@ -941,53 +941,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1443 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 12 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 5 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 241
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnAnd AT Y 98 X 15 WIDGET-ID 22
@@ -1021,6 +974,53 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 625 BY 260
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 241
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 5 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 12 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -5840,8 +5840,8 @@ PROCEDURE enable_UI :
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnNextQuery btnClear 
-         btnQueries btnClipboard ficWhere btnPrevQuery btnDump btnLoad 
+         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
+         btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad 
          btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools 
          btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
@@ -5997,6 +5997,8 @@ PROCEDURE endResize :
   RUN showNumSelected.
 
   /* Feedback txt */
+  fiFeedback:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiFeedback:SCREEN-VALUE,getFont("default")) + 10.
+  fiFeedback:HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont("default")) + 10.
   fiFeedback:X = FRAME frData:X + FRAME frData:WIDTH-PIXELS - fiFeedback:WIDTH-PIXELS.
   fiFeedback:Y = rctEdit:Y + rctEdit:HEIGHT-PIXELS - fiFeedback:HEIGHT-PIXELS - 6.
 
@@ -7443,9 +7445,9 @@ PROCEDURE initializeVisuals :
 
     FRAME frWhere:FONT = giDefaultFont.
 
-    BROWSE brTables:ROW-HEIGHT-PIXELS = font-table:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
-    BROWSE BRFIELDS:ROW-HEIGHT-PIXELS = font-table:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
-    BROWSE brIndexes:ROW-HEIGHT-PIXELS = font-table:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
+    BROWSE brTables:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
+    BROWSE BRFIELDS:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
+    BROWSE brIndexes:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
 
     cbAnDOr:FONT     = giFixedFont.
     cbFields:FONT    = giFixedFont.
@@ -11534,3 +11536,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
