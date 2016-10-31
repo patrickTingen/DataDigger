@@ -11,8 +11,10 @@ DataDigger version 21
 - Solved: Error when started with relative path (Mike Raschendörfer)
 - Solved: Settings screen still refered to OEHive (Marius Fiere)
 - Solved: Error when started without timer OCX (Annamarie Fortgens)
+- Solved: When large font is used, feedback text in lower right corner is truncated
 
 - Change: Backup is turned on by default for updates and deletes
+- Change: OFF-HOME in data browse no longer sets focus to filter fields (Edwin Schutten)
 
 
 DataDigger version 20 - 29 september 2016 (Coffee Version)

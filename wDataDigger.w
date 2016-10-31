@@ -915,8 +915,8 @@ DEFINE FRAME frMain
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
@@ -5339,9 +5339,11 @@ END PROCEDURE. /* dataDoubleClick */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
-PROCEDURE dataOffHome :
-DEFINE BUFFER bColumn FOR ttColumn. 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataGotoFilter C-Win 
+PROCEDURE dataGotoFilter :
+/* Jump from browse straight to the filter fields 
+ */
+  DEFINE BUFFER bColumn FOR ttColumn. 
 
   FIND bColumn WHERE bColumn.cFullName = gcLastDataField NO-ERROR.
   IF NOT AVAILABLE bColumn THEN FIND FIRST bColumn. 
@@ -5351,6 +5353,19 @@ DEFINE BUFFER bColumn FOR ttColumn.
   APPLY 'entry' TO bColumn.hFilter. 
 
   RETURN NO-APPLY.
+
+END PROCEDURE. /* dataGotoFilter */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
+PROCEDURE dataOffHome :
+/* Show message that this is changed as from DataDigger 21.
+ */
+ 
+  /* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
+  RUN showHelp('JumpToFilter', '').
 
 END PROCEDURE. /* dataOffHome */
 
@@ -8383,6 +8398,7 @@ PROCEDURE reopenDataBrowse-create :
       ON "SCROLL-NOTIFY"    PERSISTENT RUN dataScrollNotify        IN THIS-PROCEDURE (ghDataBrowse). 
       ON "DEFAULT-ACTION"   PERSISTENT RUN dataDoubleClick         IN THIS-PROCEDURE (ghDataBrowse). 
       ON "OFF-HOME"         PERSISTENT RUN dataOffHome             IN THIS-PROCEDURE. 
+      ON "CTRL-CURSOR-UP"   PERSISTENT RUN dataGotoFilter          IN THIS-PROCEDURE.
       ON "F5"               PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "ENTRY"            PERSISTENT RUN setTimer                IN THIS-PROCEDURE ("timedScrollNotify", 100).
       ON "LEAVE"            PERSISTENT RUN setTimer                IN THIS-PROCEDURE ("timedScrollNotify", 0).

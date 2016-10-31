@@ -1,57 +1,71 @@
-/* Get version information from GitHub */
+/*------------------------------------------------------------------------
+  File : checkVersion.p
+  Desc : Check if there is a new version on GitHub
+    
+  Notes:
+    The version nr is increased when it is ready for production, the
+    build nr is increaded when something is ready for beta testing.
+    
+  Parameters:
+    piChannel : 0=no check, 1=check stable, 2=check beta
+    plSilent  : if NO, then report local and remote versions
+  ----------------------------------------------------------------------*/
 
-PROCEDURE URLDownloadToFileA EXTERNAL "URLMON.DLL" :
-   DEFINE INPUT PARAMETER pCaller    AS LONG.
-   DEFINE INPUT PARAMETER szURL      AS CHARACTER.
-   DEFINE INPUT PARAMETER szFilename AS CHARACTER.
-   DEFINE INPUT PARAMETER dwReserved AS LONG.
-   DEFINE INPUT PARAMETER lpfnCB     AS LONG.
-   DEFINE RETURN PARAMETER ReturnValue AS LONG.
-END PROCEDURE.
+DEFINE INPUT PARAMETER piChannel     AS INTEGER NO-UNDO.
+DEFINE INPUT PARAMETER plManualCheck AS LOGICAL NO-UNDO.
 
-PROCEDURE DeleteUrlCacheEntry EXTERNAL "WININET.DLL" :
-   DEFINE INPUT PARAMETER lbszUrlName AS CHARACTER.
-END PROCEDURE.
+/* Constant values for update channels */
+&GLOBAL-DEFINE CHECK-MANUAL 0
+&GLOBAL-DEFINE CHECK-STABLE 1
+&GLOBAL-DEFINE CHECK-BETA   2
 
-FUNCTION getRemoteFile RETURNS CHARACTER (pcRemoteFile AS CHARACTER): 
-  DEFINE VARIABLE cLocalFile AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cContents  AS LONGCHAR  NO-UNDO.
-  DEFINE VARIABLE iResult    AS INTEGER   NO-UNDO.
+DEFINE VARIABLE cLocalVersion  AS CHARACTER   NO-UNDO INITIAL '{version.i}'.
+DEFINE VARIABLE cLocalBuildNr  AS CHARACTER   NO-UNDO INITIAL '{build.i}'.
+DEFINE VARIABLE cRemoteVersion AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE cRemoteBuildNr AS CHARACTER   NO-UNDO.
 
-  cLocalFile = SESSION:TEMP-DIR + 'VersionInfo.txt'.
-  OS-DELETE cLocalFile.
+RUN getVersionInfo.p(OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
 
-  RUN DeleteURLCacheEntry (INPUT pcRemoteFile). 
-  RUN urlDownloadToFileA (0, pcRemoteFile, cLocalFile, 0, 0, OUTPUT iResult).
+message
+  'RemoteVersion' cRemoteVersion skip
+  'LocalVersion' cLocalVersion skip
+  'RemoteBuildNr' cRemoteBuildNr skip
+  'LocalBuildNr' cLocalBuildNr skip
+  'ManualCheck' plManualCheck skip
+  'Channel' piChannel skip
+  'msg:' cRemoteVersion = cLocalVersion cRemoteBuildNr = cLocalBuildNr
+  
+  view-as alert-box.
+  output to c:\temp\ccc.txt.
+  put unformatted
+  'RemoteVersion' cRemoteVersion skip
+  'LocalVersion' cLocalVersion skip
+  'RemoteBuildNr' cRemoteBuildNr skip
+  'LocalBuildNr' cLocalBuildNr skip
+  'ManualCheck' plManualCheck skip
+  'Channel' piChannel skip
+. output close.
 
-  COPY-LOB FILE cLocalFile TO cContents.
-  RETURN STRING(cContents).
-END FUNCTION. 
-
-/* Versioning strategy:
- * 
- * Version nr is increased when it is ready for production
- * Build nr is increaded when something is ready for beta
- */
-DEFINE INPUT PARAMETER pcChannel AS CHARACTER NO-UNDO.
-
-DEFINE VARIABLE cCurrent AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE cRemote  AS CHARACTER   NO-UNDO.
-
-CASE pcChannel:
-  WHEN 'prod' THEN 
-    ASSIGN cCurrent = '{version.i}'
-           cRemote  = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/version.i').
-
-  WHEN 'beta' THEN 
-    ASSIGN cCurrent = '{build.i}'
-           cRemote  = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/build.i').
-
-END CASE. /* pcChannel */
-
-IF cRemote <> '' AND cRemote > cCurrent THEN
+IF (cRemoteVersion > cLocalVersion)
+  AND (plManualCheck OR piChannel = {&CHECK-STABLE}) THEN
 DO:
-  MESSAGE SUBSTITUTE('A new version (&1) is available at github', cRemote)
-    VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
+message 1 view-as alert-box.
+  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
+  MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
 END.
+    
+ELSE
+IF (cRemoteBuildNr > cLocalBuildNr)
+  AND (plManualCheck OR piChannel = {&CHECK-BETA}) THEN
+DO:
+message 2 view-as alert-box.
+  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
+  MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+END.
+  
+/* In case of a manual check, report what is found */
+ELSE
+IF plManualCheck
+  AND cRemoteVersion = cLocalVersion
+  AND cRemoteBuildNr = cLocalBuildNr THEN
+  MESSAGE 'No new version available, you are up to date' VIEW-AS ALERT-BOX INFO BUTTONS OK.
