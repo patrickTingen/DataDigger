@@ -716,11 +716,22 @@ END.
 PROCEDURE btnCheckUpgrade :
 /* Check for an upgrade of DataDigger
  */
+  DEFINE VARIABLE iChannel   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lAutoCheck AS LOGICAL NO-UNDO.
   
-  DEFINE VARIABLE iChannel AS INTEGER NO-UNDO.
   iChannel = INTEGER(cbUpdateChannel:SCREEN-VALUE IN FRAME frUpdate).
   
-  RUN checkVersion.p(INPUT iChannel, INPUT TRUE). /* false = not silent */
+  RUN checkVersion.p(INPUT iChannel, INPUT TRUE). /* TRUE for manual check */
+
+  IF iChannel = {&CHECK-MANUAL} THEN
+  DO:
+    MESSAGE 'Do you want to enable automatic update checks?' VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE lAutoCheck.
+    IF lAutoCheck THEN
+    DO:
+      setRegistry('DataDigger:Update','UpdateChannel', '{&CHECK-STABLE}').
+      cbUpdateChannel:SCREEN-VALUE = getRegistry('DataDigger:Update','UpdateChannel').
+    END.
+  END.
 
 END PROCEDURE. /* btnCheckUpgrade */
 
@@ -851,4 +862,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

@@ -14,42 +14,19 @@
 DEFINE INPUT PARAMETER piChannel     AS INTEGER NO-UNDO.
 DEFINE INPUT PARAMETER plManualCheck AS LOGICAL NO-UNDO.
 
-/* Constant values for update channels */
-&GLOBAL-DEFINE CHECK-MANUAL 0
-&GLOBAL-DEFINE CHECK-STABLE 1
-&GLOBAL-DEFINE CHECK-BETA   2
+{ DataDigger.i }
 
 DEFINE VARIABLE cLocalVersion  AS CHARACTER   NO-UNDO INITIAL '{version.i}'.
 DEFINE VARIABLE cLocalBuildNr  AS CHARACTER   NO-UNDO INITIAL '{build.i}'.
 DEFINE VARIABLE cRemoteVersion AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteBuildNr AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE lAutoCheck     AS LOGICAL     NO-UNDO.
 
 RUN getVersionInfo.p(OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
-
-message
-  'RemoteVersion' cRemoteVersion skip
-  'LocalVersion' cLocalVersion skip
-  'RemoteBuildNr' cRemoteBuildNr skip
-  'LocalBuildNr' cLocalBuildNr skip
-  'ManualCheck' plManualCheck skip
-  'Channel' piChannel skip
-  'msg:' cRemoteVersion = cLocalVersion cRemoteBuildNr = cLocalBuildNr
-  
-  view-as alert-box.
-  output to c:\temp\ccc.txt.
-  put unformatted
-  'RemoteVersion' cRemoteVersion skip
-  'LocalVersion' cLocalVersion skip
-  'RemoteBuildNr' cRemoteBuildNr skip
-  'LocalBuildNr' cLocalBuildNr skip
-  'ManualCheck' plManualCheck skip
-  'Channel' piChannel skip
-. output close.
 
 IF (cRemoteVersion > cLocalVersion)
   AND (plManualCheck OR piChannel = {&CHECK-STABLE}) THEN
 DO:
-message 1 view-as alert-box.
   OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
   MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
 END.
@@ -58,7 +35,6 @@ ELSE
 IF (cRemoteBuildNr > cLocalBuildNr)
   AND (plManualCheck OR piChannel = {&CHECK-BETA}) THEN
 DO:
-message 2 view-as alert-box.
   OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
   MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
 END.
@@ -68,4 +44,6 @@ ELSE
 IF plManualCheck
   AND cRemoteVersion = cLocalVersion
   AND cRemoteBuildNr = cLocalBuildNr THEN
-  MESSAGE 'No new version available, you are up to date' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+DO:
+  MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+END.

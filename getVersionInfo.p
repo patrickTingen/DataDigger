@@ -15,6 +15,9 @@ FUNCTION getRemoteFile RETURNS CHARACTER (pcRemoteFile AS CHARACTER) FORWARD.
 pcVersion = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/version.i').
 pcBuildNr = getRemoteFile('https://raw.githubusercontent.com/patrickTingen/DataDigger/master/build.i').
 
+pcVersion = TRIM(pcVersion).
+pcBuildNr = TRIM(pcBuildNr).
+
 /* ---------- implementation ---------- */
 PROCEDURE URLDownloadToFileA EXTERNAL "URLMON.DLL" :
    DEFINE INPUT PARAMETER pCaller    AS LONG.
