@@ -84,7 +84,7 @@ DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U
 
 DEFINE VARIABLE fiLabel AS CHARACTER FORMAT "X(256)":U 
       VIEW-AS TEXT 
-     SIZE-PIXELS 358 BY 13 NO-UNDO.
+     SIZE-PIXELS 358 BY 19 NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX  
@@ -93,7 +93,7 @@ DEFINE RECTANGLE RECT-1
 DEFINE VARIABLE tgConnect AS LOGICAL INITIAL yes 
      LABEL "&Connect after cloning" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 130 BY 17 TOOLTIP "connect the database after cloning" NO-UNDO.
+     SIZE-PIXELS 213 BY 17 TOOLTIP "connect the database after cloning" NO-UNDO.
 
 
 /* ************************  Frame Definitions  *********************** */
@@ -104,7 +104,7 @@ DEFINE FRAME Dialog-Frame
      Btn_Cancel AT Y 77 X 325
      tgConnect AT Y 52 X 12 WIDGET-ID 10
      btnChooseDumpFile AT Y 28 X 380 WIDGET-ID 8
-     fiLabel AT Y 12 X 2 COLON-ALIGNED NO-LABEL WIDGET-ID 12
+     fiLabel AT Y 9 X 2 COLON-ALIGNED NO-LABEL WIDGET-ID 12
      RECT-1 AT Y 0 X 0 WIDGET-ID 4
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 

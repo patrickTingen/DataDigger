@@ -163,7 +163,7 @@ DEFINE BUTTON btnLowerCase  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnOk 
      LABEL "&Ok" 
-     SIZE-PIXELS 74 BY 24 TOOLTIP "start the dump".
+     SIZE-PIXELS 74 BY 24 TOOLTIP "confirm changes".
 
 DEFINE BUTTON btnUpperCase  NO-FOCUS FLAT-BUTTON
      LABEL "ABC" 

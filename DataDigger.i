@@ -25,6 +25,11 @@
 &GLOBAL-DEFINE timerStart PUBLISH "timerCommand" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
 &GLOBAL-DEFINE timerStop  PUBLISH "timerCommand" ("stop" , ENTRY(1,PROGRAM-NAME(1)," ")).
 
+/* Constant values for update channels */
+&GLOBAL-DEFINE CHECK-MANUAL 0
+&GLOBAL-DEFINE CHECK-STABLE 1
+&GLOBAL-DEFINE CHECK-BETA   2
+
 DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
 
 /* TT for field data to link DataDiggers to each other */

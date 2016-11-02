@@ -176,9 +176,9 @@ fiFeedback
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
-&Scoped-define List-1 btnAnd rctQueryButtons cbAndOr cbFields cbOperator ~
-ficValue btnInsert btnBegins btnBracket btnContains btnEq btnGT btnLT ~
-btnMatches btnNE btnOr btnQt btnToday 
+&Scoped-define List-1 btnBegins btnOr btnAnd rctQueryButtons cbAndOr ~
+cbFields cbOperator ficValue btnInsert btnBracket btnContains btnEq btnGT ~
+btnLT btnMatches btnNE btnQt btnToday 
 &Scoped-define List-2 rcFieldFilter tgSelAll btnClearFieldFilter brFields ~
 btnMoveTop btnMoveUp btnReset btnMoveDown btnMoveBottom 
 &Scoped-define List-3 rcIndexFilter fiIndexNameFilter fiFlagsFilter ~
@@ -563,7 +563,7 @@ DEFINE RECTANGLE rcFieldFilter
 
 DEFINE RECTANGLE rcIndexFilter
      EDGE-PIXELS 2 GRAPHIC-EDGE    
-     SIZE-PIXELS 315 BY 201
+     SIZE-PIXELS 315 BY 141
      BGCOLOR 12 FGCOLOR 12 .
 
 DEFINE RECTANGLE rcTableFilter
@@ -674,17 +674,17 @@ DEFINE BUTTON btnSettings-txt  NO-FOCUS FLAT-BUTTON
 DEFINE BUTTON btnAnd  NO-FOCUS
      LABEL "and" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnBegins  NO-FOCUS
      LABEL "begins" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 60 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnBracket  NO-FOCUS
      LABEL "()" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field"
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
      FONT 0.
 
 DEFINE BUTTON btnCancel-2 DEFAULT 
@@ -706,17 +706,17 @@ DEFINE BUTTON btnClipboard-2
 DEFINE BUTTON btnContains  NO-FOCUS
      LABEL "contains" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 60 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnEq  NO-FOCUS
      LABEL "=" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnGT  NO-FOCUS
      LABEL ">" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnInsert 
      LABEL "+" 
@@ -726,17 +726,17 @@ DEFINE BUTTON btnInsert
 DEFINE BUTTON btnLT  NO-FOCUS
      LABEL "<" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnMatches  NO-FOCUS
      LABEL "matches" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 60 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnNE  NO-FOCUS
      LABEL "<>" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnOK AUTO-GO DEFAULT 
      LABEL "OK" 
@@ -747,12 +747,12 @@ DEFINE BUTTON btnOK AUTO-GO DEFAULT
 DEFINE BUTTON btnOr  NO-FOCUS
      LABEL "or" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnQt  NO-FOCUS
      LABEL "~"~"" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 30 BY 21 TOOLTIP "insert this text into the where field"
+     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
      FONT 0.
 
 DEFINE BUTTON btnQueries-2 
@@ -763,7 +763,7 @@ DEFINE BUTTON btnQueries-2
 DEFINE BUTTON btnToday  NO-FOCUS
      LABEL "today" 
      CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 60 BY 21 TOOLTIP "insert this text into the where field".
+     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnViewData-2 
      LABEL "->" 
@@ -776,14 +776,13 @@ DEFINE VARIABLE cbAndOr AS CHARACTER FORMAT "X(256)":U
      VIEW-AS COMBO-BOX INNER-LINES 5
      LIST-ITEMS "","AND","OR" 
      DROP-DOWN-LIST
-     SIZE-PIXELS 40 BY 21 TOOLTIP "preceding AND or OR for the expression"
-     FONT 2 NO-UNDO.
+     SIZE-PIXELS 55 BY 21 TOOLTIP "preceding AND or OR for the expression" NO-UNDO.
 
 DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 1050
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN-LIST
-     SIZE-PIXELS 210 BY 21 TOOLTIP "field used in the expression"
+     SIZE-PIXELS 186 BY 22 TOOLTIP "field used in the expression"
      FONT 2 NO-UNDO.
 
 DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U 
@@ -797,7 +796,7 @@ DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE ficWhere2 AS CHARACTER 
      CONTEXT-HELP-ID 1050
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
-     SIZE-PIXELS 525 BY 170 TOOLTIP "alt-cursor-up / down to view/hide query editor"
+     SIZE-PIXELS 501 BY 175 TOOLTIP "alt-cursor-up / down to view/hide query editor"
      FONT 2 NO-UNDO.
 
 DEFINE VARIABLE ficValue AS CHARACTER FORMAT "X(256)":U 
@@ -808,7 +807,7 @@ DEFINE VARIABLE ficValue AS CHARACTER FORMAT "X(256)":U
 
 DEFINE RECTANGLE rctQueryButtons
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 610 BY 180.
+     SIZE-PIXELS 610 BY 190.
 
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
@@ -867,8 +866,8 @@ cIndexFields
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
     WITH NO-ROW-MARKERS SEPARATORS NO-VALIDATE
-          &IF '{&WINDOW-SYSTEM}' = 'TTY':U &THEN SIZE 62 BY 9
-          &ELSE SIZE-PIXELS 308 BY 193 &ENDIF FIT-LAST-COLUMN TOOLTIP "indexes of the table"
+          &IF '{&WINDOW-SYSTEM}' = 'TTY':U &THEN SIZE 62 BY 6
+          &ELSE SIZE-PIXELS 308 BY 132 &ENDIF FIT-LAST-COLUMN TOOLTIP "indexes of the table"
          CONTEXT-HELP-ID 90.
 
 DEFINE BROWSE brTables
@@ -940,38 +939,38 @@ DEFINE FRAME frMain
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 1443 BY 675 DROP-TARGET.
+         SIZE-PIXELS 1494 BY 675 DROP-TARGET.
 
 DEFINE FRAME frWhere
-     btnAnd AT Y 98 X 15 WIDGET-ID 22
-     cbAndOr AT Y 5 X 35 COLON-ALIGNED WIDGET-ID 10
-     cbFields AT Y 5 X 76 COLON-ALIGNED NO-LABEL WIDGET-ID 12
+     btnBegins AT Y 123 X 17 WIDGET-ID 74
+     btnOr AT Y 101 X 57 WIDGET-ID 24
+     btnAnd AT Y 101 X 17 WIDGET-ID 22
+     cbAndOr AT Y 5 X 40 COLON-ALIGNED WIDGET-ID 10
+     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
      cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
      ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      btnInsert AT Y 5 X 595 WIDGET-ID 18
-     ficWhere2 AT Y 35 X 86 NO-LABEL WIDGET-ID 130
-     btnViewData-2 AT Y 210 X 90 WIDGET-ID 216
-     btnClear-2 AT Y 210 X 110 WIDGET-ID 30
-     btnQueries-2 AT Y 210 X 130 WIDGET-ID 190
-     btnClipboard-2 AT Y 210 X 150 WIDGET-ID 178
-     btnOK AT Y 210 X 460 WIDGET-ID 132
-     btnCancel-2 AT Y 210 X 540 WIDGET-ID 134
-     btnBegins AT Y 120 X 15 WIDGET-ID 74
-     btnBracket AT Y 77 X 15 WIDGET-ID 28
-     btnContains AT Y 140 X 15 WIDGET-ID 116
-     btnEq AT Y 35 X 15 WIDGET-ID 62
-     btnGT AT Y 56 X 45 WIDGET-ID 66
-     btnLT AT Y 56 X 15 WIDGET-ID 64
-     btnMatches AT Y 161 X 15 WIDGET-ID 114
-     btnNE AT Y 35 X 45 WIDGET-ID 68
-     btnOr AT Y 98 X 45 WIDGET-ID 24
-     btnQt AT Y 77 X 45 WIDGET-ID 72
-     btnToday AT Y 182 X 15 WIDGET-ID 122
+     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
+     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
+     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
+     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
+     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
+     btnOK AT Y 230 X 460 WIDGET-ID 132
+     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
+     btnBracket AT Y 79 X 17 WIDGET-ID 28
+     btnContains AT Y 145 X 17 WIDGET-ID 116
+     btnEq AT Y 35 X 17 WIDGET-ID 62
+     btnGT AT Y 57 X 57 WIDGET-ID 66
+     btnLT AT Y 57 X 17 WIDGET-ID 64
+     btnMatches AT Y 167 X 17 WIDGET-ID 114
+     btnNE AT Y 35 X 57 WIDGET-ID 68
+     btnQt AT Y 79 X 57 WIDGET-ID 72
+     btnToday AT Y 189 X 17 WIDGET-ID 122
      rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 800 Y 401
-         SIZE-PIXELS 625 BY 260
+         AT X 799 Y 370
+         SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
@@ -981,7 +980,7 @@ DEFINE FRAME frHint
      imgArrow AT Y 0 X 0 WIDGET-ID 10
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 241
+         AT X 1194 Y 242
          SIZE-PIXELS 205 BY 110
          BGCOLOR 14  WIDGET-ID 600.
 
@@ -1019,7 +1018,7 @@ DEFINE FRAME frSettings
      btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 12 SCROLLABLE 
+         AT COL 160.6 ROW 10.67 SCROLLABLE 
          BGCOLOR 15  WIDGET-ID 500.
 
 
@@ -1041,11 +1040,11 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          HIDDEN             = YES
          TITLE              = "DataDigger"
          HEIGHT-P           = 675
-         WIDTH-P            = 1445
+         WIDTH-P            = 1523
          MAX-HEIGHT-P       = 675
-         MAX-WIDTH-P        = 1445
+         MAX-WIDTH-P        = 1523
          VIRTUAL-HEIGHT-P   = 675
-         VIRTUAL-WIDTH-P    = 1445
+         VIRTUAL-WIDTH-P    = 1523
          RESIZE             = yes
          SCROLL-BARS        = no
          STATUS-AREA        = no
@@ -1487,11 +1486,14 @@ ANYWHERE DO:
     IF hWidget:X <> ? THEN iTargetX = iTargetX + hWidget:X.
     IF hWidget:Y <> ? THEN iTargetY = iTargetY + hWidget:Y.
 
-    cWidgets = SUBSTITUTE("&1 &2 : &3,&4 ~n&5"
+    cWidgets = SUBSTITUTE("&1 &2: pos: &3,&4 (&5 x &6) hlp:&7 ~n&8"
                          , hWidget:TYPE
                          , hWidget:NAME
                          , hWidget:X
                          , hWidget:Y
+                         , hWidget:WIDTH-PIXELS
+                         , hWidget:HEIGHT-PIXELS
+                         , (IF CAN-QUERY(hWidget,'CONTEXT-HELP-ID') THEN STRING(hWidget:CONTEXT-HELP-ID) ELSE '')
                          , cWidgets
                          ).
 
@@ -1499,7 +1501,7 @@ ANYWHERE DO:
   END. 
   
   MESSAGE 
-    cWidgets SKIP(1) iTargetX '/' iTargetY
+    cWidgets SKIP(0) 'Final pos:' iTargetX ',' iTargetY
     VIEW-AS ALERT-BOX INFO BUTTONS OK TITLE ' Debug info '.
 
   &ENDIF
@@ -3042,6 +3044,7 @@ DO:
     AND btnTableFilter:SENSITIVE THEN 
   DO:
     RUN setTableFilterOptions.
+    APPLY 'VALUE-CHANGED' TO brTables IN FRAME frMain. 
     APPLY 'ENTRY' TO brTables IN FRAME frMain. 
   END. 
 
@@ -3118,6 +3121,8 @@ OR 'F2' OF ficWhere2 IN FRAME frWhere
 OR 'CTRL-J' OF ttField.cFormat IN BROWSE brFields
 OR 'CHOOSE' OF btnViewData-2 IN FRAME frWhere
 DO:
+  DEFINE BUFFER bTimer FOR ttTimer.
+
   PUBLISH "setUsage" ("viewData"). /* user behaviour */
 
   /* Only proceed if the button is sensitive */
@@ -3132,7 +3137,12 @@ DO:
    * - IMMEDIATELY (within 200 msec) press ENTER
    */
   APPLY "VALUE-CHANGED" TO brTables IN FRAME frMain.
-  RUN setTableContext(INPUT gcCurrentTable).
+
+  /* Check whether a table change event is pending 
+   * And speed it up if needed. 
+   */
+  FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR.
+  IF AVAILABLE bTimer THEN RUN setTimer('timedTableChange',1).
 
   /* Open the query */
   RUN reopenDataBrowse('',?).
@@ -3895,7 +3905,6 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   /* Notify launcher that the window started */
   PUBLISH 'DataDigger'(+1).
 
-/*   RUN enable_UI. */
   RUN initializeUi. 
   RUN initializeObjects.
 
@@ -5880,10 +5889,10 @@ PROCEDURE enable_UI :
   {&OPEN-BROWSERS-IN-QUERY-frData}
   DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
       WITH FRAME frWhere IN WINDOW C-Win.
-  ENABLE btnAnd rctQueryButtons cbAndOr cbFields cbOperator ficValue btnInsert 
-         ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 btnOK btnCancel-2 
-         btnBegins btnBracket btnContains btnEq btnGT btnLT btnMatches btnNE 
-         btnOr btnQt btnToday 
+  ENABLE btnBegins btnOr btnAnd rctQueryButtons cbAndOr cbFields cbOperator 
+         ficValue btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 
+         btnOK btnCancel-2 btnBracket btnContains btnEq btnGT btnLT btnMatches 
+         btnNE btnQt btnToday 
       WITH FRAME frWhere IN WINDOW C-Win.
   VIEW FRAME frWhere IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frWhere}
@@ -7311,6 +7320,9 @@ PROCEDURE initializeSettingsFile :
 
   IF   getRegistry("DataDigger:Backup", "BackupDir") = ? 
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<PROGDIR>\Backup\").
+
+  /* Update check, set to check on STABLE if not set */
+  IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
 
   {&timerStop}
 END PROCEDURE. /* initializeSettingsFile */
@@ -10744,15 +10756,16 @@ END PROCEDURE. /* startDiggerLib */
 PROCEDURE startSession :
 /* Show a welcome message to the user.
  */
-  DEFINE VARIABLE cBuild     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cError     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hWindow    AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iStackSize AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iVersion   AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewBuild  AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lNewUser   AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lUpgraded  AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lOpenBlog  AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE cBuild     AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cError     AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hWindow    AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iStackSize AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iVersion   AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lNewBuild  AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lNewUser   AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lUpgraded  AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lOpenBlog  AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE iChannel   AS INTEGER   NO-UNDO.
 
   /* Set debug flag */
   setDebugMode(LOGICAL(getRegistry('DataDigger:debugger','DebugMode'))).
@@ -10831,6 +10844,10 @@ PROCEDURE startSession :
     IF lOpenBlog = ? OR lOpenBlog = TRUE THEN
       OS-COMMAND NO-WAIT START VALUE("http://datadigger.wordpress.com/{&build}").
   END. 
+
+  /* Check for new versions on GitHub */  
+  iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
+  RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
 
 END PROCEDURE. /* startSession */
 
