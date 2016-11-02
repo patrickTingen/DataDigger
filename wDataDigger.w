@@ -7321,8 +7321,10 @@ PROCEDURE initializeSettingsFile :
   IF   getRegistry("DataDigger:Backup", "BackupDir") = ? 
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<PROGDIR>\Backup\").
 
-  /* Update check, set to check on STABLE if not set */
-  IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
+  /* Update check, set to check on STABLE (to BETA for the beta testers) */
+  IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN
+    IF '{&version}' = '20' THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
+                           ELSE setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
 
   {&timerStop}
 END PROCEDURE. /* initializeSettingsFile */
@@ -11569,4 +11571,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
