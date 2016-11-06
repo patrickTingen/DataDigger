@@ -106,6 +106,16 @@ DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 
+&GLOBAL-DEFINE ROWCOLORMODE-NONE       'None'
+&GLOBAL-DEFINE ROWCOLORMODE-ZEBRA      'Zebra'
+&GLOBAL-DEFINE ROWCOLORMODE-VALUEBASED 'ValueBased'
+
+DEFINE VARIABLE gcRowColorMode       AS CHARACTER   NO-UNDO INITIAL {&ROWCOLORMODE-VALUEBASED}.
+DEFINE VARIABLE gcThisRowColorValue  AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcPrevRowColorValue  AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE glUseEvenRowColorSet AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE gcRowColorField      AS CHARACTER   NO-UNDO.
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -176,9 +186,9 @@ fiFeedback
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
-&Scoped-define List-1 btnBegins btnOr btnAnd rctQueryButtons cbAndOr ~
-cbFields cbOperator ficValue btnInsert btnBracket btnContains btnEq btnGT ~
-btnLT btnMatches btnNE btnQt btnToday 
+&Scoped-define List-1 rctQueryButtons btnBegins cbAndOr cbFields cbOperator ~
+ficValue btnInsert btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT ~
+btnMatches btnNE btnQt btnToday 
 &Scoped-define List-2 rcFieldFilter tgSelAll btnClearFieldFilter brFields ~
 btnMoveTop btnMoveUp btnReset btnMoveDown btnMoveBottom 
 &Scoped-define List-3 rcIndexFilter fiIndexNameFilter fiFlagsFilter ~
@@ -782,7 +792,7 @@ DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U
      CONTEXT-HELP-ID 1050
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN-LIST
-     SIZE-PIXELS 186 BY 22 TOOLTIP "field used in the expression"
+     SIZE-PIXELS 186 BY 21 TOOLTIP "field used in the expression"
      FONT 2 NO-UNDO.
 
 DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U 
@@ -941,60 +951,6 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
 
-DEFINE FRAME frWhere
-     btnBegins AT Y 123 X 17 WIDGET-ID 74
-     btnOr AT Y 101 X 57 WIDGET-ID 24
-     btnAnd AT Y 101 X 17 WIDGET-ID 22
-     cbAndOr AT Y 5 X 40 COLON-ALIGNED WIDGET-ID 10
-     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
-     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
-     btnInsert AT Y 5 X 595 WIDGET-ID 18
-     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
-     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
-     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
-     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
-     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
-     btnOK AT Y 230 X 460 WIDGET-ID 132
-     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
-     btnBracket AT Y 79 X 17 WIDGET-ID 28
-     btnContains AT Y 145 X 17 WIDGET-ID 116
-     btnEq AT Y 35 X 17 WIDGET-ID 62
-     btnGT AT Y 57 X 57 WIDGET-ID 66
-     btnLT AT Y 57 X 17 WIDGET-ID 64
-     btnMatches AT Y 167 X 17 WIDGET-ID 114
-     btnNE AT Y 35 X 57 WIDGET-ID 68
-     btnQt AT Y 79 X 57 WIDGET-ID 72
-     btnToday AT Y 189 X 17 WIDGET-ID 122
-     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 799 Y 370
-         SIZE-PIXELS 656 BY 285
-         TITLE "Query Editor"
-         DEFAULT-BUTTON btnOK WIDGET-ID 400.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 5 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
 DEFINE FRAME frSettings
      btnDataDigger AT Y 0 X 0 WIDGET-ID 126
      btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
@@ -1020,6 +976,60 @@ DEFINE FRAME frSettings
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 160.6 ROW 10.67 SCROLLABLE 
          BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 5 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frWhere
+     btnBegins AT Y 123 X 17 WIDGET-ID 74
+     cbAndOr AT Y 5 X 40 COLON-ALIGNED WIDGET-ID 10
+     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
+     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
+     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
+     btnInsert AT Y 5 X 595 WIDGET-ID 18
+     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
+     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
+     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
+     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
+     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
+     btnOK AT Y 230 X 460 WIDGET-ID 132
+     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
+     btnOr AT Y 101 X 57 WIDGET-ID 24
+     btnAnd AT Y 101 X 17 WIDGET-ID 22
+     btnBracket AT Y 79 X 17 WIDGET-ID 28
+     btnContains AT Y 145 X 17 WIDGET-ID 116
+     btnEq AT Y 35 X 17 WIDGET-ID 62
+     btnGT AT Y 57 X 57 WIDGET-ID 66
+     btnLT AT Y 57 X 17 WIDGET-ID 64
+     btnMatches AT Y 167 X 17 WIDGET-ID 114
+     btnNE AT Y 35 X 57 WIDGET-ID 68
+     btnQt AT Y 79 X 57 WIDGET-ID 72
+     btnToday AT Y 189 X 17 WIDGET-ID 122
+     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 799 Y 370
+         SIZE-PIXELS 656 BY 285
+         TITLE "Query Editor"
+         DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -5312,7 +5322,10 @@ END PROCEDURE. /* dataColumnResize */
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
  */
-  RUN reopenDataBrowse(SELF:current-column:name,?).
+  /* Set color for row coloring */
+  gcRowColorField = SELF:CURRENT-COLUMN:NAME.
+  
+  RUN reopenDataBrowse(SELF:CURRENT-COLUMN:NAME,?).
 
 END PROCEDURE. /* dataColumnSort */
 
@@ -5389,19 +5402,36 @@ PROCEDURE dataRowDisplay :
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
-  
+
+  /* Colormode can be either Zebra or ValueBased */
+  IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
+  CASE gcRowColorMode:
+    WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
+    WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
+    WHEN {&ROWCOLORMODE-VALUEBASED} THEN gcThisRowColorValue = phBrowseBuffer:BUFFER-FIELD(gcRowColorField):STRING-VALUE.
+  END CASE. /* color mode */
+
+  IF gcThisRowColorValue <> gcPrevRowColorValue THEN
+    ASSIGN 
+      glUseEvenRowColorSet = NOT glUseEvenRowColorSet
+      gcPrevRowColorValue = gcThisRowColorValue.
+
   FOR EACH bColumn, bField WHERE bField.cFieldName = bColumn.cFieldName:
     IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
 
+    ASSIGN 
+      bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1])
+      bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]).
+
     /* Alternate FG and BGcolor */
-    IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN
-      ASSIGN 
-        bColumn.hColumn:FGCOLOR = giDataOddRowColor[1]
-        bColumn.hColumn:BGCOLOR = giDataOddRowColor[2].
-    ELSE                 
-      ASSIGN 
-        bColumn.hColumn:FGCOLOR = giDataEvenRowColor[1]
-        bColumn.hColumn:BGCOLOR = giDataEvenRowColor[2].
+/*     IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN  */
+/*       ASSIGN                                                      */
+/*         bColumn.hColumn:FGCOLOR = giDataOddRowColor[1]            */
+/*         bColumn.hColumn:BGCOLOR = giDataOddRowColor[2].           */
+/*     ELSE                                                          */
+/*       ASSIGN                                                      */
+/*         bColumn.hColumn:FGCOLOR = giDataEvenRowColor[1]           */
+/*         bColumn.hColumn:BGCOLOR = giDataEvenRowColor[2].          */
 
     /* Add field for RECID */
     IF bColumn.cFieldName = "RECID" THEN
@@ -5889,10 +5919,10 @@ PROCEDURE enable_UI :
   {&OPEN-BROWSERS-IN-QUERY-frData}
   DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
       WITH FRAME frWhere IN WINDOW C-Win.
-  ENABLE btnBegins btnOr btnAnd rctQueryButtons cbAndOr cbFields cbOperator 
-         ficValue btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 
-         btnOK btnCancel-2 btnBracket btnContains btnEq btnGT btnLT btnMatches 
-         btnNE btnQt btnToday 
+  ENABLE rctQueryButtons btnBegins cbAndOr cbFields cbOperator ficValue 
+         btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 btnOK 
+         btnCancel-2 btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT 
+         btnMatches btnNE btnQt btnToday 
       WITH FRAME frWhere IN WINDOW C-Win.
   VIEW FRAME frWhere IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frWhere}
@@ -8142,10 +8172,13 @@ PROCEDURE reopenDataBrowse :
     ELSE
       lAscending = TRUE.
 
+    /* Set color for row coloring */
+    gcRowColorField = cOldSort.
+
     /* Sort direction might be overruled */
     IF plAscending <> ? THEN lAscending = plAscending.
   END.
-
+  
   /* If we do a query on the _lock table then create and fill a temp-table */
   IF cTable = '_lock' THEN
   DO:
@@ -8155,6 +8188,10 @@ PROCEDURE reopenDataBrowse :
     ghDataBuffer:EMPTY-TEMP-TABLE().
 
     CREATE BUFFER hBufferDB FOR TABLE cDatabase + '._lock'.
+
+    /* Set color for row coloring */
+    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
+
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBufferDB).
     hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', cDatabase)).
@@ -8199,6 +8236,9 @@ PROCEDURE reopenDataBrowse :
                          , pcSortField 
                          , STRING(lAscending,'/DESCENDING')
                          ).
+
+    /* Set color for row coloring */
+    gcRowColorField = pcSortField.
   END.
 
   /* If the user has set a sort field, use that to set the sort arrow */
@@ -8209,6 +8249,10 @@ PROCEDURE reopenDataBrowse :
 
   /* Set the sort arrow to the right column */
   RUN setSortArrow(ghDataBrowse, pcSortField, lAscending).
+
+  /* Set color for row coloring */
+  IF gcRowColorField = "" THEN
+    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
 
   /* for DWP query tester */
   PUBLISH "debugMessage" (INPUT 1, "cQuery = " + cQuery ).
@@ -10661,16 +10705,61 @@ END PROCEDURE. /* showTour */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue C-Win 
 PROCEDURE showValue :
-/* Show the value of the current cell
+/* Show the sum of the fields of the selected rows
  */
+  DEFINE VARIABLE hDataBuffer AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE iRecord     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cColumnName  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cColumnValue AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE dColumnTotal AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dColumnValue AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dMinValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dMaxValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dAvgValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE iExtentNr    AS INTEGER     NO-UNDO.
 
+  /* Get data */
+  IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
   IF NUM-ENTRIES(ghDataBrowse:PRIVATE-DATA,CHR(1)) <> 3 THEN RETURN. 
+  hDataBuffer = ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1).
+  IF NOT hDataBuffer:AVAILABLE THEN RETURN.
 
+  /* Walk thru all selected records */
   cColumnName  = ENTRY(1, ghDataBrowse:PRIVATE-DATA,CHR(1)).
   cColumnValue = ENTRY(2, ghDataBrowse:PRIVATE-DATA,CHR(1)).
 
+  /* If we have clicked on an extent field, extract the extent nr */
+  IF cColumnName MATCHES '*[*]' THEN 
+    ASSIGN
+      iExtentNr = INTEGER(ENTRY(1, ENTRY(2,cColumnName,'['), ']'))
+      cColumnName = ENTRY(1,cColumnName,'[').
+
+  SESSION:SET-WAIT-STATE('general').
+
+  DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
+    ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
+
+    cColumnValue = hDataBuffer:BUFFER-FIELD(cColumnName):BUFFER-VALUE(iExtentNr).
+    dColumnValue = DECIMAL(cColumnValue) NO-ERROR.
+
+    /* Min/Max */
+    IF iRecord = 1 OR dColumnValue < dMinValue THEN dMinValue = dColumnValue.
+    IF iRecord = 1 OR dColumnValue > dMaxValue THEN dMaxValue = dColumnValue.
+
+    /* Total */
+    IF NOT ERROR-STATUS:ERROR AND dColumnValue <> ? THEN
+      dColumnTotal = dColumnTotal + dColumnValue.
+  END. 
+
+  dAvgValue = dColumnTotal / ghDataBrowse:NUM-SELECTED-ROWS.
+  SESSION:SET-WAIT-STATE('').
+
+  IF ghDataBrowse:NUM-SELECTED-ROWS > 1 THEN
+    MESSAGE 
+      'Total of' ghDataBrowse:NUM-SELECTED-ROWS 'rows~t:' dColumnTotal SKIP
+      'Min / Max / Avg~t:' dMinValue ' / ' dMaxValue ' / ' dAvgValue
+      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  ELSE 
   IF cColumnValue <> '' AND cColumnValue <> ? THEN 
     MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFO BUTTONS OK.
 
@@ -11571,3 +11660,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
