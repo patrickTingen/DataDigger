@@ -106,6 +106,16 @@ DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 
+&GLOBAL-DEFINE ROWCOLORMODE-NONE       'None'
+&GLOBAL-DEFINE ROWCOLORMODE-ZEBRA      'Zebra'
+&GLOBAL-DEFINE ROWCOLORMODE-VALUEBASED 'ValueBased'
+
+DEFINE VARIABLE gcRowColorMode       AS CHARACTER   NO-UNDO INITIAL {&ROWCOLORMODE-VALUEBASED}.
+DEFINE VARIABLE gcThisRowColorValue  AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcPrevRowColorValue  AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE glUseEvenRowColorSet AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE gcRowColorField      AS CHARACTER   NO-UNDO.
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -5333,7 +5343,10 @@ END PROCEDURE. /* dataColumnResize */
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
  */
-  RUN reopenDataBrowse(SELF:current-column:name,?).
+  /* Set color for row coloring */
+  gcRowColorField = SELF:CURRENT-COLUMN:NAME.
+  
+  RUN reopenDataBrowse(SELF:CURRENT-COLUMN:NAME,?).
 
 END PROCEDURE. /* dataColumnSort */
 
@@ -5410,19 +5423,36 @@ PROCEDURE dataRowDisplay :
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
-  
+
+  /* Colormode can be either Zebra or ValueBased */
+  IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
+  CASE gcRowColorMode:
+    WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
+    WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
+    WHEN {&ROWCOLORMODE-VALUEBASED} THEN gcThisRowColorValue = phBrowseBuffer:BUFFER-FIELD(gcRowColorField):STRING-VALUE.
+  END CASE. /* color mode */
+
+  IF gcThisRowColorValue <> gcPrevRowColorValue THEN
+    ASSIGN 
+      glUseEvenRowColorSet = NOT glUseEvenRowColorSet
+      gcPrevRowColorValue = gcThisRowColorValue.
+
   FOR EACH bColumn, bField WHERE bField.cFieldName = bColumn.cFieldName:
     IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
 
+    ASSIGN 
+      bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1])
+      bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]).
+
     /* Alternate FG and BGcolor */
-    IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN
-      ASSIGN 
-        bColumn.hColumn:FGCOLOR = giDataOddRowColor[1]
-        bColumn.hColumn:BGCOLOR = giDataOddRowColor[2].
-    ELSE                 
-      ASSIGN 
-        bColumn.hColumn:FGCOLOR = giDataEvenRowColor[1]
-        bColumn.hColumn:BGCOLOR = giDataEvenRowColor[2].
+/*     IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN  */
+/*       ASSIGN                                                      */
+/*         bColumn.hColumn:FGCOLOR = giDataOddRowColor[1]            */
+/*         bColumn.hColumn:BGCOLOR = giDataOddRowColor[2].           */
+/*     ELSE                                                          */
+/*       ASSIGN                                                      */
+/*         bColumn.hColumn:FGCOLOR = giDataEvenRowColor[1]           */
+/*         bColumn.hColumn:BGCOLOR = giDataEvenRowColor[2].          */
 
     /* Add field for RECID */
     IF bColumn.cFieldName = "RECID" THEN
@@ -8163,10 +8193,13 @@ PROCEDURE reopenDataBrowse :
     ELSE
       lAscending = TRUE.
 
+    /* Set color for row coloring */
+    gcRowColorField = cOldSort.
+
     /* Sort direction might be overruled */
     IF plAscending <> ? THEN lAscending = plAscending.
   END.
-
+  
   /* If we do a query on the _lock table then create and fill a temp-table */
   IF cTable = '_lock' THEN
   DO:
@@ -8176,6 +8209,10 @@ PROCEDURE reopenDataBrowse :
     ghDataBuffer:EMPTY-TEMP-TABLE().
 
     CREATE BUFFER hBufferDB FOR TABLE cDatabase + '._lock'.
+
+    /* Set color for row coloring */
+    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
+
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBufferDB).
     hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', cDatabase)).
@@ -8220,6 +8257,9 @@ PROCEDURE reopenDataBrowse :
                          , pcSortField 
                          , STRING(lAscending,'/DESCENDING')
                          ).
+
+    /* Set color for row coloring */
+    gcRowColorField = pcSortField.
   END.
 
   /* If the user has set a sort field, use that to set the sort arrow */
@@ -8230,6 +8270,10 @@ PROCEDURE reopenDataBrowse :
 
   /* Set the sort arrow to the right column */
   RUN setSortArrow(ghDataBrowse, pcSortField, lAscending).
+
+  /* Set color for row coloring */
+  IF gcRowColorField = "" THEN
+    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
 
   /* for DWP query tester */
   PUBLISH "debugMessage" (INPUT 1, "cQuery = " + cQuery ).
@@ -10682,16 +10726,61 @@ END PROCEDURE. /* showTour */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue C-Win 
 PROCEDURE showValue :
-/* Show the value of the current cell
+/* Show the sum of the fields of the selected rows
  */
+  DEFINE VARIABLE hDataBuffer AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE iRecord     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cColumnName  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cColumnValue AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE dColumnTotal AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dColumnValue AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dMinValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dMaxValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dAvgValue    AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE iExtentNr    AS INTEGER     NO-UNDO.
 
+  /* Get data */
+  IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
   IF NUM-ENTRIES(ghDataBrowse:PRIVATE-DATA,CHR(1)) <> 3 THEN RETURN. 
+  hDataBuffer = ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1).
+  IF NOT hDataBuffer:AVAILABLE THEN RETURN.
 
+  /* Walk thru all selected records */
   cColumnName  = ENTRY(1, ghDataBrowse:PRIVATE-DATA,CHR(1)).
   cColumnValue = ENTRY(2, ghDataBrowse:PRIVATE-DATA,CHR(1)).
 
+  /* If we have clicked on an extent field, extract the extent nr */
+  IF cColumnName MATCHES '*[*]' THEN 
+    ASSIGN
+      iExtentNr = INTEGER(ENTRY(1, ENTRY(2,cColumnName,'['), ']'))
+      cColumnName = ENTRY(1,cColumnName,'[').
+
+  SESSION:SET-WAIT-STATE('general').
+
+  DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
+    ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
+
+    cColumnValue = hDataBuffer:BUFFER-FIELD(cColumnName):BUFFER-VALUE(iExtentNr).
+    dColumnValue = DECIMAL(cColumnValue) NO-ERROR.
+
+    /* Min/Max */
+    IF iRecord = 1 OR dColumnValue < dMinValue THEN dMinValue = dColumnValue.
+    IF iRecord = 1 OR dColumnValue > dMaxValue THEN dMaxValue = dColumnValue.
+
+    /* Total */
+    IF NOT ERROR-STATUS:ERROR AND dColumnValue <> ? THEN
+      dColumnTotal = dColumnTotal + dColumnValue.
+  END. 
+
+  dAvgValue = dColumnTotal / ghDataBrowse:NUM-SELECTED-ROWS.
+  SESSION:SET-WAIT-STATE('').
+
+  IF ghDataBrowse:NUM-SELECTED-ROWS > 1 THEN
+    MESSAGE 
+      'Total of' ghDataBrowse:NUM-SELECTED-ROWS 'rows~t:' dColumnTotal SKIP
+      'Min / Max / Avg~t:' dMinValue ' / ' dMaxValue ' / ' dAvgValue
+      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  ELSE 
   IF cColumnValue <> '' AND cColumnValue <> ? THEN 
     MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFO BUTTONS OK.
 
