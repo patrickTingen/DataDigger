@@ -18,6 +18,7 @@ Start/
 *.wrx
 *.r
 debugger.pref
+wDataDigger.wrx
 myDataDigger.p
 DataDigger-*.ini
 DataDigger.log
