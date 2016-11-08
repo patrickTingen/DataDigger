@@ -5,7 +5,8 @@
 
 ====================================================================================================
 
-DataDigger version 21
+DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
+
 - Solved: Nr of selected rows not cleared on table change (Mike Derrick)
 - Solved: Error when using fields that end in 'by' in the where-box (Andrew Fornek)
 - Solved: Error when started with relative path (Mike Raschendörfer)
@@ -20,6 +21,7 @@ DataDigger version 21
 
 - New   : The check on new versions of DataDigger is back.
 
+====================================================================================================
 
 DataDigger version 20 - 29 september 2016 (Coffee Version)
 
