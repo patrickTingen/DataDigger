@@ -7090,8 +7090,8 @@ PROCEDURE initializeObjects :
     iValue = INTEGER(getRegistry("DataDigger", "Window:X" )).
     IF iValue = ? THEN iValue = 200.
 
-    /* Keep DD ON primary mONitor ? (Rob Willoughby) */
-    IF LOGICAL(getRegistry("DataDigger","StartONPrimaryMONitor")) = YES
+    /* Keep DD ON primary monitor ? (Rob Willoughby) */
+    IF LOGICAL(getRegistry("DataDigger","StartOnPrimaryMonitor")) = YES
       AND (iValue < 0 OR iValue > SESSION:WORK-AREA-WIDTH-PIXELS) THEN iValue = 200.
 
     ASSIGN c-win:X = iValue NO-ERROR.
