@@ -61,6 +61,15 @@ DEFINE TEMP-TABLE ttItem NO-UNDO RCODE-INFORMATION
   INDEX iPrim IS PRIMARY cItem
   .
 
+/* TT for sorting options in user query */
+DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
+  FIELD iGroup     AS INTEGER /* 1:query, 2:browse */
+  FIELD iSortNr    AS INTEGER
+  FIELD cSortField AS CHARACTER
+  FIELD lAscending AS LOGICAL
+  INDEX iPrim IS PRIMARY iGroup iSortNr
+  .
+
 /* Local Variable Definitions --- */
 DEFINE VARIABLE ghFirstColumn              AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
@@ -590,12 +599,12 @@ DEFINE RECTANGLE rctQuery
      SIZE-PIXELS 789 BY 290
      BGCOLOR 18 .
 
-DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes 
+DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL YES 
      LABEL "" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 15 BY 13 TOOLTIP "debugging mode".
 
-DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes 
+DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL YES 
      LABEL "" 
      CONTEXT-HELP-ID 280
      VIEW-AS TOGGLE-BOX
@@ -924,8 +933,8 @@ DEFINE FRAME frMain
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
@@ -1055,15 +1064,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1523
          VIRTUAL-HEIGHT-P   = 675
          VIRTUAL-WIDTH-P    = 1523
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -1255,7 +1264,7 @@ ASSIGN
 /* SETTINGS FOR RECTANGLE rctQueryButtons IN FRAME frWhere
    1                                                                    */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = yes.
+THEN C-Win:HIDDEN = YES.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
@@ -1306,8 +1315,8 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        HEIGHT          = 1.43
        WIDTH           = 6
        WIDGET-ID       = 292
-       HIDDEN          = yes
-       SENSITIVE       = yes.
+       HIDDEN          = YES
+       SENSITIVE       = YES.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
       CtrlFrame:MOVE-AFTER(FRAME frWhere:HANDLE).
 
@@ -4284,7 +4293,7 @@ PROCEDURE btnEditChoose :
     RETURN.
   END.
 
-  RUN value(getProgramDir() + 'wEdit.w')
+  RUN VALUE(getProgramDir() + 'wEdit.w')
     ( INPUT plReadOnlyDigger
     , INPUT 'Edit'
     , INPUT ghDataBrowse
@@ -4773,8 +4782,7 @@ END PROCEDURE. /* clearFieldFilter */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearIndexFilter C-Win 
 PROCEDURE clearIndexFilter :
-/*
- * Reset the index filters to the blank values
+/* Reset the index filters to the blank values
  */
   DO WITH FRAME frMain:
     fiIndexNameFilter:screen-value = fiIndexNameFilter:private-data. 
@@ -5322,10 +5330,51 @@ END PROCEDURE. /* dataColumnResize */
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
  */
-  /* Set color for row coloring */
-  gcRowColorField = SELF:CURRENT-COLUMN:NAME.
-  
-  RUN reopenDataBrowse(SELF:CURRENT-COLUMN:NAME,?).
+  DEFINE VARIABLE lAscending AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE cFieldName AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iNumSorts  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cKeyList   AS CHARACTER   NO-UNDO.
+
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+
+  cFieldName = SELF:CURRENT-COLUMN:NAME.
+  cKeyList = GetKeyList().
+
+  /* If CTRL key is pressed, sorting is extended to include another field. 
+   * If not, all current sorting should be cleared
+   */
+  IF LOOKUP("CTRL", cKeyList) = 0 THEN 
+  DO:
+    /* Delete all user-clicked sorts */
+    FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 2:
+      DELETE bfQuerySort.
+    END.
+  END.
+
+  /* If our field is already part of the sort, reverse the order
+   * otherwise add field to the list of sort fields
+   */
+  FIND bfQuerySort 
+    WHERE bfQuerySort.iGroup = 2
+      AND bfQuerySort.cSortField = cFieldName NO-ERROR.
+
+  IF AVAILABLE bfQuerySort THEN 
+    bfQuerySort.lAscending = NOT bfQuerySort.lAscending.
+  ELSE 
+  DO:
+    /* Determine nr of sorts */
+    FIND LAST bfQuerySort WHERE bfQuerySort.iGroup = 2 NO-ERROR.
+    IF AVAILABLE bfQuerySort THEN iNumSorts = bfQuerySort.iSortNr.
+
+    CREATE bfQuerySort.
+    ASSIGN 
+      bfQuerySort.iGroup     = 2
+      bfQuerySort.iSortNr    = iNumSorts + 1
+      bfQuerySort.cSortField = cFieldName
+      bfQuerySort.lAscending = TRUE. 
+  END.
+
+  RUN reopenDataBrowse(cFieldName, lAscending).
 
 END PROCEDURE. /* dataColumnSort */
 
@@ -5365,16 +5414,29 @@ END PROCEDURE. /* dataDoubleClick */
 PROCEDURE dataGotoFilter :
 /* Jump from browse straight to the filter fields 
  */
-  DEFINE BUFFER bColumn FOR ttColumn. 
-
-  FIND bColumn WHERE bColumn.cFullName = gcLastDataField NO-ERROR.
-  IF NOT AVAILABLE bColumn THEN FIND FIRST bColumn. 
-  IF NOT AVAILABLE bColumn THEN RETURN. 
-
-  setFilterFieldColor(bColumn.hFilter).
-  APPLY 'entry' TO bColumn.hFilter. 
-
-  RETURN NO-APPLY.
+	DEFINE BUFFER bColumn FOR ttColumn.
+	
+	/* If we have been in the filters before, the name of the last visited 
+	 * filter field is in gcLastDataField. Try to jump back to that field. 
+	 * If it fails (eg made hidden) then jump to the first visible filter
+	 */
+	FIND bColumn WHERE bColumn.cFullName = gcLastDataField NO-ERROR.
+	
+	IF NOT AVAILABLE bColumn OR NOT bColumn.hColumn:VISIBLE THEN
+	DO: 
+		FindField:
+		FOR EACH bColumn BY bColumn.iColumnNr:
+			IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
+			LEAVE FindField.
+		END.
+	END.
+	
+	IF AVAILABLE bColumn THEN
+	DO: 
+		setFilterFieldColor(bColumn.hFilter).
+		APPLY 'entry' TO bColumn.hFilter. 
+		RETURN NO-APPLY.
+	END. 
 
 END PROCEDURE. /* dataGotoFilter */
 
@@ -5383,11 +5445,11 @@ END PROCEDURE. /* dataGotoFilter */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
 PROCEDURE dataOffHome :
-/* Show message that this is changed as from DataDigger 21.
- */
- 
-  /* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
-  RUN showHelp('JumpToFilter', '').
+	/* Show message that this is changed as from DataDigger 21.
+	 */
+	
+	/* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
+	RUN showHelp('JumpToFilter', '').
 
 END PROCEDURE. /* dataOffHome */
 
@@ -6661,6 +6723,82 @@ END PROCEDURE. /* getLdbsFromParamFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery C-Win 
+PROCEDURE getSortFromQuery :
+/* Extract sorting from user query 
+ */
+  DEFINE INPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
+
+  DEFINE VARIABLE cPart AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iPart AS INTEGER     NO-UNDO.
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+
+  /* Delete all sorts from the query */
+  FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 1:
+    DELETE bfQuerySort.
+  END.
+
+  /* Split query on the word ' BY ' */
+  pcQuery = REPLACE(pcQuery,' BY ', '|').
+
+  IndexLoop:
+  DO iPart = 2 TO NUM-ENTRIES(pcQuery,'|'):
+    cPart = TRIM(ENTRY(iPart,pcQuery,'|')).
+
+    CREATE bfQuerySort.
+    ASSIGN 
+      bfQuerySort.iGroup     = 1
+      bfQuerySort.iSortNr    = iPart - 1
+      bfQuerySort.cSortField = ENTRY(1,cPart,' ')
+      bfQuerySort.lAscending = NOT (cPart MATCHES '* DESC*')
+      . 
+  END.
+
+END PROCEDURE. /* getSortFromQuery */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win 
+PROCEDURE getSortedQuery :
+/* Process the query and insert the BY-phrases at the proper place
+ */
+  DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  DEFINE VARIABLE cSortFields AS CHARACTER NO-UNDO.
+  
+  /* Remove indexed-reposition keyword. Will be added back later */
+  IF LOOKUP('INDEXED-REPOSITION',pcQuery,' ') > 0 THEN
+    pcQuery = REPLACE(pcQuery,'INDEXED-REPOSITION','').
+
+  /* Take the part until the first 'BY'. Note that if there is 
+   * no ' BY ', the substring function will take the whole string
+   */
+  pcQuery = SUBSTRING(pcQuery, 1, INDEX(pcQuery,' BY ') - 1).
+
+  /* Add all query sort fields */
+  SortItem:
+  FOR EACH bfQuerySort BY bfQuerySort.iGroup BY bfQuerySort.iSortNr:
+  
+    /* If an item is already used, skip it */
+    IF LOOKUP(bfQuerySort.cSortField, cSortFields) > 0 THEN NEXT SortItem.
+    cSortFields = SUBSTITUTE('&1,&2', cSortFields, bfQuerySort.cSortField).  
+                  
+    pcQuery = SUBSTITUTE('&1 BY &2 &3'
+                        , pcQuery
+                        , bfQuerySort.cSortField
+                        , TRIM(STRING(bfQuerySort.lAscending,'/DESCENDING'))
+                        ).
+  END. 
+
+  /* add back 'INDEXED-REPOSITION' */
+  pcQuery = SUBSTITUTE('&1 INDEXED-REPOSITION', pcQuery).
+
+END PROCEDURE. /* getSortedQuery */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideColumn C-Win 
 PROCEDURE hideColumn :
 /* Hide the current column
@@ -7911,7 +8049,7 @@ PROCEDURE moveField :
   RUN setDataBrowseColumns.
 
   /* And resort it */
-   RUN reopenFieldBrowse('iOrder', YES). 
+  RUN reopenFieldBrowse('iOrder', YES). 
 
   /* Reopen browse */
   BROWSE brFields:SET-REPOSITIONED-ROW(iCurrentRow,"ALWAYS").
@@ -7965,7 +8103,7 @@ PROCEDURE navigateSettings :
 
         IF iNewButton < 1  THEN iNewButton = 1.
         IF iNewButton > 10 THEN iNewButton = 10.
-        APPLY "ENTRY" to hButton[iNewButton].
+        APPLY "ENTRY" TO hButton[iNewButton].
       END.
     END.
   
@@ -8100,101 +8238,61 @@ PROCEDURE reopenDataBrowse :
   DEFINE INPUT PARAMETER pcSortField AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER plAscending AS LOGICAL     NO-UNDO.
 
-  DEFINE VARIABLE cBaseQuery     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabase      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFullTable     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cOldSort       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cTable         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUserQuery     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBufferDB      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery         AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iNumRecords    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iQueryTime     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iStartTime     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iWord          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lAscending     AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lCountComplete AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lPrepare       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
   
-  DEFINE BUFFER bField  FOR ttField. 
   DEFINE BUFFER bColumn FOR ttColumn.
-  
-  /* In case we come from a filter field, that field needs
-   * to have the leave event to restore the shadow text.
-   */
-  IF VALID-HANDLE(FOCUS) THEN
-    APPLY "LEAVE" TO FOCUS.
-
   {&timerStart}
-
-  /* Increase query counter */
-  cDatabase  = gcCurrentDatabase.
-  cTable     = gcCurrentTable.
-  cFullTable = cDatabase + '.' + cTable.
-
-  /* Do this before the window freeze */
-  RUN incQueriesOfTable(cDatabase, cTable, +1).
-  RUN incQueriesServed(+1).
-  PROCESS EVENTS. /* to prevent a visual hick-up in the counter */
 
   /* Freeze! */
   SESSION:SET-WAIT-STATE('general'). 
   setWindowFreeze(YES). 
 
+  /* In case we come from a filter field, that field needs
+   * to have the leave event to restore the shadow text.
+   */
+  IF VALID-HANDLE(FOCUS) THEN APPLY "LEAVE" TO FOCUS.
+
+  cFullTable = gcCurrentDatabase + '.' + gcCurrentTable.
+
+  /* Increase query counter */
+  RUN incQueriesOfTable(gcCurrentDatabase, gcCurrentTable, +1).
+  RUN incQueriesServed(+1).
+
   /* If the user has changed a format in the field browse, then rebuild the data browse */
   IF glFormatChanged THEN
   DO:
-    RUN reopenDataBrowse-create(INPUT cDatabase, INPUT cTable).
+    RUN reopenDataBrowse-create(INPUT gcCurrentDatabase, INPUT gcCurrentTable).
     glFormatChanged = FALSE. 
   END.
 
-  /* Clean up existing dynamic stuff */
-  IF VALID-HANDLE(ghDataBrowse) THEN
-  DO:
-    /* Remember record we're on */
-    IF ghDataBrowse:NUM-SELECTED-ROWS > 0 THEN 
-      rCurrentRecord = ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):ROWID.
+  /* Remember currently selected record */
+  IF VALID-HANDLE(ghDataBrowse) AND ghDataBrowse:NUM-SELECTED-ROWS > 0 THEN 
+    rCurrentRecord = ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):ROWID.
 
-    /* Find out what the current sort is */
-    cBaseQuery = ghDataBrowse:QUERY:PREPARE-STRING.
-    lAscending = (LOOKUP('DESCENDING',cBaseQuery,' ') = 0).
-    iWord = LOOKUP("BY",cBaseQuery," ").
-    IF iWord > 0 THEN cOldSort = ENTRY(iWord + 1,cBaseQuery," ").
-
-    IF pcSortField = cOldSort THEN
-      CASE lAscending:
-        WHEN TRUE  THEN ASSIGN lAscending = FALSE.
-        WHEN FALSE THEN ASSIGN lAscending = ? pcSortField = ?.
-        WHEN ?     THEN ASSIGN lAscending = TRUE.
-      END CASE. 
-    ELSE
-      lAscending = TRUE.
-
-    /* Set color for row coloring */
-    gcRowColorField = cOldSort.
-
-    /* Sort direction might be overruled */
-    IF plAscending <> ? THEN lAscending = plAscending.
-  END.
-  
   /* If we do a query on the _lock table then create and fill a temp-table */
-  IF cTable = '_lock' THEN
+  IF gcCurrentTable = '_lock' THEN
   DO:
     cFullTable = '_Lock'. 
 
     /* Empty the Lock TT */
     ghDataBuffer:EMPTY-TEMP-TABLE().
 
-    CREATE BUFFER hBufferDB FOR TABLE cDatabase + '._lock'.
+    CREATE BUFFER hBufferDB FOR TABLE gcCurrentDatabase + '._lock'.
 
     /* Set color for row coloring */
     gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
 
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBufferDB).
-    hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', cDatabase)).
+    hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', gcCurrentDatabase)).
 
     hQuery:QUERY-OPEN().
     REPEAT:
@@ -8209,46 +8307,22 @@ PROCEDURE reopenDataBrowse :
 
     DELETE OBJECT hQuery.
     DELETE OBJECT hBufferDB.
-  END.
+  END. /* table = _Lock */
 
   /* Reset query pointer */
   giQueryPointer = 1.
   RUN getDataQuery(OUTPUT cQuery).
-  cUserQuery = ficWhere:screen-value IN FRAME {&frame-name}. /* this one will be saved if it has no errors */
+  cUserQuery = ficWhere:SCREEN-VALUE IN FRAME {&FRAME-NAME}. /* this one will be saved if it has no errors */
+  cQuery = REPLACE(cQuery, SUBSTITUTE("&1._lock", gcCurrentDatabase), cFullTable).
+  
+  /* Extract sorting from query */
+  RUN getSortFromQuery(cQuery).
 
-  cQuery = REPLACE(cQuery, SUBSTITUTE("&1._lock", cDatabase), cFullTable).
+  /* Rewrite query to include sorting */
+  RUN getSortedQuery(INPUT-OUTPUT cQuery).
 
-  /* Sort field might be overruled when user clicks on data column header 
-   * When query is: FOR EACH CUSTOMER BY CUSTNUM but we click on the ADDRESS 
-   * column, the query should be rewritten to FOR EACH CUSTOMER BY ADDRESS
-   */
-  IF pcSortField <> ? AND pcSortField <> "" THEN
-  DO:
-    IF LOOKUP('BY',cQuery,' ') > 0 THEN
-      cQuery = SUBSTITUTE('&1 BY &2 &3 INDEXED-REPOSITION'
-                         , TRIM(SUBSTRING(cQuery,1,INDEX(cQuery,' BY ')))
-                         , pcSortField 
-                         , STRING(lAscending,'/DESCENDING')
-                         ).
-    ELSE
-      cQuery = SUBSTITUTE('&1 BY &2 &3 INDEXED-REPOSITION'
-                         , TRIM(SUBSTRING(cQuery,1,INDEX(cQuery,' INDEXED-REPOSITION')))
-                         , pcSortField 
-                         , STRING(lAscending,'/DESCENDING')
-                         ).
-
-    /* Set color for row coloring */
-    gcRowColorField = pcSortField.
-  END.
-
-  /* If the user has set a sort field, use that to set the sort arrow */
-  iWord = LOOKUP('BY',cQuery,' ').
-  IF iWord > 0 THEN 
-    ASSIGN pcSortField = ENTRY(iWord + 1,cQuery,' ')
-           lAscending  = (LOOKUP('DESCENDING',cQuery,' ') = 0).
-
-  /* Set the sort arrow to the right column */
-  RUN setSortArrow(ghDataBrowse, pcSortField, lAscending).
+  /* Show sorts in the browse */
+  RUN setSortArrows(ghDataBrowse).
 
   /* Set color for row coloring */
   IF gcRowColorField = "" THEN
@@ -8264,14 +8338,10 @@ PROCEDURE reopenDataBrowse :
   /* if the QUERY-PREPARE failed because of the where-clause, don't open it */ 
   IF NOT lPrepare THEN 
   DO WITH FRAME {&FRAME-NAME}:
+
+    ficWhere:TOOLTIP = TRIM(ERROR-STATUS:GET-MESSAGE(1)).
     ficWhere:BGCOLOR = getColor('QueryError:fg'). /* red */
     ficWhere:FGCOLOR = getColor('QueryError:bg'). /* yellow */
-
-    ficWhere:TOOLTIP = SUBSTITUTE('Open query failed due to this error:~n~n&1~n~nYour WHERE-clause will be ignored.'
-                                 , TRIM(ERROR-STATUS:GET-MESSAGE(1))
-                                 ).
-    cQuery = SUBSTITUTE("FOR EACH &1 NO-LOCK WHERE FALSE", cFullTable).
-    lPrepare = ghDataQuery:QUERY-PREPARE(cQuery).
 
     /* Activate buttons */
     setUpdatePanel('no-data').
@@ -8279,13 +8349,13 @@ PROCEDURE reopenDataBrowse :
     APPLY "entry" TO ficWhere.
   END.
   ELSE
-  DO WITH FRAME {&frame-name}:
+  DO WITH FRAME {&FRAME-NAME}:
     ficWhere:BGCOLOR = ?. /* default */
     ficWhere:FGCOLOR = ?. /* default */
     ficWhere:TOOLTIP = getReadableQuery(cQuery).
 
     /* Save the user-query and set the pointer to 1 */
-    RUN saveQuery(cDatabase, cTable, cUserQuery).
+    RUN saveQuery(gcCurrentDatabase, gcCurrentTable, cUserQuery).
 
     /* Try to grab as many records as we can in a limited time.
      * This will give an indication of the amount of records.
@@ -8297,9 +8367,6 @@ PROCEDURE reopenDataBrowse :
       iNumRecords = iNumRecords + 1.
     END.
     
-    lCountComplete = ghDataQuery:QUERY-OFF-END.
-    iQueryTime = ETIME - iStartTime.
-
     /* query might have gotten off end, so: */
     IF ghDataQuery:QUERY-OFF-END THEN
       ghDataQuery:QUERY-OPEN().
@@ -8324,7 +8391,7 @@ PROCEDURE reopenDataBrowse :
     setUpdatePanel('display').
   END.
   
-  RUN showNumRecords(iNumRecords,lCountComplete).
+  RUN showNumRecords(iNumRecords, ghDataQuery:QUERY-OFF-END).
   RUN showNumSelected.
 
   /* Show or hide red line around filters */
@@ -8391,6 +8458,8 @@ PROCEDURE reopenDataBrowse-create :
     PUBLISH "debugMessage" (1, SUBSTITUTE("Old DataBuffer:&1 &2",ghDataBuffer, ghDataBuffer:NAME )).
 
   RUN deleteDataFilters(ghDataBrowse).
+  EMPTY TEMP-TABLE ttQuerySort.
+  gcRowColorField = ''.
 
   IF VALID-HANDLE(ghDataBrowse) AND VALID-HANDLE(ghDataBrowse:QUERY) THEN DELETE OBJECT ghDataBrowse:QUERY NO-ERROR.
   IF VALID-HANDLE(ghDataBrowse) THEN DELETE OBJECT ghDataBrowse NO-ERROR.
@@ -8757,6 +8826,9 @@ PROCEDURE reopenDataBrowse-create :
 
   /* Adjust all filters */
   RUN dataScrollNotify(ghDataBrowse).
+
+  /* Reset the TAB order of the filter fields */
+  RUN setFilterFieldTabOrder.
 
   setWindowFreeze(NO).
 
@@ -9572,8 +9644,8 @@ END PROCEDURE. /* setConnectionMenu */
 PROCEDURE setDataBrowseColumns :
 /* Set all columns according to their iColumnNr
  */
-  DEFINE VARIABLE iOldPos  AS INTEGER NO-UNDO.
-
+  DEFINE VARIABLE iOldPos     AS INTEGER NO-UNDO.
+  
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
 
@@ -9594,7 +9666,7 @@ PROCEDURE setDataBrowseColumns :
 
         /* Move the column to its new position */
         ghDataBrowse:MOVE-COLUMN(iOldPos,bColumn.iColumnNr).
-
+        
         /* Done, go to next column */
         NEXT colLoop.
       END. /* column found */
@@ -9602,7 +9674,10 @@ PROCEDURE setDataBrowseColumns :
   END. /* valid-handle ghDataBrowse */
 
   /* Redraw filters etc */
-  RUN dataScrollNotify(ghDataBrowse). 
+  RUN dataScrollNotify(ghDataBrowse).
+   
+  /* Reset the TAB order of the filter fields */
+  RUN setFilterFieldTabOrder.
 
   setWindowFreeze(FALSE).
 
@@ -9654,6 +9729,38 @@ END PROCEDURE. /* setDataFilter */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win
+PROCEDURE setFilterFieldTabOrder:
+  /* Reset the TAB order of the filter fields
+   */
+  DEFINE VARIABLE hPrevFilter AS HANDLE  NO-UNDO.
+  DEFINE BUFFER bColumn FOR ttColumn.
+  
+  PUBLISH 'debugMessage' (1, 'Yooooo!' ).
+
+  /* Set the TAB order of the filter to after the previous filter field */
+  FOR EACH bColumn BY bColumn.iColumnNr:
+    IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
+    
+    PUBLISH 'debugMessage' (1, SUBSTITUTE('&1 &2 &3 (&4)'
+      , bColumn.iColumnNr
+      , bColumn.cFullName
+      , bColumn.hColumn:VISIBLE
+      , (IF VALID-HANDLE(hPrevFilter) THEN hPrevFilter:NAME ELSE '')
+      )).
+      
+    IF VALID-HANDLE(hPrevFilter) THEN bColumn.hFilter:MOVE-AFTER-TAB-ITEM(hPrevFilter).
+    hPrevFilter = bColumn.hFilter.
+  END.
+
+END PROCEDURE. /* setFilterFieldTabOrder */
+	
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win 
 PROCEDURE setPage :
@@ -9803,6 +9910,65 @@ PROCEDURE setRedLines :
 
   {&timerStop}
 END PROCEDURE. /* setRedLines */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrows C-Win 
+PROCEDURE setSortArrows :
+/* Set the sorting arrows on a browse
+ */
+  DEFINE INPUT PARAMETER phBrowse    AS HANDLE    NO-UNDO. 
+
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  DEFINE BUFFER bfColumn    FOR ttColumn.
+  
+  DEFINE VARIABLE iSortOrder  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE lMultiSort  AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE cSortFields AS CHARACTER NO-UNDO.
+  
+  {&timerStart}
+
+  /* Clear existing sorts */
+  phBrowse:CLEAR-SORT-ARROWS().
+
+  /* If there is only one sort, don't use numbered arrows */
+  FIND bfQuerySort NO-ERROR.
+  IF AMBIGUOUS bfQuerySort THEN lMultiSort = TRUE. 
+  
+  /* Process all sorts, first those that come from the query, 
+   * then the ones that came from clicking on the columns 
+   */
+  SortItem:
+  FOR EACH bfQuerySort BY bfQuerySort.iGroup BY bfQuerySort.iSortNr:
+
+    /* If an item is already used, skip it */
+    IF LOOKUP(bfQuerySort.cSortField, cSortFields) > 0 THEN NEXT SortItem.
+    cSortFields = SUBSTITUTE('&1,&2', cSortFields, bfQuerySort.cSortField).  
+
+    /* Find column name */
+    FIND FIRST bfColumn WHERE bfColumn.cFieldName = bfQuerySort.cSortField NO-ERROR.
+    IF NOT AVAILABLE bfColumn THEN
+      FIND FIRST bfColumn WHERE bfQuerySort.cSortField MATCHES '*' + bfColumn.cFieldName + '*' NO-ERROR.
+    IF NOT AVAILABLE bfColumn THEN NEXT SortItem. 
+
+    /* Set color for row coloring */
+    gcRowColorField = bfColumn.cFieldName.
+    
+    /* Increase counter for sort arrow. Max value in Progress is 9 */
+    iSortOrder = iSortOrder + 1.
+    IF iSortOrder > 9 THEN NEXT SortItem.
+    
+    IF lMultiSort THEN 
+      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, NOT bfQuerySort.lAscending, iSortOrder).
+    ELSE 
+      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, NOT bfQuerySort.lAscending).
+
+  END. /* SortItem */
+  
+  {&timerStop}
+
+END PROCEDURE. /* setSortArrow */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -10293,7 +10459,10 @@ PROCEDURE showField :
     IF LAST-EVENT:EVENT-TYPE = "KEYPRESS" 
       AND (LAST-EVENT:CODE = 32 OR LAST-EVENT:CODE = 13) THEN 
       brFields:SELECT-NEXT-ROW(). 
-
+    
+    /* Reset the TAB order of the filter fields */
+    RUN setFilterFieldTabOrder.
+    
     saveSelectedFields().
     brFields:REFRESH().
     RUN dataScrollNotify(ghDataBrowse).
