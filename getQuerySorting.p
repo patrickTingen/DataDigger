@@ -1,54 +1,62 @@
-  
-  /* TT for sorting options in user query */
-  DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
-    FIELD iSortNr     AS INTEGER
-    FIELD cSortField  AS CHARACTER
-    FIELD lDescending AS LOGICAL
-    INDEX iPrim IS PRIMARY iSortNr
-    .
-  
+/* TT for sorting options in user query */
+DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
+  FIELD iSortNr     AS INTEGER
+  FIELD cSortField  AS CHARACTER
+  FIELD lDescending AS LOGICAL
+  INDEX iPrim IS PRIMARY iSortNr
+  .
 
 PROCEDURE getQuerySorting:
-  DEFINE INPUT  PARAMETER pcQuery AS CHARACTER NO-UNDO.
+  /* Extract sorting from user query */
+  DEFINE INPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE iWord     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cWord     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cField    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iNumSorts AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cWhere    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cPart AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iPart AS INTEGER     NO-UNDO.
 
   /* Clear old sorting */
   EMPTY TEMP-TABLE ttQuerySort.
-
-  /* Restructure query, remove double spaces */
-  DO iWord = 1 TO NUM-ENTRIES(pcQuery,' ') - 1:
-    cWord = ENTRY(iWord,pcQuery,' ').
-    IF cWord <> '' THEN cWhere = TRIM(cWhere + ' ' + cWord).
-  END. 
+  
+  /* Split query on the word ' BY ' */
+  pcQuery = REPLACE(pcQuery,' BY ', '|').
 
   IndexLoop:
-  DO iWord = 1 TO NUM-ENTRIES(cWhere,' ') - 1:
-    cWord = ENTRY(iWord,cWhere,' ').
+  DO iPart = 2 TO NUM-ENTRIES(pcQuery,'|'):
+    cPart = TRIM(ENTRY(iPart,pcQuery,'|')).
+    RUN addQuerySort(ENTRY(1,cPart,' '), (cPart MATCHES '* DESC*')).
+  END.
+END PROCEDURE. /* getQuerySorting */
 
-    IF cWord = 'BY' THEN
-    DO:
-      iNumSorts = iNumSorts + 1.
 
-      CREATE ttQuerySort.
-      ASSIGN 
-        ttQuerySort.iSortNr     = iNumSorts
-        ttQuerySort.cSortField  = ENTRY(iWord + 1,cWhere,' ')
-        ttQuerySort.lDescending =     ( NUM-ENTRIES(cWhere,' ') >= iWord + 2 ) 
-                                  AND ( ENTRY(iWord + 2,cWhere,' ') BEGINS "DESC" ).
-    END.
-  END. 
-END PROCEDURE. 
+PROCEDURE addQuerySort:
+  /* Add a user query to tt with sortings */
+  DEFINE INPUT PARAMETER pcField      AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER plDescending AS LOGICAL     NO-UNDO.
+  
+  DEFINE VARIABLE iNumSorts AS INTEGER     NO-UNDO.
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+
+  IF pcField = '' OR pcField = ? THEN RETURN.
+  
+  /* Determine nr of sorts */
+  FIND LAST bfQuerySort NO-ERROR.
+  IF AVAILABLE bfQuerySort THEN iNumSorts = bfQuerySort.iSortNr.
+
+  CREATE bfQuerySort.
+  ASSIGN 
+    bfQuerySort.iSortNr     = iNumSorts + 1
+    bfQuerySort.cSortField  = pcField
+    bfQuerySort.lDescending = plDescending. 
+
+END PROCEDURE. /* addQuerySort */ 
+
+
 
 RUN getQuerySorting("for   each      customer   by          name by city descending by sales-rep   ").
 
 DEFINE VARIABLE cSort AS CHARACTER   NO-UNDO.
 
 FOR EACH ttQuerySort BY ttQuerySort.iSortNr:
+
   cSort = SUBSTITUTE('&1~n&2 &3', cSort, ttQuerySort.cSortField, STRING(ttQuerySort.lDescending,'descending/')).
 END.
 MESSAGE cSort
