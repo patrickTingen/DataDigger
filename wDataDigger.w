@@ -5316,6 +5316,56 @@ END PROCEDURE. /* createMenuDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win
+PROCEDURE createSortTable:
+  /* Create a newly arranged sort table for all sort options 
+   * from both query and user selected sorts */
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  DEFINE BUFFER bfNewSort   FOR ttQuerySort.
+  DEFINE VARIABLE iNumSorts AS INTEGER NO-UNDO.
+  
+  FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 0:
+    DELETE bfQuerySort.
+  END. 
+  
+  FOR EACH bfQuerySort 
+    WHERE bfQuerySort.iGroup > 0
+       BY bfQuerySort.iGroup
+       BY bfQuerySort.iSortNr:
+    
+    /* See if the sort already exists, if not create it. 
+     * This can happen if the sort is in the query and 
+     * later is manually changed by the user by clicking
+     * on the column to reverse the sort. 
+     */
+    FIND bfNewSort 
+      WHERE bfNewSort.iGroup = 0
+        AND bfNewSort.cSortField = bfQuerySort.cSortField
+            NO-ERROR.
+            
+    IF NOT AVAILABLE bfNewSort THEN 
+    DO:
+      iNumSorts = iNumSorts + 1.
+    
+      CREATE bfNewSort.
+      ASSIGN 
+        bfNewSort.iGroup     = 0
+        bfNewSort.iSortNr    = iNumSorts 
+        bfNewSort.cSortField = bfQuerySort.cSortField
+        .
+    END.
+    
+    ASSIGN bfNewSort.lAscending = bfQuerySort.lAscending.
+  END.   
+
+END PROCEDURE. /* createSortTable */
+	
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard C-Win 
 PROCEDURE cutToClipboard :
 /* Copy value to clipboard and delete current value
@@ -5351,18 +5401,19 @@ END PROCEDURE. /* dataColumnResize */
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
  */
-  DEFINE VARIABLE lAscending AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE lAscending AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cFieldName AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iNumSorts  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cKeyList   AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  DEFINE BUFFER bfCurrentSort FOR ttQuerySort.
 
   cFieldName = SELF:CURRENT-COLUMN:NAME.
   cKeyList = GetKeyList().
 
   /* If CTRL key is pressed, sorting is extended to include another field. 
-   * If not, all current sorting should be cleared
+   * If not, all current user sorting should be cleared
    */
   IF LOOKUP("CTRL", cKeyList) = 0 THEN 
   DO:
@@ -5372,16 +5423,17 @@ PROCEDURE dataColumnSort PRIVATE :
     END.
   END.
 
-  /* If our field is already part of the sort, reverse the order
-   * otherwise add field to the list of sort fields
-   */
+  /* See if there is any sort on this field */
+  FIND bfCurrentSort 
+    WHERE bfCurrentSort.iGroup = 0 
+      AND bfCurrentSort.cSortField = cFieldName NO-ERROR.
+
+  /* Now find or create the sort on level 2 */
   FIND bfQuerySort 
     WHERE bfQuerySort.iGroup = 2
       AND bfQuerySort.cSortField = cFieldName NO-ERROR.
 
-  IF AVAILABLE bfQuerySort THEN 
-    bfQuerySort.lAscending = NOT bfQuerySort.lAscending.
-  ELSE 
+  IF NOT AVAILABLE bfQuerySort THEN 
   DO:
     /* Determine nr of sorts */
     FIND LAST bfQuerySort WHERE bfQuerySort.iGroup = 2 NO-ERROR.
@@ -5391,9 +5443,13 @@ PROCEDURE dataColumnSort PRIVATE :
     ASSIGN 
       bfQuerySort.iGroup     = 2
       bfQuerySort.iSortNr    = iNumSorts + 1
-      bfQuerySort.cSortField = cFieldName
-      bfQuerySort.lAscending = TRUE. 
+      bfQuerySort.cSortField = cFieldName.
   END.
+  
+  IF AVAILABLE bfCurrentSort THEN 
+    bfQuerySort.lAscending = NOT bfCurrentSort.lAscending.
+  ELSE 
+    bfQuerySort.lAscending = TRUE. 
 
   RUN reopenDataBrowse(cFieldName, lAscending).
 
@@ -6754,7 +6810,7 @@ PROCEDURE getSortFromQuery :
   DEFINE VARIABLE iPart AS INTEGER     NO-UNDO.
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
 
-  /* Delete all sorts from the query */
+  /* Delete all query sorts */
   FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 1:
     DELETE bfQuerySort.
   END.
@@ -6786,7 +6842,6 @@ PROCEDURE getSortedQuery :
  */
   DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
-  DEFINE VARIABLE cSortFields AS CHARACTER NO-UNDO.
   
   /* Remove indexed-reposition keyword. Will be added back later */
   IF LOOKUP('INDEXED-REPOSITION',pcQuery,' ') > 0 THEN
@@ -6799,12 +6854,10 @@ PROCEDURE getSortedQuery :
 
   /* Add all query sort fields */
   SortItem:
-  FOR EACH bfQuerySort BY bfQuerySort.iGroup BY bfQuerySort.iSortNr:
+  FOR EACH bfQuerySort 
+    WHERE bfQuerySort.iGroup = 0 
+       BY bfQuerySort.iSortNr:
   
-    /* If an item is already used, skip it */
-    IF LOOKUP(bfQuerySort.cSortField, cSortFields) > 0 THEN NEXT SortItem.
-    cSortFields = SUBSTITUTE('&1,&2', cSortFields, bfQuerySort.cSortField).  
-                  
     pcQuery = SUBSTITUTE('&1 BY &2 &3'
                         , pcQuery
                         , bfQuerySort.cSortField
@@ -8339,6 +8392,9 @@ PROCEDURE reopenDataBrowse :
   /* Extract sorting from query */
   RUN getSortFromQuery(cQuery).
 
+  /* Create a new sort table */
+  RUN createSortTable.
+  
   /* Rewrite query to include sorting */
   RUN getSortedQuery(INPUT-OUTPUT cQuery).
 
@@ -9946,7 +10002,6 @@ PROCEDURE setSortArrows :
   
   DEFINE VARIABLE iSortOrder  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lMultiSort  AS LOGICAL NO-UNDO.
-  DEFINE VARIABLE cSortFields AS CHARACTER NO-UNDO.
   
   {&timerStart}
 
@@ -9961,11 +10016,9 @@ PROCEDURE setSortArrows :
    * then the ones that came from clicking on the columns 
    */
   SortItem:
-  FOR EACH bfQuerySort BY bfQuerySort.iGroup BY bfQuerySort.iSortNr:
-
-    /* If an item is already used, skip it */
-    IF LOOKUP(bfQuerySort.cSortField, cSortFields) > 0 THEN NEXT SortItem.
-    cSortFields = SUBSTITUTE('&1,&2', cSortFields, bfQuerySort.cSortField).  
+  FOR EACH bfQuerySort 
+    WHERE bfQuerySort.iGroup = 0 
+       BY bfQuerySort.iSortNr:
 
     /* Find column name */
     FIND FIRST bfColumn WHERE bfColumn.cFieldName = bfQuerySort.cSortField NO-ERROR.
@@ -9981,9 +10034,9 @@ PROCEDURE setSortArrows :
     IF iSortOrder > 9 THEN NEXT SortItem.
     
     IF lMultiSort THEN 
-      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, NOT bfQuerySort.lAscending, iSortOrder).
+      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, bfQuerySort.lAscending, iSortOrder).
     ELSE 
-      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, NOT bfQuerySort.lAscending).
+      phBrowse:SET-SORT-ARROW(bfColumn.iColumnNr, bfQuerySort.lAscending).
 
   END. /* SortItem */
   
