@@ -1573,6 +1573,7 @@ PROCEDURE getFields :
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTableCacheId      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUniqueIndexFields AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cSDBName           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBufferField       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hBufferFile        AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery             AS HANDLE      NO-UNDO.
@@ -1592,12 +1593,12 @@ PROCEDURE getFields :
 
   {&timerStart}
   
-  /* For dataservers, use the schema name */
-  pcDatabase = SDBNAME(pcDatabase).
-
   /* Clean up first */
   EMPTY TEMP-TABLE bField.
   EMPTY TEMP-TABLE bColumn.
+
+  /* For dataservers, use the schema name [dataserver] */
+  ASSIGN cSDBName = SDBNAME(pcDatabase).
 
   /* Return if no db connected */
   IF NUM-DBS = 0 THEN RETURN. 
@@ -1609,7 +1610,8 @@ PROCEDURE getFields :
     FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
     
     /* Verify whether the CRC is still the same. If not, kill the cache */
-    CREATE BUFFER hBufferFile FOR TABLE pcDatabase + "._File".
+    CREATE BUFFER hBufferFile FOR TABLE cSDBName + "._File".
+
     hBufferFile:FIND-UNIQUE(SUBSTITUTE('where _file-name = &1 and _File._File-Number < 32768', QUOTER(pcTableName)),NO-LOCK).
     IF hBufferFile::_crc <> bTable.cCrc THEN
     DO:
@@ -1689,15 +1691,15 @@ PROCEDURE getFields :
    */
   FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
 
-  CREATE BUFFER hBufferFile  FOR TABLE pcDatabase + "._File".                    
-  CREATE BUFFER hBufferField FOR TABLE pcDatabase + "._Field".
+  CREATE BUFFER hBufferFile  FOR TABLE cSDBName + "._File".                    
+  CREATE BUFFER hBufferField FOR TABLE cSDBName + "._Field".
 
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hBufferFile,hBufferField).
 
   cQuery = SUBSTITUTE("FOR EACH &1._File  WHERE &1._file._file-name = '&2' AND _File._File-Number < 32768 NO-LOCK, " +
                       "    EACH &1._Field OF &1._File NO-LOCK BY _ORDER" 
-                     , pcDatabase
+                     , cSDBName
                      , pcTableName
                      ).
 
@@ -1706,10 +1708,10 @@ PROCEDURE getFields :
   hQuery:GET-FIRST().
 
   /* Get list of fields in primary index. */
-  cPrimIndexFields = getIndexFields(pcDatabase, pcTableName, "P").
+  cPrimIndexFields = getIndexFields(cSDBName, pcTableName, "P").
 
   /* Get list of fields in all unique indexes. */
-  cUniqueIndexFields = getIndexFields(pcDatabase, pcTableName, "U").
+  cUniqueIndexFields = getIndexFields(cSDBName, pcTableName, "U").
 
   /* Get list of all previously selected fields */
   cSelectedFields = getRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Fields",pcTableName)).
@@ -2032,10 +2034,12 @@ PROCEDURE getTables :
       CREATE QUERY hFileQuery  IN WIDGET-POOL "metaInfo".
   
       hFileQuery:SET-BUFFERS(hDbBuffer, hFileBuffer).
-      hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK " +
-                               ", EACH _File NO-LOCK" +
-                               "  WHERE _File._Db-recid    = RECID(_Db)" +
-                               "    AND _File._File-Number < 32768").
+      hFileQuery:QUERY-PREPARE( "FOR EACH _Db NO-LOCK "
+                              + ",   EACH _File NO-LOCK"
+                              + "   WHERE _File._Db-recid    = RECID(_Db)"
+                              + "     AND _File._File-Number < 32768"
+                              + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"
+                              ).
 
       /* To get all fields */
       CREATE QUERY hFieldQuery IN WIDGET-POOL "metaInfo".
@@ -2086,10 +2090,30 @@ PROCEDURE getTables :
       DO:
         /* Move the tables of the current db to a separate tt so we can dump it. */
         EMPTY TEMP-TABLE ttTableXml.
-        FOR EACH ttTable WHERE ttTable.cDatabase = LDBNAME(iDatabase):
+
+        CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
+
+        CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".
+
+        hFileQuery:SET-BUFFERS(hDbBuffer).
+        hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK ").
+
+        hFileQuery:QUERY-OPEN().
+        REPEAT:
+           hFileQuery:GET-NEXT().
+           IF hFileQuery:QUERY-OFF-END THEN LEAVE.
+
+           FOR EACH ttTable 
+              WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
           CREATE ttTableXml.
           BUFFER-COPY ttTable TO ttTableXml.
         END.
+        END.
+
+        hFileQuery:QUERY-CLOSE().
+        DELETE OBJECT hFileQuery.
+        DELETE OBJECT hDbBuffer.
+
         TEMP-TABLE ttTableXml:WRITE-XML("file", cCacheFile, YES, ?, ?, NO, NO).
         EMPTY TEMP-TABLE ttTableXml.
       END.
@@ -3379,6 +3403,12 @@ PROCEDURE updateFields :
 
   FOR EACH bField:
 
+    /* Due to a bug the nr of decimals may be set on non-decimal fields
+     * See PKB P185263 (article 18087) for more information
+     * http://knowledgebase.progress.com/articles/Article/P185263
+     */
+    IF bField.cDataType <> 'DECIMAL' THEN bField.iDecimals = ?.
+
     /* Was this field selected? */
     bField.lShow = CAN-DO(cSelectedFields, bField.cFullName).
 
@@ -3725,19 +3755,26 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
   22-01-2009 pti Created
   ----------------------------------------------------------------------*/
   
-  DEFINE VARIABLE cDatabaseList AS CHARACTER   NO-UNDO.
-
-  DEFINE VARIABLE iCount AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cDatabaseList  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cSchemaHolders AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iCount         AS INTEGER     NO-UNDO.
 
   {&timerStart}
   
-  /* Special options */
-  do iCount = 1 to num-dbs:
-    cDatabaseList = cDatabaseList + ',' + ldbname(iCount).
+  /* Make a list of schema holders */
+  DO iCount = 1 TO NUM-DBS:
+    IF DBTYPE(iCount) <> 'PROGRESS' THEN cSchemaHolders = cSchemaHolders + ',' + SDBNAME(iCount).
+  END.
+
+  /* And a list of all databases. If a database is in the list of schemaholders
+   * we don't want to see it here. */
+  DO iCount = 1 to NUM-DBS:
+    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT.
+    cDatabaseList = cDatabaseList + ',' + LDBNAME(iCount).
   END.
 
   {&timerStop}
-  return trim(cDatabaseList,',').
+  RETURN TRIM(cDatabaseList,',').
 
 END FUNCTION. /* getDatabaseList */
 

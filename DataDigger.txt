@@ -7,6 +7,10 @@
 
 DataDigger version 22
 - Solved: Query-open errors were not shown in tooltip of query fill-in
+- Solved: High nr of decimals on non-decimal fields could cause errors. See PKB P185263
+- Solved: Errors on SQL Server dataserver tables (Edwin Schutten)
+- Solved: Interface errors when using larger fonts
+
 - New   : Row coloring can be set to 'zebra' or 'value-based'
 - New   : Multi-sort on data columns now possible
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
