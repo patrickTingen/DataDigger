@@ -7880,6 +7880,10 @@ PROCEDURE keepAlive :
   
   /* hBuffer::_dbstatus-cachestamp */
   DO iDatabase = 1 TO NUM-DBS:
+    /* Skip non Progress databases [dataserver] */
+    IF DBTYPE(iDatabase) NE "PROGRESS" THEN
+      NEXT.
+
     CREATE BUFFER hBuffer FOR TABLE LDBNAME(iDatabase) + "._DbStatus".
     hBuffer:FIND-FIRST("",NO-LOCK).
     cTimeStamp = hBuffer::_dbstatus-cachestamp.
