@@ -432,6 +432,17 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getXmlNodeName) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getXmlNodeName Procedure 
+FUNCTION getXmlNodeName RETURNS CHARACTER
+  ( pcFieldName AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-isBrowseChanged) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isBrowseChanged Procedure 
@@ -1097,7 +1108,7 @@ PROCEDURE dumpRecord :
 
     WHEN 'browse' THEN 
     DO:
-      hBuffer = phSource:QUERY:get-buffer-handle(1).
+      hBuffer = phSource:QUERY:GET-BUFFER-HANDLE(1).
 
       /* Create temptable-handle... */
       CREATE TEMP-TABLE hExportTt.
@@ -1147,6 +1158,9 @@ PROCEDURE dumpRecord :
     RETURN. 
   END. 
 
+  /* Fix XML Node Names for fields in the tt */
+  RUN setXmlNodeNames(INPUT hExportTt:DEFAULT-BUFFER-HANDLE).
+
   /* See if the user has specified his own dump program
    */
   plContinue = ?. /* To see if it ran or not */
@@ -1181,7 +1195,6 @@ PROCEDURE dumpRecord :
     ).
 
   DELETE OBJECT hExportTt.
-
 END PROCEDURE. /* dumpRecord */
 
 /* _UIB-CODE-BLOCK-END */
@@ -1737,6 +1750,7 @@ PROCEDURE getFields :
       bField.iOrderOrg     = iFieldOrder 
 
       bField.cFullName     = hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE 
+      bField.cXmlNodeName  = getXmlNodeName(bField.cFieldName)
       bField.cDataType     = hBufferField:BUFFER-FIELD('_data-type'):BUFFER-VALUE 
       bField.cInitial      = hBufferField:BUFFER-FIELD('_initial'):BUFFER-VALUE   
       bField.cFormat       = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE     
@@ -3137,11 +3151,32 @@ END PROCEDURE. /* setUsage */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-setXmlNodeNames) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setXmlNodeNames Procedure 
+PROCEDURE setXmlNodeNames :
+/* 
+ * Set the XML-NODE-NAMES of all fields in a buffer
+ */
+  DEFINE INPUT PARAMETER phTable AS HANDLE NO-UNDO.
+  DEFINE VARIABLE iField AS INTEGER NO-UNDO.
+
+  DO iField = 1 TO phTable:NUM-FIELDS:
+    phTable:BUFFER-FIELD(iField):XML-NODE-NAME = getXmlNodeName(phTable:BUFFER-FIELD(iField):NAME).
+  END.
+
+END PROCEDURE. /* setXmlNodeNames */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-showHelp) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHelp Procedure 
 PROCEDURE showHelp :
-  DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
+DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcStrings AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cButtons       AS CHARACTER   NO-UNDO.
@@ -3301,7 +3336,6 @@ END PROCEDURE. /* ShowScrollbars */
 &ANALYZE-RESUME
 
 &ENDIF
-
 
 &IF DEFINED(EXCLUDE-unlockWindow) = 0 &THEN
 
@@ -4458,17 +4492,9 @@ FUNCTION getTableList RETURNS CHARACTER
   , INPUT  pcTableFilter    AS CHARACTER
   ) :
 
-/*------------------------------------------------------------------------
-  Name         : getTableList
-  Description  : Get a list of all tables in the current database that 
-                 match a certain filter. 
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  23-01-2009 pti added filter
-  08-10-2009 pti added input parm plShowHiddenTables
-  17-12-2009 pti added input parm pcSortField / plAscending
-  ----------------------------------------------------------------------*/
-  
+/* Get a list of all tables in the current 
+ * database that match a certain filter 
+ */
   DEFINE VARIABLE cTableList  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery      AS CHARACTER   NO-UNDO.
 
@@ -4569,6 +4595,27 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
   return ?.
 
 END FUNCTION. /* getWidgetUnderMouse */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getXmlNodeName) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getXmlNodeName Procedure 
+FUNCTION getXmlNodeName RETURNS CHARACTER
+  ( pcFieldName AS CHARACTER ) :
+  /* Return a name that is safe to use in XML output by
+   * replacing forbidden characters with an underscore
+   */
+
+  pcFieldName = REPLACE(pcFieldName,'%', '_').
+  pcFieldName = REPLACE(pcFieldName,'#', '_').
+
+  RETURN pcFieldName. 
+
+END FUNCTION. /* getXmlNodeName */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5161,3 +5208,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

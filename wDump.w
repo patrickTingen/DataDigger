@@ -1444,7 +1444,7 @@ PROCEDURE DumpData4GL :
     IF (ETIME - iTimeStarted) > 1000 THEN
     DO:
       iTimeStarted = ETIME.
-      RUN showProgressBar("Dumping records, please wait", iNumRecords / piNumRecords * 100).
+      RUN showProgressBar("Dumping, please wait", iNumRecords / piNumRecords * 100).
       PROCESS EVENTS.
       IF glAborted THEN LEAVE pumpDataLoop. 
     END.
@@ -2185,6 +2185,9 @@ PROCEDURE DumpDataXml :
       lMinSchema      = tbMinimalSchema:checked
       .
   
+    /* Fix XML Node Names for fields in the tt */
+    RUN setXmlNodeNames(INPUT pihTempTable:DEFAULT-BUFFER-HANDLE).
+
     pihTempTable:WRITE-XML
       ( cTargetType
       , cFile
@@ -2748,4 +2751,3 @@ END FUNCTION. /* function multipleLookUpGreaterThanZero returns logical */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
