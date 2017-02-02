@@ -10,6 +10,7 @@ DataDigger version 22
 - Solved: High nr of decimals on non-decimal fields could cause errors. See PKB P185263
 - Solved: Errors on SQL Server dataserver tables (Edwin Schutten)
 - Solved: Interface errors when using larger fonts
+- Solved: Fields with % or # in their name cannot be dumped as XML (Damir Pem)
 
 - New   : Row coloring can be set to 'zebra' or 'value-based'
 - New   : Multi-sort on data columns now possible

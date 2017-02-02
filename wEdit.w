@@ -1456,9 +1456,6 @@ PROCEDURE initializeObject :
   APPLY 'window-resized' TO wEdit.
 
   /* Open the browse */
-  /*
-  run reopenFieldBrowse('iOrder',yes).
-  */
   {&OPEN-QUERY-brRecord}
    
   /* Restore sort */
