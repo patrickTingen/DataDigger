@@ -45,8 +45,8 @@
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnTabAbout btnTabChanges BtnOK edChangelog ~
-btnDataDigger 
+&Scoped-Define ENABLED-OBJECTS btnDataDigger btnTabAbout btnTabChanges ~
+BtnOK edChangelog 
 &Scoped-Define DISPLAYED-OBJECTS edChangelog fiDataDigger-1 fiDataDigger-2 
 
 /* Custom List Definitions                                              */
@@ -63,7 +63,7 @@ btnDataDigger
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnDataDigger  NO-FOCUS FLAT-BUTTON
-     LABEL "" 
+     LABEL "D" 
      SIZE 6 BY 1.43.
 
 DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
@@ -98,11 +98,11 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
+     btnDataDigger AT ROW 1.24 COL 2 WIDGET-ID 82
      btnTabAbout AT ROW 3.19 COL 1 WIDGET-ID 78
      btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      BtnOK AT Y 5 X 545 WIDGET-ID 48
      edChangelog AT Y 70 X 0 NO-LABEL WIDGET-ID 72
-     btnDataDigger AT ROW 1.24 COL 2 WIDGET-ID 82
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
@@ -128,7 +128,7 @@ DEFINE FRAME Dialog-Frame
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
-   FRAME-NAME                                                           */
+   NOT-VISIBLE FRAME-NAME                                               */
 ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE.
 
@@ -153,6 +153,17 @@ ASSIGN
 ON WINDOW-CLOSE OF FRAME Dialog-Frame /* About DataDigger */
 DO:
   APPLY "END-ERROR":U TO SELF.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME btnDataDigger
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger Dialog-Frame
+ON CHOOSE OF btnDataDigger IN FRAME Dialog-Frame /* D */
+DO:
+  RUN showLog.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -249,7 +260,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 
       WITH FRAME Dialog-Frame.
-  ENABLE btnTabAbout btnTabChanges BtnOK edChangelog btnDataDigger 
+  ENABLE btnDataDigger btnTabAbout btnTabChanges BtnOK edChangelog 
       WITH FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
 END PROCEDURE.
@@ -265,19 +276,23 @@ define input parameter piStartValue as integer no-undo.
   define variable iStartTime   as integer    no-undo.
   define variable iTranparency as integer    no-undo.
 
-  if piEndValue > piStartValue then 
-  do iTranparency = piStartValue to piEndValue by 24:
-    run setTransparency( input frame Dialog-Frame:handle, iTranparency).
-    iStartTime = etime.
-    do while etime < iStartTime + 20: end.
-  end.
+  &IF DEFINED(UIB_is_Running) = 0 &THEN
+  
+    if piEndValue > piStartValue then 
+    do iTranparency = piStartValue to piEndValue by 24:
+      run setTransparency( input frame Dialog-Frame:handle, iTranparency).
+      iStartTime = etime.
+      do while etime < iStartTime + 20: end.
+    end.
+  
+    else
+    do iTranparency = piStartValue to piEndValue by -24:
+      run setTransparency( input frame Dialog-Frame:handle, iTranparency).
+      iStartTime = etime.
+      do while etime < iStartTime + 20: end.
+    end.
 
-  else
-  do iTranparency = piStartValue to piEndValue by -24:
-    run setTransparency( input frame Dialog-Frame:handle, iTranparency).
-    iStartTime = etime.
-    do while etime < iStartTime + 20: end.
-  end.
+  &ENDIF
 
 END PROCEDURE. /* fadeWindow */
 
@@ -295,21 +310,24 @@ PROCEDURE initializeObject :
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    FRAME {&FRAME-NAME}:FONT = getFont('Default').
-    fiDataDigger-1:FONT = getFont('Fixed').
-    fiDataDigger-2:FONT = getFont('Fixed').
-    edChangelog:FONT = getFont('Fixed').
-
-    btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
-    RUN setPage(1).
-
     fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
     fiDataDigger-2:SCREEN-VALUE = 'Build {&build}'.
+    
+    &if defined(UIB_is_Running) = 0  &then
 
-    RUN setTransparency(INPUT FRAME Dialog-Frame:HANDLE, 1).
-
-    /* For some reasons, these #*$&# scrollbars keep coming back */
-    RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
+      FRAME {&FRAME-NAME}:FONT = getFont('Default').
+      fiDataDigger-1:FONT = getFont('Fixed').
+      fiDataDigger-2:FONT = getFont('Fixed').
+      edChangelog:FONT = getFont('Fixed').
+  
+      btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
+      
+      RUN setPage(1).
+      RUN setTransparency(INPUT FRAME Dialog-Frame:HANDLE, 1).
+      
+      /* For some reasons, these #*$&# scrollbars keep coming back */
+      RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
+    &ENDIF
 
   END.
 
@@ -352,6 +370,54 @@ PROCEDURE setPage :
   end.
   
 END PROCEDURE. /* setPage */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog Dialog-Frame 
+PROCEDURE showLog :
+DEFINE VARIABLE cLine   AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName   AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iOrgPos AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStep   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE dMoveX  AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dMoveY  AS DECIMAL     NO-UNDO.
+  DEFINE VARIABLE dGrowY  AS DECIMAL     NO-UNDO.
+
+  INPUT FROM 'DataDigger.txt'.
+  SEEK INPUT TO 300. /* random nr after header */
+  
+  REPEAT:
+    IMPORT UNFORMATTED cLine.
+    IF NOT cLine MATCHES '*(*)' THEN NEXT. 
+    cName = TRIM( ENTRY(NUM-ENTRIES(cLine,'('),cLine,'(' ), ')').
+  END.
+  
+  INPUT CLOSE. 
+
+  DO WITH FRAME {&FRAME-NAME}:
+    btnTabAbout:VISIBLE = NO.
+    btnTabChanges:VISIBLE = NO.
+    
+    dMoveX = ((SESSION:WIDTH-PIXELS  - FRAME {&FRAME-NAME}:WIDTH-PIXELS)  / 2 - FRAME {&FRAME-NAME}:X) / 100.
+    dMoveY = ((SESSION:HEIGHT-PIXELS - 700) / 2 - FRAME {&FRAME-NAME}:Y) / 100.
+    dGrowY = (700 - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 100.
+
+    DO iStep = 1 TO 100:
+      /* Move vertically */
+      FRAME {&FRAME-NAME}:Y = FRAME {&FRAME-NAME}:Y + dMoveY.
+      FRAME {&FRAME-NAME}:X = FRAME {&FRAME-NAME}:X + dMoveX.
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS + dGrowY.
+
+      ETIME(YES). REPEAT WHILE ETIME < 5: PROCESS EVENTS. END.
+    END.
+
+    edChangelog:HEIGHT-PIXELS = 10.
+    edChangelog:Y = FRAME {&FRAME-NAME}:Y + FRAME {&FRAME-NAME}:HEIGHT-PIXELS - edChangelog:Y - edChangelog:HEIGHT-PIXELS - 150.
+  END.
+
+  
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

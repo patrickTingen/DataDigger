@@ -3002,6 +3002,28 @@ END PROCEDURE. /* setCaching */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-setLabelPosition) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setLabelPosition Procedure 
+PROCEDURE setLabelPosition :
+/*
+ * Correct the position of the label for larger fonts 
+ */
+  DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
+
+  /* Move horizontally far enough from the widget */
+  phWidget:SIDE-LABEL-HANDLE:X = phWidget:X 
+    - FONT-TABLE:GET-TEXT-WIDTH-PIXELS(phWidget:SIDE-LABEL-HANDLE:SCREEN-VALUE, phWidget:FRAME:FONT)
+    - (IF phWidget:TYPE = 'fill-in' THEN 5 ELSE 0)
+    .
+
+END PROCEDURE. /* setLabelPosition */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-setSortArrow) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrow Procedure 

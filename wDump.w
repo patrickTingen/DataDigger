@@ -1064,21 +1064,6 @@ END PROCEDURE. /* cbNumericFormatValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE correctLabel wDump 
-PROCEDURE correctLabel :
-/*
- * Correct the position of the label for larger fonts 
- */
-  DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
-
-  phWidget:SIDE-LABEL-HANDLE:X = phWidget:X - 
-      FONT-TABLE:GET-TEXT-WIDTH-PIXELS(phWidget:SIDE-LABEL-HANDLE:SCREEN-VALUE, FRAME {&FRAME-NAME}:FONT).
-  
-END PROCEDURE. /* correctLabel */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI wDump  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
@@ -2262,14 +2247,14 @@ PROCEDURE initializeObject :
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
     FRAME infoFrame:FONT = getFont('Default').
 
-    RUN correctLabel(ficFileName:HANDLE).
-    RUN correctLabel(cbDumpType:HANDLE).
-    RUN correctLabel(cbSeparator:HANDLE).
-    RUN correctLabel(cbiRecordSelection:HANDLE).
-    RUN correctLabel(cbiFieldSelection:HANDLE).
-    RUN correctLabel(cbCodePage:HANDLE).
-    RUN correctLabel(cbNumericFormat:HANDLE).
-    RUN correctLabel(cbDateFormat:HANDLE).
+    RUN setLabelPosition(ficFileName:HANDLE).
+    RUN setLabelPosition(cbDumpType:HANDLE).
+    RUN setLabelPosition(cbSeparator:HANDLE).
+    RUN setLabelPosition(cbiRecordSelection:HANDLE).
+    RUN setLabelPosition(cbiFieldSelection:HANDLE).
+    RUN setLabelPosition(cbCodePage:HANDLE).
+    RUN setLabelPosition(cbNumericFormat:HANDLE).
+    RUN setLabelPosition(cbDateFormat:HANDLE).
                                           
     btnViewLastDump:LOAD-IMAGE(getImagePath('View.gif')).
     btnOpenLastDumpDir:LOAD-IMAGE(getImagePath('OpenFolder.gif')).
@@ -2751,3 +2736,4 @@ END FUNCTION. /* function multipleLookUpGreaterThanZero returns logical */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
