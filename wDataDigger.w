@@ -599,12 +599,12 @@ DEFINE RECTANGLE rctQuery
      SIZE-PIXELS 789 BY 290
      BGCOLOR 18 .
 
-DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL YES 
+DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes 
      LABEL "" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 15 BY 13 TOOLTIP "debugging mode".
 
-DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL YES 
+DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes 
      LABEL "" 
      CONTEXT-HELP-ID 280
      VIEW-AS TOGGLE-BOX
@@ -933,8 +933,8 @@ DEFINE FRAME frMain
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
@@ -959,53 +959,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 10.67 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 5 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1040,6 +993,53 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 5 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 10.67 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
+
 
 /* *********************** Procedure Settings ************************ */
 
@@ -1060,19 +1060,19 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          TITLE              = "DataDigger"
          HEIGHT-P           = 675
          WIDTH-P            = 1523
-         MAX-HEIGHT-P       = 675
-         MAX-WIDTH-P        = 1523
-         VIRTUAL-HEIGHT-P   = 675
-         VIRTUAL-WIDTH-P    = 1523
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         MAX-HEIGHT-P       = 1134
+         MAX-WIDTH-P        = 1920
+         VIRTUAL-HEIGHT-P   = 1134
+         VIRTUAL-WIDTH-P    = 1920
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -1264,7 +1264,7 @@ ASSIGN
 /* SETTINGS FOR RECTANGLE rctQueryButtons IN FRAME frWhere
    1                                                                    */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = YES.
+THEN C-Win:HIDDEN = yes.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
@@ -1315,8 +1315,8 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        HEIGHT          = 1.43
        WIDTH           = 6
        WIDGET-ID       = 292
-       HIDDEN          = YES
-       SENSITIVE       = YES.
+       HIDDEN          = yes
+       SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
       CtrlFrame:MOVE-AFTER(FRAME frWhere:HANDLE).
 
@@ -1463,24 +1463,52 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON F11 OF C-Win /* DataDigger */
 ANYWHERE DO:
-  DEFINE VARIABLE cDatabases AS CHARACTER   NO-UNDO.
 
-  DO WITH FRAME frMain:
-    
-    /* Get all connected databases */
-    cDatabases = getDatabaseList().
-  
-    ASSIGN 
-      cbDatabaseFilter:LIST-ITEMS   = ',' + cDatabases
-      cbDatabaseFilter:SCREEN-VALUE = gcCurrentDatabase.
-  
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
-  
-    RUN filterTables.
+  IF FRAME frMain:BGCOLOR = ? THEN
+  DO:
+    FRAME frMain:BGCOLOR = 0.
+    FRAME frData:BGCOLOR = 0.
+
+    setRegistry('DataDigger:colors', 'DataRow:odd:fg','6').
+    setRegistry('DataDigger:colors', 'DataRow:odd:bg','0').
+    setRegistry('DataDigger:colors', 'DataRow:even:fg','7').
+    setRegistry('DataDigger:colors', 'DataRow:even:bg','0').
+
   END.
-  
+  ELSE 
+  DO:
+    FRAME frMain:BGCOLOR = ?.
+    FRAME frData:BGCOLOR = ?.
+
+/*       WHEN 'CustomFormat:fg'           THEN iColor = 12. /* red       */ */
+/*       WHEN 'CustomOrder:fg'            THEN iColor = 12. /* red       */ */
+/*       WHEN 'DataRow:even:bg'           THEN iColor =  8. /* lightgray */ */
+/*       WHEN 'DataRow:even:fg'           THEN iColor =  0. /* black     */ */
+/*       WHEN 'DataRow:odd:bg'            THEN iColor = 15. /* white     */ */
+/*       WHEN 'DataRow:odd:fg'            THEN iColor =  0. /* black     */ */
+/*       WHEN 'FilterBox:bg'              THEN iColor = 12. /* red       */ */
+/*       WHEN 'IndexInactive:fg'          THEN iColor = 12. /* red       */ */
+/*       WHEN 'PrimIndex:bg'              THEN iColor =  8. /* lightgray */ */
+/*       WHEN 'QueryCounter:fg'           THEN iColor =  7. /* darkgray  */ */
+/*       WHEN 'QueryError:bg'             THEN iColor = 12. /* red       */ */
+/*       WHEN 'QueryError:fg'             THEN iColor = 14. /* yellow    */ */
+/*       WHEN 'QueryInfo:fg'              THEN iColor =  7. /* darkgray  */ */
+/*       WHEN 'RecordCount:Complete:fg'   THEN iColor =  2. /* green     */ */
+/*       WHEN 'RecordCount:Incomplete:fg' THEN iColor = 12. /* red       */ */
+/*       WHEN 'RecordCount:Selected:fg'   THEN iColor =  7. /* darkgray */  */
+/*       WHEN 'WarningBox:bg'             THEN iColor = 14. /* yellow    */ */
+/*       WHEN 'WarningBox:fg'             THEN iColor = 12. /* red       */ */
+/*       WHEN 'FieldFilter:bg'            THEN iColor = 14. /* yellow    */ */
+/*       WHEN 'FieldFilter:fg'            THEN iColor =  9. /* blue      */ */
+
+  END.
+
+  /* Colors for odd/even data rows */
+  giDataOddRowColor[1]  = getColor("DataRow:odd:fg" ). 
+  giDataOddRowColor[2]  = getColor("DataRow:odd:bg" ). 
+  giDataEvenRowColor[1] = getColor("DataRow:even:fg"). 
+  giDataEvenRowColor[2] = getColor("DataRow:even:bg"). 
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1579,9 +1607,10 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain C-Win
 ON DROP-FILE-NOTIFY OF FRAME frMain
 DO:
-  DEFINE VARIABLE cDroppedFiles AS CHARACTER   NO-UNDO.
+  
   DEFINE VARIABLE lSuccess      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rNewRecord    AS ROWID       NO-UNDO.
+  DEFINE VARIABLE cDroppedFiles AS CHARACTER   NO-UNDO.
 
   /* Get first dropped file */
   cDroppedFiles = getDroppedFiles(INPUT FRAME frMain:HANDLE).
@@ -5295,10 +5324,9 @@ END PROCEDURE. /* createMenuDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win
-PROCEDURE createSortTable:
-  /* Create a newly arranged sort table for all sort options 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win 
+PROCEDURE createSortTable :
+/* Create a newly arranged sort table for all sort options 
    * from both query and user selected sorts */
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
   DEFINE BUFFER bfNewSort   FOR ttQuerySort.
@@ -5339,11 +5367,9 @@ PROCEDURE createSortTable:
   END.   
 
 END PROCEDURE. /* createSortTable */
-	
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
-
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard C-Win 
 PROCEDURE cutToClipboard :
@@ -5470,29 +5496,29 @@ END PROCEDURE. /* dataDoubleClick */
 PROCEDURE dataGotoFilter :
 /* Jump from browse straight to the filter fields 
  */
-	DEFINE BUFFER bColumn FOR ttColumn.
-	
-	/* If we have been in the filters before, the name of the last visited 
-	 * filter field is in gcLastDataField. Try to jump back to that field. 
-	 * If it fails (eg made hidden) then jump to the first visible filter
-	 */
-	FIND bColumn WHERE bColumn.cFullName = gcLastDataField NO-ERROR.
-	
-	IF NOT AVAILABLE bColumn OR NOT bColumn.hColumn:VISIBLE THEN
-	DO: 
-		FindField:
-		FOR EACH bColumn BY bColumn.iColumnNr:
-			IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
-			LEAVE FindField.
-		END.
-	END.
-	
-	IF AVAILABLE bColumn THEN
-	DO: 
-		setFilterFieldColor(bColumn.hFilter).
-		APPLY 'entry' TO bColumn.hFilter. 
-		RETURN NO-APPLY.
-	END. 
+        DEFINE BUFFER bColumn FOR ttColumn.
+        
+        /* If we have been in the filters before, the name of the last visited 
+         * filter field is in gcLastDataField. Try to jump back to that field. 
+         * If it fails (eg made hidden) then jump to the first visible filter
+         */
+        FIND bColumn WHERE bColumn.cFullName = gcLastDataField NO-ERROR.
+        
+        IF NOT AVAILABLE bColumn OR NOT bColumn.hColumn:VISIBLE THEN
+        DO: 
+                FindField:
+                FOR EACH bColumn BY bColumn.iColumnNr:
+                        IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
+                        LEAVE FindField.
+                END.
+        END.
+        
+        IF AVAILABLE bColumn THEN
+        DO: 
+                setFilterFieldColor(bColumn.hFilter).
+                APPLY 'entry' TO bColumn.hFilter. 
+                RETURN NO-APPLY.
+        END. 
 
 END PROCEDURE. /* dataGotoFilter */
 
@@ -5501,11 +5527,11 @@ END PROCEDURE. /* dataGotoFilter */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
 PROCEDURE dataOffHome :
-	/* Show message that this is changed as from DataDigger 21.
-	 */
-	
-	/* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
-	RUN showHelp('JumpToFilter', '').
+/* Show message that this is changed as from DataDigger 21.
+         */
+        
+        /* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
+        RUN showHelp('JumpToFilter', '').
 
 END PROCEDURE. /* dataOffHome */
 
@@ -5521,12 +5547,29 @@ PROCEDURE dataRowDisplay :
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
 
-  /* Colormode can be either Zebra or ValueBased */
+/*********
+  /* Colormode can be either None, Zebra or ValueBased */
   IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
   CASE gcRowColorMode:
     WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
     WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
     WHEN {&ROWCOLORMODE-VALUEBASED} THEN gcThisRowColorValue = phBrowseBuffer:BUFFER-FIELD(gcRowColorField):STRING-VALUE.
+  END CASE. /* color mode */
+***********/
+
+  /* Colormode can be either None, Zebra or ValueBased */
+  IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
+  CASE gcRowColorMode:
+    WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
+    WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
+    WHEN {&ROWCOLORMODE-VALUEBASED} THEN 
+    DO:
+      gcThisRowColorValue = ''.
+      FOR EACH ttQuerySort WHERE ttQuerySort.iGroup = 0:
+        gcThisRowColorValue = gcThisRowColorValue + '|' + phBrowseBuffer:BUFFER-FIELD(ttQuerySort.cSortField):STRING-VALUE.
+      END.
+    END.
+
   END CASE. /* color mode */
 
   IF gcThisRowColorValue <> gcPrevRowColorValue THEN
@@ -5537,19 +5580,12 @@ PROCEDURE dataRowDisplay :
   FOR EACH bColumn, bField WHERE bField.cFieldName = bColumn.cFieldName:
     IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
 
-    ASSIGN 
-      bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1])
-      bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]).
+    /* Set colors */
+/*     bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1]). */
+/*     bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]). */
 
-    /* Alternate FG and BGcolor */
-/*     IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN  */
-/*       ASSIGN                                                      */
-/*         bColumn.hColumn:FGCOLOR = giDataOddRowColor[1]            */
-/*         bColumn.hColumn:BGCOLOR = giDataOddRowColor[2].           */
-/*     ELSE                                                          */
-/*       ASSIGN                                                      */
-/*         bColumn.hColumn:FGCOLOR = giDataEvenRowColor[1]           */
-/*         bColumn.hColumn:BGCOLOR = giDataEvenRowColor[2].          */
+    bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:fg") ELSE getColor("DataRow:odd:fg")).
+    bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:bg") ELSE getColor("DataRow:odd:bg")).
 
     /* Add field for RECID */
     IF bColumn.cFieldName = "RECID" THEN
@@ -6779,6 +6815,43 @@ END PROCEDURE. /* getLdbsFromParamFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win 
+PROCEDURE getSortedQuery :
+/* Process the query and insert the BY-phrases at the proper place
+ */
+  DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  
+  /* Remove indexed-reposition keyword. Will be added back later */
+  IF LOOKUP('INDEXED-REPOSITION',pcQuery,' ') > 0 THEN
+    pcQuery = REPLACE(pcQuery,'INDEXED-REPOSITION','').
+
+  /* Take the part until the first 'BY'. Note that if there is 
+   * no ' BY ', the substring function will take the whole string
+   */
+  pcQuery = SUBSTRING(pcQuery, 1, INDEX(pcQuery,' BY ') - 1).
+
+  /* Add all query sort fields */
+  SortItem:
+  FOR EACH bfQuerySort 
+    WHERE bfQuerySort.iGroup = 0 
+    BREAK BY bfQuerySort.iSortNr:
+  
+    pcQuery = SUBSTITUTE('&1 BY &2 &3'
+                        , pcQuery
+                        , bfQuerySort.cSortField
+                        , TRIM(STRING(bfQuerySort.lAscending,'/DESCENDING'))
+                        ).
+  END. 
+
+  /* add back 'INDEXED-REPOSITION' */
+  pcQuery = SUBSTITUTE('&1 INDEXED-REPOSITION', pcQuery).
+
+END PROCEDURE. /* getSortedQuery */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery C-Win 
 PROCEDURE getSortFromQuery :
 /* Extract sorting from user query 
@@ -6811,43 +6884,6 @@ PROCEDURE getSortFromQuery :
   END.
 
 END PROCEDURE. /* getSortFromQuery */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win 
-PROCEDURE getSortedQuery :
-/* Process the query and insert the BY-phrases at the proper place
- */
-  DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
-  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
-  
-  /* Remove indexed-reposition keyword. Will be added back later */
-  IF LOOKUP('INDEXED-REPOSITION',pcQuery,' ') > 0 THEN
-    pcQuery = REPLACE(pcQuery,'INDEXED-REPOSITION','').
-
-  /* Take the part until the first 'BY'. Note that if there is 
-   * no ' BY ', the substring function will take the whole string
-   */
-  pcQuery = SUBSTRING(pcQuery, 1, INDEX(pcQuery,' BY ') - 1).
-
-  /* Add all query sort fields */
-  SortItem:
-  FOR EACH bfQuerySort 
-    WHERE bfQuerySort.iGroup = 0 
-       BY bfQuerySort.iSortNr:
-  
-    pcQuery = SUBSTITUTE('&1 BY &2 &3'
-                        , pcQuery
-                        , bfQuerySort.cSortField
-                        , TRIM(STRING(bfQuerySort.lAscending,'/DESCENDING'))
-                        ).
-  END. 
-
-  /* add back 'INDEXED-REPOSITION' */
-  pcQuery = SUBSTITUTE('&1 INDEXED-REPOSITION', pcQuery).
-
-END PROCEDURE. /* getSortedQuery */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -9790,10 +9826,9 @@ END PROCEDURE. /* setDataFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win
-PROCEDURE setFilterFieldTabOrder:
-  /* Reset the TAB order of the filter fields
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win 
+PROCEDURE setFilterFieldTabOrder :
+/* Reset the TAB order of the filter fields
    */
   DEFINE VARIABLE hPrevFilter AS HANDLE  NO-UNDO.
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -9816,11 +9851,9 @@ PROCEDURE setFilterFieldTabOrder:
   END.
 
 END PROCEDURE. /* setFilterFieldTabOrder */
-	
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
-
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win 
 PROCEDURE setPage :
