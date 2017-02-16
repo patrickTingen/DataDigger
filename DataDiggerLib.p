@@ -2596,18 +2596,14 @@ END PROCEDURE. /* readConfigFile */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilterFields Procedure 
 PROCEDURE resizeFilterFields :
-/*------------------------------------------------------------------------
-  Name         : resizeFilterFields
-  Description  : Generic procedure to redraw the filter fields of the 
-                 fields browse and of the index browse. 
-
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE INPUT  PARAMETER pcFilterFields AS CHARACTER   NO-UNDO.
-  DEFINE INPUT  PARAMETER pcButtons      AS CHARACTER   NO-UNDO.
-  DEFINE INPUT  PARAMETER phBrowse       AS HANDLE      NO-UNDO.
+/*
+ * Generic procedure to redraw the filter fields of the 
+ * fields browse and of the index browse. 
+ */
+  DEFINE INPUT PARAMETER phLeadButton   AS HANDLE      NO-UNDO.
+  DEFINE INPUT PARAMETER pcFilterFields AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcButtons      AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER phBrowse       AS HANDLE      NO-UNDO.
 
   DEFINE VARIABLE iField        AS INTEGER NO-UNDO. 
   DEFINE VARIABLE iButton       AS INTEGER NO-UNDO. 
@@ -2708,6 +2704,12 @@ PROCEDURE resizeFilterFields :
   END.
   PUBLISH "timerCommand" ("stop", "resizeFilterFields:fieldLoop").
   
+  /* Finally, set the lead button to the utmost left */
+  IF VALID-HANDLE(phLeadButton) THEN
+    ASSIGN 
+      phLeadButton:X = phBrowse:X 
+      phLeadButton:Y = phBrowse:Y - 23.
+
   {&timerStop}
 
 END PROCEDURE. /* resizeFilterFields */

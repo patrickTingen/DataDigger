@@ -237,6 +237,17 @@ DEFINE TEMP-TABLE ttConfig NO-UNDO RCODE-INFORMATION
   FIELD cValue   as character
   INDEX idxPrim IS PRIMARY cSection cSetting.
 
+
+/* TT for sorting options in user query */
+DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
+  FIELD iGroup     AS INTEGER /* 1:query, 2:browse */
+  FIELD iSortNr    AS INTEGER
+  FIELD cSortField AS CHARACTER
+  FIELD lAscending AS LOGICAL
+  FIELD iExt       AS INTEGER
+  INDEX iPrim IS PRIMARY iGroup iSortNr
+  .
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 

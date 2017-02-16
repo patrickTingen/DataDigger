@@ -61,15 +61,6 @@ DEFINE TEMP-TABLE ttItem NO-UNDO RCODE-INFORMATION
   INDEX iPrim IS PRIMARY cItem
   .
 
-/* TT for sorting options in user query */
-DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
-  FIELD iGroup     AS INTEGER /* 1:query, 2:browse */
-  FIELD iSortNr    AS INTEGER
-  FIELD cSortField AS CHARACTER
-  FIELD lAscending AS LOGICAL
-  INDEX iPrim IS PRIMARY iGroup iSortNr
-  .
-
 /* Local Variable Definitions --- */
 DEFINE VARIABLE ghFirstColumn              AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
@@ -115,15 +106,8 @@ DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 
-&GLOBAL-DEFINE ROWCOLORMODE-NONE       'None'
-&GLOBAL-DEFINE ROWCOLORMODE-ZEBRA      'Zebra'
-&GLOBAL-DEFINE ROWCOLORMODE-VALUEBASED 'ValueBased'
-
-DEFINE VARIABLE gcRowColorMode       AS CHARACTER   NO-UNDO INITIAL {&ROWCOLORMODE-VALUEBASED}.
-DEFINE VARIABLE gcThisRowColorValue  AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcPrevRowColorValue  AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE glUseEvenRowColorSet AS LOGICAL     NO-UNDO.
-DEFINE VARIABLE gcRowColorField      AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
+DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -365,6 +349,10 @@ DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 DEFINE BUTTON btnClearDataFilter 
      LABEL "C" 
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
+
+DEFINE BUTTON btnDataSort 
+     LABEL "S" 
+     SIZE-PIXELS 16 BY 21 TOOLTIP "set sorting".
 
 DEFINE VARIABLE fiNumRecords AS CHARACTER FORMAT "X(256)":U 
       VIEW-AS TEXT 
@@ -1004,10 +992,11 @@ DEFINE FRAME frHint
          BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
      btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
      fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
      fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 5 WIDGET-ID 272
+     rctData AT Y 0 X 0 WIDGET-ID 272
      rctDataFilter AT Y 1 X 12 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
@@ -1058,7 +1047,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger"
-         HEIGHT-P           = 675
+         HEIGHT-P           = 700
          WIDTH-P            = 1523
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
@@ -1094,6 +1083,9 @@ ASSIGN FRAME frData:FRAME = FRAME frMain:HANDLE
                                                                         */
 ASSIGN 
        btnClearDataFilter:HIDDEN IN FRAME frData           = TRUE.
+
+ASSIGN 
+       btnDataSort:HIDDEN IN FRAME frData           = TRUE.
 
 /* SETTINGS FOR RECTANGLE rctDataFilter IN FRAME frData
    NO-ENABLE                                                            */
@@ -1647,7 +1639,7 @@ DO:
   IF lSuccess = TRUE THEN
   DO:
     RUN showHelp('DataLoaded', '').
-    RUN reopenDataBrowse('',?).
+    RUN reopenDataBrowse.
 
     IF rNewRecord <> ? THEN
       ghDataBrowse:QUERY:REPOSITION-TO-ROWID(rNewRecord).
@@ -2183,6 +2175,7 @@ DO:
   /* Switch on/off UI */
   btnFavourite:SENSITIVE = lTableFound.
   btnClearDataFilter:SENSITIVE IN FRAME frData = lTableFound.
+  btnDataSort:SENSITIVE IN FRAME frData = lTableFound.
   btnNextQuery:SENSITIVE = lTableFound.
   btnPrevQuery:SENSITIVE = lTableFound.
   btnViewData-2:SENSITIVE IN FRAME frWhere = lTableFound.
@@ -2552,6 +2545,20 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define FRAME-NAME frData
+&Scoped-define SELF-NAME btnDataSort
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataSort C-Win
+ON CHOOSE OF btnDataSort IN FRAME frData /* S */
+OR 'ALT-S', 'CTRL-ALT-S' OF c-win ANYWHERE
+DO:
+  PUBLISH "setUsage" ("SortData"). /* user behaviour */
+  RUN btnDataSortChoose.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnDelete
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDelete C-Win
@@ -2880,7 +2887,6 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
 ON CHOOSE OF btnSettings IN FRAME frSettings /* Set */
 , btnSettings-txt 
-OR 'ALT-S' OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("Settings"). /* user behaviour */
   HIDE FRAME frSettings.
@@ -3193,7 +3199,7 @@ DO:
   IF AVAILABLE bTimer THEN RUN setTimer('timedTableChange',1).
 
   /* Open the query */
-  RUN reopenDataBrowse('',?).
+  RUN reopenDataBrowse.
 
   IF VALID-HANDLE(ghDataBrowse) THEN
     APPLY 'entry' TO ghDataBrowse. 
@@ -4014,7 +4020,7 @@ PROCEDURE btnAddChoose :
 
   IF lRecordsUpdated = TRUE THEN 
   DO:
-    RUN reopenDataBrowse('',?).
+    RUN reopenDataBrowse.
     ghDataBrowse:QUERY:REPOSITION-TO-ROWID(rNewRecord).
   END.
 
@@ -4041,7 +4047,7 @@ PROCEDURE btnClearDataFilterChoose :
     END.
   END.
 
-  RUN reopenDataBrowse('',?).
+  RUN reopenDataBrowse.
 
 END PROCEDURE. /* btnClearDataFilterChoose */
 
@@ -4121,10 +4127,29 @@ PROCEDURE btnCloneChoose :
   DO:
     ghDataBrowse:QUERY:reposition-to-rowid(rNewRecord) NO-ERROR.
     ghDataBrowse:SELECT-FOCUSED-ROW().
-    RUN reopenDataBrowse('',?).
+    RUN reopenDataBrowse.
   END.
 
 END PROCEDURE. /* btnCloneChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataSortChoose C-Win 
+PROCEDURE btnDataSortChoose :
+/* Set sorting for data browse
+ */
+  DEFINE VARIABLE lSortChanged AS LOGICAL NO-UNDO.
+  
+  RUN VALUE(getProgramDir() + 'dSorting.w') 
+     ( INPUT TABLE ttColumn
+     , INPUT-OUTPUT TABLE ttQuerySort
+     , OUTPUT lSortChanged
+     ).
+
+  IF lSortChanged THEN RUN reopenDataBrowse.
+                              
+END PROCEDURE. /* btnDataSortChoose */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4234,7 +4259,7 @@ PROCEDURE btnDeleteChoose :
     ELSE 
       MESSAGE 'Sorry, could not delete record.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
 
-  RUN reopenDataBrowse(?,?).
+  RUN reopenDataBrowse.
 
 END PROCEDURE. /* btnDeleteChoose */
 
@@ -4403,7 +4428,7 @@ PROCEDURE btnLoadChoose :
 
   IF lRecordsUpdated = TRUE THEN 
   DO:
-    RUN reopenDataBrowse('',?).
+    RUN reopenDataBrowse.
     ghDataBrowse:QUERY:REPOSITION-TO-ROWID(rNewRecord) NO-ERROR.
   END.
 
@@ -4789,6 +4814,22 @@ PROCEDURE clearDataFilter :
   phFilterField:LIST-ITEMS = "".
 
 END PROCEDURE. /* clearDataFilter */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataSort C-Win 
+PROCEDURE clearDataSort :
+/*
+ * Remove data column sorting and reopen browse
+ */
+ FOR EACH ttQuerySort WHERE ttQuerySort.iGroup = 2:
+   DELETE ttQuerySort.
+ END.
+
+ RUN reopenDataBrowse.
+
+END PROCEDURE. /* clearDataSort */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5295,6 +5336,14 @@ PROCEDURE createMenuDataBrowse :
   hMenuItem = createMenuItem(hMenu,"Item","Clear Filters","clearFilter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnClearDataFilterChoose IN THIS-PROCEDURE (YES).
 
+  /* Set data sorting */
+  hMenuItem = createMenuItem(hMenu,"Item","Set Sorting","SortData").
+  ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDataSortChoose IN THIS-PROCEDURE.
+
+  /* Clear sorting */
+  hMenuItem = createMenuItem(hMenu,"Item","Clear Sorting","ClearSorting").
+  ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearDataSort IN THIS-PROCEDURE.
+
   /* Rule */
   hMenuItem = createMenuItem(hMenu,"Rule","","").
 
@@ -5381,6 +5430,7 @@ PROCEDURE createSortTable :
         bfNewSort.iGroup     = 0
         bfNewSort.iSortNr    = iNumSorts 
         bfNewSort.cSortField = bfQuerySort.cSortField
+        bfNewSort.iExt       = bfQuerySort.iExt
         .
     END.
     
@@ -5470,6 +5520,10 @@ PROCEDURE dataColumnSort PRIVATE :
       bfQuerySort.iGroup     = 2
       bfQuerySort.iSortNr    = iNumSorts + 1
       bfQuerySort.cSortField = cFieldName.
+
+    /* Extract extent nr from name */
+    IF bfQuerySort.cSortField MATCHES '*[*]' THEN
+      bfQuerySort.iExt = INTEGER( ENTRY(1,ENTRY(2,bfQuerySort.cSortField,'['),']') ).
   END.
   
   IF AVAILABLE bfCurrentSort THEN 
@@ -5477,7 +5531,7 @@ PROCEDURE dataColumnSort PRIVATE :
   ELSE 
     bfQuerySort.lAscending = TRUE. 
 
-  RUN reopenDataBrowse(cFieldName, lAscending).
+  RUN reopenDataBrowse.
 
 END PROCEDURE. /* dataColumnSort */
 
@@ -5565,63 +5619,58 @@ PROCEDURE dataRowDisplay :
  */
   DEFINE INPUT PARAMETER phBrowseBuffer AS HANDLE NO-UNDO.
 
-  DEFINE BUFFER bColumn FOR ttColumn.
-  DEFINE BUFFER bField  FOR ttField.
+  DEFINE BUFFER bColumn     FOR ttColumn.
+  DEFINE BUFFER bField      FOR ttField.
+  DEFINE BUFFER bfQuerySort FOR ttQuerySort.
 
-/*********
-  /* Colormode can be either None, Zebra or ValueBased */
-  IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
-  CASE gcRowColorMode:
-    WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
-    WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
-    WHEN {&ROWCOLORMODE-VALUEBASED} THEN gcThisRowColorValue = phBrowseBuffer:BUFFER-FIELD(gcRowColorField):STRING-VALUE.
-  END CASE. /* color mode */
-***********/
+  DEFINE VARIABLE cFieldValue    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cCurrentValues AS CHARACTER   NO-UNDO.
 
-  /* Colormode can be either None, Zebra or ValueBased */
-  IF NOT VALID-HANDLE(phBrowseBuffer:BUFFER-FIELD(gcRowColorField)) THEN RETURN. 
-  CASE gcRowColorMode:
-    WHEN {&ROWCOLORMODE-NONE}       THEN gcThisRowColorValue = ''.
-    WHEN {&ROWCOLORMODE-ZEBRA}      THEN gcThisRowColorValue = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
-    WHEN {&ROWCOLORMODE-VALUEBASED} THEN 
-    DO:
-      gcThisRowColorValue = ''.
-      FOR EACH ttQuerySort WHERE ttQuerySort.iGroup = 0:
-        gcThisRowColorValue = gcThisRowColorValue + '|' + phBrowseBuffer:BUFFER-FIELD(ttQuerySort.cSortField):STRING-VALUE.
-      END.
+  /* Set row coloring based on sorts */
+  IF TEMP-TABLE bfQuerySort:HAS-RECORDS THEN
+  DO:
+    cCurrentValues = ''.
+    FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 0:
+
+      CASE bfQuerySort.cSortField:
+        WHEN 'RECID' THEN cFieldValue = STRING(phBrowseBuffer:RECID). 
+        WHEN 'ROWID' THEN cFieldValue = STRING(phBrowseBuffer:ROWID).
+        OTHERWISE cFieldValue = phBrowseBuffer:BUFFER-FIELD(ENTRY(1,bfQuerySort.cSortField,'[')):STRING-VALUE(bfQuerySort.iExt).
+      END. 
+
+      cCurrentValues = cCurrentValues + '|' + cFieldValue.
     END.
+  END.
+  ELSE 
+    cCurrentValues = STRING(phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2).
 
-  END CASE. /* color mode */
-
-  IF gcThisRowColorValue <> gcPrevRowColorValue THEN
+  IF cCurrentValues <> gcPreviousValues THEN
     ASSIGN 
       glUseEvenRowColorSet = NOT glUseEvenRowColorSet
-      gcPrevRowColorValue = gcThisRowColorValue.
+      gcPreviousValues = cCurrentValues.
 
   FOR EACH bColumn, bField WHERE bField.cFieldName = bColumn.cFieldName:
     IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
 
     /* Set colors */
-/*     bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1]). */
-/*     bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]). */
-
     bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:fg") ELSE getColor("DataRow:odd:fg")).
     bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:bg") ELSE getColor("DataRow:odd:bg")).
 
-    /* Add field for RECID */
+    /* Set font/value for RECID field */
     IF bColumn.cFieldName = "RECID" THEN
     DO:
       bColumn.hColumn:FONT = giFixedFont.
       bColumn.hColumn:SCREEN-VALUE = STRING( phBrowseBuffer:RECID, "zzzzzzzzz9" ).
     END.
 
-    /* Add field for ROWID */
+    /* Set font/value for ROWID field */
     IF bColumn.cFieldName = "ROWID" THEN
     DO:
       bColumn.hColumn:FONT = giFixedFont.
       bColumn.hColumn:SCREEN-VALUE = STRING(phBrowseBuffer:ROWID, "x(30)").
     END.
 
+    /* Set value for TIME field */
     IF bField.cFormat BEGINS "HH:MM" THEN
     DO:
       /* Try to format in time format */
@@ -5715,7 +5764,8 @@ PROCEDURE dataScrollNotify :
 
   /* Resize them */
   RUN resizeFilterFields
-    ( INPUT cFilterFields
+    ( INPUT btnDataSort:HANDLE
+    , INPUT cFilterFields
     , INPUT cButtons
     , INPUT phBrowse
     ).
@@ -6089,7 +6139,7 @@ PROCEDURE enable_UI :
   {&OPEN-BROWSERS-IN-QUERY-frHint}
   DISPLAY fiNumSelected fiNumRecords 
       WITH FRAME frData IN WINDOW C-Win.
-  ENABLE rctData btnClearDataFilter fiNumSelected fiNumRecords 
+  ENABLE rctData btnDataSort btnClearDataFilter fiNumSelected fiNumRecords 
       WITH FRAME frData IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frData}
   DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
@@ -6117,201 +6167,229 @@ PROCEDURE endResize :
 
   DEFINE BUFFER ttField FOR ttField. 
 
-  setWindowFreeze(YES).
-
-  /* Set max width */
-  IF C-Win:WIDTH > 384 THEN C-Win:WIDTH = 384.
-
-  /* Set frame width */
-  FRAME {&FRAME-NAME}:WIDTH-PIXELS = C-Win:FULL-WIDTH-PIXELS NO-ERROR.
-  FRAME {&FRAME-NAME}:HEIGHT-PIXELS = C-Win:FULL-HEIGHT-PIXELS NO-ERROR.
-
-  /* Sanity checks */
-  IF btnResizeVer:Y < 150 THEN btnResizeVer:Y = 150.
-  IF btnResizeVer:Y > (C-Win:HEIGHT-PIXELS - 180) THEN btnResizeVer:Y = C-Win:HEIGHT-PIXELS - 180.
-
-  /* Park widgets at a safe place, so making the window smaller will 
-   * not results in errors for widgets not being placeable 
-   */
-  IF VALID-HANDLE(ghDataBrowse) THEN
-  ASSIGN 
-    ghDataBrowse:WIDTH-PIXELS  = 100
-    ghDataBrowse:HEIGHT-PIXELS = 100
-    ghDataBrowse:Y = 1
-    ghDataBrowse:X = 1.
-
-  fiFeedback:X = 1.
-  fiFeedback:Y = 1.
-
-  /* Set width of main rectangles */
-  rctQuery:WIDTH-PIXELS  = C-Win:WIDTH-PIXELS - 4 NO-ERROR. 
-  rctQuery:X             = 0 NO-ERROR.
-  rctQuery:Y             = 0 NO-ERROR.
-  rctQuery:HEIGHT-PIXELS = btnResizeVer:Y + 32.
-
-  /* Buttons DD / Tools / Help */
-  btnResizeVer:WIDTH-PIXELS = rctQuery:WIDTH-PIXELS.
-  btnResizeVer:X = 0.
-
-  /* Table browse */
-  rcTableFilter:X = rctQuery:X + 20.
-  rcTableFilter:Y = rctQuery:Y + 24.
-  rcTableFilter:WIDTH-PIXELS = 226.
-  rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y.
-
-  brTables:X = rcTableFilter:X + 3.  
-  brTables:Y = rcTableFilter:Y + 3.  
-  brTables:WIDTH-PIXELS = rcTableFilter:WIDTH-PIXELS - 6.
-  brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 6 - fiTableDesc:HEIGHT-PIXELS.
-  btnTabTables:X = brTables:X - 23.
-  btnTabFavourites:X = brTables:X - 23.
-
-  fiTableDesc:X = brTables:X.
-  fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS.
-  fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS.
-
-  btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS.
-  btnFavourite:Y = fiTableDesc:Y.
-
-  /* Data */
-  DO WITH FRAME frData:
-
-    /* Prepare embedding frame. First make small to avoid errors */
-    FRAME frData:WIDTH-PIXELS  = 100.
-    FRAME frData:HEIGHT-PIXELS = 100.
-    FRAME frData:X = 0.
-    FRAME frData:Y = rctQuery:Y + rctQuery:HEIGHT-PIXELS + 2.   
-    FRAME frData:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS + 4 NO-ERROR.
-    FRAME frData:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34 NO-ERROR.
-
-    /* Make small to prevent errors */
-    rctData:WIDTH-PIXELS  = 1.
-    rctData:HEIGHT-PIXELS = 1.
-    rctDataFilter:WIDTH-PIXELS  = 1. 
-    rctDataFilter:HEIGHT-PIXELS = 27. 
-
-    rctData:X             = 0.
-    rctData:Y             = 1.
-    rctData:WIDTH-PIXELS  = FRAME frData:WIDTH-PIXELS - 0 NO-ERROR.
-    rctData:HEIGHT-PIXELS = FRAME frData:HEIGHT-PIXELS - 10 NO-ERROR.
-
-    rctDataFilter:WIDTH-PIXELS = FRAME frData:WIDTH-PIXELS - rctDataFilter:X - 4 NO-ERROR.
-  END.
+  /* To catch resize errors */
+  DO ON ERROR UNDO, LEAVE:
+    setWindowFreeze(YES).
   
-  /* Edit buttons */
-  rctEdit:X = FRAME frData:X NO-ERROR.
-  rctEdit:Y = FRAME frData:Y + FRAME frData:HEIGHT-PIXELS + 0 NO-ERROR.
+    /* Set max width */
+    IF C-Win:WIDTH > 384 THEN C-Win:WIDTH = 384.
   
-  /* Positioning of buttons "Add" "Save" etc */
-  iButtonSpacingX = 5.
-  iButtonSpacingY = 0.
-  btnAdd:X      = rctEdit:X + iButtonSpacingX.
-  btnClone:X    = btnAdd:X  + btnAdd:WIDTH-PIXELS .
-  btnEdit:X     = btnClone:X + btnClone:WIDTH-PIXELS.
-  btnDump:X     = btnEdit:X + (2 * btnEdit:WIDTH-PIXELS).
-  btnView:X     = btnDump:X + btnDump:WIDTH-PIXELS.
-  btnLoad:X     = btnView:X + btnView:WIDTH-PIXELS. 
-  btnDelete:X   = btnLoad:X + (2 * btnLoad:WIDTH-PIXELS).
-
-  btnAdd:Y      = rctEdit:Y + iButtonSpacingY.
-  btnClone:Y    = rctEdit:Y + iButtonSpacingY.
-  btnEdit:Y     = rctEdit:Y + iButtonSpacingY.
-  btnDump:Y     = rctEdit:Y + iButtonSpacingY.
-  btnView:Y     = rctEdit:Y + iButtonSpacingY.
-  btnLoad:Y     = rctEdit:Y + iButtonSpacingY. 
-  btnDelete:Y   = rctEdit:Y + iButtonSpacingY.
-
-  /* Num results of query */
-  RUN showNumRecords(?,?).
-  RUN showNumSelected.
-
-  /* Feedback txt */
-  fiFeedback:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiFeedback:SCREEN-VALUE,getFont("default")) + 10.
-  fiFeedback:HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont("default")) + 10.
-  fiFeedback:X = FRAME frData:X + FRAME frData:WIDTH-PIXELS - fiFeedback:WIDTH-PIXELS.
-  fiFeedback:Y = rctEdit:Y + rctEdit:HEIGHT-PIXELS - fiFeedback:HEIGHT-PIXELS - 6.
-
-  DO:
-    /* Positioning of browse with fields */
-    ghFieldBrowse:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS - 322.
-    ghFieldBrowse:HEIGHT-PIXELS = btnResizeVer:Y - ghFieldBrowse:Y - 3.
-
-    /* Index browse has same dimensions as field browse 
-     * Due to errors on resizing, first 'park' the browse in the upper 
-     * left with width 1, then set the proper size attributes.
+    /* Set frame width */
+    FRAME {&FRAME-NAME}:WIDTH-PIXELS = C-Win:FULL-WIDTH-PIXELS NO-ERROR.
+    FRAME {&FRAME-NAME}:HEIGHT-PIXELS = C-Win:FULL-HEIGHT-PIXELS NO-ERROR.
+  
+    /* Sanity checks */
+    IF btnResizeVer:Y < 150 THEN btnResizeVer:Y = 150.
+    IF btnResizeVer:Y > (C-Win:HEIGHT-PIXELS - 200) THEN btnResizeVer:Y = C-Win:HEIGHT-PIXELS - 200.
+  
+    /* Park widgets at a safe place, so making the window smaller will 
+     * not results in errors for widgets not being placeable 
      */
-    brIndexes:X             = 1.
-    brIndexes:WIDTH-PIXELS  = 1.
-    brIndexes:X             = ghFieldBrowse:X.            
-    brIndexes:Y             = ghFieldBrowse:Y.            
-    brIndexes:WIDTH-PIXELS  = ghFieldBrowse:WIDTH-PIXELS. 
-    brIndexes:HEIGHT-PIXELS = ghFieldBrowse:HEIGHT-PIXELS.
-
-    /* resize rectangles around the browse */
-    rcFieldFilter:X             = ghFieldBrowse:X - 3.
-    rcFieldFilter:Y             = ghFieldBrowse:Y - 3.
-    rcFieldFilter:WIDTH-PIXELS  = ghFieldBrowse:WIDTH-PIXELS + 6.
-    rcFieldFilter:HEIGHT-PIXELS = ghFieldBrowse:HEIGHT-PIXELS + 6.
-    rcIndexFilter:X             = brIndexes:X - 3.
-    rcIndexFilter:Y             = brIndexes:Y - 3.
-    rcIndexFilter:WIDTH-PIXELS  = brIndexes:WIDTH-PIXELS + 6.
-    rcIndexFilter:HEIGHT-PIXELS = brIndexes:HEIGHT-PIXELS + 6.
-
-    /* right-align buttons with field browse */
-    btnClipboard:X = (ghFieldBrowse:X + ghFieldBrowse:WIDTH-PIXELS) - btnClipboard:WIDTH-PIXELS.
-    btnQueries:X   = btnClipboard:X - btnQueries:WIDTH-PIXELS.
-    btnClear:X     = btnQueries:X - btnClear:WIDTH-PIXELS.
-    btnViewData:X  = btnClear:X - btnViewData:WIDTH-PIXELS.
-    btnWhere:X     = btnViewData:X - btnWhere:WIDTH-PIXELS.
-
-    btnClipboard:Y = btnResizeVer:Y + btnResizeVer:HEIGHT-PIXELS.
-    btnQueries:Y   = btnClipboard:Y.
-    btnClear:Y     = btnClipboard:Y.
-    btnViewData:Y  = btnClipboard:Y.
-    btnWhere:Y     = btnClipboard:Y.
-
-    /* Query buttons */
-    btnPrevQuery:X = brTables:X + 1.
-    btnNextQuery:X = btnPrevQuery:X + btnPrevQuery:WIDTH-PIXELS.
-    btnPrevQuery:Y = btnClipboard:Y.
-    btnNextQuery:Y = btnClipboard:Y.
-
-    /* And align editor to the left of button btnViewData */
-    ficWhere:X = btnNextQuery:X + btnNextQuery:WIDTH-PIXELS + 2.
-    ficWhere:WIDTH-PIXELS = btnWhere:X - ficWhere:X - 2.
-    ficWhere:Y = btnClipboard:Y + 1.
-
-    /* Buttons for field moving */
-    btnMoveUp:X       = rctQuery:WIDTH-PIXELS - 25.
-    btnMoveDown:X     = rctQuery:WIDTH-PIXELS - 25.
-    btnReset:X        = rctQuery:WIDTH-PIXELS - 25.
-    btnMoveTop:X      = rctQuery:WIDTH-PIXELS - 25.
-    btnMoveBottom:X   = rctQuery:WIDTH-PIXELS - 25.
-  END.
-
-  /* Positioning of browse with data */
-  IF VALID-HANDLE(ghDataBrowse) THEN
-  DO:
-    ghDataBrowse:Y = 1. /* to safely adjust size */
-    ghDataBrowse:WIDTH-PIXELS = rctData:WIDTH-PIXELS - 10.
-    ghDataBrowse:HEIGHT-PIXELS = rctData:HEIGHT-PIXELS - 10 - 23. /* Extra space for filters */
-    ghDataBrowse:X = rctData:X + 3.
-    ghDataBrowse:Y = rctData:Y + 5 + 21. /* Extra space for filters */
+    IF VALID-HANDLE(ghDataBrowse) THEN
+    ASSIGN 
+      ghDataBrowse:WIDTH-PIXELS  = 100
+      ghDataBrowse:HEIGHT-PIXELS = 100
+      ghDataBrowse:Y = 1
+      ghDataBrowse:X = 1 NO-ERROR.
   
-    RUN dataScrollNotify(INPUT ghDataBrowse).
-  END.
+    fiFeedback:X = 1.
+    fiFeedback:Y = 1.
+  
+    /* Set width of main rectangles */
+    ASSIGN 
+      rctQuery:WIDTH-PIXELS  = C-Win:WIDTH-PIXELS - 4 
+      rctQuery:X             = 0 
+      rctQuery:Y             = 0 
+      rctQuery:HEIGHT-PIXELS = btnResizeVer:Y + 32 
+      NO-ERROR.
+  
+    /* Buttons DD / Tools / Help */
+    ASSIGN 
+      btnResizeVer:WIDTH-PIXELS = rctQuery:WIDTH-PIXELS
+      btnResizeVer:X = 0 
+      NO-ERROR.
+  
+    /* Table browse */
+    ASSIGN
+      rcTableFilter:X = rctQuery:X + 20
+      rcTableFilter:Y = rctQuery:Y + 24
+      rcTableFilter:WIDTH-PIXELS = 226
+      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y
+    
+      brTables:X = rcTableFilter:X + 3
+      brTables:Y = rcTableFilter:Y + 3  
+      brTables:WIDTH-PIXELS = rcTableFilter:WIDTH-PIXELS - 6
+      brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 6 - fiTableDesc:HEIGHT-PIXELS
+      btnTabTables:X = brTables:X - 23
+      btnTabFavourites:X = brTables:X - 23
+    
+      fiTableDesc:X = brTables:X
+      fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS
+      fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS
+    
+      btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
+      btnFavourite:Y = fiTableDesc:Y
+      NO-ERROR.
+  
+    /* Data */
+    DO WITH FRAME frData:
+  
+      /* Prepare embedding frame. First make small to avoid errors */
+      ASSIGN 
+        FRAME frData:WIDTH-PIXELS  = 100
+        FRAME frData:HEIGHT-PIXELS = 100
+        FRAME frData:X = 0
+        FRAME frData:Y = rctQuery:Y + rctQuery:HEIGHT-PIXELS + 2
+        FRAME frData:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS + 4 
+        FRAME frData:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34 
+        NO-ERROR.
+  
+      /* Make small to prevent errors */
+      ASSIGN
+        rctData:WIDTH-PIXELS        = 1
+        rctData:HEIGHT-PIXELS       = 1
+        rctDataFilter:WIDTH-PIXELS  = 1
+        rctDataFilter:HEIGHT-PIXELS = 27
+        rctData:X                   = 0
+        rctData:Y                   = 1
+        rctData:WIDTH-PIXELS        = FRAME frData:WIDTH-PIXELS - 0 
+        rctData:HEIGHT-PIXELS       = FRAME frData:HEIGHT-PIXELS - 10 
+        rctDataFilter:WIDTH-PIXELS  = FRAME frData:WIDTH-PIXELS - rctDataFilter:X - 4 
+        NO-ERROR.
+    END.
+    
+    /* Edit buttons */
+    ASSIGN
+      rctEdit:X = FRAME frData:X 
+      rctEdit:Y = FRAME frData:Y + FRAME frData:HEIGHT-PIXELS + 0 
+      NO-ERROR.
+    
+    /* Positioning of buttons "Add" "Save" etc */
+    ASSIGN
+      iButtonSpacingX = 5
+      iButtonSpacingY = 0
+      btnAdd:X        = rctEdit:X + iButtonSpacingX
+      btnClone:X      = btnAdd:X  + btnAdd:WIDTH-PIXELS 
+      btnEdit:X       = btnClone:X + btnClone:WIDTH-PIXELS
+      btnDump:X       = btnEdit:X + (2 * btnEdit:WIDTH-PIXELS)
+      btnView:X       = btnDump:X + btnDump:WIDTH-PIXELS
+      btnLoad:X       = btnView:X + btnView:WIDTH-PIXELS 
+      btnDelete:X     = btnLoad:X + (2 * btnLoad:WIDTH-PIXELS)
+                      
+      btnAdd:Y        = rctEdit:Y + iButtonSpacingY
+      btnClone:Y      = rctEdit:Y + iButtonSpacingY
+      btnEdit:Y       = rctEdit:Y + iButtonSpacingY
+      btnDump:Y       = rctEdit:Y + iButtonSpacingY
+      btnView:Y       = rctEdit:Y + iButtonSpacingY
+      btnLoad:Y       = rctEdit:Y + iButtonSpacingY
+      btnDelete:Y     = rctEdit:Y + iButtonSpacingY
+      NO-ERROR.
+  
+    /* Num results of query */
+    RUN showNumRecords(?,?).
+    RUN showNumSelected.
+  
+    /* Feedback txt */
+    ASSIGN 
+      fiFeedback:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiFeedback:SCREEN-VALUE,getFont("default")) + 10
+      fiFeedback:HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont("default")) + 10
+      fiFeedback:X = FRAME frData:X + FRAME frData:WIDTH-PIXELS - fiFeedback:WIDTH-PIXELS
+      fiFeedback:Y = rctEdit:Y + rctEdit:HEIGHT-PIXELS - fiFeedback:HEIGHT-PIXELS - 6
+      NO-ERROR.
+  
+    DO:
+      /* Positioning of browse with fields */
+      ASSIGN
+        ghFieldBrowse:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS - 322
+        ghFieldBrowse:HEIGHT-PIXELS = btnResizeVer:Y - ghFieldBrowse:Y - 3
+        NO-ERROR.
+  
+      /* Index browse has same dimensions as field browse 
+       * Due to errors on resizing, first 'park' the browse in the upper 
+       * left with width 1, then set the proper size attributes.
+       */
+      ASSIGN
+        brIndexes:X             = 1
+        brIndexes:WIDTH-PIXELS  = 1
+        brIndexes:X             = ghFieldBrowse:X
+        brIndexes:Y             = ghFieldBrowse:Y
+        brIndexes:WIDTH-PIXELS  = ghFieldBrowse:WIDTH-PIXELS
+        brIndexes:HEIGHT-PIXELS = ghFieldBrowse:HEIGHT-PIXELS
+    
+        /* resize rectangles around the browse */
+        rcFieldFilter:X             = ghFieldBrowse:X - 3
+        rcFieldFilter:Y             = ghFieldBrowse:Y - 3
+        rcFieldFilter:WIDTH-PIXELS  = ghFieldBrowse:WIDTH-PIXELS + 6
+        rcFieldFilter:HEIGHT-PIXELS = ghFieldBrowse:HEIGHT-PIXELS + 6
+        rcIndexFilter:X             = brIndexes:X - 3
+        rcIndexFilter:Y             = brIndexes:Y - 3
+        rcIndexFilter:WIDTH-PIXELS  = brIndexes:WIDTH-PIXELS + 6
+        rcIndexFilter:HEIGHT-PIXELS = brIndexes:HEIGHT-PIXELS + 6
+    
+        /* right-align buttons with field browse */
+        btnClipboard:X = (ghFieldBrowse:X + ghFieldBrowse:WIDTH-PIXELS) - btnClipboard:WIDTH-PIXELS
+        btnQueries:X   = btnClipboard:X - btnQueries:WIDTH-PIXELS
+        btnClear:X     = btnQueries:X - btnClear:WIDTH-PIXELS
+        btnViewData:X  = btnClear:X - btnViewData:WIDTH-PIXELS
+        btnWhere:X     = btnViewData:X - btnWhere:WIDTH-PIXELS
+    
+        btnClipboard:Y = btnResizeVer:Y + btnResizeVer:HEIGHT-PIXELS
+        btnQueries:Y   = btnClipboard:Y
+        btnClear:Y     = btnClipboard:Y
+        btnViewData:Y  = btnClipboard:Y
+        btnWhere:Y     = btnClipboard:Y
+    
+        /* Query buttons */
+        btnPrevQuery:X = brTables:X + 1
+        btnNextQuery:X = btnPrevQuery:X + btnPrevQuery:WIDTH-PIXELS
+        btnPrevQuery:Y = btnClipboard:Y
+        btnNextQuery:Y = btnClipboard:Y
+    
+        /* And align editor to the left of button btnViewData */
+        ficWhere:X = btnNextQuery:X + btnNextQuery:WIDTH-PIXELS + 2
+        ficWhere:WIDTH-PIXELS = btnWhere:X - ficWhere:X - 2
+        ficWhere:Y = btnClipboard:Y + 1
+    
+        /* Buttons for field moving */
+        btnMoveUp:X       = rctQuery:WIDTH-PIXELS - 25
+        btnMoveDown:X     = rctQuery:WIDTH-PIXELS - 25
+        btnReset:X        = rctQuery:WIDTH-PIXELS - 25
+        btnMoveTop:X      = rctQuery:WIDTH-PIXELS - 25
+        btnMoveBottom:X   = rctQuery:WIDTH-PIXELS - 25
+        NO-ERROR.
 
-  RUN resizeFilters(INPUT {&PAGE-TABLES}). 
-  RUN resizeFilters(INPUT {&PAGE-FAVOURITES}). 
-  RUN resizeFilters(INPUT {&PAGE-FIELDS}). 
-  RUN resizeFilters(INPUT {&PAGE-INDEXES}). 
+    END.
+  
+    /* Positioning of browse with data */
+    IF VALID-HANDLE(ghDataBrowse) THEN
+    DO:
+      ASSIGN 
+        ghDataBrowse:Y = 1 /* to safely adjust size */
+        ghDataBrowse:WIDTH-PIXELS = rctData:WIDTH-PIXELS - 10
+        ghDataBrowse:HEIGHT-PIXELS = rctData:HEIGHT-PIXELS - 10 - 23 /* Extra space for filters */
+        ghDataBrowse:X = rctData:X + 3
+        ghDataBrowse:Y = rctData:Y + 5 + 21 /* Extra space for filters */
+        NO-ERROR.
+    
+      RUN dataScrollNotify(INPUT ghDataBrowse).
+    END.
+  
+    RUN resizeFilters(INPUT {&PAGE-TABLES}). 
+    RUN resizeFilters(INPUT {&PAGE-FAVOURITES}). 
+    RUN resizeFilters(INPUT {&PAGE-FIELDS}). 
+    RUN resizeFilters(INPUT {&PAGE-INDEXES}). 
+  
+    RUN fixTooltips(c-win:HANDLE).
+  
+    RUN saveWindow.
+    RUN showScrollBars(FRAME frData:HANDLE, NO, NO).
+    RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
+    setWindowFreeze(NO).
+  
+  END. 
 
-  RUN fixTooltips(c-win:HANDLE).
-
-  RUN saveWindow.
-  RUN showScrollBars(FRAME frData:HANDLE, NO, NO).
-  RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
-  setWindowFreeze(NO).
+  /* If something goes wrong with resizing we end up here */
+  RUN unlockWindow(C-Win:HANDLE).
 
   {&timerStop}
 
@@ -6333,7 +6411,7 @@ PROCEDURE filterDataBrowse :
  * Apply the filter to the data browse
  */
   PUBLISH "setUsage" ("filterData"). /* user behaviour */
-  RUN reopenDataBrowse('',?).
+  RUN reopenDataBrowse.
 
 END PROCEDURE. /* filterDataBrowse */
 
@@ -6471,7 +6549,8 @@ PROCEDURE filterFieldScrollNotify :
 
   /* Resize them */
   RUN resizeFilterFields
-    ( INPUT cFilterFields
+    ( INPUT ?
+    , INPUT cFilterFields
     , INPUT cButtons
     , INPUT phBrowse
     ).
@@ -6651,6 +6730,11 @@ PROCEDURE getDataQuery :
   
   /* For speed of repositioning... */
   pcQuery = SUBSTITUTE("&1 INDEXED-REPOSITION", pcQuery).
+
+  /* Add tilde chr(126) to curly opening brace chr(123) if not already there */
+  IF INDEX(pcQuery,CHR(123)) > 0
+    AND INDEX(pcQuery,CHR(126)) <> INDEX(pcQuery,CHR(123)) - 1 THEN 
+    pcQuery = REPLACE(pcQuery, '~{', '~~~{').
 
 END PROCEDURE. /* getDataQuery */
 
@@ -6842,6 +6926,7 @@ PROCEDURE getSortedQuery :
  */
   DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
+  DEFINE VARIABLE cField AS CHARACTER   NO-UNDO.
   
   /* Remove indexed-reposition keyword. Will be added back later */
   IF LOOKUP('INDEXED-REPOSITION',pcQuery,' ') > 0 THEN
@@ -6858,9 +6943,15 @@ PROCEDURE getSortedQuery :
     WHERE bfQuerySort.iGroup = 0 
     BREAK BY bfQuerySort.iSortNr:
   
+    CASE bfQuerySort.cSortField:
+      WHEN 'RECID' THEN cField = SUBSTITUTE('RECID(&1)', gcCurrentTable).
+      WHEN 'ROWID' THEN cField = SUBSTITUTE('ROWID(&1)', gcCurrentTable).
+      OTHERWISE cField = bfQuerySort.cSortField.
+    END. 
+
     pcQuery = SUBSTITUTE('&1 BY &2 &3'
                         , pcQuery
-                        , bfQuerySort.cSortField
+                        , cField
                         , TRIM(STRING(bfQuerySort.lAscending,'/DESCENDING'))
                         ).
   END. 
@@ -6902,6 +6993,9 @@ PROCEDURE getSortFromQuery :
       bfQuerySort.cSortField = ENTRY(1,cPart,' ')
       bfQuerySort.lAscending = NOT (cPart MATCHES '* DESC*')
       . 
+    /* Extract extent nr from name */
+    IF bfQuerySort.cSortField MATCHES '*[*]' THEN
+      bfQuerySort.iExt = INTEGER( ENTRY(1,ENTRY(2,bfQuerySort.cSortField,'['),']') ).
   END.
 
 END PROCEDURE. /* getSortFromQuery */
@@ -7194,9 +7288,10 @@ PROCEDURE initializeObjects :
       giDataEvenRowColor[1] = 1
       giDataEvenRowColor[2] = 15.
     
-    /* Num selected records */
     DO WITH FRAME frData:
-      btnClearDataFilter:VISIBLE = (NUM-DBS > 0).
+      ASSIGN
+        btnClearDataFilter:VISIBLE = (NUM-DBS > 0)
+        btnDataSort       :VISIBLE = (NUM-DBS > 0).
     END.
 
     /* Load images for buttONs */
@@ -7362,8 +7457,8 @@ PROCEDURE initializeObjects :
     /* Resize bar */
     iValue = INTEGER(getRegistry("DataDigger", "ResizeBar:Y" )).
     IF iValue = ? OR iValue < 150 THEN iValue = 150.
-    IF iValue > (C-Win:HEIGHT-PIXELS - 180) THEN iValue = C-Win:HEIGHT-PIXELS - 180.
-    ASSIGN btnResizeVer:Y = iValue.
+    IF iValue > (C-Win:HEIGHT-PIXELS - 200) THEN iValue = C-Win:HEIGHT-PIXELS - 200.
+    ASSIGN btnResizeVer:Y = iValue NO-ERROR.
 
     /* Get all connected databases */
     cDatabases = getDatabaseList().
@@ -7681,7 +7776,7 @@ PROCEDURE initializeUi :
   DISPLAY fiNumRecords WITH FRAME frData IN WINDOW C-Win. 
 
   ENABLE 
-    rctData btnClearDataFilter fiNumRecords 
+    rctData btnClearDataFilter btnDataSort fiNumRecords 
     WITH FRAME frData IN WINDOW C-Win.
 
   /* FRAME frSettings */
@@ -7849,6 +7944,7 @@ PROCEDURE initializeVisuals :
     btnClearFieldFilter:LOAD-IMAGE(getImagePath("Clear.gif")).
     btnClearIndexFilter:LOAD-IMAGE(getImagePath("Clear.gif")).
     btnClearDataFilter:LOAD-IMAGE (getImagePath("Clear.gif")).
+    btnDataSort:LOAD-IMAGE        (getImagePath("SortGroups.gif")).
 
     btnPrevQuery:LOAD-IMAGE       (getImagePath("Prev.gif")).
     btnNextQuery:LOAD-IMAGE       (getImagePath("Next.gif")).
@@ -8349,9 +8445,6 @@ END PROCEDURE. /* processQuery */
 PROCEDURE reopenDataBrowse :
 /* Build the query, based on where-box and filter fields
  */
-  DEFINE INPUT PARAMETER pcSortField AS CHARACTER   NO-UNDO.
-  DEFINE INPUT PARAMETER plAscending AS LOGICAL     NO-UNDO.
-
   DEFINE VARIABLE cFullTable     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUserQuery     AS CHARACTER   NO-UNDO.
@@ -8401,9 +8494,6 @@ PROCEDURE reopenDataBrowse :
 
     CREATE BUFFER hBufferDB FOR TABLE gcCurrentDatabase + '._lock'.
 
-    /* Set color for row coloring */
-    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
-
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBufferDB).
     hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', gcCurrentDatabase)).
@@ -8440,10 +8530,6 @@ PROCEDURE reopenDataBrowse :
 
   /* Show sorts in the browse */
   RUN setSortArrows(ghDataBrowse).
-
-  /* Set color for row coloring */
-  IF gcRowColorField = "" THEN
-    gcRowColorField = ghDataBuffer:BUFFER-FIELD(1):NAME.      
 
   /* for DWP query tester */
   PUBLISH "debugMessage" (INPUT 1, "cQuery = " + cQuery ).
@@ -8576,7 +8662,6 @@ PROCEDURE reopenDataBrowse-create :
 
   RUN deleteDataFilters(ghDataBrowse).
   EMPTY TEMP-TABLE ttQuerySort.
-  gcRowColorField = ''.
 
   IF VALID-HANDLE(ghDataBrowse) AND VALID-HANDLE(ghDataBrowse:QUERY) THEN DELETE OBJECT ghDataBrowse:QUERY NO-ERROR.
   IF VALID-HANDLE(ghDataBrowse) THEN DELETE OBJECT ghDataBrowse NO-ERROR.
@@ -8628,7 +8713,7 @@ PROCEDURE reopenDataBrowse-create :
     TRIGGERS:
       ON "CTRL-A"           PERSISTENT RUN dataSelectAll           IN THIS-PROCEDURE (ghDataBrowse).
       ON "CTRL-D"           PERSISTENT RUN dataSelectNone          IN THIS-PROCEDURE (ghDataBrowse).
-      ON "CTRL-J"           PERSISTENT RUN reopenDataBrowse        IN THIS-PROCEDURE ("",?).
+      ON "CTRL-J"           PERSISTENT RUN reopenDataBrowse        IN THIS-PROCEDURE.
       ON "ROW-DISPLAY"      PERSISTENT RUN dataRowDisplay          IN THIS-PROCEDURE (ghDataBuffer).
       ON "START-SEARCH"     PERSISTENT RUN dataColumnSort          IN THIS-PROCEDURE.
       ON "INSERT-MODE"      PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE.
@@ -9508,7 +9593,8 @@ PROCEDURE resizeFilters :
 
     /* Resize them */
     RUN resizeFilterFields
-      ( INPUT cFilterFields
+      ( INPUT ?
+      , INPUT cFilterFields
       , INPUT cButtons
       , INPUT hBrowse
       ).
@@ -9837,7 +9923,7 @@ PROCEDURE setDataFilter :
       RUN filterFieldValueChanged(bColumn.hFilter,NO).
     END.
 
-    RUN reopenDataBrowse('',?).
+    RUN reopenDataBrowse.
   END. 
 
   setWindowFreeze(NO).
@@ -9908,7 +9994,7 @@ PROCEDURE setPage :
 
         IF NOT VALID-HANDLE(ghDataBrowse) THEN
         DO WITH FRAME frData:
-          HIDE btnClearDataFilter.
+          HIDE btnClearDataFilter btnDataSort. 
         END.
       END.
   
@@ -10058,14 +10144,11 @@ PROCEDURE setSortArrows :
        BY bfQuerySort.iSortNr:
 
     /* Find column name */
-    FIND FIRST bfColumn WHERE bfColumn.cFieldName = bfQuerySort.cSortField NO-ERROR.
+    FIND FIRST bfColumn WHERE bfColumn.cFullName = bfQuerySort.cSortField NO-ERROR.
     IF NOT AVAILABLE bfColumn THEN
       FIND FIRST bfColumn WHERE bfQuerySort.cSortField MATCHES '*' + bfColumn.cFieldName + '*' NO-ERROR.
     IF NOT AVAILABLE bfColumn THEN NEXT SortItem. 
 
-    /* Set color for row coloring */
-    gcRowColorField = bfColumn.cFieldName.
-    
     /* Increase counter for sort arrow. Max value in Progress is 9 */
     iSortOrder = iSortOrder + 1.
     IF iSortOrder > 9 THEN NEXT SortItem.
@@ -10138,7 +10221,7 @@ PROCEDURE setTable :
       IF gcCurrentTable <> "" THEN
       DO:
         RUN setTableContext(INPUT gcCurrentTable ).
-        RUN reopenDataBrowse('',?).
+        RUN reopenDataBrowse.
       END. 
       ELSE 
       DO:
@@ -11886,6 +11969,7 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
     DO WITH FRAME frData:
       ASSIGN
         btnClearDataFilter:VISIBLE = VALID-HANDLE(ghDataBrowse)
+        btnDataSort:VISIBLE        = VALID-HANDLE(ghDataBrowse)
         fiNumRecords:VISIBLE       = (gcRecordMode <> 'no-record')
         .
     END.
