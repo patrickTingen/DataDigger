@@ -45,8 +45,8 @@
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnDataDigger btnTabAbout btnTabChanges ~
-BtnOK edChangelog 
+&Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog btnTabAbout ~
+btnTabChanges 
 &Scoped-Define DISPLAYED-OBJECTS edChangelog fiDataDigger-1 fiDataDigger-2 
 
 /* Custom List Definitions                                              */
@@ -99,10 +99,10 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 
 DEFINE FRAME Dialog-Frame
      btnDataDigger AT ROW 1.24 COL 2 WIDGET-ID 82
-     btnTabAbout AT ROW 3.19 COL 1 WIDGET-ID 78
-     btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      BtnOK AT Y 5 X 545 WIDGET-ID 48
      edChangelog AT Y 70 X 0 NO-LABEL WIDGET-ID 72
+     btnTabAbout AT ROW 3.19 COL 1 WIDGET-ID 78
+     btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
@@ -260,7 +260,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 
       WITH FRAME Dialog-Frame.
-  ENABLE btnDataDigger btnTabAbout btnTabChanges BtnOK edChangelog 
+  ENABLE btnDataDigger BtnOK edChangelog btnTabAbout btnTabChanges 
       WITH FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
 END PROCEDURE.
@@ -336,6 +336,26 @@ END PROCEDURE. /* initializeObject. */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveEditor Dialog-Frame 
+PROCEDURE moveEditor :
+/*------------------------------------------------------------------------------
+  Purpose:     
+  Parameters:  <none>
+  Notes:       
+------------------------------------------------------------------------------*/
+  DEFINE INPUT PARAMETER piMove AS INTEGER NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+    IF    edChangelog:X + piMove > 0 
+      AND edChangelog:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS - 10) THEN
+      edChangelog:X = edChangelog:X + piMove.
+  END.
+
+END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage Dialog-Frame 
 PROCEDURE setPage :
 /*------------------------------------------------------------------------
@@ -376,13 +396,23 @@ END PROCEDURE. /* setPage */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog Dialog-Frame 
 PROCEDURE showLog :
-DEFINE VARIABLE cLine   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iOrgPos AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStep   AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE dMoveX  AS DECIMAL     NO-UNDO.
-  DEFINE VARIABLE dMoveY  AS DECIMAL     NO-UNDO.
-  DEFINE VARIABLE dGrowY  AS DECIMAL     NO-UNDO.
+DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName     AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iStep     AS INTEGER     NO-UNDO.
+
+  DEFINE VARIABLE iStartH   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartW   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartX   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartY   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartEdH  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartEdW  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndH     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndW     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndY     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndX     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndEdH    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndEdW    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iNumSteps AS INTEGER     NO-UNDO INITIAL 100.
 
   INPUT FROM 'DataDigger.txt'.
   SEEK INPUT TO 300. /* random nr after header */
@@ -399,25 +429,50 @@ DEFINE VARIABLE cLine   AS CHARACTER   NO-UNDO.
     btnTabAbout:VISIBLE = NO.
     btnTabChanges:VISIBLE = NO.
     
-    dMoveX = ((SESSION:WIDTH-PIXELS  - FRAME {&FRAME-NAME}:WIDTH-PIXELS)  / 2 - FRAME {&FRAME-NAME}:X) / 100.
-    dMoveY = ((SESSION:HEIGHT-PIXELS - 700) / 2 - FRAME {&FRAME-NAME}:Y) / 100.
-    dGrowY = (700 - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 100.
+    ASSIGN 
+      iStartH = FRAME {&FRAME-NAME}:HEIGHT-PIXELS
+      iStartW = FRAME {&FRAME-NAME}:WIDTH-PIXELS
+      iStartX = FRAME {&FRAME-NAME}:X
+      iStartY = FRAME {&FRAME-NAME}:Y
+      iEndH   = 700
+      iEndW   = iStartW
+      iEndY   = (SESSION:HEIGHT-PIXELS - iEndH) / 2
+      iEndX   = (SESSION:WIDTH-PIXELS - iEndW) / 2
 
-    DO iStep = 1 TO 100:
+      /* editor box */
+      iStartEdH = edChangelog:HEIGHT-PIXELS
+      iEndEdH   = 10
+      iStartEdW = edChangelog:WIDTH-PIXELS - 40
+      iEndEdW   = 80
+      .
+
+    DO iStep = 1 TO iNumSteps:
       /* Move vertically */
-      FRAME {&FRAME-NAME}:Y = FRAME {&FRAME-NAME}:Y + dMoveY.
-      FRAME {&FRAME-NAME}:X = FRAME {&FRAME-NAME}:X + dMoveX.
-      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS + dGrowY.
+      FRAME {&FRAME-NAME}:X             = iStartX + ((iEndX - iStartX)) / iNumSteps * iStep.
+      FRAME {&FRAME-NAME}:Y             = iStartY + ((iEndY - iStartY)) / iNumSteps * iStep.
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = iStartH + ((iEndH - iStartH)) / iNumSteps * iStep.
+      FRAME {&FRAME-NAME}:WIDTH-PIXELS  = iStartW + ((iEndW - iStartW)) / iNumSteps * iStep.
 
-      ETIME(YES). REPEAT WHILE ETIME < 5: PROCESS EVENTS. END.
+      edChangelog:HEIGHT-PIXELS = iStartEdH + ((iEndEdH - iStartEdH)) / iNumSteps * iStep.
+      edChangelog:Y             = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - edChangelog:HEIGHT-PIXELS - 40.
+
+      edChangelog:WIDTH-PIXELS = iStartEdW + ((iEndEdW - iStartEdW)) / iNumSteps * iStep.
+      edChangelog:X            = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS) / 2.
+
+      ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
     END.
 
-    edChangelog:HEIGHT-PIXELS = 10.
-    edChangelog:Y = FRAME {&FRAME-NAME}:Y + FRAME {&FRAME-NAME}:HEIGHT-PIXELS - edChangelog:Y - edChangelog:HEIGHT-PIXELS - 150.
-  END.
+    edChangelog:BGCOLOR = 1.
+    edChangelog:READ-ONLY = TRUE.
 
+    /* Enable play mode */
+    ON 'cursor-right' OF edChangelog PERSISTENT RUN moveEditor(+15).
+    ON 'cursor-left' OF edChangelog PERSISTENT RUN moveEditor(-15).
+    WAIT-FOR CHOOSE OF btnOk.
+
+  END.
   
-END PROCEDURE.
+END PROCEDURE. /* showLog */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
