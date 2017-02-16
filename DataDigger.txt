@@ -11,6 +11,8 @@ DataDigger version 22
 - Solved: Errors on SQL Server dataserver tables (Edwin Schutten)
 - Solved: Interface errors when using larger fonts
 - Solved: Fields with % or # in their name cannot be dumped as XML (Damir Pem)
+- Solved: Curly brace could break query
+- Solved: Resize error in large window with resize bar
 
 - New   : Row coloring can be set to 'zebra' or 'value-based'
 - New   : Multi-sort on data columns now possible
