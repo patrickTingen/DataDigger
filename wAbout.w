@@ -1,8 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
-&Scoped-define WINDOW-NAME CURRENT-WINDOW
-&Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
+&Scoped-define WINDOW-NAME wAbout
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wAbout 
 /*------------------------------------------------------------------------
 
   File: 
@@ -18,17 +17,22 @@
   Author: 
 
   Created: 
+
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
+
+/* Create an unnamed pool to store all the widgets created 
+     by this procedure. This is a good default which assures
+     that this procedure's triggers and internal procedures 
+     will execute in this procedure's storage, and that proper
+     cleanup will occur on deletion of the procedure. */
+
+CREATE WIDGET-POOL.
 
 /* ***************************  Definitions  ************************** */
 
 { datadigger.i }
-
-/* Parameters Definitions ---                                           */
-
-/* Local Variable Definitions ---                                       */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -38,11 +42,11 @@
 
 /* ********************  Preprocessor Definitions  ******************** */
 
-&Scoped-define PROCEDURE-TYPE Dialog-Box
+&Scoped-define PROCEDURE-TYPE Window
 &Scoped-define DB-AWARE no
 
 /* Name of designated FRAME-NAME and/or first browse and/or first query */
-&Scoped-define FRAME-NAME Dialog-Frame
+&Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog btnTabAbout ~
@@ -59,7 +63,8 @@ btnTabChanges
 
 /* ***********************  Control Definitions  ********************** */
 
-/* Define a dialog box                                                  */
+/* Define the widget handle for the window                              */
+DEFINE VAR wAbout AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnDataDigger  NO-FOCUS FLAT-BUTTON
@@ -97,7 +102,7 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 
 /* ************************  Frame Definitions  *********************** */
 
-DEFINE FRAME Dialog-Frame
+DEFINE FRAME DEFAULT-FRAME
      btnDataDigger AT ROW 1.24 COL 2 WIDGET-ID 82
      BtnOK AT Y 5 X 545 WIDGET-ID 48
      edChangelog AT Y 70 X 0 NO-LABEL WIDGET-ID 72
@@ -105,40 +110,67 @@ DEFINE FRAME Dialog-Frame
      btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 672 BY 439
-         TITLE "About DataDigger"
-         DEFAULT-BUTTON BtnOK WIDGET-ID 100.
+         AT COL 1 ROW 1
+         SIZE 125.8 BY 19.62 WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
 
 &ANALYZE-SUSPEND _PROCEDURE-SETTINGS
 /* Settings for THIS-PROCEDURE
-   Type: Dialog-Box
-   Allow: Basic,Browse,DB-Fields,Query
+   Type: Window
+   Allow: Basic,Browse,DB-Fields,Window,Query
    Other Settings: COMPILE
  */
 &ANALYZE-RESUME _END-PROCEDURE-SETTINGS
+
+/* *************************  Create Window  ************************** */
+
+&ANALYZE-SUSPEND _CREATE-WINDOW
+IF SESSION:DISPLAY-TYPE = "GUI":U THEN
+  CREATE WINDOW wAbout ASSIGN
+         HIDDEN             = YES
+         TITLE              = "<insert window title>"
+         HEIGHT             = 19.62
+         WIDTH              = 125.8
+         MAX-HEIGHT         = 30.81
+         MAX-WIDTH          = 209.6
+         VIRTUAL-HEIGHT     = 30.81
+         VIRTUAL-WIDTH      = 209.6
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
+         BGCOLOR            = ?
+         FGCOLOR            = ?
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
+ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
+/* END WINDOW DEFINITION                                                */
+&ANALYZE-RESUME
 
 
 
 /* ***********  Runtime Attributes and AppBuilder Settings  *********** */
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
-/* SETTINGS FOR DIALOG-BOX Dialog-Frame
-   NOT-VISIBLE FRAME-NAME                                               */
+/* SETTINGS FOR WINDOW wAbout
+  VISIBLE,,RUN-PERSISTENT                                               */
+/* SETTINGS FOR FRAME DEFAULT-FRAME
+   FRAME-NAME                                                           */
 ASSIGN 
-       FRAME Dialog-Frame:SCROLLABLE       = FALSE.
+       edChangelog:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
-ASSIGN 
-       edChangelog:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+/* SETTINGS FOR FILL-IN fiDataDigger-1 IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+/* SETTINGS FOR FILL-IN fiDataDigger-2 IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
+THEN wAbout:HIDDEN = no.
 
-/* SETTINGS FOR FILL-IN fiDataDigger-1 IN FRAME Dialog-Frame
-   NO-ENABLE                                                            */
-/* SETTINGS FOR FILL-IN fiDataDigger-2 IN FRAME Dialog-Frame
-   NO-ENABLE                                                            */
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
@@ -148,11 +180,26 @@ ASSIGN
 
 /* ************************  Control Triggers  ************************ */
 
-&Scoped-define SELF-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON WINDOW-CLOSE OF FRAME Dialog-Frame /* About DataDigger */
+&Scoped-define SELF-NAME wAbout
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wAbout wAbout
+ON END-ERROR OF wAbout /* <insert window title> */
+OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
+  /* This case occurs when the user presses the "Esc" key.
+     In a persistently run window, just ignore this.  If we did not, the
+     application would exit. */
+  IF THIS-PROCEDURE:PERSISTENT THEN RETURN NO-APPLY.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wAbout wAbout
+ON WINDOW-CLOSE OF wAbout /* <insert window title> */
 DO:
-  APPLY "END-ERROR":U TO SELF.
+  /* This event will close the window and terminate the procedure.  */
+  APPLY "CLOSE":U TO THIS-PROCEDURE.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -160,8 +207,8 @@ END.
 
 
 &Scoped-define SELF-NAME btnDataDigger
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger Dialog-Frame
-ON CHOOSE OF btnDataDigger IN FRAME Dialog-Frame /* D */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
+ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
   RUN showLog.
 END.
@@ -171,8 +218,8 @@ END.
 
 
 &Scoped-define SELF-NAME btnTabAbout
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabAbout Dialog-Frame
-ON CHOOSE OF btnTabAbout IN FRAME Dialog-Frame /* About */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabAbout wAbout
+ON CHOOSE OF btnTabAbout IN FRAME DEFAULT-FRAME /* About */
 or 'ctrl-1' of frame {&frame-name} anywhere
 DO:
   run setPage(1).
@@ -183,8 +230,8 @@ END.
 
 
 &Scoped-define SELF-NAME btnTabChanges
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabChanges Dialog-Frame
-ON CHOOSE OF btnTabChanges IN FRAME Dialog-Frame /* Changes */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabChanges wAbout
+ON CHOOSE OF btnTabChanges IN FRAME DEFAULT-FRAME /* Changes */
 or 'ctrl-2' of frame {&frame-name} anywhere
 DO:
   run setPage(2).
@@ -196,15 +243,22 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wAbout 
 
 
 /* ***************************  Main Block  *************************** */
 
-/* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
-IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ?
-THEN FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
+/* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+       THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
+/* The CLOSE event can be used from inside or outside the procedure to  */
+/* terminate it.                                                        */
+ON CLOSE OF THIS-PROCEDURE 
+   RUN disable_UI.
+
+/* Best default for GUI applications is...                              */
+PAUSE 0 BEFORE-HIDE.
 
 /* Now enable the interface and wait for the exit condition.            */
 /* (NOTE: handle ERROR and END-KEY so cleanup code will always fire.    */
@@ -212,17 +266,15 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  frame {&frame-name}:hidden = yes.
-  run enable_UI.
-  run initializeObject.
-  frame {&frame-name}:hidden = no.
+  FRAME {&FRAME-NAME}:HIDDEN = YES.
+  RUN enable_UI.
+  RUN initializeObject.
+  FRAME {&FRAME-NAME}:HIDDEN = NO.
   
-  run fadeWindow(0,240).
-  wait-for go of frame {&frame-name} focus edChangelog.
-  run fadeWindow(240,0).
+  RUN fadeWindow(0,240).
+  WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS edChangelog.
+  RUN fadeWindow(240,0).
 END.
-
-RUN disable_UI.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -230,7 +282,7 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI Dialog-Frame  _DEFAULT-DISABLE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI wAbout  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
   Purpose:     DISABLE the User Interface
@@ -240,14 +292,16 @@ PROCEDURE disable_UI :
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
-  /* Hide all frames. */
-  HIDE FRAME Dialog-Frame.
+  /* Delete the WINDOW we created */
+  IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
+  THEN DELETE WIDGET wAbout.
+  IF THIS-PROCEDURE:PERSISTENT THEN DELETE PROCEDURE THIS-PROCEDURE.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI Dialog-Frame  _DEFAULT-ENABLE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI wAbout  _DEFAULT-ENABLE
 PROCEDURE enable_UI :
 /*------------------------------------------------------------------------------
   Purpose:     ENABLE the User Interface
@@ -259,16 +313,17 @@ PROCEDURE enable_UI :
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 
-      WITH FRAME Dialog-Frame.
+      WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   ENABLE btnDataDigger BtnOK edChangelog btnTabAbout btnTabChanges 
-      WITH FRAME Dialog-Frame.
-  {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
+      WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
+  {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
+  VIEW wAbout.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fadeWindow Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fadeWindow wAbout 
 PROCEDURE fadeWindow :
 define input parameter piStartValue as integer no-undo.
   define input parameter piEndValue   as integer no-undo.
@@ -280,14 +335,14 @@ define input parameter piStartValue as integer no-undo.
   
     if piEndValue > piStartValue then 
     do iTranparency = piStartValue to piEndValue by 24:
-      run setTransparency( input frame Dialog-Frame:handle, iTranparency).
+      run setTransparency( input frame {&FRAME-NAME}:handle, iTranparency).
       iStartTime = etime.
       do while etime < iStartTime + 20: end.
     end.
   
     else
     do iTranparency = piStartValue to piEndValue by -24:
-      run setTransparency( input frame Dialog-Frame:handle, iTranparency).
+      run setTransparency( input frame {&FRAME-NAME}:handle, iTranparency).
       iStartTime = etime.
       do while etime < iStartTime + 20: end.
     end.
@@ -299,7 +354,7 @@ END PROCEDURE. /* fadeWindow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wAbout 
 PROCEDURE initializeObject :
 /*------------------------------------------------------------------------------
   Purpose:     
@@ -323,7 +378,7 @@ PROCEDURE initializeObject :
       btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
       
       RUN setPage(1).
-      RUN setTransparency(INPUT FRAME Dialog-Frame:HANDLE, 1).
+      RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
       
       /* For some reasons, these #*$&# scrollbars keep coming back */
       RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
@@ -336,7 +391,7 @@ END PROCEDURE. /* initializeObject. */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveEditor Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveEditor wAbout 
 PROCEDURE moveEditor :
 /*------------------------------------------------------------------------------
   Purpose:     
@@ -356,7 +411,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wAbout 
 PROCEDURE setPage :
 /*------------------------------------------------------------------------
   Name         : setPage
@@ -394,7 +449,7 @@ END PROCEDURE. /* setPage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout 
 PROCEDURE showLog :
 DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cName     AS CHARACTER   NO-UNDO.
@@ -430,13 +485,13 @@ DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
     btnTabChanges:VISIBLE = NO.
     
     ASSIGN 
-      iStartH = FRAME {&FRAME-NAME}:HEIGHT-PIXELS
-      iStartW = FRAME {&FRAME-NAME}:WIDTH-PIXELS
-      iStartX = FRAME {&FRAME-NAME}:X
-      iStartY = FRAME {&FRAME-NAME}:Y
+      iStartH = wAbout:HEIGHT-PIXELS
+      iStartW = wAbout:WIDTH-PIXELS
+      iStartX = wAbout:X
+      iStartY = wAbout:Y
       iEndH   = 700
       iEndW   = 700
-      iEndY   = 125
+      iEndY   = (SESSION:HEIGHT-PIXELS - iEndH) / 2
       iEndX   = (SESSION:WIDTH-PIXELS - iEndW) / 2
 
       /* editor box */
@@ -446,27 +501,23 @@ DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
       iEndEdW   = 80
       .
 
-    MESSAGE SESSION:HEIGHT-PIXELS iendy
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
     DO iStep = 1 TO iNumSteps:
       /* Move vertically */
-      FRAME {&FRAME-NAME}:X             = iStartX + ((iEndX - iStartX)) / iNumSteps * iStep.
-      FRAME {&FRAME-NAME}:Y             = iStartY + ((iEndY - iStartY)) / iNumSteps * iStep.
-      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = iStartH + ((iEndH - iStartH)) / iNumSteps * iStep.
-      FRAME {&FRAME-NAME}:WIDTH-PIXELS  = iStartW + ((iEndW - iStartW)) / iNumSteps * iStep.
+      wAbout:X             = iStartX + ((iEndX - iStartX)) / iNumSteps * iStep.
+      wAbout:Y             = iStartY + ((iEndY - iStartY)) / iNumSteps * iStep.
+      wAbout:HEIGHT-PIXELS = iStartH + ((iEndH - iStartH)) / iNumSteps * iStep.
+      wAbout:WIDTH-PIXELS  = iStartW + ((iEndW - iStartW)) / iNumSteps * iStep.
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = wAbout:HEIGHT-PIXELS.
+      FRAME {&FRAME-NAME}:WIDTH-PIXELS = wAbout:WIDTH-PIXELS.
 
       edChangelog:HEIGHT-PIXELS = iStartEdH + ((iEndEdH - iStartEdH)) / iNumSteps * iStep.
-      edChangelog:Y             = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - edChangelog:HEIGHT-PIXELS - 40.
+      edChangelog:Y             = wAbout:HEIGHT-PIXELS - edChangelog:HEIGHT-PIXELS - 40.
 
       edChangelog:WIDTH-PIXELS = iStartEdW + ((iEndEdW - iStartEdW)) / iNumSteps * iStep.
-      edChangelog:X            = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS) / 2.
+      edChangelog:X            = (wAbout:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS) / 2.
 
       ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
     END.
-
-    MESSAGE FRAME {&FRAME-NAME}:Y 
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
 
     edChangelog:BGCOLOR = 1.
     edChangelog:READ-ONLY = TRUE.
