@@ -446,9 +446,6 @@ DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
       iEndEdW   = 80
       .
 
-    MESSAGE SESSION:HEIGHT-PIXELS iendy
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
     DO iStep = 1 TO iNumSteps:
       /* Move vertically */
       FRAME {&FRAME-NAME}:X             = iStartX + ((iEndX - iStartX)) / iNumSteps * iStep.
@@ -465,9 +462,6 @@ DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
       ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
     END.
 
-    MESSAGE FRAME {&FRAME-NAME}:Y 
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
     edChangelog:BGCOLOR = 1.
     edChangelog:READ-ONLY = TRUE.
 
@@ -482,4 +476,3 @@ END PROCEDURE. /* showLog */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
