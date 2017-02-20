@@ -613,7 +613,14 @@ PROCEDURE checkFiles :
   DO:
     CREATE BUFFER hTableBuffer FOR TABLE picDatabase + "." + picTableName.
     CREATE TEMP-TABLE ghXmlTable.
+    
+    /* To keep it running on 10.1B */
+    &IF PROVERSION < '10.1C' &THEN
+    ghXmlTable:CREATE-LIKE(hTableBuffer).
+    &ELSE
     ghXmlTable:CREATE-LIKE-SEQUENTIAL(hTableBuffer).
+    &ENDIF
+
     ghXmlTable:TEMP-TABLE-PREPARE(picTableName).
     DELETE OBJECT hTableBuffer.
   
@@ -894,4 +901,3 @@ END FUNCTION.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

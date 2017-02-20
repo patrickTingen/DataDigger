@@ -13,9 +13,10 @@ DataDigger version 22
 - Solved: Fields with % or # in their name cannot be dumped as XML (Damir Pem)
 - Solved: Curly brace could break query
 - Solved: Resize error in large window with resize bar
+- Solved: Compilation errors on Progress 10.1B (Cherian George)
 
-- New   : Row coloring can be set to 'zebra' or 'value-based'
 - New   : Multi-sort on data columns now possible
+- New   : Row coloring now depending on chosen sort
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
 
 
@@ -242,7 +243,7 @@ DataDigger version 18 - 01-06-2013
 - Change: Table browse focusses on exact match when filtering (Edwin Schutten)
 - Change: Field definitions are cached to improve performance of switching between tables
 - Change: Data browse is created once and not everytime the data query is (re)opened
-- Change: INI file settings are cached to improve performance (see below)
+- Change: INI file settings are cached to improve performance, see below
 - Change: Toggling visibility of all fields now much faster
 - Change: Column sort toggles between no sort, ascending, descending
 - Change: Better location for table filter window
@@ -290,7 +291,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - Solved: Inconsistent behavior on copying the query
 - Solved: When starting, font check failed.
 - Solved: Helpfile not available in non-compile environment (Jeroen Beugels)
-- Solved: DD does not start on only .r files (tip: run wDataDigger.r)
+- Solved: DD does not start on only .r files. Tip: run wDataDigger.r
 - Solved: Full path to datadigger.p in datadigger.pf
 - Solved: Rectangle does not fit in screen for query history (Didier Dujardin)
 - Solved: Flashing when scrolling mousewheel on data browse (Dick Knol)
@@ -298,7 +299,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - Solved: Clear table filter button gone in index view
 - Solved: View record shows all ? when one of the fields is unknown (Albert Flikkema)
 - Solved: Removed scrollbars on settings frame when non-standard fonts used
-- Solved: 'select all fields' toggle only works on all fields (not restrained by filter)
+- Solved: 'select all fields' toggle only works on all fields, not restrained by filter
 - Solved: Records with dictionary validation give error 7347. Now deleted with generated program
 - Solved: Bug in dump routine prevented record from being deleted (Rob Willoughby)
 - Solved: When a record is deleted but still visible in the browse, double click gives an error
@@ -312,7 +313,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - Solved: Edit window flashes briefly when opening (Dick Knol)
 - Solved: Edit button insensitive after CTRL-A on data browse
 - Solved: Edit window allowed only maximum string format of x(256) (Ronald Zijlstra)
-- Solved: Replication Triggers still fired (due to error in Progress docs)
+- Solved: Replication Triggers still fired due to error in Progress docs
 - Solved: Min/Max buttons on window missing (Albert Flikkema)
 
 - Change: Disable updates if started without sources (Jeroen Beugels)
@@ -340,9 +341,9 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - New   : Extra startup program DataReader to start DataDigger in read-only mode.
 - New   : ALT-F and ALT-I will switch screen to Field view / Index view and set focus on field/index name
 - New   : Auto-hide of settings frame after 2 seconds, unless mouse is over frame
-- New   : When you start Data Dictionary, the window is made resizable (Thanks to Sebastien Lacroix)
+- New   : When you start Data Dictionary, the window is made resizable (Sebastien Lacroix)
 - New   : During editing, a field can be changed with SHIFT-UP / DOWN / HOME / END
-- New   : Added DUMPNAME tag as option for FileTemplate (Create/Update/Delete)
+- New   : Added DUMPNAME tag as option for FileTemplate, Create/Update/Delete
 - New   : Added Procedure Editor button to toolbar
 - New   : SHIFT-INS on databrowse adds a record based on the one that is selected
 - New   : Default filtering is now MATCHES instead of EQ. Can be changed in Settings Window
@@ -354,7 +355,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - New   : Edit window also shows order nr of fields
 - New   : Fields in edit window can be sorted by clicking on header
 - New   : Record can be backed up on create/update/delete
-- New   : Added ACTION tag as option for DirTemplate and FileTemplate (Create/Update/Delete)
+- New   : Added ACTION tag as option for DirTemplate and FileTemplate, Create/Update/Delete
 - New   : New setting MaxQueryTime to set maximum nr of msec for query to open 
 - New   : Nr of selected records is shown in the right lower corner of the data browse
 - New   : Possibility to start data dictionary from tools menu
@@ -376,9 +377,9 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - Solved: Copy to clipboard could contain double 'where' in query
 - Solved: No recompile when old version has been compiled after release date of new version
 - Solved: Change of database in database combo was not remembered in INI 
-- Solved: Maximum window size is now same as monitor (was 1680x1200)
+- Solved: Maximum window size is now same as monitor, was 1680x1200
 - Solved: DataDigger looks bad if default font is changed in progress.ini 
-- Solved: When toggling 'Show Hidden Tables' the table browse is not refreshed (2nd attempt)
+- Solved: When toggling 'Show Hidden Tables' the table browse is not refreshed, 2nd attempt
 - Solved: dump stopped at 2000 records (thanks to Tim Lewis)
 - Solved: messages about the dumping process showed up in the .d dump file itself
 - Solved: wrong file name was written to dumpfile when filename contained an underscore
@@ -394,7 +395,7 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - Change: Database combo is sorted
 - Change: Recompile logfile has more informative layout 
 - Change: DataBrowse is no longer updatable 
-- Change: Minimum window size is now 650x430 (was 790x530)
+- Change: Minimum window size is now 650x430, was 790x530
 - Change: Expanded query editor is now a popup frame 
 - Change: Dump data to Excel now applies autofilter to your sheet
 - Change: Dump data to Excel or Html now use normal label instead of column-label
@@ -410,11 +411,11 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - New   : Right-click on databrowse gives option to hide individual columns
 - New   : Right-click on databrowse gives option to show data value
 - New   : Possibility to start DataDigger with no databases connected
-- New   : Added USERID tag as option for DumpFileTemplate (userid of first connected db)
-- New   : Added TIMESTAMP tag as option for DumpFileTemplate (setting in ini file)
-- New   : Added LASTDIR tag as option for DumpFileTemplate (last used dir for dumping)
-- New   : Added WEEKDAY tag as option for DumpFileTemplate (nr 1-7 from weekday function)
-- New   : Added DAYNAME tag as option for DumpFileTemplate (3 letter name for weekday)
+- New   : Added USERID tag as option for DumpFileTemplate: userid of first connected db
+- New   : Added TIMESTAMP tag as option for DumpFileTemplate: setting in ini file
+- New   : Added LASTDIR tag as option for DumpFileTemplate: last used dir for dumping
+- New   : Added WEEKDAY tag as option for DumpFileTemplate: nr 1-7 from weekday function
+- New   : Added DAYNAME tag as option for DumpFileTemplate: 3 letter name for weekday
 - New   : Added HH, MM, SS tags as option for DumpFileTemplate (Time portions)
 - New   : When deleting records, a backup will be saved in an XML file
 - New   : You can specify your own dump program, see CustomDump

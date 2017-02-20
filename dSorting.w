@@ -85,63 +85,63 @@ DEFINE VARIABLE cbSortField-1 AS CHARACTER
      LABEL "First sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-2 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-3 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-4 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-5 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-6 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-7 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-8 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE cbSortField-9 AS CHARACTER 
      LABEL "Then sort on" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
-     DROP-DOWN
+     DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
 DEFINE VARIABLE tgDescending-1 AS LOGICAL INITIAL no 
@@ -313,8 +313,9 @@ END.
 ON CHOOSE OF btnOk IN FRAME frSorting /* OK */
 OR 'go' OF FRAME {&FRAME-NAME} ANYWHERE
 DO:
-  RUN btnOkChoose.
-  APPLY 'GO' TO FRAME {&FRAME-NAME}.
+  DEFINE VARIABLE lContinue AS LOGICAL     NO-UNDO.
+  RUN btnOkChoose(OUTPUT lContinue).
+  IF lContinue THEN APPLY 'GO' TO FRAME {&FRAME-NAME}.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -341,11 +342,16 @@ ON RETURN OF cbSortField-1 IN FRAME frSorting /* First sort on */
 , cbSortField-2, cbSortField-3, cbSortField-4, cbSortField-5, cbSortField-6, cbSortField-7, cbSortField-8, cbSortField-9
 , tgDescending-1, tgDescending-2, tgDescending-3, tgDescending-4, tgDescending-5, tgDescending-6, tgDescending-7, tgDescending-8, tgDescending-9
 DO:
-  DEFINE VARIABLE iSelf AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iSelf     AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lContinue AS LOGICAL NO-UNDO.
+
   iSelf = INTEGER(ENTRY(2,SELF:NAME,'-')).
 
   IF ghSortField[iSelf]:SCREEN-VALUE = ? THEN 
-    APPLY 'go' TO FRAME {&FRAME-NAME}.
+  DO:
+    RUN btnOkChoose(OUTPUT lContinue).
+    IF lContinue THEN APPLY 'GO' TO FRAME {&FRAME-NAME}.
+  END.
   ELSE 
     IF iSelf < 9 THEN APPLY 'entry' TO ghSortField[iSelf + 1].
 END.
@@ -427,6 +433,8 @@ RUN disable_UI.
 PROCEDURE btnOkChoose :
 /* Accept sort and go back
  */  
+  DEFINE OUTPUT PARAMETER plContinue AS LOGICAL NO-UNDO.
+
   DEFINE VARIABLE i AS INTEGER NO-UNDO.
   DEFINE BUFFER bfQuerySort FOR ttQuerySort.
 
@@ -436,6 +444,13 @@ PROCEDURE btnOkChoose :
   END.
 
   DO i = 1 TO 9:
+    IF LOOKUP(ghSortField[i]:SCREEN-VALUE, ghSortField[i]:LIST-ITEMS) = 0 THEN
+    DO:
+      MESSAGE 'Sorting' i 'does not seem to be a valid field name' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      APPLY 'entry' TO ghSortField[i].
+      RETURN NO-APPLY.
+    END.
+
     IF ghSortField[i]:SCREEN-VALUE <> ? THEN 
     DO:
       CREATE bfQuerySort.
@@ -452,6 +467,7 @@ PROCEDURE btnOkChoose :
   END.
 
   plSortChanged = TRUE.
+  plContinue = TRUE. 
 
 END PROCEDURE.
 

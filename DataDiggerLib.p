@@ -1737,7 +1737,7 @@ PROCEDURE getFields :
               
   REPEAT WHILE NOT hQuery:QUERY-OFF-END:
 
-    CREATE bField.
+CREATE bField.
     ASSIGN 
       iFieldOrder          = iFieldOrder + 1
       bField.cTableCacheId = bTable.cCacheId
@@ -1750,8 +1750,7 @@ PROCEDURE getFields :
       bField.iOrderOrg     = iFieldOrder 
 
       bField.cFullName     = hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE 
-      bField.cXmlNodeName  = getXmlNodeName(bField.cFieldName)
-      bField.cDataType     = hBufferField:BUFFER-FIELD('_data-type'):BUFFER-VALUE 
+      bField.cDataType     = hBufferField:BUFFER-FIELD('_data-type'):BUFFER-VALUE
       bField.cInitial      = hBufferField:BUFFER-FIELD('_initial'):BUFFER-VALUE   
       bField.cFormat       = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE     
       bField.cFormatOrg    = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE      
@@ -1770,6 +1769,9 @@ PROCEDURE getFields :
       bField.cHelp         = hBufferField:BUFFER-FIELD('_Help'):BUFFER-VALUE
       bField.cDesc         = hBufferField:BUFFER-FIELD('_Desc'):BUFFER-VALUE
       bField.cViewAs       = hBufferField:BUFFER-FIELD('_View-as'):BUFFER-VALUE
+      .
+    ASSIGN
+      bField.cXmlNodeName  = getXmlNodeName(bField.cFieldName)
       .
 
     /* Make a list of fields on table level */
@@ -2074,6 +2076,8 @@ PROCEDURE getTables :
           ttTable.cCrc        = hFileBuffer::_crc
           ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, hFileBuffer::_file-name, hFileBuffer::_crc)
           ttTable.iFileNumber = hFileBuffer::_file-number
+          .
+        ASSIGN
           ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name)
           .
 
@@ -5230,4 +5234,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-
