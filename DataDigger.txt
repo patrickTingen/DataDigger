@@ -5,7 +5,8 @@
 
 ====================================================================================================
 
-DataDigger version 22
+DataDigger version 23
+
 - Solved: Query-open errors were not shown in tooltip of query fill-in
 - Solved: High nr of decimals on non-decimal fields could cause errors. See PKB P185263
 - Solved: Errors on SQL Server dataserver tables (Edwin Schutten)
@@ -13,12 +14,16 @@ DataDigger version 22
 - Solved: Fields with % or # in their name cannot be dumped as XML (Damir Pem)
 - Solved: Curly brace could break query
 - Solved: Resize error in large window with resize bar
-- Solved: Compilation errors on Progress 10.1B (Cherian George)
 
 - New   : Multi-sort on data columns now possible
 - New   : Row coloring now depending on chosen sort
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
 
+====================================================================================================
+
+DataDigger version 22 - 20 feb 2017 (Titanium)
+
+- Solved: Compilation errors on Progress 10.1B (Cherian George)
 
 ====================================================================================================
 

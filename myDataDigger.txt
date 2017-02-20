@@ -41,11 +41,12 @@ PROCEDURE customShowField:
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO INITIAL TRUE.
 
   /* Example, hide the cust-num field except on the customer table
   IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
   */
+
 END PROCEDURE. /* customShowField */
 
 
