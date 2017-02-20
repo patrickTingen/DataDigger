@@ -5,6 +5,12 @@
 
 ====================================================================================================
 
+DataDigger version 22 - 20 feb 2017 (Titanium)
+
+- Solved: Compilation errors on Progress 10.1B (Cherian George)
+
+====================================================================================================
+
 DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
 
 - Solved: Nr of selected rows not cleared on table change (Mike Derrick)

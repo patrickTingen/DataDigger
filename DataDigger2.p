@@ -538,7 +538,7 @@ PROCEDURE recompileSelf :
     IF SEARCH(cFile) = ? THEN 
     DO:
       USE "DataDigger".
-      PUT-KEY-VALUE SECTION "DataDigger:files" KEY bOsFile.cFileName VALUE ?.
+      PUT-KEY-VALUE SECTION "DataDigger:files" KEY ENTRY(iFile,cFileList) VALUE ?.
       USE "".
     END.
   END.
