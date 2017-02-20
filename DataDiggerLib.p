@@ -2056,6 +2056,8 @@ PROCEDURE getTables :
           ttTable.cCrc        = hFileBuffer::_crc
           ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, hFileBuffer::_file-name, hFileBuffer::_crc)
           ttTable.iFileNumber = hFileBuffer::_file-number
+          .
+        ASSIGN
           ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name)
           .
 
