@@ -34,6 +34,43 @@ CREATE WIDGET-POOL.
 
 { datadigger.i }
 
+DEFINE TEMP-TABLE ttBlock NO-UNDO
+  FIELD cBlockId AS CHARACTER 
+  FIELD cDesc    AS CHARACTER
+  FIELD iScore   AS INTEGER
+  FIELD hButton  AS HANDLE 
+  FIELD iLine    AS INTEGER 
+  INDEX iPrim IS PRIMARY cBlockId
+  .
+
+/* For debugging in the UIB */
+&IF DEFINED(UIB_is_Running) <> 0 &THEN
+
+FUNCTION getImagePath RETURNS CHARACTER (pcImage AS CHARACTER):
+  RETURN 'd:\data\progress\DataDigger\image\default_' + pcImage.
+END FUNCTION. 
+
+FUNCTION getProgramDir RETURNS CHARACTER ():
+  RETURN 'd:\data\progress\DataDigger\'.
+END FUNCTION. 
+
+FUNCTION getFont RETURNS INTEGER (pcFontType AS CHARACTER ):
+  RETURN LOOKUP(pcFontType, ',fixed,,default').
+END FUNCTION. 
+
+PROCEDURE setTransparency:
+  DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.
+  DEFINE INPUT PARAMETER piTrans AS INTEGER NO-UNDO.
+END PROCEDURE. 
+
+PROCEDURE showScrollBars:
+  DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.
+  DEFINE INPUT PARAMETER plHor   AS LOGICAL NO-UNDO.
+  DEFINE INPUT PARAMETER plVer   AS LOGICAL NO-UNDO.
+END PROCEDURE. 
+
+&ENDIF
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -99,6 +136,16 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
      SIZE-PIXELS 155 BY 13
      FONT 0 NO-UNDO.
 
+DEFINE RECTANGLE rcBall
+     EDGE-PIXELS 8    ROUNDED 
+     SIZE 3 BY .6
+     BGCOLOR 12 FGCOLOR 12 .
+
+DEFINE RECTANGLE rcBar
+     EDGE-PIXELS 0    ROUNDED 
+     SIZE 14 BY .43
+     BGCOLOR 1 .
+
 
 /* ************************  Frame Definitions  *********************** */
 
@@ -110,6 +157,8 @@ DEFINE FRAME DEFAULT-FRAME
      btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
+     rcBar AT ROW 3.14 COL 52 WIDGET-ID 84
+     rcBall AT ROW 2.43 COL 58 WIDGET-ID 92
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
@@ -132,7 +181,7 @@ DEFINE FRAME DEFAULT-FRAME
 IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wAbout ASSIGN
          HIDDEN             = YES
-         TITLE              = "<insert window title>"
+         TITLE              = "About the DataDigger"
          HEIGHT             = 19.62
          WIDTH              = 125.8
          MAX-HEIGHT         = 30.81
@@ -168,6 +217,16 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FILL-IN fiDataDigger-2 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
+/* SETTINGS FOR RECTANGLE rcBall IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+ASSIGN 
+       rcBall:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+
+/* SETTINGS FOR RECTANGLE rcBar IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+ASSIGN 
+       rcBar:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
 THEN wAbout:HIDDEN = no.
 
@@ -182,12 +241,11 @@ THEN wAbout:HIDDEN = no.
 
 &Scoped-define SELF-NAME wAbout
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wAbout wAbout
-ON END-ERROR OF wAbout /* <insert window title> */
+ON END-ERROR OF wAbout /* About the DataDigger */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
-  /* This case occurs when the user presses the "Esc" key.
-     In a persistently run window, just ignore this.  If we did not, the
-     application would exit. */
-  IF THIS-PROCEDURE:PERSISTENT THEN RETURN NO-APPLY.
+
+  APPLY 'CLOSE' TO THIS-PROCEDURE.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -195,7 +253,7 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wAbout wAbout
-ON WINDOW-CLOSE OF wAbout /* <insert window title> */
+ON WINDOW-CLOSE OF wAbout /* About the DataDigger */
 DO:
   /* This event will close the window and terminate the procedure.  */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
@@ -211,6 +269,17 @@ END.
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
   RUN showLog.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME BtnOK
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL BtnOK wAbout
+ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
+DO:
+  APPLY 'CLOSE' TO THIS-PROCEDURE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -282,6 +351,89 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE buildBlocks wAbout 
+PROCEDURE buildBlocks :
+/* Build blocks on the screen via button widgets
+ */
+ DEFINE BUFFER bfBlock FOR ttBlock.
+ 
+ &GLOBAL-DEFINE border 20
+ 
+ DEFINE VARIABLE xx AS INTEGER NO-UNDO.
+ DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+ DEFINE VARIABLE ii AS INTEGER NO-UNDO.
+
+ DEFINE VARIABLE iBlockLine  AS INTEGER     NO-UNDO.
+ DEFINE VARIABLE iNumLines   AS INTEGER     NO-UNDO.
+ DEFINE VARIABLE iNumBlocks  AS INTEGER     NO-UNDO.
+ DEFINE VARIABLE iTotalWidth AS INTEGER     NO-UNDO.
+ DEFINE VARIABLE iSpace      AS INTEGER     NO-UNDO.
+
+ xx = {&border}.
+ yy = 50.
+ iBlockLine = 1.
+
+ FOR EACH bfBlock BY bfBlock.iScore DESCENDING:
+
+   CREATE BUTTON bfBlock.hButton
+     ASSIGN
+       X           = 1
+       Y           = 1
+       LABEL       = bfBlock.cBlockId
+       FRAME       = FRAME {&FRAME-NAME}:HANDLE
+       SENSITIVE   = TRUE
+       VISIBLE     = TRUE
+       WIDTH-CHARS = LENGTH(bfBlock.cBlockId) + 4
+       .
+   ON 'CHOOSE' OF bfBlock.hButton PERSISTENT RUN showDesc(bfBlock.cDesc).
+
+   /* See where it fits */
+   IF xx + bfBlock.hButton:WIDTH-PIXELS > FRAME {&FRAME-NAME}:WIDTH-PIXELS - {&border} THEN 
+   DO:
+     xx = {&border}.
+     yy = yy + 30.
+     iBlockLine = iBlockLine + 1.
+     iNumLines = iBlockLine.
+   END.
+
+   bfBlock.hButton:X = xx.
+   bfBlock.hButton:Y = yy.
+   bfBlock.iLine = iBlockLine.
+   xx = xx + bfBlock.hButton:WIDTH-PIXELS + 5.
+ END.
+
+ /* Justify blocks */
+ DO ii = 1 TO iNumLines:
+
+   /* How much buttons on a row */
+   iTotalWidth = 0.
+   iNumBlocks = 0.
+   FOR EACH bfBlock WHERE bfBlock.iLine = ii:
+     iTotalWidth = iTotalWidth + bfBlock.hButton:WIDTH-PIXELS.
+     iNumBlocks = iNumBlocks + 1.
+   END.
+
+   /* Free space */
+   iSpace = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth) / (iNumBlocks + 1).
+
+   /* Redraw buttons */
+   xx = {&border} + iSpace.
+   FOR EACH bfBlock WHERE bfBlock.iLine = ii:
+     bfBlock.hButton:X = xx.
+     xx = xx + bfBlock.hButton:WIDTH-PIXELS + iSpace.
+   END.
+ END.
+
+ FOR EACH bfBlock WHERE bfBlock.iLine = ii:
+   iTotalWidth = iTotalWidth + bfBlock.hButton:WIDTH-PIXELS.
+ END.
+
+
+END PROCEDURE. /* buildBlocks */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI wAbout  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
@@ -325,29 +477,25 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fadeWindow wAbout 
 PROCEDURE fadeWindow :
-define input parameter piStartValue as integer no-undo.
-  define input parameter piEndValue   as integer no-undo.
+DEFINE INPUT PARAMETER piStartValue AS INTEGER NO-UNDO.
+  DEFINE INPUT PARAMETER piEndValue   AS INTEGER NO-UNDO.
 
-  define variable iStartTime   as integer    no-undo.
-  define variable iTranparency as integer    no-undo.
+  DEFINE VARIABLE iStartTime   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iTranparency AS INTEGER NO-UNDO.
 
-  &IF DEFINED(UIB_is_Running) = 0 &THEN
-  
-    if piEndValue > piStartValue then 
-    do iTranparency = piStartValue to piEndValue by 24:
-      run setTransparency( input frame {&FRAME-NAME}:handle, iTranparency).
-      iStartTime = etime.
-      do while etime < iStartTime + 20: end.
-    end.
-  
-    else
-    do iTranparency = piStartValue to piEndValue by -24:
-      run setTransparency( input frame {&FRAME-NAME}:handle, iTranparency).
-      iStartTime = etime.
-      do while etime < iStartTime + 20: end.
-    end.
+  IF piEndValue > piStartValue THEN 
+  DO iTranparency = piStartValue TO piEndValue by 24:
+    RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
+    iStartTime = ETIME.
+    DO WHILE ETIME < iStartTime + 20: END.
+  END.
 
-  &ENDIF
+  ELSE
+  DO iTranparency = piStartValue TO piEndValue by -24:
+    RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
+    iStartTime = ETIME.
+    DO WHILE ETIME < iStartTime + 20: END.
+  END.
 
 END PROCEDURE. /* fadeWindow */
 
@@ -368,21 +516,18 @@ PROCEDURE initializeObject :
     fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
     fiDataDigger-2:SCREEN-VALUE = 'Build {&build}'.
     
-    &if defined(UIB_is_Running) = 0  &then
+    FRAME {&FRAME-NAME}:FONT = getFont('Default').
+    fiDataDigger-1:FONT      = getFont('Fixed').
+    fiDataDigger-2:FONT      = getFont('Fixed').
+    edChangelog:FONT         = getFont('Fixed').
 
-      FRAME {&FRAME-NAME}:FONT = getFont('Default').
-      fiDataDigger-1:FONT = getFont('Fixed').
-      fiDataDigger-2:FONT = getFont('Fixed').
-      edChangelog:FONT = getFont('Fixed').
-  
-      btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
-      
-      RUN setPage(1).
-      RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
-      
-      /* For some reasons, these #*$&# scrollbars keep coming back */
-      RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
-    &ENDIF
+    btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
+    
+    RUN setPage(1).
+    RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
+    
+    /* For some reasons, these #*$&# scrollbars keep coming back */
+    RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
 
   END.
 
@@ -401,9 +546,9 @@ PROCEDURE moveEditor :
   DEFINE INPUT PARAMETER piMove AS INTEGER NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
-    IF    edChangelog:X + piMove > 0 
-      AND edChangelog:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS - 10) THEN
-      edChangelog:X = edChangelog:X + piMove.
+    IF    rcBar:X + piMove > 0 
+      AND rcBar:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBar:WIDTH-PIXELS - 10) THEN
+      rcBar:X = rcBar:X + piMove.
   END.
 
 END PROCEDURE.
@@ -411,78 +556,29 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wAbout 
-PROCEDURE setPage :
-/*------------------------------------------------------------------------
-  Name         : setPage
-  Description  : Activate either the About or the Changes tab
-
-  ----------------------------------------------------------------------
-  7-9-2012 pti Created
-  ----------------------------------------------------------------------*/
-  DEFINE INPUT PARAMETER piPage AS INTEGER     NO-UNDO.
-
-  do with frame {&frame-name}:
-    edChangelog:SCREEN-VALUE = "".
-
-    case piPage:
-      when 1 then do:
-        btnTabAbout  :load-image( getImagePath('tab_about_active.gif'    )).
-        btnTabChanges:load-image( getImagePath('tab_changes_inactive.gif' )).
-
-        edChangeLog:insert-file(getProgramDir() + 'DataDiggerAbout.txt').
-        edChangeLog:cursor-offset = 1.
-      end.
-  
-      when 2 then do:
-        btnTabAbout  :load-image( getImagePath('tab_about_inactive.gif'    )).
-        btnTabChanges:load-image( getImagePath('tab_changes_active.gif' )).
-
-        edChangeLog:insert-file(getProgramDir() + 'DataDigger.txt').
-        edChangeLog:cursor-offset = 1.
-      end.                                          
-    end case. /* piPage */
-  end.
-  
-END PROCEDURE. /* setPage */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout 
-PROCEDURE showLog :
-DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName     AS CHARACTER   NO-UNDO.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE prepareWindow wAbout 
+PROCEDURE prepareWindow :
+/* Grow window to desired size and position
+  */
   DEFINE VARIABLE iStep     AS INTEGER     NO-UNDO.
-
   DEFINE VARIABLE iStartH   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iStartW   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iStartX   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iStartY   AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStartEdH  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStartEdW  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartEdH AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartEdW AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iEndH     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iEndW     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iEndY     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iEndX     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iEndEdH    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iEndEdW    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndEdH   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iEndEdW   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumSteps AS INTEGER     NO-UNDO INITIAL 50.
-
-  INPUT FROM 'DataDigger.txt'.
-  SEEK INPUT TO 300. /* random nr after header */
-  
-  REPEAT:
-    IMPORT UNFORMATTED cLine.
-    IF NOT cLine MATCHES '*(*)' THEN NEXT. 
-    cName = TRIM( ENTRY(NUM-ENTRIES(cLine,'('),cLine,'(' ), ')').
-  END.
-  
-  INPUT CLOSE. 
 
   DO WITH FRAME {&FRAME-NAME}:
     btnTabAbout:VISIBLE = NO.
     btnTabChanges:VISIBLE = NO.
+    BtnOK:VISIBLE = NO.
     
     ASSIGN 
       iStartH = wAbout:HEIGHT-PIXELS
@@ -519,13 +615,129 @@ DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
       ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
     END.
 
-    edChangelog:BGCOLOR = 1.
-    edChangelog:READ-ONLY = TRUE.
+    rcBar:X = edChangelog:X.
+    rcBar:Y = edChangelog:Y.
+    rcBar:WIDTH-PIXELS  = edChangelog:WIDTH-PIXELS.
+    rcBar:HEIGHT-PIXELS = edChangelog:HEIGHT-PIXELS.
+
+    edChangelog:VISIBLE = FALSE.
+    edChangelog:SENSITIVE = FALSE.
+
+    rcBar:VISIBLE = TRUE.
+    rcBar:SENSITIVE = TRUE.
+
+    rcBall:X = rcBar:X + (rcBar:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) / 2.
+    rcBall:Y = rcBar:Y - rcBall:HEIGHT-PIXELS.
+    rcBall:VISIBLE = TRUE.
+
+  END.
+
+END PROCEDURE. /* prepareWindow */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE readAboutFile wAbout 
+PROCEDURE readAboutFile :
+/* Build blocks with names of all contributors 
+ **/
+  DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName     AS CHARACTER   NO-UNDO.
+  DEFINE BUFFER bfBlock FOR ttBlock.
+
+  INPUT FROM 'DataDigger.txt'.
+  SEEK INPUT TO 300. /* random nr after header */
+  
+  REPEAT:
+    IMPORT UNFORMATTED cLine.
+    IF cLine BEGINS 'DataDigger' THEN NEXT. /* lines with version name */
+    IF NOT cLine MATCHES '*(*)' THEN NEXT. /* does not end with brackets */
+    cName = TRIM( ENTRY(NUM-ENTRIES(cLine,'('),cLine,'(' ), ')').
+    IF cName = '' THEN NEXT.  /* blank name */
+
+    FIND bfBlock WHERE bfBlock.cBlockId = cName NO-ERROR.
+    IF NOT AVAILABLE bfBlock THEN
+    DO:
+      CREATE bfBlock.
+      ASSIGN bfBlock.cBlockId = cName. 
+    END.
+
+    ASSIGN 
+      bfBlock.cDesc  = TRIM(bfBlock.cDesc + '~n' + REPLACE(cLine,'(' + cName + ')', ''), '~n')
+      bfBlock.iScore = bfBlock.iScore + 1.
+  END.
+  
+  INPUT CLOSE. 
+
+END PROCEDURE. /* readAboutFile */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wAbout 
+PROCEDURE setPage :
+/*------------------------------------------------------------------------
+  Name         : setPage
+  Description  : Activate either the About or the Changes tab
+
+  ----------------------------------------------------------------------
+  7-9-2012 pti Created
+  ----------------------------------------------------------------------*/
+  DEFINE INPUT PARAMETER piPage AS INTEGER     NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+    edChangelog:SCREEN-VALUE = "".
+
+    CASE piPage:
+      WHEN 1 THEN DO:
+        btnTabAbout  :LOAD-IMAGE( getImagePath('tab_about_active.gif'    )).
+        btnTabChanges:LOAD-IMAGE( getImagePath('tab_changes_inactive.gif' )).
+
+        edChangeLog:INSERT-FILE(getProgramDir() + 'DataDiggerAbout.txt').
+        edChangeLog:CURSOR-OFFSET = 1.
+      END.
+  
+      WHEN 2 THEN DO:
+        btnTabAbout  :LOAD-IMAGE( getImagePath('tab_about_inactive.gif'    )).
+        btnTabChanges:LOAD-IMAGE( getImagePath('tab_changes_active.gif' )).
+
+        edChangeLog:INSERT-FILE(getProgramDir() + 'DataDigger.txt').
+        edChangeLog:CURSOR-OFFSET = 1.
+      END.                                          
+    END CASE. /* piPage */
+  END.
+  
+END PROCEDURE. /* setPage */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDesc wAbout 
+PROCEDURE showDesc :
+/* Show contributions of a user
+ */
+  DEFINE INPUT PARAMETER pcText AS CHARACTER NO-UNDO.
+
+  MESSAGE pcText VIEW-AS ALERT-BOX INFO BUTTONS OK.
+
+END PROCEDURE. /* showDesc */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout 
+PROCEDURE showLog :
+/* Play arkanoid-like game 
+ */ 
+  RUN prepareWindow.
+  RUN readAboutFile.
+  RUN buildBlocks.
+
+  DO WITH FRAME {&FRAME-NAME}:
 
     /* Enable play mode */
-    ON 'cursor-right' OF edChangelog PERSISTENT RUN moveEditor(+15).
-    ON 'cursor-left' OF edChangelog PERSISTENT RUN moveEditor(-15).
-    WAIT-FOR CHOOSE OF btnOk.
+    ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveEditor(+15).
+    ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveEditor(-15).
 
   END.
   
