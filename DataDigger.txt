@@ -325,7 +325,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - Change: Do not delete object files if started without sources (Jeroen Beugels)
 - Change: Added shortcuts in tooltips
 - Change: disabled old settings screen, new settings screen is fully functional now
-- Change: added Query Tester to tools panel (thanks to Marius Fiere)
+- Change: added Query Tester to tools panel (Marius Fiere)
 - Change: When changing tables, the field and index filters are cleared.
 - Change: View record shows fields in the same order as in the main window (Albert Flikkema)
 - Change: On startup, DD will try to set proper fonts by itself
@@ -385,7 +385,7 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - Solved: Maximum window size is now same as monitor, was 1680x1200
 - Solved: DataDigger looks bad if default font is changed in progress.ini 
 - Solved: When toggling 'Show Hidden Tables' the table browse is not refreshed, 2nd attempt
-- Solved: dump stopped at 2000 records (thanks to Tim Lewis)
+- Solved: dump stopped at 2000 records (Tim Lewis)
 - Solved: messages about the dumping process showed up in the .d dump file itself
 - Solved: wrong file name was written to dumpfile when filename contained an underscore
 - Solved: Favourites showed ? when database name was blank
@@ -421,7 +421,7 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - New   : Added LASTDIR tag as option for DumpFileTemplate: last used dir for dumping
 - New   : Added WEEKDAY tag as option for DumpFileTemplate: nr 1-7 from weekday function
 - New   : Added DAYNAME tag as option for DumpFileTemplate: 3 letter name for weekday
-- New   : Added HH, MM, SS tags as option for DumpFileTemplate (Time portions)
+- New   : Added HH, MM, SS tags as option for DumpFileTemplate, Time portions
 - New   : When deleting records, a backup will be saved in an XML file
 - New   : You can specify your own dump program, see CustomDump
 - New   : DataDigger file date/times are saved in DataDigger.ini
@@ -544,23 +544,23 @@ NOTE: To support multiple history of queries on a table, this version of DataDig
       saved with the extention .bak. See also QueryWindow
 
 - Solved: Error on lockWindowUpdate when DataDigger was used in combination with DWP
-- Solved: Wrong quotation on insertion of linkInfo fields (none on integer, double on characters)
+- Solved: Wrong quotation on insertion of linkInfo fields, none on integer, double on characters
 - Solved: Scrollbars appearing on frame
 - Solved: Edit panel remains active after db switch althoug databrowse is hidden
 - Solved: Flashing on startup
 
-- Change: Removed buttons for navigation (first, prev, next last)
+- Change: Removed buttons for navigation: first, prev, next last
 - Change: Replaced LockWindowUpdate with RedrawWindow
 - Change: Connection numbers for databases in INI file must be sequential. 
 - Change: Startup is now faster due to limited scanning of connections.
-- Change: Save nr of queries on a table (for future use)
+- Change: Save nr of queries on a table, for future use
 - Change: Different behavior on table list since this has been changed from selection-list to browse
 - Change: Order of fields is now the sequence number, not the _Order field from the dictionary
 - Change: Button 'watskeburt' now opens wiki. Right mouse click opens DataDigger.txt
 - Change: Moved all images to separate dir
 - Change: Behavior for LinkInfo has been reversed: press ctrl to escape it instead of using it
 
-- New   : DumpAndLoad window for export to .XML / .D (thanks to Jeroen Beugels)
+- New   : DumpAndLoad window for export to .XML / .D (Jeroen Beugels)
 - New   : Executed queries are saved and can be recalled via pageUp/pageDown on query editor
 - New   : QueryWindow to recall executed queries
 - New   : Maximum nr of queries to save is set via setting MaxQueryHistory. Default value is 10
@@ -688,9 +688,9 @@ DataDigger version 6 - 9 sep 2009 (Triple-9 version)
 - Changed DataDigger text logo to real button 
 - Added connection favourites
 - Added index information in separate browse
-- Save/restore active tab (Fields or Indexes)
+- Save/restore active tab, Fields or Indexes
 - Save/restore whether or not to show hidden fields
-- Count total number of queries served (just for fun)
+- Count total number of queries served, just for fun
 - When changing format of field, show original format in browse tooltip
 - Button 'Clear Filters' now resets filterfields to original state
 - Remember which version has run and show welcome message when needed
@@ -742,7 +742,7 @@ DataDigger version 3 - 9 jul 2009
 - Save/restore field sort in INI
 - Connect/disconnect on + and - key
 - Reset color of where-editor on table change
-- Added buttons with default text (= <> > < "" TODAY)
+- Added buttons with default text: = <> > < "" TODAY
 - Save/restore query in INI
 - Put selected text between brackets on click of () button in where-editor
 - Replace selected text with buttontext in where-editor
