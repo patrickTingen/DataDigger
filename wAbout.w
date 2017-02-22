@@ -138,13 +138,26 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 
 DEFINE RECTANGLE rcBall
      EDGE-PIXELS 8    ROUNDED 
-     SIZE 3 BY .6
+     SIZE 3 BY .62
      BGCOLOR 12 FGCOLOR 12 .
 
 DEFINE RECTANGLE rcBar
      EDGE-PIXELS 0    ROUNDED 
      SIZE 14 BY .43
      BGCOLOR 1 .
+
+DEFINE BUTTON btGotIt 
+     LABEL "I &Got it" 
+     SIZE-PIXELS 75 BY 24.
+
+DEFINE VARIABLE edHint AS CHARACTER 
+     VIEW-AS EDITOR NO-BOX
+     SIZE-PIXELS 145 BY 65
+     BGCOLOR 14 FGCOLOR 9  NO-UNDO.
+
+DEFINE IMAGE imgArrow
+     FILENAME "adeicon/blank":U TRANSPARENT
+     SIZE-PIXELS 32 BY 32.
 
 
 /* ************************  Frame Definitions  *********************** */
@@ -162,7 +175,17 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 125.8 BY 19.62 WIDGET-ID 100.
+         SIZE 125.8 BY 19.67 WIDGET-ID 100.
+
+DEFINE FRAME frHint
+     edHint AT Y 10 X 50 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 75 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 187 Y 173
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -182,7 +205,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wAbout ASSIGN
          HIDDEN             = YES
          TITLE              = "About the DataDigger"
-         HEIGHT             = 19.62
+         HEIGHT             = 19.67
          WIDTH              = 125.8
          MAX-HEIGHT         = 30.81
          MAX-WIDTH          = 209.6
@@ -208,6 +231,9 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR WINDOW wAbout
   VISIBLE,,RUN-PERSISTENT                                               */
+/* REPARENT FRAME */
+ASSIGN FRAME frHint:FRAME = FRAME DEFAULT-FRAME:HANDLE.
+
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 ASSIGN 
@@ -227,6 +253,16 @@ ASSIGN
 ASSIGN 
        rcBar:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
+/* SETTINGS FOR FRAME frHint
+   NOT-VISIBLE                                                          */
+ASSIGN 
+       FRAME frHint:HIDDEN           = TRUE.
+
+ASSIGN 
+       edHint:READ-ONLY IN FRAME frHint        = TRUE.
+
+/* SETTINGS FOR IMAGE imgArrow IN FRAME frHint
+   NO-ENABLE                                                            */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
 THEN wAbout:HIDDEN = no.
 
@@ -264,6 +300,41 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define FRAME-NAME frHint
+&Scoped-define SELF-NAME btGotIt
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
+ON 1 OF btGotIt IN FRAME frHint /* I Got it */
+OR "2" OF btGotIt
+OR "3" OF btGotIt
+OR "4" OF btGotIt
+DO:
+
+  DO WITH FRAME frHint:
+    APPLY "choose" TO btGotIt.
+
+    RUN showHint( INPUT WIDGET-HANDLE(FRAME frHint:PRIVATE-DATA)
+                , INPUT INTEGER(KEYLABEL(LASTKEY))
+                , INPUT edHint:SCREEN-VALUE
+                ).
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
+ON CHOOSE OF btGotIt IN FRAME frHint /* I Got it */
+DO:
+  FRAME frHint:VISIBLE = FALSE.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME DEFAULT-FRAME
 &Scoped-define SELF-NAME btnDataDigger
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
@@ -469,6 +540,11 @@ PROCEDURE enable_UI :
   ENABLE btnDataDigger BtnOK edChangelog btnTabAbout btnTabChanges 
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
+  DISPLAY edHint 
+      WITH FRAME frHint IN WINDOW wAbout.
+  ENABLE edHint btGotIt 
+      WITH FRAME frHint IN WINDOW wAbout.
+  {&OPEN-BROWSERS-IN-QUERY-frHint}
   VIEW wAbout.
 END PROCEDURE.
 
@@ -615,20 +691,8 @@ PROCEDURE prepareWindow :
       ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
     END.
 
-    rcBar:X = edChangelog:X.
-    rcBar:Y = edChangelog:Y.
-    rcBar:WIDTH-PIXELS  = edChangelog:WIDTH-PIXELS.
-    rcBar:HEIGHT-PIXELS = edChangelog:HEIGHT-PIXELS.
-
     edChangelog:VISIBLE = FALSE.
     edChangelog:SENSITIVE = FALSE.
-
-    rcBar:VISIBLE = TRUE.
-    rcBar:SENSITIVE = TRUE.
-
-    rcBall:X = rcBar:X + (rcBar:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) / 2.
-    rcBall:Y = rcBar:Y - rcBall:HEIGHT-PIXELS.
-    rcBall:VISIBLE = TRUE.
 
   END.
 
@@ -670,6 +734,77 @@ PROCEDURE readAboutFile :
   INPUT CLOSE. 
 
 END PROCEDURE. /* readAboutFile */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBall wAbout 
+PROCEDURE setBall :
+DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
+  DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
+  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT 1. /* hor speed */
+  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0. /* ver speed */
+  DEFINE VARIABLE elas AS DECIMAL NO-UNDO INIT .85. /* perc speed left after bounce */
+  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
+
+  DO WITH FRAME {&FRAME-NAME}:
+    rcBar:X = 280.
+    rcBar:Y = 666.
+    rcBar:VISIBLE = TRUE.
+
+    rcBall:X = 1.
+    rcBall:Y = 475.
+    rcBall:VISIBLE = TRUE.
+
+    yy = rcBall:Y.
+    xx = rcBall:X.
+  END.
+
+  REPEAT:
+    /* Normal flow */
+    dy = dy + grav.
+    xx = xx + dx.
+    yy = yy + dy.
+    
+    /* Bounce at bottom of frame */
+    IF xx < 280 AND yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS) THEN
+    DO:
+      yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS.
+      dy = -1 * dy.
+      dy = dy * elas.
+      IF xx > 305 THEN LEAVE. 
+    END.
+
+    /* Bounce at the bat */
+    IF xx > 280 AND yy > (rcBar:Y - rcBall:HEIGHT-PIXELS) THEN
+    DO:
+      yy = rcBar:Y - rcBall:HEIGHT-PIXELS.
+      dy = -1 * dy.
+      dy = dy * elas * elas * elas.
+      dx = dx * elas.
+      IF xx > 305 THEN LEAVE. 
+    END.
+
+    rcBall:X = xx.
+    rcBall:Y = yy.
+
+    ETIME(yes).
+    DO WHILE ETIME < 12: 
+      PROCESS EVENTS.
+    END. 
+  END. 
+
+  rcBall:X = 305.
+END.
+
+PROCEDURE justWait:
+  DEFINE INPUT  PARAMETER piWait AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
+  iStart = ETIME.
+  DO WHILE ETIME < iStart + piWait: 
+    PROCESS EVENTS.
+  END. 
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -725,6 +860,24 @@ END PROCEDURE. /* showDesc */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHint wAbout 
+PROCEDURE showHint :
+/* Show a hint to the user to play
+ */
+   
+  DO WITH FRAME frHint:
+    imgArrow:LOAD-IMAGE(getImagePath('LeftDown.gif')).
+    FRAME frHint:Y = 500.
+    FRAME frHint:X = 340.
+    FRAME frHint:VISIBLE = TRUE. 
+    edHint:SCREEN-VALUE = "Ah, come on...~n~nYou know what to do. ~nGo bounce 'em all!". 
+  END.
+
+END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout 
 PROCEDURE showLog :
 /* Play arkanoid-like game 
@@ -732,7 +885,9 @@ PROCEDURE showLog :
   RUN prepareWindow.
   RUN readAboutFile.
   RUN buildBlocks.
-
+  RUN setBall.
+  RUN showHint.
+  
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Enable play mode */
