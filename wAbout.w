@@ -43,31 +43,58 @@ DEFINE TEMP-TABLE ttBlock NO-UNDO
   INDEX iPrim IS PRIMARY cBlockId
   .
 
+DEFINE VARIABLE cGameStatus AS CHARACTER NO-UNDO.
+
 /* For debugging in the UIB */
 &IF DEFINED(UIB_is_Running) <> 0 &THEN
 
-FUNCTION getImagePath RETURNS CHARACTER (pcImage AS CHARACTER):
-  RETURN 'd:\data\progress\DataDigger\image\default_' + pcImage.
-END FUNCTION. 
+RUN startDiggerLib.
 
-FUNCTION getProgramDir RETURNS CHARACTER ():
-  RETURN 'd:\data\progress\DataDigger\'.
-END FUNCTION. 
+PROCEDURE startDiggerLib :
+/* Start DiggerLib if it has not already been started
+ */
+  DEFINE VARIABLE hDiggerLib AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cDiggerLib AS CHARACTER NO-UNDO.
 
-FUNCTION getFont RETURNS INTEGER (pcFontType AS CHARACTER ):
-  RETURN LOOKUP(pcFontType, ',fixed,,default').
-END FUNCTION. 
+  /* Call out to see if the lib has been started */
+  PUBLISH 'DataDiggerLib' (OUTPUT hDiggerLib).
 
-PROCEDURE setTransparency:
-  DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.
-  DEFINE INPUT PARAMETER piTrans AS INTEGER NO-UNDO.
-END PROCEDURE. 
+  IF NOT VALID-HANDLE(hDiggerLib) THEN
+  DO:
+    /* gcProgramDir = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,R-INDEX(THIS-PROCEDURE:FILE-NAME,'\')). */
+    cDiggerLib = THIS-PROCEDURE:FILE-NAME.
+    cDiggerLib = REPLACE(cDiggerLib,"\","/").
+    cDiggerLib = SUBSTRING(cDiggerLib,1,R-INDEX(cDiggerLib,'/')) + 'DataDiggerLib.p'.
+    IF SEARCH(cDiggerLib) = ? THEN cDiggerLib = 'd:\data\progress\DataDigger\DataDiggerLib.p'.
+    IF SEARCH(cDiggerLib) = ? THEN cDiggerLib = 'd:\data\dropbox\DataDigger\src\DataDiggerLib.p'.
+    RUN VALUE(cDiggerLib) PERSISTENT SET hDiggerLib.
+    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
+  END.
 
-PROCEDURE showScrollBars:
-  DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.
-  DEFINE INPUT PARAMETER plHor   AS LOGICAL NO-UNDO.
-  DEFINE INPUT PARAMETER plVer   AS LOGICAL NO-UNDO.
-END PROCEDURE. 
+END PROCEDURE. /* startDiggerLib */
+
+/* FUNCTION getImagePath RETURNS CHARACTER (pcImage AS CHARACTER):  */
+/*   RETURN 'd:\data\progress\DataDigger\image\default_' + pcImage. */
+/* END FUNCTION.                                                    */
+/*                                                                  */
+/* FUNCTION getProgramDir RETURNS CHARACTER ():                     */
+/*   RETURN 'd:\data\progress\DataDigger\'.                         */
+/* END FUNCTION.                                                    */
+/*                                                                  */
+/* FUNCTION getFont RETURNS INTEGER (pcFontType AS CHARACTER ):     */
+/*   RETURN LOOKUP(pcFontType, ',fixed,,default').                  */
+/* END FUNCTION.                                                    */
+/*                                                                  */
+/* PROCEDURE setTransparency:                                       */
+/*   DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.             */
+/*   DEFINE INPUT PARAMETER piTrans AS INTEGER NO-UNDO.             */
+/* END PROCEDURE.                                                   */
+/*                                                                  */
+/* PROCEDURE showScrollBars:                                        */
+/*   DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.             */
+/*   DEFINE INPUT PARAMETER plHor   AS LOGICAL NO-UNDO.             */
+/*   DEFINE INPUT PARAMETER plVer   AS LOGICAL NO-UNDO.             */
+/* END PROCEDURE.                                                   */
 
 &ENDIF
 
@@ -155,10 +182,6 @@ DEFINE VARIABLE edHint AS CHARACTER
      SIZE-PIXELS 145 BY 65
      BGCOLOR 14 FGCOLOR 9  NO-UNDO.
 
-DEFINE IMAGE imgArrow
-     FILENAME "adeicon/blank":U TRANSPARENT
-     SIZE-PIXELS 32 BY 32.
-
 
 /* ************************  Frame Definitions  *********************** */
 
@@ -178,13 +201,12 @@ DEFINE FRAME DEFAULT-FRAME
          SIZE 125.8 BY 19.67 WIDGET-ID 100.
 
 DEFINE FRAME frHint
-     edHint AT Y 10 X 50 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 75 X 0 WIDGET-ID 10
+     edHint AT Y 10 X 25 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 65 WIDGET-ID 4
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
          AT X 187 Y 173
-         SIZE-PIXELS 205 BY 110
+         SIZE-PIXELS 200 BY 110
          BGCOLOR 14  WIDGET-ID 600.
 
 
@@ -207,9 +229,9 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          TITLE              = "About the DataDigger"
          HEIGHT             = 19.67
          WIDTH              = 125.8
-         MAX-HEIGHT         = 30.81
+         MAX-HEIGHT         = 53.52
          MAX-WIDTH          = 209.6
-         VIRTUAL-HEIGHT     = 30.81
+         VIRTUAL-HEIGHT     = 53.52
          VIRTUAL-WIDTH      = 209.6
          RESIZE             = yes
          SCROLL-BARS        = no
@@ -261,8 +283,6 @@ ASSIGN
 ASSIGN 
        edHint:READ-ONLY IN FRAME frHint        = TRUE.
 
-/* SETTINGS FOR IMAGE imgArrow IN FRAME frHint
-   NO-ENABLE                                                            */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
 THEN wAbout:HIDDEN = no.
 
@@ -303,30 +323,9 @@ END.
 &Scoped-define FRAME-NAME frHint
 &Scoped-define SELF-NAME btGotIt
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
-ON 1 OF btGotIt IN FRAME frHint /* I Got it */
-OR "2" OF btGotIt
-OR "3" OF btGotIt
-OR "4" OF btGotIt
-DO:
-
-  DO WITH FRAME frHint:
-    APPLY "choose" TO btGotIt.
-
-    RUN showHint( INPUT WIDGET-HANDLE(FRAME frHint:PRIVATE-DATA)
-                , INPUT INTEGER(KEYLABEL(LASTKEY))
-                , INPUT edHint:SCREEN-VALUE
-                ).
-  END.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
 ON CHOOSE OF btGotIt IN FRAME frHint /* I Got it */
 DO:
+  cGameStatus = 'running'.
   FRAME frHint:VISIBLE = FALSE.
 END.
 
@@ -413,7 +412,6 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   
   RUN fadeWindow(0,240).
   WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS edChangelog.
-  RUN fadeWindow(240,0).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -448,13 +446,13 @@ PROCEDURE buildBlocks :
 
    CREATE BUTTON bfBlock.hButton
      ASSIGN
-       X           = 1
-       Y           = 1
-       LABEL       = bfBlock.cBlockId
-       FRAME       = FRAME {&FRAME-NAME}:HANDLE
-       SENSITIVE   = TRUE
-       VISIBLE     = TRUE
-       WIDTH-CHARS = LENGTH(bfBlock.cBlockId) + 4
+       X            = 1
+       Y            = 1
+       LABEL        = bfBlock.cBlockId
+       FRAME        = FRAME {&FRAME-NAME}:HANDLE
+       SENSITIVE    = TRUE
+       VISIBLE      = TRUE
+       WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBlock.cBlockId, getFont('default')) + 10
        .
    ON 'CHOOSE' OF bfBlock.hButton PERSISTENT RUN showDesc(bfBlock.cDesc).
 
@@ -612,8 +610,8 @@ END PROCEDURE. /* initializeObject. */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveEditor wAbout 
-PROCEDURE moveEditor :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBar wAbout 
+PROCEDURE moveBar :
 /*------------------------------------------------------------------------------
   Purpose:     
   Parameters:  <none>
@@ -627,7 +625,55 @@ PROCEDURE moveEditor :
       rcBar:X = rcBar:X + piMove.
   END.
 
-END PROCEDURE.
+END PROCEDURE. /* moveBar */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE playGame wAbout 
+PROCEDURE playGame :
+/* Play some game ...
+ */  
+  DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iOldMouseX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iBallX     AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iBallY     AS INTEGER NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    /* Enable cursor movement of bar */
+    ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveBar(+20).
+    ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveBar(-20).
+
+    /* Wait for game to start via 'I get it' button */
+    REPEAT WHILE cGameStatus = '':
+      PROCESS EVENTS. 
+    END.
+
+    /* Game is on! */
+    REPEAT:
+      RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
+
+      IF iOldMouseX <> iMouseX
+        AND iMouseX > (rcBar:WIDTH-PIXELS / 2) 
+        AND iMouseX < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (rcBar:WIDTH-PIXELS / 2)) THEN 
+      DO:
+        rcBar:X = iMouseX - (rcBar:WIDTH-PIXELS / 2).
+        iOldMouseX = iMouseX.
+      END.                   
+
+      ETIME(YES). REPEAT WHILE ETIME < 5: PROCESS EVENTS. END.
+      PROCESS EVENTS. 
+
+      rcBall:X = rcBall:X + iBallX.
+      rcBall:Y = rcBall:Y + iBallY.
+
+    END.
+
+  END.
+
+END PROCEDURE. /* playGame */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -866,9 +912,8 @@ PROCEDURE showHint :
  */
    
   DO WITH FRAME frHint:
-    imgArrow:LOAD-IMAGE(getImagePath('LeftDown.gif')).
     FRAME frHint:Y = 500.
-    FRAME frHint:X = 340.
+    FRAME frHint:X = 215.
     FRAME frHint:VISIBLE = TRUE. 
     edHint:SCREEN-VALUE = "Ah, come on...~n~nYou know what to do. ~nGo bounce 'em all!". 
   END.
@@ -882,19 +927,13 @@ END PROCEDURE.
 PROCEDURE showLog :
 /* Play arkanoid-like game 
  */ 
+
   RUN prepareWindow.
   RUN readAboutFile.
   RUN buildBlocks.
   RUN setBall.
   RUN showHint.
-  
-  DO WITH FRAME {&FRAME-NAME}:
-
-    /* Enable play mode */
-    ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveEditor(+15).
-    ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveEditor(-15).
-
-  END.
+  RUN playGame.
   
 END PROCEDURE. /* showLog */
 
