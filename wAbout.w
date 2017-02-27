@@ -301,7 +301,7 @@ ON END-ERROR OF wAbout /* About the DataDigger */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
 
   APPLY 'CLOSE' TO THIS-PROCEDURE.
-
+message 123.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -313,7 +313,7 @@ ON WINDOW-CLOSE OF wAbout /* About the DataDigger */
 DO:
   /* This event will close the window and terminate the procedure.  */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
-  RETURN NO-APPLY.
+  
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -554,21 +554,18 @@ PROCEDURE fadeWindow :
 DEFINE INPUT PARAMETER piStartValue AS INTEGER NO-UNDO.
   DEFINE INPUT PARAMETER piEndValue   AS INTEGER NO-UNDO.
 
-  DEFINE VARIABLE iStartTime   AS INTEGER NO-UNDO.
   DEFINE VARIABLE iTranparency AS INTEGER NO-UNDO.
 
   IF piEndValue > piStartValue THEN 
   DO iTranparency = piStartValue TO piEndValue by 24:
     RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
-    iStartTime = ETIME.
-    DO WHILE ETIME < iStartTime + 20: END.
+    RUN justWait(20).
   END.
 
   ELSE
   DO iTranparency = piStartValue TO piEndValue by -24:
     RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
-    iStartTime = ETIME.
-    DO WHILE ETIME < iStartTime + 20: END.
+    RUN justWait(20).
   END.
 
 END PROCEDURE. /* fadeWindow */
@@ -606,6 +603,23 @@ PROCEDURE initializeObject :
   END.
 
 END PROCEDURE. /* initializeObject. */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE justWait wAbout 
+PROCEDURE justWait :
+/* Wait a few miliseconds 
+ */
+  DEFINE INPUT  PARAMETER piWait AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
+   
+  iStart = ETIME.
+  DO WHILE ETIME < iStart + piWait: 
+    PROCESS EVENTS.
+  END. 
+
+END PROCEDURE. /* justWait */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -652,7 +666,9 @@ PROCEDURE playGame :
     END.
 
     /* Game is on! */
+    #Game:
     REPEAT:
+      IF NOT FRAME {&FRAME-NAME}:VISIBLE THEN LEAVE #Game.
       RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
 
       IF iOldMouseX <> iMouseX
@@ -663,9 +679,8 @@ PROCEDURE playGame :
         iOldMouseX = iMouseX.
       END.                   
 
-      ETIME(YES). REPEAT WHILE ETIME < 5: PROCESS EVENTS. END.
-      PROCESS EVENTS. 
-
+      RUN justWait(5).
+      
       rcBall:X = rcBall:X + iBallX.
       rcBall:Y = rcBall:Y + iBallY.
 
@@ -734,7 +749,7 @@ PROCEDURE prepareWindow :
       edChangelog:WIDTH-PIXELS = iStartEdW + ((iEndEdW - iStartEdW)) / iNumSteps * iStep.
       edChangelog:X            = (wAbout:WIDTH-PIXELS - edChangelog:WIDTH-PIXELS) / 2.
 
-      ETIME(YES). REPEAT WHILE ETIME < 1: PROCESS EVENTS. END.
+      RUN justWait(5).
     END.
 
     edChangelog:VISIBLE = FALSE.
@@ -834,23 +849,11 @@ DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
     rcBall:X = xx.
     rcBall:Y = yy.
 
-    ETIME(yes).
-    DO WHILE ETIME < 12: 
-      PROCESS EVENTS.
-    END. 
+    RUN justWait(12).
   END. 
 
   rcBall:X = 305.
 END.
-
-PROCEDURE justWait:
-  DEFINE INPUT  PARAMETER piWait AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
-  iStart = ETIME.
-  DO WHILE ETIME < iStart + piWait: 
-    PROCESS EVENTS.
-  END. 
-END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
