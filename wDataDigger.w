@@ -1,9 +1,9 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
-/* Connected Databases
+/* Connected Databases 
 */
 &Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*
  * Main program for DataDigger
  */
@@ -113,7 +113,7 @@ DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in Da
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -128,8 +128,8 @@ DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in Da
 &Scoped-define INTERNAL-TABLES ttField ttIndex ttTable
 
 /* Definitions for BROWSE brFields                                      */
-&Scoped-define FIELDS-IN-QUERY-brFields ttField.lShow ttField.iOrder ttField.cFieldName (IF ttField.iExtent > 0 THEN SUBSTITUTE('&1[&2]', ttField.cDataType, ttField.iExtent) ELSE ttField.cDataType ) @ ttField.cDataType ttField.cFormat ttField.cLabel /* Extra fields as per v19 */ ttField.cInitial ttField.cColLabel ttField.lMandatory ttField.iExtent ttField.iDecimals ttField.iFieldRpos ttField.cValExp ttField.cValMsg ttField.cHelp ttField.cDesc ttField.cViewAs
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brFields ttField.lShow  ttField.cFormat
+&Scoped-define FIELDS-IN-QUERY-brFields ttField.lShow ttField.iOrder ttField.cFieldName (IF ttField.iExtent > 0 THEN SUBSTITUTE('&1[&2]', ttField.cDataType, ttField.iExtent) ELSE ttField.cDataType ) @ ttField.cDataType ttField.cFormat ttField.cLabel /* Extra fields as per v19 */ ttField.cInitial ttField.cColLabel ttField.lMandatory ttField.iExtent ttField.iDecimals ttField.iFieldRpos ttField.cValExp ttField.cValMsg ttField.cHelp ttField.cDesc ttField.cViewAs   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brFields ttField.lShow  ttField.cFormat   
 &Scoped-define ENABLED-TABLES-IN-QUERY-brFields ttField
 &Scoped-define FIRST-ENABLED-TABLE-IN-QUERY-brFields ttField
 &Scoped-define SELF-NAME brFields
@@ -140,8 +140,8 @@ DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in Da
 
 
 /* Definitions for BROWSE brIndexes                                     */
-&Scoped-define FIELDS-IN-QUERY-brIndexes cIndexName cIndexFlags cIndexFields
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brIndexes
+&Scoped-define FIELDS-IN-QUERY-brIndexes cIndexName cIndexFlags cIndexFields   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brIndexes   
 &Scoped-define SELF-NAME brIndexes
 &Scoped-define QUERY-STRING-brIndexes FOR EACH ttIndex
 &Scoped-define OPEN-QUERY-brIndexes OPEN QUERY {&SELF-NAME} FOR EACH ttIndex.
@@ -150,8 +150,8 @@ DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in Da
 
 
 /* Definitions for BROWSE brTables                                      */
-&Scoped-define FIELDS-IN-QUERY-brTables ttTable.cTableName ttTable.cDatabase ttTable.iNumQueries
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables
+&Scoped-define FIELDS-IN-QUERY-brTables ttTable.cTableName ttTable.cDatabase ttTable.iNumQueries   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables   
 &Scoped-define SELF-NAME brTables
 &Scoped-define QUERY-STRING-brTables FOR EACH ttTable
 &Scoped-define OPEN-QUERY-brTables OPEN QUERY {&SELF-NAME} FOR EACH ttTable.
@@ -172,20 +172,20 @@ btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
 btnQueries btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad ~
 btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools btnDelete ~
-btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback
+btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
-fiFeedback
+fiFeedback 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
 &Scoped-define List-1 rctQueryButtons btnBegins cbAndOr cbFields cbOperator ~
 ficValue btnInsert btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT ~
-btnMatches btnNE btnQt btnToday
+btnMatches btnNE btnQt btnToday 
 &Scoped-define List-2 rcFieldFilter tgSelAll btnClearFieldFilter brFields ~
-btnMoveTop btnMoveUp btnReset btnMoveDown btnMoveBottom
+btnMoveTop btnMoveUp btnReset btnMoveDown btnMoveBottom 
 &Scoped-define List-3 rcIndexFilter fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brIndexes
+fiFieldsFilter btnClearIndexFilter brIndexes 
 
 /* _UIB-PREPROCESSOR-BLOCK-END */
 &ANALYZE-RESUME
@@ -193,14 +193,14 @@ fiFieldsFilter btnClearIndexFilter brIndexes
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenu C-Win 
 FUNCTION createMenu RETURNS HANDLE
   ( phParent AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenuItem C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenuItem C-Win 
 FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
@@ -211,105 +211,105 @@ FUNCTION createMenuItem RETURNS HANDLE
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getActiveQueryEditor C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getActiveQueryEditor C-Win 
 FUNCTION getActiveQueryEditor RETURNS HANDLE
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDroppedFiles C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDroppedFiles C-Win 
 FUNCTION getDroppedFiles RETURNS CHARACTER
   ( phDropTarget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList C-Win 
 FUNCTION getFieldList RETURNS CHARACTER
   ( pcSortBy AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQueryFromFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQueryFromFields C-Win 
 FUNCTION getQueryFromFields RETURNS CHARACTER
   ( INPUT pcFieldList AS CHARACTER ) FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedFields C-Win 
 FUNCTION getSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedText C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedText C-Win 
 FUNCTION getSelectedText RETURNS CHARACTER
   ( INPUT hWidget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD killMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD killMenu C-Win 
 FUNCTION killMenu RETURNS LOGICAL
   ( phMenu AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD saveSelectedFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD saveSelectedFields C-Win 
 FUNCTION saveSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setCurrentTable C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setCurrentTable C-Win 
 FUNCTION setCurrentTable RETURNS LOGICAL
   ( pcTableName AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setDebugMode C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setDebugMode C-Win 
 FUNCTION setDebugMode RETURNS LOGICAL
   ( plDebugMode AS LOGICAL )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQuery C-Win 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQueryEditor C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQueryEditor C-Win 
 FUNCTION setQueryEditor RETURNS LOGICAL
   ( pcQueryEditorState AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel C-Win 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setWindowFreeze C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setWindowFreeze C-Win 
 FUNCTION setWindowFreeze RETURNS LOGICAL
   ( plWindowsLocked AS LOGICAL )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD trimList C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD trimList C-Win 
 FUNCTION trimList RETURNS CHARACTER
   ( pcList  AS CHARACTER
   , pcSep   AS CHARACTER
@@ -326,18 +326,18 @@ FUNCTION trimList RETURNS CHARACTER
 DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
-DEFINE MENU POPUP-MENU-brTables
-       MENU-ITEM m_Quick_Connect LABEL "Quick Connect"
-       MENU-ITEM m_Disconnect   LABEL "&Disconnect"
+DEFINE MENU POPUP-MENU-brTables 
+       MENU-ITEM m_Quick_Connect LABEL "Quick Connect" 
+       MENU-ITEM m_Disconnect   LABEL "&Disconnect"   
        MENU-ITEM m_Manage_Connections LABEL "Manage Connections"
        MENU-ITEM m_Toggle_as_favourite LABEL "Set / Unset as &Favourite"
        MENU-ITEM m_Dump_table_DF LABEL "&Dump definitions"
        MENU-ITEM m_Clone_this_Database LABEL "&Clone this Database"
        RULE.
 
-DEFINE MENU POPUP-MENU-btnView
-       MENU-ITEM m_View_as_text LABEL "View as TEXT"
-       MENU-ITEM m_View_as_HTML LABEL "View as HTML"
+DEFINE MENU POPUP-MENU-btnView 
+       MENU-ITEM m_View_as_text LABEL "View as TEXT"  
+       MENU-ITEM m_View_as_HTML LABEL "View as HTML"  
        MENU-ITEM m_View_as_Excel LABEL "View as Excel" .
 
 
@@ -346,36 +346,36 @@ DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
 DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnClearDataFilter
-     LABEL "C"
+DEFINE BUTTON btnClearDataFilter 
+     LABEL "C" 
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnDataSort
-     LABEL "S"
+DEFINE BUTTON btnDataSort 
+     LABEL "S" 
      SIZE-PIXELS 16 BY 21 TOOLTIP "set sorting".
 
-DEFINE VARIABLE fiNumRecords AS CHARACTER FORMAT "X(256)":U
-      VIEW-AS TEXT
+DEFINE VARIABLE fiNumRecords AS CHARACTER FORMAT "X(256)":U 
+      VIEW-AS TEXT 
      SIZE-PIXELS 90 BY 13 TOOLTIP "nr of results of the query, double click to fetch all records" NO-UNDO.
 
-DEFINE VARIABLE fiNumSelected AS CHARACTER FORMAT "X(256)":U
-      VIEW-AS TEXT
+DEFINE VARIABLE fiNumSelected AS CHARACTER FORMAT "X(256)":U 
+      VIEW-AS TEXT 
      SIZE-PIXELS 29 BY 13 TOOLTIP "nr of selected rows" NO-UNDO.
 
 DEFINE RECTANGLE rctData
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 785 BY 205.
 
 DEFINE RECTANGLE rctDataFilter
-     EDGE-PIXELS 2 GRAPHIC-EDGE
+     EDGE-PIXELS 2 GRAPHIC-EDGE    
      SIZE-PIXELS 765 BY 28
      BGCOLOR 12 .
 
-DEFINE BUTTON btGotIt
-     LABEL "I &Got it"
+DEFINE BUTTON btGotIt 
+     LABEL "I &Got it" 
      SIZE-PIXELS 75 BY 24.
 
-DEFINE VARIABLE edHint AS CHARACTER
+DEFINE VARIABLE edHint AS CHARACTER 
      VIEW-AS EDITOR NO-BOX
      SIZE-PIXELS 160 BY 75
      BGCOLOR 14 FGCOLOR 9  NO-UNDO.
@@ -385,446 +385,446 @@ DEFINE IMAGE imgArrow
      SIZE-PIXELS 32 BY 32.
 
 DEFINE BUTTON btnAdd  NO-FOCUS FLAT-BUTTON
-     LABEL "&Add"
+     LABEL "&Add" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "add a record #(INS)".
 
-DEFINE BUTTON btnClear
-     LABEL "&C"
+DEFINE BUTTON btnClear 
+     LABEL "&C" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "clear the where field #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClearFieldFilter
-     LABEL "C"
+DEFINE BUTTON btnClearFieldFilter 
+     LABEL "C" 
      CONTEXT-HELP-ID 280
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClearIndexFilter
-     LABEL "C"
+DEFINE BUTTON btnClearIndexFilter 
+     LABEL "C" 
      CONTEXT-HELP-ID 960
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClearTableFilter
-     LABEL "C"
+DEFINE BUTTON btnClearTableFilter 
+     LABEL "C" 
      CONTEXT-HELP-ID 950
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClipboard
-     LABEL "Cp"
+DEFINE BUTTON btnClipboard 
+     LABEL "Cp" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "copy the expression to the clipboard #(CTRL-C)".
 
 DEFINE BUTTON btnClone  NO-FOCUS FLAT-BUTTON
-     LABEL "Cl&one"
+     LABEL "Cl&one" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "clone focused record and edit #(ALT-O)".
 
 DEFINE BUTTON btnDelete  NO-FOCUS FLAT-BUTTON
-     LABEL "Del"
+     LABEL "Del" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "delete the selected records #(DEL)".
 
 DEFINE BUTTON btnDump  NO-FOCUS FLAT-BUTTON
-     LABEL "&Save"
+     LABEL "&Save" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "save data to disk #(CTRL-S)".
 
 DEFINE BUTTON btnEdit  NO-FOCUS FLAT-BUTTON
-     LABEL "&Edit"
+     LABEL "&Edit" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "edit the selected records #(ALT-E)".
 
 DEFINE BUTTON btnFavourite  NO-FOCUS FLAT-BUTTON
-     LABEL "F"
+     LABEL "F" 
      SIZE-PIXELS 20 BY 20 TOOLTIP "toggle as favourite".
 
 DEFINE BUTTON btnLoad  NO-FOCUS FLAT-BUTTON
-     LABEL "&Load"
+     LABEL "&Load" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "load data #(CTRL-L)".
 
-DEFINE BUTTON btnMoveBottom
-     LABEL "Btm"
+DEFINE BUTTON btnMoveBottom 
+     LABEL "Btm" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field to bottom #(CTRL-SHIFT-DOWN)".
 
-DEFINE BUTTON btnMoveDown
-     LABEL "Dn"
+DEFINE BUTTON btnMoveDown 
+     LABEL "Dn" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field down #(CTRL-DOWN)".
 
-DEFINE BUTTON btnMoveTop
-     LABEL "Top"
+DEFINE BUTTON btnMoveTop 
+     LABEL "Top" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field to top #(CTRL-SHIFT-UP)".
 
-DEFINE BUTTON btnMoveUp
-     LABEL "Up"
+DEFINE BUTTON btnMoveUp 
+     LABEL "Up" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field up #(CTRL-UP)".
 
 DEFINE BUTTON btnNextQuery  NO-FOCUS FLAT-BUTTON
-     LABEL "->"
+     LABEL "->" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "next query".
 
 DEFINE BUTTON btnPrevQuery  NO-FOCUS FLAT-BUTTON
-     LABEL "<-"
+     LABEL "<-" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "previous query".
 
-DEFINE BUTTON btnQueries
-     LABEL "&Q"
+DEFINE BUTTON btnQueries 
+     LABEL "&Q" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "show previous queries on this table #(ALT-Q)".
 
-DEFINE BUTTON btnReset
-     LABEL "R"
+DEFINE BUTTON btnReset 
+     LABEL "R" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "reset default ordering #(CTRL-SHIFT-HOME)".
 
 DEFINE BUTTON btnResizeVer  NO-FOCUS FLAT-BUTTON
-     LABEL "||||||||||||||||||||||||||"
+     LABEL "||||||||||||||||||||||||||" 
      SIZE 156 BY .24 TOOLTIP "drag me up and down".
 
 DEFINE BUTTON btnTabFavourites  NO-FOCUS FLAT-BUTTON
-     LABEL "Fav"
+     LABEL "Fav" 
      CONTEXT-HELP-ID 270
      SIZE-PIXELS 25 BY 77 TOOLTIP "show favorites #(CTRL-2)".
 
 DEFINE BUTTON btnTabFields  NO-FOCUS FLAT-BUTTON
-     LABEL "Fld"
+     LABEL "Fld" 
      CONTEXT-HELP-ID 270
      SIZE-PIXELS 25 BY 77 TOOLTIP "show fields #(CTRL-3)".
 
 DEFINE BUTTON btnTabIndexes  NO-FOCUS FLAT-BUTTON
-     LABEL "Idx"
+     LABEL "Idx" 
      CONTEXT-HELP-ID 270
      SIZE-PIXELS 25 BY 77 TOOLTIP "show indexes #(CTRL-4)".
 
-DEFINE BUTTON btnTableFilter
-     LABEL "Y"
+DEFINE BUTTON btnTableFilter 
+     LABEL "Y" 
      CONTEXT-HELP-ID 950
      SIZE-PIXELS 20 BY 21 TOOLTIP "press arrow-down for extra filter options #(CTRL-DOWN)".
 
 DEFINE BUTTON btnTabTables  NO-FOCUS FLAT-BUTTON
-     LABEL "Tbl"
+     LABEL "Tbl" 
      CONTEXT-HELP-ID 270
      SIZE-PIXELS 25 BY 77 TOOLTIP "show tables #(CTRL-1)".
 
 DEFINE BUTTON btnTools  NO-FOCUS FLAT-BUTTON
-     LABEL "Tools"
+     LABEL "Tools" 
      SIZE-PIXELS 21 BY 21 TOOLTIP "tools and settings".
 
 DEFINE BUTTON btnView  NO-FOCUS FLAT-BUTTON
-     LABEL "&View"
+     LABEL "&View" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "view selected records  #(ENTER) #right click to set type of view".
 
-DEFINE BUTTON btnViewData
-     LABEL "->"
+DEFINE BUTTON btnViewData 
+     LABEL "->" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "execute the query #(CTRL-ENTER)".
 
-DEFINE BUTTON btnWhere
-     LABEL "&Where"
+DEFINE BUTTON btnWhere 
+     LABEL "&Where" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(CTRL-ALT-W)".
 
-DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U
+DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 950
      VIEW-AS COMBO-BOX SORT INNER-LINES 10
-     LIST-ITEMS "Item 1"
+     LIST-ITEMS "Item 1" 
      DROP-DOWN-LIST
      SIZE-PIXELS 59 BY 21 TOOLTIP "filter on database" NO-UNDO.
 
-DEFINE VARIABLE ficWhere AS CHARACTER
+DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 595 BY 21 TOOLTIP "query on your table  #(ALT-W)"
      FONT 2 NO-UNDO.
 
-DEFINE VARIABLE fiFeedback AS CHARACTER FORMAT "X(256)":U INITIAL "Got a question or feedback?"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiFeedback AS CHARACTER FORMAT "X(256)":U INITIAL "Got a question or feedback?" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 145 BY 13 TOOLTIP "click me!"
      FGCOLOR 7  NO-UNDO.
 
-DEFINE VARIABLE fiFieldsFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Fields"
+DEFINE VARIABLE fiFieldsFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Fields" 
      CONTEXT-HELP-ID 960
-     VIEW-AS FILL-IN
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 140 BY 21 TOOLTIP "filter indexes on used fields"
      FGCOLOR 7  NO-UNDO.
 
-DEFINE VARIABLE fiFlagsFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Flags"
+DEFINE VARIABLE fiFlagsFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Flags" 
      CONTEXT-HELP-ID 960
-     VIEW-AS FILL-IN
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 55 BY 21 TOOLTIP "filter indexes on index flags"
      FGCOLOR 7  NO-UNDO.
 
-DEFINE VARIABLE fiIndexNameFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Index Name"
+DEFINE VARIABLE fiIndexNameFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Index Name" 
      CONTEXT-HELP-ID 960
-     VIEW-AS FILL-IN
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 75 BY 21 TOOLTIP "filter indexes on name"
      FGCOLOR 7  NO-UNDO.
 
-DEFINE VARIABLE fiTableDesc AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiTableDesc AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 200 BY 20 NO-UNDO.
 
-DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Table filter"
+DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Table filter" 
      CONTEXT-HELP-ID 950
-     VIEW-AS FILL-IN
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 70 BY 21 TOOLTIP "filter on table names  #(ALT-T)"
      FGCOLOR 7  NO-UNDO.
 
-DEFINE VARIABLE fiWarning AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiWarning AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 45 BY 21
      BGCOLOR 14 FGCOLOR 12  NO-UNDO.
 
 DEFINE RECTANGLE rcFieldFilter
-     EDGE-PIXELS 2 GRAPHIC-EDGE
+     EDGE-PIXELS 2 GRAPHIC-EDGE    
      SIZE-PIXELS 466 BY 237
      BGCOLOR 12 FGCOLOR 12 .
 
 DEFINE RECTANGLE rcIndexFilter
-     EDGE-PIXELS 2 GRAPHIC-EDGE
+     EDGE-PIXELS 2 GRAPHIC-EDGE    
      SIZE-PIXELS 315 BY 141
      BGCOLOR 12 FGCOLOR 12 .
 
 DEFINE RECTANGLE rcTableFilter
-     EDGE-PIXELS 2 GRAPHIC-EDGE
+     EDGE-PIXELS 2 GRAPHIC-EDGE    
      SIZE-PIXELS 226 BY 236
      BGCOLOR 12 .
 
 DEFINE RECTANGLE rctEdit
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 265 BY 35.
 
 DEFINE RECTANGLE rctQuery
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 789 BY 290
      BGCOLOR 18 .
 
-DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes
-     LABEL ""
+DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes 
+     LABEL "" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 15 BY 13 TOOLTIP "debugging mode".
 
-DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes
-     LABEL ""
+DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes 
+     LABEL "" 
      CONTEXT-HELP-ID 280
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 14 BY 15 TOOLTIP "toggle to (de)select all fields" NO-UNDO.
 
-DEFINE BUTTON btnAbout
-     LABEL "Que"
+DEFINE BUTTON btnAbout 
+     LABEL "Que" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-A)".
 
 DEFINE BUTTON btnAbout-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "About DataDigger"
+     LABEL "About DataDigger" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-A)".
 
-DEFINE BUTTON btnConnections
-     LABEL "Co&n"
+DEFINE BUTTON btnConnections 
+     LABEL "Co&n" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "connections #(CTRL-SHIFT-N)".
 
 DEFINE BUTTON btnConnections-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Co&nnections"
+     LABEL "Co&nnections" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "connections #(CTRL-SHIFT-N)".
 
-DEFINE BUTTON btnDataAdmin
-     LABEL "&ADM"
+DEFINE BUTTON btnDataAdmin 
+     LABEL "&ADM" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "Data Administration".
 
 DEFINE BUTTON btnDataAdmin-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Data Administration"
+     LABEL "Data Administration" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "Data Administration".
 
-DEFINE BUTTON btnDataDigger
-     LABEL "DD"
+DEFINE BUTTON btnDataDigger 
+     LABEL "DD" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start a new DataDigger window #(ALT-D)".
 
 DEFINE BUTTON btnDataDigger-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "New &Window"
+     LABEL "New &Window" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "start a new DataDigger window #(ALT-D)".
 
-DEFINE BUTTON btnDict
-     LABEL "&DD"
+DEFINE BUTTON btnDict 
+     LABEL "&DD" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
 
 DEFINE BUTTON btnDict-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Data &Dictionary"
+     LABEL "Data &Dictionary" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
 
-DEFINE BUTTON btnHelp
-     LABEL "Help"
+DEFINE BUTTON btnHelp 
+     LABEL "Help" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "get help about the DataDigger window".
 
 DEFINE BUTTON btnHelp-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Help"
+     LABEL "Help" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "show quick intro".
 
-DEFINE BUTTON btnProcEdit
-     LABEL "&Ed"
+DEFINE BUTTON btnProcEdit 
+     LABEL "&Ed" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start the Procedure Editor #(SHIFT-F3)".
 
 DEFINE BUTTON btnProcEdit-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Procedure &Editor"
+     LABEL "Procedure &Editor" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "start the Procedure Editor #(SHIFT-F3)".
 
-DEFINE BUTTON btnQueries-3
-     LABEL "&Q"
+DEFINE BUTTON btnQueries-3 
+     LABEL "&Q" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "show previous queries #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnQueries-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Manage &Queries"
+     LABEL "Manage &Queries" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "show previous queries on this table #(CTRL-SHIFT-Q)".
 
-DEFINE BUTTON btnQueryTester
-     LABEL "Q&T"
+DEFINE BUTTON btnQueryTester 
+     LABEL "Q&T" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start the query tester #(CTRL-Q)".
 
 DEFINE BUTTON btnQueryTester-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Query &Tester"
+     LABEL "Query &Tester" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "start the query tester #(CTRL-SHIFT-T)".
 
-DEFINE BUTTON btnSettings
-     LABEL "&Set"
+DEFINE BUTTON btnSettings 
+     LABEL "&Set" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "edit your settings file #(ALT-S)".
 
 DEFINE BUTTON btnSettings-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "&Settings"
+     LABEL "&Settings" 
      SIZE-PIXELS 155 BY 30 TOOLTIP "edit your settings file #(ALT-S)".
 
 DEFINE BUTTON btnAnd  NO-FOCUS
-     LABEL "and"
+     LABEL "and" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnBegins  NO-FOCUS
-     LABEL "begins"
+     LABEL "begins" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnBracket  NO-FOCUS
-     LABEL "()"
+     LABEL "()" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
      FONT 0.
 
-DEFINE BUTTON btnCancel-2 DEFAULT
-     LABEL "Cancel"
+DEFINE BUTTON btnCancel-2 DEFAULT 
+     LABEL "Cancel" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON btnClear-2
-     LABEL "&C"
+DEFINE BUTTON btnClear-2 
+     LABEL "&C" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 20 BY 23 TOOLTIP "clear the where field".
 
-DEFINE BUTTON btnClipboard-2
-     LABEL "Cp"
+DEFINE BUTTON btnClipboard-2 
+     LABEL "Cp" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 20 BY 23 TOOLTIP "copy the expression to the clipboard".
 
 DEFINE BUTTON btnContains  NO-FOCUS
-     LABEL "contains"
+     LABEL "contains" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnEq  NO-FOCUS
-     LABEL "="
+     LABEL "=" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnGT  NO-FOCUS
-     LABEL ">"
+     LABEL ">" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
-DEFINE BUTTON btnInsert
-     LABEL "+"
+DEFINE BUTTON btnInsert 
+     LABEL "+" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 20 BY 23 TOOLTIP "insert the expression into the where field".
 
 DEFINE BUTTON btnLT  NO-FOCUS
-     LABEL "<"
+     LABEL "<" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnMatches  NO-FOCUS
-     LABEL "matches"
+     LABEL "matches" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnNE  NO-FOCUS
-     LABEL "<>"
+     LABEL "<>" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
-DEFINE BUTTON btnOK AUTO-GO DEFAULT
-     LABEL "OK"
+DEFINE BUTTON btnOK AUTO-GO DEFAULT 
+     LABEL "OK" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
 DEFINE BUTTON btnOr  NO-FOCUS
-     LABEL "or"
+     LABEL "or" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
 
 DEFINE BUTTON btnQt  NO-FOCUS
-     LABEL "~"~""
+     LABEL "~"~"" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
      FONT 0.
 
-DEFINE BUTTON btnQueries-2
-     LABEL "&Q"
+DEFINE BUTTON btnQueries-2 
+     LABEL "&Q" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 20 BY 23 TOOLTIP "show previous queries on this table".
 
 DEFINE BUTTON btnToday  NO-FOCUS
-     LABEL "today"
+     LABEL "today" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
 
-DEFINE BUTTON btnViewData-2
-     LABEL "->"
+DEFINE BUTTON btnViewData-2 
+     LABEL "->" 
      CONTEXT-HELP-ID 1050
      SIZE-PIXELS 20 BY 23 TOOLTIP "execute the query".
 
-DEFINE VARIABLE cbAndOr AS CHARACTER FORMAT "X(256)":U
-     LABEL "&Where"
+DEFINE VARIABLE cbAndOr AS CHARACTER FORMAT "X(256)":U 
+     LABEL "&Where" 
      CONTEXT-HELP-ID 1050
      VIEW-AS COMBO-BOX INNER-LINES 5
-     LIST-ITEMS "","AND","OR"
+     LIST-ITEMS "","AND","OR" 
      DROP-DOWN-LIST
      SIZE-PIXELS 55 BY 21 TOOLTIP "preceding AND or OR for the expression" NO-UNDO.
 
-DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U
+DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 1050
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN-LIST
      SIZE-PIXELS 186 BY 21 TOOLTIP "field used in the expression"
      FONT 2 NO-UNDO.
 
-DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U
+DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 1050
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "","=","<>",">",">=","<","<=","begins","matches","contains"
+     LIST-ITEMS "","=","<>",">",">=","<","<=","begins","matches","contains" 
      DROP-DOWN-LIST
      SIZE-PIXELS 85 BY 21 TOOLTIP "operator used in the expression"
      FONT 2 NO-UNDO.
 
-DEFINE VARIABLE ficWhere2 AS CHARACTER
+DEFINE VARIABLE ficWhere2 AS CHARACTER 
      CONTEXT-HELP-ID 1050
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 501 BY 175 TOOLTIP "alt-cursor-up / down to view/hide query editor"
      FONT 2 NO-UNDO.
 
-DEFINE VARIABLE ficValue AS CHARACTER FORMAT "X(256)":U
+DEFINE VARIABLE ficValue AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 1050
-     VIEW-AS FILL-IN
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 210 BY 23 TOOLTIP "the literal value for the expression"
      FONT 2 NO-UNDO.
 
 DEFINE RECTANGLE rctQueryButtons
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 610 BY 190.
 
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
-DEFINE QUERY brFields FOR
+DEFINE QUERY brFields FOR 
       ttField SCROLLING.
 
-DEFINE QUERY brIndexes FOR
+DEFINE QUERY brIndexes FOR 
       ttIndex SCROLLING.
 
-DEFINE QUERY brTables FOR
+DEFINE QUERY brTables FOR 
       ttTable SCROLLING.
 &ANALYZE-RESUME
 
@@ -943,10 +943,58 @@ DEFINE FRAME frMain
      rcTableFilter AT Y 24 X 35 WIDGET-ID 254
      rcFieldFilter AT Y 24 X 292 WIDGET-ID 256
      rcIndexFilter AT Y 24 X 795 WIDGET-ID 258
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
+
+DEFINE FRAME frSettings
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 10.67 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -974,60 +1022,12 @@ DEFINE FRAME frWhere
      btnQt AT Y 79 X 57 WIDGET-ID 72
      btnToday AT Y 189 X 17 WIDGET-ID 122
      rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
          AT X 799 Y 370
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frSettings
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         AT COL 160.6 ROW 10.67 SCROLLABLE
-         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1081,20 +1081,20 @@ ASSIGN FRAME frData:FRAME = FRAME frMain:HANDLE
 
 /* SETTINGS FOR FRAME frData
                                                                         */
-ASSIGN
+ASSIGN 
        btnClearDataFilter:HIDDEN IN FRAME frData           = TRUE.
 
-ASSIGN
+ASSIGN 
        btnDataSort:HIDDEN IN FRAME frData           = TRUE.
 
 /* SETTINGS FOR RECTANGLE rctDataFilter IN FRAME frData
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        rctDataFilter:HIDDEN IN FRAME frData           = TRUE.
 
 /* SETTINGS FOR FRAME frHint
    NOT-VISIBLE                                                          */
-ASSIGN
+ASSIGN 
        edHint:READ-ONLY IN FRAME frHint        = TRUE.
 
 /* SETTINGS FOR IMAGE imgArrow IN FRAME frHint
@@ -1106,17 +1106,17 @@ ASSIGN
 /* BROWSE-TAB brIndexes btnMoveTop frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
-ASSIGN
+ASSIGN 
        brFields:ALLOW-COLUMN-SEARCHING IN FRAME frMain = TRUE
        brFields:COLUMN-RESIZABLE IN FRAME frMain       = TRUE.
 
 /* SETTINGS FOR BROWSE brIndexes IN FRAME frMain
    3                                                                    */
-ASSIGN
+ASSIGN 
        brIndexes:ALLOW-COLUMN-SEARCHING IN FRAME frMain = TRUE
        brIndexes:COLUMN-RESIZABLE IN FRAME frMain       = TRUE.
 
-ASSIGN
+ASSIGN 
        brTables:POPUP-MENU IN FRAME frMain             = MENU POPUP-MENU-brTables:HANDLE
        brTables:ALLOW-COLUMN-SEARCHING IN FRAME frMain = TRUE
        brTables:COLUMN-RESIZABLE IN FRAME frMain       = TRUE.
@@ -1135,82 +1135,82 @@ ASSIGN
    2                                                                    */
 /* SETTINGS FOR BUTTON btnReset IN FRAME frMain
    2                                                                    */
-ASSIGN
+ASSIGN 
        btnResizeVer:MOVABLE IN FRAME frMain          = TRUE.
 
-ASSIGN
+ASSIGN 
        btnView:POPUP-MENU IN FRAME frMain       = MENU POPUP-MENU-btnView:HANDLE.
 
 /* SETTINGS FOR BUTTON btnViewData IN FRAME frMain
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiFeedback:READ-ONLY IN FRAME frMain        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiFieldsFilter IN FRAME frMain
    3                                                                    */
-ASSIGN
-       fiFieldsFilter:PRIVATE-DATA IN FRAME frMain     =
+ASSIGN 
+       fiFieldsFilter:PRIVATE-DATA IN FRAME frMain     = 
                 "Fields".
 
 /* SETTINGS FOR FILL-IN fiFlagsFilter IN FRAME frMain
    3                                                                    */
-ASSIGN
-       fiFlagsFilter:PRIVATE-DATA IN FRAME frMain     =
+ASSIGN 
+       fiFlagsFilter:PRIVATE-DATA IN FRAME frMain     = 
                 "Flags".
 
 /* SETTINGS FOR FILL-IN fiIndexNameFilter IN FRAME frMain
    3                                                                    */
-ASSIGN
-       fiIndexNameFilter:PRIVATE-DATA IN FRAME frMain     =
+ASSIGN 
+       fiIndexNameFilter:PRIVATE-DATA IN FRAME frMain     = 
                 "Index Name".
 
 /* SETTINGS FOR FILL-IN fiTableDesc IN FRAME frMain
    ALIGN-L                                                              */
-ASSIGN
+ASSIGN 
        fiTableDesc:READ-ONLY IN FRAME frMain        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiTableFilter IN FRAME frMain
    ALIGN-L                                                              */
-ASSIGN
-       fiTableFilter:PRIVATE-DATA IN FRAME frMain     =
+ASSIGN 
+       fiTableFilter:PRIVATE-DATA IN FRAME frMain     = 
                 "Table filter".
 
 /* SETTINGS FOR FILL-IN fiWarning IN FRAME frMain
    NO-DISPLAY NO-ENABLE                                                 */
-ASSIGN
+ASSIGN 
        fiWarning:HIDDEN IN FRAME frMain           = TRUE.
 
 /* SETTINGS FOR RECTANGLE rcFieldFilter IN FRAME frMain
    NO-ENABLE 2                                                          */
-ASSIGN
+ASSIGN 
        rcFieldFilter:HIDDEN IN FRAME frMain           = TRUE.
 
 /* SETTINGS FOR RECTANGLE rcIndexFilter IN FRAME frMain
    NO-ENABLE 3                                                          */
-ASSIGN
+ASSIGN 
        rcIndexFilter:HIDDEN IN FRAME frMain           = TRUE.
 
 /* SETTINGS FOR RECTANGLE rcTableFilter IN FRAME frMain
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        rcTableFilter:HIDDEN IN FRAME frMain           = TRUE.
 
 /* SETTINGS FOR TOGGLE-BOX tgDebugMode IN FRAME frMain
    NO-DISPLAY                                                           */
-ASSIGN
+ASSIGN 
        tgDebugMode:HIDDEN IN FRAME frMain           = TRUE.
 
 /* SETTINGS FOR TOGGLE-BOX tgSelAll IN FRAME frMain
    2                                                                    */
 /* SETTINGS FOR FRAME frSettings
    NOT-VISIBLE Size-to-Fit                                              */
-ASSIGN
+ASSIGN 
        FRAME frSettings:SCROLLABLE       = FALSE
        FRAME frSettings:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FRAME frWhere
                                                                         */
-ASSIGN
+ASSIGN 
        FRAME frWhere:HIDDEN           = TRUE
        FRAME frWhere:MOVABLE          = TRUE.
 
@@ -1250,7 +1250,7 @@ ASSIGN
    1                                                                    */
 /* SETTINGS FOR FILL-IN ficValue IN FRAME frWhere
    1                                                                    */
-ASSIGN
+ASSIGN 
        ficWhere2:RETURN-INSERTED IN FRAME frWhere  = TRUE.
 
 /* SETTINGS FOR RECTANGLE rctQueryButtons IN FRAME frWhere
@@ -1291,7 +1291,7 @@ OPEN QUERY {&SELF-NAME} FOR EACH ttTable.
 */  /* BROWSE brTables */
 &ANALYZE-RESUME
 
-
+ 
 
 
 /* **********************  Create OCX Containers  ********************** */
@@ -1496,10 +1496,10 @@ ANYWHERE DO:
   END.
 
   /* Colors for odd/even data rows */
-  giDataOddRowColor[1]  = getColor("DataRow:odd:fg" ).
-  giDataOddRowColor[2]  = getColor("DataRow:odd:bg" ).
-  giDataEvenRowColor[1] = getColor("DataRow:even:fg").
-  giDataEvenRowColor[2] = getColor("DataRow:even:bg").
+/*   giDataOddRowColor[1]  = getColor("DataRow:odd:fg" ). */
+/*   giDataOddRowColor[2]  = getColor("DataRow:odd:bg" ). */
+/*   giDataEvenRowColor[1] = getColor("DataRow:even:fg"). */
+/*   giDataEvenRowColor[2] = getColor("DataRow:even:bg"). */
 
 END.
 
@@ -3785,7 +3785,7 @@ END.
 &Scoped-define BROWSE-NAME brFields
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
 
 
 SESSION:DEBUG-ALERT = YES.
@@ -3990,7 +3990,7 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose C-Win 
 PROCEDURE btnAddChoose :
 /* Add new record
  */
@@ -4028,7 +4028,7 @@ END PROCEDURE. /* btnAddChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearDataFilterChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearDataFilterChoose C-Win 
 PROCEDURE btnClearDataFilterChoose :
 /* Clear filters and reopen data browse
  */
@@ -4053,7 +4053,7 @@ END PROCEDURE. /* btnClearDataFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearFieldFilterChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearFieldFilterChoose C-Win 
 PROCEDURE btnClearFieldFilterChoose :
 /*
  * Clear field filters and set focus to field browse
@@ -4067,7 +4067,7 @@ END PROCEDURE. /* btnClearFieldFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearIndexFilterChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearIndexFilterChoose C-Win 
 PROCEDURE btnClearIndexFilterChoose :
 /*
  * Clear index filters
@@ -4084,7 +4084,7 @@ END PROCEDURE. /* btnClearIndexFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose C-Win 
 PROCEDURE btnCloneChoose :
 /* Copy the current record and edit it.
  */
@@ -4134,7 +4134,7 @@ END PROCEDURE. /* btnCloneChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataSortChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataSortChoose C-Win 
 PROCEDURE btnDataSortChoose :
 /* Set sorting for data browse
  */
@@ -4153,7 +4153,7 @@ END PROCEDURE. /* btnDataSortChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose C-Win 
 PROCEDURE btnDeleteChoose :
 /* Delete selected records
  */
@@ -4265,7 +4265,7 @@ END PROCEDURE. /* btnDeleteChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose C-Win 
 PROCEDURE btnDumpChoose :
 /* Dump selected records
  */
@@ -4324,7 +4324,7 @@ END PROCEDURE. /* btnDumpChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose C-Win 
 PROCEDURE btnEditChoose :
 /* Edit one or more records in a separate window
  */
@@ -4366,7 +4366,7 @@ END PROCEDURE. /* btnEditChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnFavouritesChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnFavouritesChoose C-Win 
 PROCEDURE btnFavouritesChoose :
 /* Maintenance of database connection settings
  */
@@ -4400,7 +4400,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnLoadChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnLoadChoose C-Win 
 PROCEDURE btnLoadChoose :
 /* Load data into table
  */
@@ -4436,7 +4436,7 @@ END PROCEDURE. /* btnLoadChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueriesChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueriesChoose C-Win 
 PROCEDURE btnQueriesChoose :
 /* Maintenance of database connection settings
  */
@@ -4470,7 +4470,7 @@ END PROCEDURE. /* btnQueriesChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSettingsChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSettingsChoose C-Win 
 PROCEDURE btnSettingsChoose :
 /* Show DataDigger settings window
  */
@@ -4510,7 +4510,7 @@ END PROCEDURE. /* btnSettingsChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewChoose C-Win 
 PROCEDURE btnViewChoose :
 /* Show a record in a more readable format in a new window.
  */
@@ -4689,7 +4689,7 @@ END PROCEDURE. /* btnViewChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFonts C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFonts C-Win 
 PROCEDURE checkFonts :
 /* If the default fonts have been messed up, try to set the fonts to reasonable settings.
  */
@@ -4775,7 +4775,7 @@ END PROCEDURE. /* checkFonts */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataFilter C-Win 
 PROCEDURE clearDataFilter :
 /* clear the Data Filters
  */
@@ -4797,7 +4797,7 @@ END PROCEDURE. /* clearDataFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataSort C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataSort C-Win 
 PROCEDURE clearDataSort :
 /*
  * Remove data column sorting and reopen browse
@@ -4813,7 +4813,7 @@ END PROCEDURE. /* clearDataSort */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearField C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearField C-Win 
 PROCEDURE clearField :
 /* Clear a field
  */
@@ -4824,7 +4824,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearFieldFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearFieldFilter C-Win 
 PROCEDURE clearFieldFilter :
 /* Reset the field filters to the blank values
  */
@@ -4850,7 +4850,7 @@ END PROCEDURE. /* clearFieldFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearIndexFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearIndexFilter C-Win 
 PROCEDURE clearIndexFilter :
 /* Reset the index filters to the blank values
  */
@@ -4869,7 +4869,7 @@ END PROCEDURE. /* clearIndexFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo C-Win 
 PROCEDURE collectFieldInfo PRIVATE :
 /* Fill the fields temp-table
  */
@@ -4895,7 +4895,7 @@ END PROCEDURE. /* collectFieldInfo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectIndexInfo C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectIndexInfo C-Win 
 PROCEDURE collectIndexInfo :
 /* Fill the index temp-table
  */
@@ -4988,7 +4988,7 @@ END PROCEDURE. /* collectIndexInfo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase C-Win 
 PROCEDURE connectDatabase :
 /* Quick-Connect to a database via the context menu
  */
@@ -5036,7 +5036,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDroppedDatabase C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDroppedDatabase C-Win 
 PROCEDURE connectDroppedDatabase :
 /* Quick-Connect to a drag-and-dropped database
  */
@@ -5095,7 +5095,7 @@ END PROCEDURE. /* connectDroppedDatabase */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectParamFile C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectParamFile C-Win 
 PROCEDURE connectParamFile :
 /* Quick-Connect to a drag-and-dropped database
  */
@@ -5141,10 +5141,10 @@ END PROCEDURE. /* connectParamFile */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load C-Win  _CONTROL-LOAD
 PROCEDURE control_load :
 /*------------------------------------------------------------------------------
-  Purpose:     Load the OCXs
+  Purpose:     Load the OCXs    
   Parameters:  <none>
-  Notes:       Here we load, initialize and make visible the
-               OCXs in the interface.
+  Notes:       Here we load, initialize and make visible the 
+               OCXs in the interface.                        
 ------------------------------------------------------------------------------*/
 
 &IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
@@ -5176,7 +5176,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE convertSettings C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE convertSettings C-Win 
 PROCEDURE convertSettings :
 /* Do one-time conversions for new versions
  */
@@ -5256,7 +5256,7 @@ END PROCEDURE. /* convertSettings */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyDataToClipboard C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyDataToClipboard C-Win 
 PROCEDURE copyDataToClipboard :
 /* Copy the value of the column to the clipboard
  */
@@ -5275,7 +5275,7 @@ END PROCEDURE. /* copyDataToClipboard */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyToClipboard C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyToClipboard C-Win 
 PROCEDURE copyToClipboard :
 /* Copy value to clipboard
  */
@@ -5286,7 +5286,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuDataBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuDataBrowse C-Win 
 PROCEDURE createMenuDataBrowse :
 /* Rebuild the connection submenu of the 'add' button
  */
@@ -5373,7 +5373,7 @@ END PROCEDURE. /* createMenuDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win 
 PROCEDURE createSortTable :
 /* Create a newly arranged sort table for all sort options
    * from both query and user selected sorts */
@@ -5421,7 +5421,7 @@ END PROCEDURE. /* createSortTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard C-Win 
 PROCEDURE cutToClipboard :
 /* Copy value to clipboard and delete current value
  */
@@ -5434,7 +5434,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnResize C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnResize C-Win 
 PROCEDURE dataColumnResize :
 /* Resize a data column
  */
@@ -5452,7 +5452,7 @@ END PROCEDURE. /* dataColumnResize */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnSort C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnSort C-Win 
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
  */
@@ -5517,7 +5517,7 @@ END PROCEDURE. /* dataColumnSort */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDiggerClose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDiggerClose C-Win 
 PROCEDURE DataDiggerClose :
 /* Close DataDigger after event 'DataDiggerClose'
  */
@@ -5528,7 +5528,7 @@ END PROCEDURE. /* DataDiggerClose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataDoubleClick C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataDoubleClick C-Win 
 PROCEDURE dataDoubleClick :
 /* Double click on databrowse might result in EDIT / VIEW / DUMP
  */
@@ -5546,7 +5546,7 @@ END PROCEDURE. /* dataDoubleClick */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataGotoFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataGotoFilter C-Win 
 PROCEDURE dataGotoFilter :
 /* Jump from browse straight to the filter fields
  */
@@ -5579,7 +5579,7 @@ END PROCEDURE. /* dataGotoFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
 PROCEDURE dataOffHome :
 /* Show message that this is changed as from DataDigger 21.
          */
@@ -5592,7 +5592,7 @@ END PROCEDURE. /* dataOffHome */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowDisplay C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowDisplay C-Win 
 PROCEDURE dataRowDisplay :
 /* Set the background color to another color to get an odd/even coloring of the rows.
  */
@@ -5632,8 +5632,8 @@ PROCEDURE dataRowDisplay :
     IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
 
     /* Set colors */
-    bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:fg") ELSE getColor("DataRow:odd:fg")).
-    bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN getColor("DataRow:even:bg") ELSE getColor("DataRow:odd:bg")).
+    bColumn.hColumn:FGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[1] ELSE giDataOddRowColor[1]).
+    bColumn.hColumn:BGCOLOR = (IF glUseEvenRowColorSet THEN giDataEvenRowColor[2] ELSE giDataOddRowColor[2]).
 
     /* Set font/value for RECID field */
     IF bColumn.cFieldName = "RECID" THEN
@@ -5666,7 +5666,7 @@ END PROCEDURE. /* dataRowDisplay */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowJumpToEnd C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowJumpToEnd C-Win 
 PROCEDURE dataRowJumpToEnd :
 /* End on datarow
  */
@@ -5677,7 +5677,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowValueChanged C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowValueChanged C-Win 
 PROCEDURE dataRowValueChanged :
 /* Save the content of the fields in linkinfo
  */
@@ -5708,7 +5708,7 @@ END PROCEDURE. /* dataRowValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataScrollNotify C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataScrollNotify C-Win 
 PROCEDURE dataScrollNotify :
 /* Adjust size and position of the filterfields to browse
  */
@@ -5760,7 +5760,7 @@ END PROCEDURE.  /* dataScrollNotify */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectAll C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectAll C-Win 
 PROCEDURE dataSelectAll :
 /* Select all records in the browse
  */
@@ -5779,7 +5779,7 @@ END PROCEDURE. /* dataSelectAll */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectNone C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectNone C-Win 
 PROCEDURE dataSelectNone :
 /* Deselect all records in the browse
  */
@@ -5796,7 +5796,7 @@ END PROCEDURE. /* dataSelectNone */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteDataFilters C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteDataFilters C-Win 
 PROCEDURE deleteDataFilters :
 /* Kill the data filters and its menu
  */
@@ -5816,7 +5816,7 @@ END PROCEDURE. /* deleteDataFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteRecord C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteRecord C-Win 
 PROCEDURE deleteRecord :
 /* Generate a program to delete a record with dictionary validations
  */
@@ -5883,7 +5883,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -5896,7 +5896,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disconnectDatabase C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disconnectDatabase C-Win 
 PROCEDURE disconnectDatabase :
 /*
  * Disconnect the current database and rebuild table table
@@ -5969,7 +5969,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE doNothing C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE doNothing C-Win 
 PROCEDURE doNothing :
 /* Wait for an amount of msec
  */
@@ -5986,7 +5986,7 @@ END PROCEDURE. /* doNothing */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dropFieldMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dropFieldMenu C-Win 
 PROCEDURE dropFieldMenu :
 /* Event for opening the field popup-menu on brFields
  */
@@ -6087,46 +6087,46 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   RUN control_load.
-  DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter
-          fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere fiFeedback
+  DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
+          fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery btnFavourite rctEdit fiTableFilter cbDatabaseFilter
-         btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter
-         tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset
-         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries
-         btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad
-         btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools
-         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback
+  ENABLE rctQuery btnFavourite rctEdit fiTableFilter cbDatabaseFilter 
+         btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
+         tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
+         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
+         btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad 
+         btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnTools 
+         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnDataDigger btnAbout-txt btnConnections btnSettings btnProcEdit
-         btnDict btnDataAdmin btnQueries-3 btnQueryTester btnHelp btnAbout
-         btnConnections-txt btnDataAdmin-txt btnDataDigger-txt btnDict-txt
-         btnHelp-txt btnProcEdit-txt btnQueries-txt btnQueryTester-txt
-         btnSettings-txt
+  ENABLE btnDataDigger btnAbout-txt btnConnections btnSettings btnProcEdit 
+         btnDict btnDataAdmin btnQueries-3 btnQueryTester btnHelp btnAbout 
+         btnConnections-txt btnDataAdmin-txt btnDataDigger-txt btnDict-txt 
+         btnHelp-txt btnProcEdit-txt btnQueries-txt btnQueryTester-txt 
+         btnSettings-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
-  DISPLAY edHint
+  DISPLAY edHint 
       WITH FRAME frHint IN WINDOW C-Win.
-  ENABLE edHint btGotIt
+  ENABLE edHint btGotIt 
       WITH FRAME frHint IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frHint}
-  DISPLAY fiNumSelected fiNumRecords
+  DISPLAY fiNumSelected fiNumRecords 
       WITH FRAME frData IN WINDOW C-Win.
-  ENABLE rctData btnDataSort btnClearDataFilter fiNumSelected fiNumRecords
+  ENABLE rctData btnDataSort btnClearDataFilter fiNumSelected fiNumRecords 
       WITH FRAME frData IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frData}
-  DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2
+  DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
       WITH FRAME frWhere IN WINDOW C-Win.
-  ENABLE rctQueryButtons btnBegins cbAndOr cbFields cbOperator ficValue
-         btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 btnOK
-         btnCancel-2 btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT
-         btnMatches btnNE btnQt btnToday
+  ENABLE rctQueryButtons btnBegins cbAndOr cbFields cbOperator ficValue 
+         btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 btnOK 
+         btnCancel-2 btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT 
+         btnMatches btnNE btnQt btnToday 
       WITH FRAME frWhere IN WINDOW C-Win.
   VIEW FRAME frWhere IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frWhere}
@@ -6135,7 +6135,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE endResize C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE endResize C-Win 
 PROCEDURE endResize :
 /* Event handler for resize of window
  */
@@ -6384,7 +6384,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterDataBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterDataBrowse C-Win 
 PROCEDURE filterDataBrowse :
 /*
  * Apply the filter to the data browse
@@ -6397,7 +6397,7 @@ END PROCEDURE. /* filterDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldClearAll C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldClearAll C-Win 
 PROCEDURE filterFieldClearAll :
 /* Wipe contents of all filter fields in the same group
  */
@@ -6418,7 +6418,7 @@ END PROCEDURE. /* filterFieldClearAll */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldCursorDown C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldCursorDown C-Win 
 PROCEDURE filterFieldCursorDown :
 /* Jump from filter field to browse on cursor down
  */
@@ -6441,7 +6441,7 @@ END PROCEDURE. /* filterFieldCursorDown */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldEntry C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldEntry C-Win 
 PROCEDURE filterFieldEntry :
 /* Set the color for the text in the filter to black
  */
@@ -6465,7 +6465,7 @@ END PROCEDURE. /* filterFieldEntry */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldLeave C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldLeave C-Win 
 PROCEDURE filterFieldLeave :
 /* Set the color for the text in the filter to gray
  */
@@ -6482,7 +6482,7 @@ END PROCEDURE. /* filterFieldLeave */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldsBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldsBrowse C-Win 
 PROCEDURE filterFieldsBrowse :
 /* Apply the filter to the fields browse
  */
@@ -6494,7 +6494,7 @@ END PROCEDURE. /* filterFieldsBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldScrollNotify C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldScrollNotify C-Win 
 PROCEDURE filterFieldScrollNotify :
 /* Catch CURSOR-LEFT and CURSOR-RIGHT actions on the browse
  */
@@ -6542,7 +6542,7 @@ END PROCEDURE.  /* filterScrollNotify */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldShow C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldShow C-Win 
 PROCEDURE filterFieldShow :
 /* Show or hide a filter field
  */
@@ -6561,7 +6561,7 @@ END PROCEDURE. /* filterFieldShow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldValueChanged C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldValueChanged C-Win 
 PROCEDURE filterFieldValueChanged :
 /* Save current filter value
  */
@@ -6578,7 +6578,7 @@ END PROCEDURE. /* filterFieldValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterIndexBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterIndexBrowse C-Win 
 PROCEDURE filterIndexBrowse :
 /* Apply the filter to the index browse
  */
@@ -6590,7 +6590,7 @@ END PROCEDURE. /* filterIndexBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterTables C-Win 
 PROCEDURE filterTables :
 /*
  * Apply the filter to the table browse
@@ -6606,7 +6606,7 @@ END PROCEDURE. /* filterTables */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fixTooltips C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fixTooltips C-Win 
 PROCEDURE fixTooltips :
 /* Replace # in tooltips with a CHR(10)
  */
@@ -6626,7 +6626,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDataQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDataQuery C-Win 
 PROCEDURE getDataQuery :
 /* Return the query that belongs to the currently shown data
  */
@@ -6720,7 +6720,7 @@ END PROCEDURE. /* getDataQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFilterQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFilterQuery C-Win 
 PROCEDURE getFilterQuery :
 /* Return a query built from fields in the filter fields
  */
@@ -6829,7 +6829,7 @@ END PROCEDURE. /* getFilterQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getLdbsFromParamFile C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getLdbsFromParamFile C-Win 
 PROCEDURE getLdbsFromParamFile :
 /* Analyze a param file and return a list of all logical
  * names from it that are currently connected
@@ -6899,7 +6899,7 @@ END PROCEDURE. /* getLdbsFromParamFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win 
 PROCEDURE getSortedQuery :
 /* Process the query and insert the BY-phrases at the proper place
  */
@@ -6943,7 +6943,7 @@ END PROCEDURE. /* getSortedQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery C-Win 
 PROCEDURE getSortFromQuery :
 /* Extract sorting from user query
  */
@@ -6982,7 +6982,7 @@ END PROCEDURE. /* getSortFromQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideColumn C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideColumn C-Win 
 PROCEDURE hideColumn :
 /* Hide the current column
  */
@@ -7004,7 +7004,7 @@ END PROCEDURE. /* hideColumn */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideSettingsFrame C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideSettingsFrame C-Win 
 PROCEDURE hideSettingsFrame :
 /* Auto-hide the settings frame after 2 seconds
  */
@@ -7026,7 +7026,7 @@ END PROCEDURE. /* hideSettingsFrame */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesOfTable C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesOfTable C-Win 
 PROCEDURE incQueriesOfTable :
 /* Increment the number of queries served for a table.
  * NOTE: This must be done in one move by fetching the nr
@@ -7077,7 +7077,7 @@ END PROCEDURE. /* incQueriesOfTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesServed C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesServed C-Win 
 PROCEDURE incQueriesServed :
 /*
  * Increment the number of queries served. We need to do
@@ -7103,7 +7103,7 @@ END PROCEDURE. /* incQueriesServed */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeFilters C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeFilters C-Win 
 PROCEDURE initializeFilters :
 /* Create filter widgets
  */
@@ -7191,7 +7191,7 @@ END PROCEDURE. /* initializeFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObjects C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObjects C-Win 
 PROCEDURE initializeObjects :
 /* General setup of the window
  */
@@ -7255,17 +7255,20 @@ PROCEDURE initializeObjects :
     .setDebugMode(YES). /* debug-patrick */
 
     /* Colors for odd/even data rows */
-    giDataOddRowColor[1]  = getColor("DataRow:odd:fg" ).
-    giDataOddRowColor[2]  = getColor("DataRow:odd:bg" ).
-    giDataEvenRowColor[1] = getColor("DataRow:even:fg").
-    giDataEvenRowColor[2] = getColor("DataRow:even:bg").
-
     IF getRegistry("DataDigger:colors","DataRow:UseSystem") = "YES" THEN
-    ASSIGN
-      giDataOddRowColor[1]  = 1
-      giDataOddRowColor[2]  = 24
-      giDataEvenRowColor[1] = 1
-      giDataEvenRowColor[2] = 15.
+      ASSIGN
+        giDataOddRowColor[1]  = 1
+        giDataOddRowColor[2]  = 24 /* ButtonFace, often defined as off-white */
+        giDataEvenRowColor[1] = 1
+        giDataEvenRowColor[2] = 15 /* white */
+        .
+    ELSE 
+      ASSIGN 
+        giDataOddRowColor[1]  = getColor("DataRow:odd:fg" )
+        giDataOddRowColor[2]  = getColor("DataRow:odd:bg" )
+        giDataEvenRowColor[1] = getColor("DataRow:even:fg")
+        giDataEvenRowColor[2] = getColor("DataRow:even:bg")
+        .
 
     DO WITH FRAME frData:
       ASSIGN
@@ -7506,7 +7509,7 @@ END PROCEDURE. /* initializeObjects */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeSettingsFile C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeSettingsFile C-Win 
 PROCEDURE initializeSettingsFile :
 /* Initialize the settings file
  */
@@ -7684,7 +7687,7 @@ END PROCEDURE. /* initializeSettingsFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeUi C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeUi C-Win 
 PROCEDURE initializeUi :
 /*------------------------------------------------------------------------------
   Purpose:     ENABLE the User Interface
@@ -7777,7 +7780,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeVisuals C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeVisuals C-Win 
 PROCEDURE initializeVisuals :
 /* Initialize all kind of visual things
  */
@@ -7794,10 +7797,10 @@ PROCEDURE initializeVisuals :
   DEFINE VARIABLE hFilterField  AS HANDLE    NO-UNDO.
   DEFINE VARIABLE IFilter       AS INTEGER   NO-UNDO.
 
-  /* Make the color table large enough TO hold at least 25 fONts
+  /* Make the color table large enough TO hold at least 25 fonts
    * Entries 0-23 are for the user and entry 24 will be used for
-   * the color defined by "ButtONFace" ON the local system. We will
-   * use this color IF the user sets "use system colors"
+   * the color defined by "ButtonFace" ON the local system. We will
+   * use this color if the user sets "use system colors"
    */
   IF COLOR-TABLE:NUM-ENTRIES < 25 THEN COLOR-TABLE:NUM-ENTRIES = 25.
   DO iColor = 0 TO COLOR-TABLE:NUM-ENTRIES - 1:
@@ -7814,7 +7817,7 @@ PROCEDURE initializeVisuals :
     END.
   END.
 
-  /* Get the RGB value for "ButtONFace" and set color 24 */
+  /* Get the RGB value for "ButtonFace" and set color 24 */
   RUN GetSysColor(15, OUTPUT iRgbValue).
   COLOR-TABLE:SET-RGB-VALUE(24, iRgbValue).
 
@@ -7976,7 +7979,7 @@ END PROCEDURE. /* initializeVisuals */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE keepAlive C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE keepAlive C-Win 
 PROCEDURE keepAlive :
 /* Query all databases to keep connection alive
  */
@@ -8054,7 +8057,7 @@ END PROCEDURE. /* keepAlive */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE menuDropDataBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE menuDropDataBrowse C-Win 
 PROCEDURE menuDropDataBrowse :
 /* Enable / disable items in the context menu
  */
@@ -8124,7 +8127,7 @@ END PROCEDURE. /* menuDropDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveField C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveField C-Win 
 PROCEDURE moveField :
 /* Move a field up or down in the field browse.
  */
@@ -8251,7 +8254,7 @@ END PROCEDURE. /* moveField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE navigateSettings C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE navigateSettings C-Win 
 PROCEDURE navigateSettings :
 /*
  * Navigate between the buttons in the settings frame
@@ -8303,7 +8306,7 @@ END PROCEDURE. /* navigateSettings */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pasteFromClipboard C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pasteFromClipboard C-Win 
 PROCEDURE pasteFromClipboard :
 /* Paste value from clipboard to a widget
  */
@@ -8314,7 +8317,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE preCache C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE preCache C-Win 
 PROCEDURE preCache :
 /* Pre-cache tables that have been queried at least once in the last month
  */
@@ -8361,7 +8364,7 @@ END PROCEDURE. /* preCache */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win 
 PROCEDURE processQuery :
 /* Move a field up or down in the field browse.
  */
@@ -8420,7 +8423,7 @@ END PROCEDURE. /* processQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse C-Win 
 PROCEDURE reopenDataBrowse :
 /* Build the query, based on where-box and filter fields
  */
@@ -8602,7 +8605,7 @@ END PROCEDURE. /* reopenDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse-create C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse-create C-Win 
 PROCEDURE reopenDataBrowse-create :
 /* Create the browse and open the query
  */
@@ -9036,7 +9039,7 @@ END PROCEDURE. /* reopenDataBrowse-create */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenFieldBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenFieldBrowse C-Win 
 PROCEDURE reopenFieldBrowse :
 /* Open the field browse again, taking into account the filter values the user has entered.
  */
@@ -9195,7 +9198,7 @@ END PROCEDURE. /* reopenFieldBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenIndexBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenIndexBrowse C-Win 
 PROCEDURE reopenIndexBrowse :
 /* Reopen the browse with indexes.
  */
@@ -9299,7 +9302,7 @@ END PROCEDURE. /* reopenIndexBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenTableBrowse C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenTableBrowse C-Win 
 PROCEDURE reopenTableBrowse :
 /* Open the table browse again, taking into account the filter values the user has entered.
  */
@@ -9452,7 +9455,7 @@ END PROCEDURE. /* reopenTableBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetFields C-Win 
 PROCEDURE resetFields :
 /* Reset the field order of all fields and reset databrowse
  */
@@ -9499,7 +9502,7 @@ END PROCEDURE. /* resetFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilters C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilters C-Win 
 PROCEDURE resizeFilters :
 /* Redraw the filters. This is needed when the window resizes, one of
  * the columns resizes or the user scrolls in the browse.
@@ -9588,7 +9591,7 @@ END PROCEDURE. /* resizeFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveFilterValue C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveFilterValue C-Win 
 PROCEDURE saveFilterValue :
 /* Save the last x filter values to registry
  */
@@ -9642,7 +9645,7 @@ END PROCEDURE. /* saveFilterValue */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindow C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindow C-Win 
 PROCEDURE saveWindow :
 /* Save size and position of the window.
  */
@@ -9664,7 +9667,7 @@ END PROCEDURE. /* saveWindow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectClickedRow C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectClickedRow C-Win 
 PROCEDURE selectClickedRow :
 /* Select the row the user last clicked on
  */
@@ -9772,7 +9775,7 @@ END PROCEDURE. /* selectClickedRow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setConnectionMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setConnectionMenu C-Win 
 PROCEDURE setConnectionMenu :
 /* Rebuild the connection submenu of the 'add' button
  */
@@ -9822,7 +9825,7 @@ END PROCEDURE. /* setConnectionMenu */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataBrowseColumns C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataBrowseColumns C-Win 
 PROCEDURE setDataBrowseColumns :
 /* Set all columns according to their iColumnNr
  */
@@ -9868,7 +9871,7 @@ END PROCEDURE. /* setDataBrowseColumns */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataFilter C-Win 
 PROCEDURE setDataFilter :
 /* Optionally clear the filters and set a filter value
  */
@@ -9912,7 +9915,7 @@ END PROCEDURE. /* setDataFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win 
 PROCEDURE setFilterFieldTabOrder :
 /* Reset the TAB order of the filter fields
    */
@@ -9941,7 +9944,7 @@ END PROCEDURE. /* setFilterFieldTabOrder */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win 
 PROCEDURE setPage :
 /* Set active page: Tables/Pinned/Fields/Indexes
  */
@@ -10021,7 +10024,7 @@ END PROCEDURE. /* setPage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRedLines C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRedLines C-Win 
 PROCEDURE setRedLines :
 /* Show red lines around browse when filtered
  */
@@ -10093,7 +10096,7 @@ END PROCEDURE. /* setRedLines */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrows C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrows C-Win 
 PROCEDURE setSortArrows :
 /* Set the sorting arrows on a browse
  */
@@ -10146,7 +10149,7 @@ END PROCEDURE. /* setSortArrow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTable C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTable C-Win 
 PROCEDURE setTable :
 /* If some text is selected in the session or a text is on the clipboard, select the table with that name.
  */
@@ -10223,7 +10226,7 @@ END PROCEDURE. /* setTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableContext C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableContext C-Win 
 PROCEDURE setTableContext :
 /* Perform actions when a change of table has occurred.
  */
@@ -10312,7 +10315,7 @@ END PROCEDURE. /* setTableContext */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableFilterOptions C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableFilterOptions C-Win 
 PROCEDURE setTableFilterOptions :
 /* Filter tables based on whether they hold certain fields
  */
@@ -10360,7 +10363,7 @@ END PROCEDURE. /* setTableFilterOptions */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableView C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableView C-Win 
 PROCEDURE setTableView :
 /* Set tables view to either 'tables' or 'favourites'
  */
@@ -10411,7 +10414,7 @@ END PROCEDURE. /* setTableView */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimer C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimer C-Win 
 PROCEDURE setTimer :
 /*
  * Enable or disable a named timer.
@@ -10459,7 +10462,7 @@ END PROCEDURE. /* setTimer */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimerInterval C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimerInterval C-Win 
 PROCEDURE setTimerInterval :
 /*
  * Set the interval of the timer so that it will tick exactly when the next timed event is due.
@@ -10486,7 +10489,7 @@ END PROCEDURE. /* setTimerInterval */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setViewType C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setViewType C-Win 
 PROCEDURE setViewType :
 /* Set the type of view to view records (TXT HTML XLS)
  */
@@ -10509,7 +10512,7 @@ END PROCEDURE. /* setViewType */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setWindowTitle C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setWindowTitle C-Win 
 PROCEDURE setWindowTitle :
 /* Set the title of the DataDigger window
  */
@@ -10548,7 +10551,7 @@ END PROCEDURE. /* setWindowTitle */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDataFilters C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDataFilters C-Win 
 PROCEDURE showDataFilters :
 /* Show/hide the data filters
  */
@@ -10568,7 +10571,7 @@ END PROCEDURE. /* showDataFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFavourite C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFavourite C-Win 
 PROCEDURE showFavourite :
 /* Show Favourite icon
  */
@@ -10588,7 +10591,7 @@ END PROCEDURE. /* showFavourite */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showField C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showField C-Win 
 PROCEDURE showField :
 /* Toggle the selected status of a field.
  */
@@ -10648,7 +10651,7 @@ END PROCEDURE. /* showField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHint C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHint C-Win 
 PROCEDURE showHint :
 /* Show a small window with a hint
  */
@@ -10812,7 +10815,7 @@ END PROCEDURE. /* showHint */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNewFeatures C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNewFeatures C-Win 
 PROCEDURE showNewFeatures :
 /* Highlight some new features
  */
@@ -10888,7 +10891,7 @@ END PROCEDURE. /* showNewFeatures */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumRecords C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumRecords C-Win 
 PROCEDURE showNumRecords :
 /*
  * Show nr of total and selected records
@@ -10927,7 +10930,7 @@ END PROCEDURE. /* showNumRecords */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumSelected C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumSelected C-Win 
 PROCEDURE showNumSelected :
 /*
  * Show nr of selected records
@@ -10952,7 +10955,7 @@ END PROCEDURE. /* showNumSelected */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTour C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTour C-Win 
 PROCEDURE showTour :
 /* Highlight some of the main features of DD
  */
@@ -11045,7 +11048,7 @@ END PROCEDURE. /* showTour */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue C-Win 
 PROCEDURE showValue :
 /* Show the sum of the fields of the selected rows
  */
@@ -11110,7 +11113,7 @@ END PROCEDURE. /* showValue */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE sortComboBox C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE sortComboBox C-Win 
 PROCEDURE sortComboBox :
 /* Sort the entries of a ComboBox
  */
@@ -11141,7 +11144,7 @@ END. /* sortComboBox */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib C-Win 
 PROCEDURE startDiggerLib :
 /* Start DiggerLib if it has not already been started
  */
@@ -11185,7 +11188,7 @@ END PROCEDURE. /* startDiggerLib */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startSession C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startSession C-Win 
 PROCEDURE startSession :
 /* Show a welcome message to the user.
  */
@@ -11287,7 +11290,7 @@ END PROCEDURE. /* startSession */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startTool C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startTool C-Win 
 PROCEDURE startTool :
 /* Start Dictionary or Data Adminstration
  */
@@ -11347,7 +11350,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tgSelAllChoose C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tgSelAllChoose C-Win 
 PROCEDURE tgSelAllChoose :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -11409,7 +11412,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedFieldFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedFieldFilter C-Win 
 PROCEDURE timedFieldFilter :
 /* Activated by the timer to apply the filter
  */
@@ -11425,7 +11428,7 @@ END PROCEDURE. /* timedFieldFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedIndexFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedIndexFilter C-Win 
 PROCEDURE timedIndexFilter :
 /* Activated by the timer to apply the filter
  */
@@ -11441,7 +11444,7 @@ END PROCEDURE. /* timedIndexFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedScrollNotify C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedScrollNotify C-Win 
 PROCEDURE timedScrollNotify :
 /* Run scrollnotify when user scrolls using cursor keys
  */
@@ -11469,7 +11472,7 @@ END PROCEDURE. /* timedScrollNotify */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableChange C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableChange C-Win 
 PROCEDURE timedTableChange :
 /* Activated by the timer to change the browse
  */
@@ -11483,7 +11486,7 @@ END PROCEDURE. /* timedTableChange */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableFilter C-Win 
 PROCEDURE timedTableFilter :
 /* Activated by the timer to apply the filter
  */
@@ -11501,7 +11504,7 @@ END PROCEDURE. /* timedTableChange */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenu C-Win 
 FUNCTION createMenu RETURNS HANDLE
   ( phParent AS HANDLE ) :
 
@@ -11532,7 +11535,7 @@ END FUNCTION. /* createMenu */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenuItem C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenuItem C-Win 
 FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
@@ -11583,7 +11586,7 @@ END FUNCTION. /* createMenuItem */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getActiveQueryEditor C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getActiveQueryEditor C-Win 
 FUNCTION getActiveQueryEditor RETURNS HANDLE
   ( /* parameter-definitions */ ) :
 
@@ -11599,7 +11602,7 @@ END FUNCTION. /* getActiveQueryEditor */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDroppedFiles C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDroppedFiles C-Win 
 FUNCTION getDroppedFiles RETURNS CHARACTER
   ( phDropTarget AS HANDLE ) :
   /* Return a list of dropped files onto a target.
@@ -11621,7 +11624,7 @@ END FUNCTION. /* getDroppedFiles */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList C-Win 
 FUNCTION getFieldList RETURNS CHARACTER
   ( pcSortBy AS CHARACTER ) :
 /* Return a comma separated list of all fields.
@@ -11657,7 +11660,7 @@ END FUNCTION. /* getFieldList */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQueryFromFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQueryFromFields C-Win 
 FUNCTION getQueryFromFields RETURNS CHARACTER
   ( INPUT pcFieldList AS CHARACTER ):
 
@@ -11693,7 +11696,7 @@ END FUNCTION. /* getQueryFromFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedFields C-Win 
 FUNCTION getSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
 
@@ -11716,7 +11719,7 @@ END FUNCTION. /* getSelectedFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedText C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedText C-Win 
 FUNCTION getSelectedText RETURNS CHARACTER
   ( INPUT hWidget AS HANDLE ) :
 /* Return the currently selected text in a widget
@@ -11743,7 +11746,7 @@ END FUNCTION. /* getSelectedText */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION killMenu C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION killMenu C-Win 
 FUNCTION killMenu RETURNS LOGICAL
   ( phMenu AS HANDLE ) :
 
@@ -11767,7 +11770,7 @@ END FUNCTION. /* killMenu */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION saveSelectedFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION saveSelectedFields C-Win 
 FUNCTION saveSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
 
@@ -11799,7 +11802,7 @@ END FUNCTION. /* saveSelectedFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setCurrentTable C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setCurrentTable C-Win 
 FUNCTION setCurrentTable RETURNS LOGICAL
   ( pcTableName AS CHARACTER ) :
 /* Save last used table to ini
@@ -11820,7 +11823,7 @@ END FUNCTION. /* setCurrentTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setDebugMode C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setDebugMode C-Win 
 FUNCTION setDebugMode RETURNS LOGICAL
   ( plDebugMode AS LOGICAL ) :
 
@@ -11836,7 +11839,7 @@ END FUNCTION. /* setDebugMode */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQuery C-Win 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER ) :
 
@@ -11862,7 +11865,7 @@ END FUNCTION. /* setQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQueryEditor C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQueryEditor C-Win 
 FUNCTION setQueryEditor RETURNS LOGICAL
   ( pcQueryEditorState AS CHARACTER ) :
 /* Show or hide the query editor and associated fields.
@@ -11912,7 +11915,7 @@ END FUNCTION. /* setQueryEditor */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setUpdatePanel C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setUpdatePanel C-Win 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER ) :
 
@@ -11968,7 +11971,7 @@ END FUNCTION. /* setUpdatePanel */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setWindowFreeze C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setWindowFreeze C-Win 
 FUNCTION setWindowFreeze RETURNS LOGICAL
   ( plWindowsLocked AS LOGICAL ) :
   /* Freeze updates to the screen
@@ -11982,7 +11985,7 @@ END FUNCTION. /* setWindowFreeze */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION trimList C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION trimList C-Win 
 FUNCTION trimList RETURNS CHARACTER
   ( pcList  AS CHARACTER
   , pcSep   AS CHARACTER
@@ -12003,3 +12006,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
