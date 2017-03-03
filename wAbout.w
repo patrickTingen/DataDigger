@@ -39,7 +39,11 @@ DEFINE TEMP-TABLE ttBlock NO-UNDO
   FIELD cDesc    AS CHARACTER
   FIELD iScore   AS INTEGER
   FIELD hButton  AS HANDLE 
-  FIELD iLine    AS INTEGER 
+  FIELD iLine    AS INTEGER
+  FIELD x1       AS INTEGER
+  FIELD x2       AS INTEGER
+  FIELD y1       AS INTEGER
+  FIELD y2       AS INTEGER
   INDEX iPrim IS PRIMARY cBlockId
   .
 
@@ -73,30 +77,10 @@ PROCEDURE startDiggerLib :
 
 END PROCEDURE. /* startDiggerLib */
 
-/* FUNCTION getImagePath RETURNS CHARACTER (pcImage AS CHARACTER):  */
-/*   RETURN 'd:\data\progress\DataDigger\image\default_' + pcImage. */
-/* END FUNCTION.                                                    */
-/*                                                                  */
-/* FUNCTION getProgramDir RETURNS CHARACTER ():                     */
-/*   RETURN 'd:\data\progress\DataDigger\'.                         */
-/* END FUNCTION.                                                    */
-/*                                                                  */
-/* FUNCTION getFont RETURNS INTEGER (pcFontType AS CHARACTER ):     */
-/*   RETURN LOOKUP(pcFontType, ',fixed,,default').                  */
-/* END FUNCTION.                                                    */
-/*                                                                  */
-/* PROCEDURE setTransparency:                                       */
-/*   DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.             */
-/*   DEFINE INPUT PARAMETER piTrans AS INTEGER NO-UNDO.             */
-/* END PROCEDURE.                                                   */
-/*                                                                  */
-/* PROCEDURE showScrollBars:                                        */
-/*   DEFINE INPUT PARAMETER phFrame AS HANDLE  NO-UNDO.             */
-/*   DEFINE INPUT PARAMETER plHor   AS LOGICAL NO-UNDO.             */
-/*   DEFINE INPUT PARAMETER plVer   AS LOGICAL NO-UNDO.             */
-/* END PROCEDURE.                                                   */
-
 &ENDIF
+
+DEFINE VARIABLE giBallX AS INTEGER NO-UNDO INITIAL -4.
+DEFINE VARIABLE giBallY AS INTEGER NO-UNDO INITIAL -4.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -129,6 +113,10 @@ btnTabChanges
 
 /* Define the widget handle for the window                              */
 DEFINE VAR wAbout AS WIDGET-HANDLE NO-UNDO.
+
+/* Definitions of handles for OCX Containers                            */
+DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnDataDigger  NO-FOCUS FLAT-BUTTON
@@ -292,6 +280,28 @@ THEN wAbout:HIDDEN = no.
  
 
 
+/* **********************  Create OCX Containers  ********************** */
+
+&ANALYZE-SUSPEND _CREATE-DYNAMIC
+
+&IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
+
+CREATE CONTROL-FRAME CtrlFrame ASSIGN
+       FRAME           = FRAME DEFAULT-FRAME:HANDLE
+       ROW             = 1.95
+       COLUMN          = 83
+       HEIGHT          = 1.43
+       WIDTH           = 6
+       WIDGET-ID       = 292
+       HIDDEN          = yes
+       SENSITIVE       = yes.
+/* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: BallTimer */
+      CtrlFrame:MOVE-AFTER(BtnOK:HANDLE IN FRAME DEFAULT-FRAME).
+
+&ENDIF
+
+&ANALYZE-RESUME /* End of _CREATE-DYNAMIC */
+
 
 /* ************************  Control Triggers  ************************ */
 
@@ -301,7 +311,7 @@ ON END-ERROR OF wAbout /* About the DataDigger */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
 
   APPLY 'CLOSE' TO THIS-PROCEDURE.
-message 123.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -327,6 +337,10 @@ ON CHOOSE OF btGotIt IN FRAME frHint /* I Got it */
 DO:
   cGameStatus = 'running'.
   FRAME frHint:VISIBLE = FALSE.
+
+  /* Enable ball mover */
+  chCtrlFrame:BallTimer:ENABLED = TRUE.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -375,6 +389,90 @@ or 'ctrl-2' of frame {&frame-name} anywhere
 DO:
   run setPage(2).
 END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME CtrlFrame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame wAbout OCX.Tick
+PROCEDURE CtrlFrame.BallTimer.Tick .
+/*------------------------------------------------------------------------------
+    Name : BallTimer.ocx.tick
+    Desc : Move the ball
+  ------------------------------------------------------------------------------*/
+
+  DEFINE BUFFER bfBlock FOR ttBlock.
+
+  /* Turn off events when we're running */
+  IF cGameStatus <> 'running' THEN RETURN.
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    /* Gonna hit the wall? */
+    IF (rcBall:Y + giBallY) < 0 
+      OR (rcBall:Y + giBallY) > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS) THEN
+    DO:
+      giBallY = giBallY * -1.
+    END.
+    ELSE 
+    DO:
+      rcBall:Y = rcBall:Y + giBallY.
+
+      IF giBallY < 0 THEN /* Hit brick from below? */
+        FIND FIRST bfBlock
+          WHERE rcBall:Y < bfBlock.y2
+            AND rcBall:X > bfBlock.x1
+            AND rcBall:X < bfBlock.x2 NO-ERROR.
+      ELSE /* Hit brick from above? */
+        FIND FIRST bfBlock
+          WHERE rcBall:Y + rcBall:HEIGHT-PIXELS > bfBlock.y1
+            AND rcBall:X > bfBlock.x1
+            AND rcBall:X < bfBlock.x2 NO-ERROR.
+
+      /* Hit a brick, so invert vertical movement */
+      IF AVAILABLE bfBlock THEN 
+      DO:
+        giBallY = giBallY * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+
+    /* Gonna hit the wall? */
+    IF (rcBall:X + giBallX) < 0 
+      OR (rcBall:X + giBallX) > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) THEN
+    DO:
+      giBallX = giBallX * -1.
+    END.
+    ELSE 
+    DO:
+      rcBall:X = rcBall:X + giBallX.
+
+      IF giBallX > 0 THEN /* Hit brick from left? */
+        FIND FIRST bfBlock
+          WHERE rcBall:X > bfBlock.x1
+            AND rcBall:Y > bfBlock.y1
+            AND rcBall:Y < bfBlock.y2 NO-ERROR.
+      ELSE /* Hit brick from right? */
+        FIND FIRST bfBlock
+          WHERE rcBall:X + rcBall:WIDTH-PIXELS < bfBlock.x2
+            AND rcBall:Y > bfBlock.y1
+            AND rcBall:Y < bfBlock.y2 NO-ERROR.
+
+      /* Hit a brick, so invert vertical movement */
+      IF AVAILABLE bfBlock THEN 
+      DO:
+        giBallX = giBallX * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+  END.
+
+END PROCEDURE. /* OCX.psTimer.Tick */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -469,6 +567,7 @@ PROCEDURE buildBlocks :
    bfBlock.hButton:Y = yy.
    bfBlock.iLine = iBlockLine.
    xx = xx + bfBlock.hButton:WIDTH-PIXELS + 5.
+
  END.
 
  /* Justify blocks */
@@ -490,15 +589,58 @@ PROCEDURE buildBlocks :
    FOR EACH bfBlock WHERE bfBlock.iLine = ii:
      bfBlock.hButton:X = xx.
      xx = xx + bfBlock.hButton:WIDTH-PIXELS + iSpace.
+
+     /* Register exact position */
+     ASSIGN 
+       bfBlock.x1 = bfBlock.hButton:X
+       bfBlock.y1 = bfBlock.hButton:Y 
+       bfBlock.x2 = bfBlock.hButton:X + bfBlock.hButton:WIDTH-PIXELS
+       bfBlock.y2 = bfBlock.hButton:Y + bfBlock.hButton:HEIGHT-PIXELS
+       .
    END.
  END.
 
- FOR EACH bfBlock WHERE bfBlock.iLine = ii:
-   iTotalWidth = iTotalWidth + bfBlock.hButton:WIDTH-PIXELS.
- END.
-
+ TEMP-TABLE bfBlock:WRITE-XML('file', 'c:\temp\TempTable.xml',YES,'utf-8', ?). 
 
 END PROCEDURE. /* buildBlocks */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load wAbout  _CONTROL-LOAD
+PROCEDURE control_load :
+/*------------------------------------------------------------------------------
+  Purpose:     Load the OCXs    
+  Parameters:  <none>
+  Notes:       Here we load, initialize and make visible the 
+               OCXs in the interface.                        
+------------------------------------------------------------------------------*/
+
+&IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
+DEFINE VARIABLE UIB_S    AS LOGICAL    NO-UNDO.
+DEFINE VARIABLE OCXFile  AS CHARACTER  NO-UNDO.
+
+OCXFile = SEARCH( "wAbout.wrx":U ).
+IF OCXFile = ? THEN
+  OCXFile = SEARCH(SUBSTRING(THIS-PROCEDURE:FILE-NAME, 1,
+                     R-INDEX(THIS-PROCEDURE:FILE-NAME, ".":U), "CHARACTER":U) + "wrx":U).
+
+IF OCXFile <> ? THEN
+DO:
+  ASSIGN
+    chCtrlFrame = CtrlFrame:COM-HANDLE
+    UIB_S = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U)
+    CtrlFrame:NAME = "CtrlFrame":U
+  .
+  RUN initialize-controls IN THIS-PROCEDURE NO-ERROR.
+END.
+ELSE MESSAGE "wAbout.wrx":U SKIP(1)
+             "The binary control file could not be found. The controls cannot be loaded."
+             VIEW-AS ALERT-BOX TITLE "Controls Not Loaded".
+
+&ENDIF
+
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -533,6 +675,7 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
+  RUN control_load.
   DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   ENABLE btnDataDigger BtnOK edChangelog btnTabAbout btnTabChanges 
@@ -849,7 +992,7 @@ DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
     rcBall:X = xx.
     rcBall:Y = yy.
 
-    RUN justWait(12).
+    .RUN justWait(12).
   END. 
 
   rcBall:X = 305.
