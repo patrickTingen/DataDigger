@@ -71,6 +71,7 @@ PROCEDURE startDiggerLib :
     cDiggerLib = SUBSTRING(cDiggerLib,1,R-INDEX(cDiggerLib,'/')) + 'DataDiggerLib.p'.
     IF SEARCH(cDiggerLib) = ? THEN cDiggerLib = 'd:\data\progress\DataDigger\DataDiggerLib.p'.
     IF SEARCH(cDiggerLib) = ? THEN cDiggerLib = 'd:\data\dropbox\DataDigger\src\DataDiggerLib.p'.
+    IF SEARCH(cDiggerLib) = ? THEN cDiggerLib = 'c:\data\dropbox\DataDigger\src\DataDiggerLib.p'.
     RUN VALUE(cDiggerLib) PERSISTENT SET hDiggerLib.
     SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
   END.
@@ -79,8 +80,8 @@ END PROCEDURE. /* startDiggerLib */
 
 &ENDIF
 
-DEFINE VARIABLE giBallX AS INTEGER NO-UNDO INITIAL -4.
-DEFINE VARIABLE giBallY AS INTEGER NO-UNDO INITIAL -4.
+DEFINE VARIABLE giBallX AS INTEGER NO-UNDO INITIAL -3.
+DEFINE VARIABLE giBallY AS INTEGER NO-UNDO INITIAL -5.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -107,6 +108,46 @@ btnTabChanges
 /* _UIB-PREPROCESSOR-BLOCK-END */
 &ANALYZE-RESUME
 
+
+/* ************************  Function Prototypes ********************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD inRange wAbout 
+FUNCTION inRange RETURNS LOGICAL
+  ( piValue AS INTEGER
+  , piMin   AS INTEGER
+  , piMax   AS INTEGER
+  )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD pointInRect wAbout 
+FUNCTION pointInRect RETURNS LOGICAL
+  ( piX AS INTEGER
+  , piY AS INTEGER
+  , phRect AS HANDLE )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD rangeIntersect wAbout 
+FUNCTION rangeIntersect RETURNS LOGICAL
+  ( piMin1 AS INTEGER 
+  , piMax1 AS INTEGER
+  , piMin2 AS INTEGER 
+  , piMax2 AS INTEGER
+  )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD rectIntersect wAbout 
+FUNCTION rectIntersect RETURNS LOGICAL
+  ( phRect1 AS HANDLE 
+  , phRect2 AS HANDLE )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
 
 /* ***********************  Control Definitions  ********************** */
@@ -186,7 +227,7 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 125.8 BY 19.67 WIDGET-ID 100.
+         SIZE 125.8 BY 19.33 WIDGET-ID 100.
 
 DEFINE FRAME frHint
      edHint AT Y 10 X 25 NO-LABEL WIDGET-ID 2
@@ -215,7 +256,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wAbout ASSIGN
          HIDDEN             = YES
          TITLE              = "About the DataDigger"
-         HEIGHT             = 19.67
+         HEIGHT             = 19.33
          WIDTH              = 125.8
          MAX-HEIGHT         = 53.52
          MAX-WIDTH          = 209.6
@@ -330,6 +371,29 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME DEFAULT-FRAME
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
+ON F11 OF FRAME DEFAULT-FRAME
+DO:
+  chCtrlFrame:BallTimer:INTERVAL = max(1,chCtrlFrame:BallTimer:INTERVAL - 10).
+  wAbout:TITLE = STRING(chCtrlFrame:BallTimer:INTERVAL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
+ON F12 OF FRAME DEFAULT-FRAME
+DO:
+  chCtrlFrame:BallTimer:INTERVAL = chCtrlFrame:BallTimer:INTERVAL + 10.
+  wAbout:TITLE = STRING(chCtrlFrame:BallTimer:INTERVAL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define FRAME-NAME frHint
 &Scoped-define SELF-NAME btGotIt
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
@@ -402,75 +466,7 @@ PROCEDURE CtrlFrame.BallTimer.Tick .
     Desc : Move the ball
   ------------------------------------------------------------------------------*/
 
-  DEFINE BUFFER bfBlock FOR ttBlock.
-
-  /* Turn off events when we're running */
-  IF cGameStatus <> 'running' THEN RETURN.
-
-  DO WITH FRAME {&FRAME-NAME}:
-
-    /* Gonna hit the wall? */
-    IF (rcBall:Y + giBallY) < 0 
-      OR (rcBall:Y + giBallY) > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS) THEN
-    DO:
-      giBallY = giBallY * -1.
-    END.
-    ELSE 
-    DO:
-      rcBall:Y = rcBall:Y + giBallY.
-
-      IF giBallY < 0 THEN /* Hit brick from below? */
-        FIND FIRST bfBlock
-          WHERE rcBall:Y < bfBlock.y2
-            AND rcBall:X > bfBlock.x1
-            AND rcBall:X < bfBlock.x2 NO-ERROR.
-      ELSE /* Hit brick from above? */
-        FIND FIRST bfBlock
-          WHERE rcBall:Y + rcBall:HEIGHT-PIXELS > bfBlock.y1
-            AND rcBall:X > bfBlock.x1
-            AND rcBall:X < bfBlock.x2 NO-ERROR.
-
-      /* Hit a brick, so invert vertical movement */
-      IF AVAILABLE bfBlock THEN 
-      DO:
-        giBallY = giBallY * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
-        RETURN. 
-      END.
-    END.
-
-    /* Gonna hit the wall? */
-    IF (rcBall:X + giBallX) < 0 
-      OR (rcBall:X + giBallX) > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) THEN
-    DO:
-      giBallX = giBallX * -1.
-    END.
-    ELSE 
-    DO:
-      rcBall:X = rcBall:X + giBallX.
-
-      IF giBallX > 0 THEN /* Hit brick from left? */
-        FIND FIRST bfBlock
-          WHERE rcBall:X > bfBlock.x1
-            AND rcBall:Y > bfBlock.y1
-            AND rcBall:Y < bfBlock.y2 NO-ERROR.
-      ELSE /* Hit brick from right? */
-        FIND FIRST bfBlock
-          WHERE rcBall:X + rcBall:WIDTH-PIXELS < bfBlock.x2
-            AND rcBall:Y > bfBlock.y1
-            AND rcBall:Y < bfBlock.y2 NO-ERROR.
-
-      /* Hit a brick, so invert vertical movement */
-      IF AVAILABLE bfBlock THEN 
-      DO:
-        giBallX = giBallX * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
-        RETURN. 
-      END.
-    END.
-  END.
+  RUN moveBall.
 
 END PROCEDURE. /* OCX.psTimer.Tick */
 
@@ -763,6 +759,183 @@ PROCEDURE justWait :
   END. 
 
 END PROCEDURE. /* justWait */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBall wAbout 
+PROCEDURE moveBall :
+/*------------------------------------------------------------------------------
+  Purpose:     
+  Parameters:  <none>
+  Notes:       
+------------------------------------------------------------------------------*/
+
+  DEFINE BUFFER bfBlock FOR ttBlock.
+
+  /* Turn off events when we're running */
+  IF cGameStatus <> 'running' THEN RETURN.
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    /* Gonna hit the top or bottom? */
+    IF (rcBall:Y + giBallY) < 0 
+      OR (rcBall:Y + rcBall:HEIGHT-PIXELS + giBallY) > FRAME {&FRAME-NAME}:HEIGHT-PIXELS THEN 
+    DO:
+      giBallY = giBallY * -1.
+      RETURN.
+    END.
+
+    /* Gonna hit the wall? */
+    IF (rcBall:X + giBallX) < 0 
+      OR (rcBall:X + giBallX) > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) THEN 
+    DO:
+      giBallX = giBallX * -1.
+      RETURN.
+    END.
+
+    rcBall:Y = rcBall:Y + giBallY.
+    FOR EACH bfBlock 
+      WHERE ( rcBall:Y >= bfBlock.y1 AND rcBall:Y <= bfBlock.y2 )
+         OR ( rcBall:Y + rcBall:HEIGHT-PIXELS >= bfBlock.y1 AND rcBall:Y + rcBall:HEIGHT-PIXELS <= bfBlock.y2 ):
+
+      IF rectIntersect(rcBall:HANDLE, bfBlock.hButton) THEN
+      DO:
+        giBallY = giBallY * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+
+    rcBall:X = rcBall:X + giBallX.
+    FOR EACH bfBlock 
+      WHERE ( rcBall:X >= bfBlock.x1 AND rcBall:X <= bfBlock.x2 )
+         OR ( rcBall:X + rcBall:WIDTH-PIXELS >= bfBlock.x1 AND rcBall:X + rcBall:WIDTH-PIXELS <= bfBlock.x2 ):
+
+      IF rectIntersect(rcBall:HANDLE, bfBlock.hButton) THEN
+      DO:
+        giBallX = giBallX * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+
+    /* hit the bat? */
+    IF rectIntersect(rcBall:HANDLE, rcBar:HANDLE) THEN 
+    DO:
+      giBallY = giBallY * -1.
+
+      IF rcBall:X + 7 < rcBar:X + 20 THEN giBallX = -5.
+      ELSE 
+      IF rcBall:X + 7 < rcBar:X + 50 THEN (IF giBallX < 0 THEN giBallX = 3 ELSE giBallX = -3).
+      ELSE
+      IF rcBall:X + 7 < rcBar:X + 70 THEN giBallX = 5.
+    END.
+      
+
+  END.
+
+END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBall-org wAbout 
+PROCEDURE moveBall-org :
+/*------------------------------------------------------------------------------
+  Purpose:     
+  Parameters:  <none>
+  Notes:       
+------------------------------------------------------------------------------*/
+
+  DEFINE BUFFER bfBlock FOR ttBlock.
+  DEFINE VARIABLE iBall_x1 AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBall_y1 AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBall_x2 AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBall_y2 AS INTEGER     NO-UNDO.
+
+  /* Turn off events when we're running */
+  IF cGameStatus <> 'running' THEN RETURN.
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    ASSIGN
+      iBall_x1 = rcBall:X
+      iBall_y1 = rcBall:Y
+      iBall_x2 = rcBall:X + rcBall:WIDTH-PIXELS
+      iBall_y2 = rcBall:Y + rcBall:HEIGHT-PIXELS
+      .
+
+    /* Gonna hit the wall? */
+    IF (iBall_y1 + giBallY) < 0 
+      OR (iBall_y2 + giBallY) > FRAME {&FRAME-NAME}:HEIGHT-PIXELS THEN
+    DO:
+      giBallY = giBallY * -1.
+    END.
+    ELSE 
+    DO:
+      rcBall:Y = rcBall:Y + giBallY.
+
+      IF giBallY < 0 THEN /* Hit brick from below? */
+        FIND FIRST bfBlock
+          WHERE (    iBall_y1 > bfBlock.y1 AND iBall_y1 < bfBlock.y2
+                 AND iBall_x1 > bfBlock.x1 AND iBall_x1 < bfBlock.x2)
+             OR (    iBall_y1 > bfBlock.y1 AND iBall_y1 < bfBlock.y2
+                 AND iBall_x2 > bfBlock.x1 AND iBall_x2 < bfBlock.x2) NO-ERROR.
+      ELSE /* Hit brick from above? */
+        FIND FIRST bfBlock
+          WHERE (    iBall_y2 > bfBlock.y1 AND iBall_y2 < bfBlock.y2
+                 AND iBall_x1 > bfBlock.x1 AND iBall_x1 < bfBlock.x2)
+             OR (    iBall_y2 > bfBlock.y1 AND iBall_y2 < bfBlock.y2
+                 AND iBall_x2 > bfBlock.x1 AND iBall_x2 < bfBlock.x2) NO-ERROR.
+        
+      /* Hit a brick, so invert vertical movement */
+      IF AVAILABLE bfBlock THEN 
+      DO:
+        giBallY = giBallY * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+
+    /* Gonna hit the wall? */
+    IF (iBall_x1 + giBallX) < 0 
+      OR (iBall_x1 + giBallX) > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) THEN
+    DO:
+      giBallX = giBallX * -1.
+    END.
+    ELSE 
+    DO:
+      rcBall:X = rcBall:X + giBallX.
+
+      IF giBallX > 0 THEN /* Hit brick from left? */
+        FIND FIRST bfBlock
+          WHERE (    iBall_y1 > bfBlock.y1 AND iBall_y1 < bfBlock.y2
+                 AND iBall_x1 > bfBlock.x1 AND iBall_x1 < bfBlock.x2)
+             OR (    iBall_y1 > bfBlock.y1 AND iBall_y1 < bfBlock.y2
+                 AND iBall_x2 > bfBlock.x1 AND iBall_x2 < bfBlock.x2) NO-ERROR.
+      ELSE /* Hit brick from above? */
+        FIND FIRST bfBlock
+          WHERE (    iBall_y2 > bfBlock.y1 AND iBall_y2 < bfBlock.y2
+                 AND iBall_x1 > bfBlock.x1 AND iBall_x1 < bfBlock.x2)
+             OR (    iBall_y2 > bfBlock.y1 AND iBall_y2 < bfBlock.y2
+                 AND iBall_x2 > bfBlock.x1 AND iBall_x2 < bfBlock.x2) NO-ERROR.
+
+      /* Hit a brick, so invert vertical movement */
+      IF AVAILABLE bfBlock THEN 
+      DO:
+        giBallX = giBallX * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN. 
+      END.
+    END.
+  END.
+
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1082,6 +1255,70 @@ PROCEDURE showLog :
   RUN playGame.
   
 END PROCEDURE. /* showLog */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+/* ************************  Function Implementations ***************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION inRange wAbout 
+FUNCTION inRange RETURNS LOGICAL
+  ( piValue AS INTEGER
+  , piMin   AS INTEGER
+  , piMax   AS INTEGER
+  ) :
+
+  RETURN (piValue >= piMin) AND (piValue <= piMax).
+
+END FUNCTION. /* inRange */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION pointInRect wAbout 
+FUNCTION pointInRect RETURNS LOGICAL
+  ( piX AS INTEGER
+  , piY AS INTEGER
+  , phRect AS HANDLE ) :
+
+  RETURN inRange(piX, phRect:X, phRect:X + phRect:WIDTH-PIXELS) 
+     AND inRange(piY, phRect:Y, phRect:Y + phRect:HEIGHT-PIXELS).
+
+END FUNCTION. /* pointInRect */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION rangeIntersect wAbout 
+FUNCTION rangeIntersect RETURNS LOGICAL
+  ( piMin1 AS INTEGER 
+  , piMax1 AS INTEGER
+  , piMin2 AS INTEGER 
+  , piMax2 AS INTEGER
+  ) :
+
+  RETURN MAXIMUM(piMin1,piMax1) >= MINIMUM(piMin2,piMax2) 
+     AND MINIMUM(piMin1,piMax1) <= MAXIMUM(piMin2,piMax2).
+
+END FUNCTION. /* rangeIntersect */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION rectIntersect wAbout 
+FUNCTION rectIntersect RETURNS LOGICAL
+  ( phRect1 AS HANDLE 
+  , phRect2 AS HANDLE ) :
+
+  RETURN 
+    rangeIntersect( phRect1:X, phRect1:X + phRect1:WIDTH-PIXELS
+                  , phRect2:X, phRect2:X + phRect2:WIDTH-PIXELS)
+    AND
+
+    rangeIntersect( phRect1:Y, phRect1:Y + phRect1:HEIGHT-PIXELS
+                  , phRect2:Y, phRect2:Y + phRect2:HEIGHT-PIXELS).
+
+END FUNCTION. /* rectIntersect */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
