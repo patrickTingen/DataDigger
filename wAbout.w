@@ -45,6 +45,7 @@ DEFINE TEMP-TABLE ttBlock NO-UNDO
   FIELD y1       AS INTEGER
   FIELD y2       AS INTEGER
   INDEX iPrim IS PRIMARY cBlockId
+  INDEX iPos x1 x2 y1 y2
   .
 
 DEFINE TEMP-TABLE ttScores NO-UNDO
@@ -117,46 +118,6 @@ btnTabChanges
 /* _UIB-PREPROCESSOR-BLOCK-END */
 &ANALYZE-RESUME
 
-
-/* ************************  Function Prototypes ********************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD inRange wAbout 
-FUNCTION inRange RETURNS LOGICAL
-  ( piValue AS INTEGER
-  , piMin   AS INTEGER
-  , piMax   AS INTEGER
-  )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD pointInRect wAbout 
-FUNCTION pointInRect RETURNS LOGICAL
-  ( piX AS INTEGER
-  , piY AS INTEGER
-  , phRect AS HANDLE )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD rangeIntersect wAbout 
-FUNCTION rangeIntersect RETURNS LOGICAL
-  ( piMin1 AS INTEGER 
-  , piMax1 AS INTEGER
-  , piMin2 AS INTEGER 
-  , piMax2 AS INTEGER
-  )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD rectIntersect wAbout 
-FUNCTION rectIntersect RETURNS LOGICAL
-  ( phRect1 AS HANDLE 
-  , phRect2 AS HANDLE )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
 
 
 /* ***********************  Control Definitions  ********************** */
@@ -408,6 +369,17 @@ END.
 
 &Scoped-define SELF-NAME DEFAULT-FRAME
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
+ON F10 OF FRAME DEFAULT-FRAME
+DO:
+  chCtrlFrame:BallTimer:INTERVAL = 50.
+  wAbout:TITLE = STRING(chCtrlFrame:BallTimer:INTERVAL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
 ON F11 OF FRAME DEFAULT-FRAME
 DO:
   chCtrlFrame:BallTimer:INTERVAL = max(1,chCtrlFrame:BallTimer:INTERVAL - 10).
@@ -651,6 +623,7 @@ PROCEDURE buildBlocks :
        bfBlock.x2 = bfBlock.hButton:X + bfBlock.hButton:WIDTH-PIXELS
        bfBlock.y2 = bfBlock.hButton:Y + bfBlock.hButton:HEIGHT-PIXELS
        .
+
    END.
  END.
 
@@ -858,44 +831,76 @@ PROCEDURE moveBall :
     END.
 
     rcBall:Y = rcBall:Y + giBallY.
-    FOR EACH bfBlock 
-      WHERE ( rcBall:Y >= bfBlock.y1 AND rcBall:Y <= bfBlock.y2 )
-         OR ( rcBall:Y + rcBall:HEIGHT-PIXELS >= bfBlock.y1 AND rcBall:Y + rcBall:HEIGHT-PIXELS <= bfBlock.y2 ):
+    IF giBallY < 0 THEN /* Hit brick from below? */
+      FIND FIRST bfBlock
+        WHERE rcBall:Y > bfBlock.y1
+          AND rcBall:Y < bfBlock.y2
+          AND rcBall:X + 7 > bfBlock.x1
+          AND rcBall:X + 7 < bfBlock.x2 NO-ERROR.
+    ELSE /* Hit brick from above? */
+      FIND FIRST bfBlock
+        WHERE rcBall:Y + rcBall:HEIGHT-PIXELS > bfBlock.y1
+          AND rcBall:Y + rcBall:HEIGHT-PIXELS < bfBlock.y2
+          AND rcBall:X + 7 > bfBlock.x1
+          AND rcBall:X + 7 < bfBlock.x2 NO-ERROR.
 
-      IF rectIntersect(rcBall:HANDLE, bfBlock.hButton) THEN
-      DO:
-        giBallY = giBallY * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
-        RETURN. 
-      END.
+    IF AVAILABLE bfBlock THEN
+    DO:
+      giBallY = giBallY * -1.
+      DELETE OBJECT bfBlock.hButton.
+      DELETE bfBlock.
+      RETURN.
     END.
 
     rcBall:X = rcBall:X + giBallX.
-    FOR EACH bfBlock 
-      WHERE ( rcBall:X >= bfBlock.x1 AND rcBall:X <= bfBlock.x2 )
-         OR ( rcBall:X + rcBall:WIDTH-PIXELS >= bfBlock.x1 AND rcBall:X + rcBall:WIDTH-PIXELS <= bfBlock.x2 ):
+    IF giBallX < 0 THEN /* Hit brick from right? */
+      FIND FIRST bfBlock
+        WHERE rcBall:X > bfBlock.x1
+          AND rcBall:X < bfBlock.x2
+          AND rcBall:Y + 7 > bfBlock.y1
+          AND rcBall:Y + 7 < bfBlock.y2 NO-ERROR.
+    ELSE /* Hit brick from left? */
+      FIND FIRST bfBlock
+        WHERE rcBall:X + rcBall:WIDTH-PIXELS > bfBlock.x1
+          AND rcBall:X + rcBall:WIDTH-PIXELS < bfBlock.x2
+          AND rcBall:Y + 7 > bfBlock.y1
+          AND rcBall:Y + 7 < bfBlock.y2 NO-ERROR.
 
-      IF rectIntersect(rcBall:HANDLE, bfBlock.hButton) THEN
-      DO:
-        giBallX = giBallX * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
-        RETURN. 
-      END.
+    IF AVAILABLE bfBlock THEN
+    DO:
+      giBallX = giBallX * -1.
+      DELETE OBJECT bfBlock.hButton.
+      DELETE bfBlock.
+      RETURN.
     END.
 
     /* hit the bat? */
-    IF rectIntersect(rcBall:HANDLE, rcBar:HANDLE) THEN 
+    IF    rcBall:Y + rcBall:HEIGHT-PIXELS > rcBar:Y 
+      AND rcBall:Y + rcBall:HEIGHT-PIXELS < rcBar:Y + rcBall:HEIGHT-PIXELS THEN
     DO:
-      giBallY = giBallY * -1.
 
       /* Right side ball hits left side of bat */
-      IF rcBall:X + 15 < rcBar:X + 20 THEN giBallX = -3 - (RANDOM(1,3) * 2).
-      ELSE 
+      IF    rcBall:X + 7 >= rcBar:X 
+        AND rcBall:X + 7 <= rcBar:X + 20 THEN 
+        ASSIGN 
+          giBallY = giBallY * -1
+          giBallX = -3 - (RANDOM(1,3) * 2).
 
+      ELSE
+      /* Ball hits center of bat */
+      IF    rcBall:X + 7 >= rcBar:X + 20
+        AND rcBall:X + 7 <= rcBar:X + 50 THEN 
+        ASSIGN 
+          giBallY = giBallY * -1.
+
+      ELSE
       /* Left side of ball hits right side of bat */
-      IF rcBall:X > rcBar:X + 50 THEN giBallX = 3 + (RANDOM(1,3) * 2).
+      IF    rcBall:X + 7 >= rcBar:X + 50
+        AND rcBall:X + 7 <= rcBar:X + 70 THEN 
+        ASSIGN 
+          giBallY = giBallY * -1
+          giBallX = 3 + (RANDOM(1,3) * 2).
+
     END.
   END.
 
@@ -1115,7 +1120,7 @@ DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
     rcBall:X = xx.
     rcBall:Y = yy.
 
-    RUN justWait(12).
+    .RUN justWait(12).
   END. 
 
   rcBall:X = 305.
@@ -1124,7 +1129,7 @@ DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   REPEAT WHILE rcBall:X < (FRAME {&FRAME-NAME}:WIDTH-PIXELS / 2):
     rcBall:X = rcBall:X + 5.
     rcBar:X = rcBar:X + 5.
-    RUN justWait(12).
+    .RUN justWait(12).
   END.
 END.
 
@@ -1245,7 +1250,6 @@ END PROCEDURE.
 PROCEDURE showLog :
 /* Play arkanoid-like game 
  */ 
-
   RUN prepareWindow.
   RUN readAboutFile.
   RUN buildBlocks.
@@ -1254,70 +1258,6 @@ PROCEDURE showLog :
   RUN playGame.
   
 END PROCEDURE. /* showLog */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-/* ************************  Function Implementations ***************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION inRange wAbout 
-FUNCTION inRange RETURNS LOGICAL
-  ( piValue AS INTEGER
-  , piMin   AS INTEGER
-  , piMax   AS INTEGER
-  ) :
-
-  RETURN (piValue >= piMin) AND (piValue <= piMax).
-
-END FUNCTION. /* inRange */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION pointInRect wAbout 
-FUNCTION pointInRect RETURNS LOGICAL
-  ( piX AS INTEGER
-  , piY AS INTEGER
-  , phRect AS HANDLE ) :
-
-  RETURN inRange(piX, phRect:X, phRect:X + phRect:WIDTH-PIXELS) 
-     AND inRange(piY, phRect:Y, phRect:Y + phRect:HEIGHT-PIXELS).
-
-END FUNCTION. /* pointInRect */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION rangeIntersect wAbout 
-FUNCTION rangeIntersect RETURNS LOGICAL
-  ( piMin1 AS INTEGER 
-  , piMax1 AS INTEGER
-  , piMin2 AS INTEGER 
-  , piMax2 AS INTEGER
-  ) :
-
-  RETURN MAXIMUM(piMin1,piMax1) >= MINIMUM(piMin2,piMax2) 
-     AND MINIMUM(piMin1,piMax1) <= MAXIMUM(piMin2,piMax2).
-
-END FUNCTION. /* rangeIntersect */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION rectIntersect wAbout 
-FUNCTION rectIntersect RETURNS LOGICAL
-  ( phRect1 AS HANDLE 
-  , phRect2 AS HANDLE ) :
-
-  RETURN 
-    rangeIntersect( phRect1:X, phRect1:X + phRect1:WIDTH-PIXELS
-                  , phRect2:X, phRect2:X + phRect2:WIDTH-PIXELS)
-    AND
-
-    rangeIntersect( phRect1:Y, phRect1:Y + phRect1:HEIGHT-PIXELS
-                  , phRect2:Y, phRect2:Y + phRect2:HEIGHT-PIXELS).
-
-END FUNCTION. /* rectIntersect */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
