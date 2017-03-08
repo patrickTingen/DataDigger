@@ -476,9 +476,14 @@ PROCEDURE CtrlFrame.BallTimer.Tick .
     Desc : Move the ball
   ------------------------------------------------------------------------------*/
 
+etime(yes).
   RUN setBar.
   RUN moveBall.
   RUN setTime.
+  
+  DO WITH FRAME {&FRAME-NAME}:
+    fiTime:SCREEN-VALUE = STRING(eTIME).
+  END.
 
 END PROCEDURE. /* OCX.Tick */
 
@@ -753,6 +758,9 @@ PROCEDURE initializeObject :
   DEFINE BUFFER bQuery FOR ttQuery.
 
   DO WITH FRAME {&FRAME-NAME}:
+
+    /* Disable ball mover */
+    chCtrlFrame:BallTimer:ENABLED = FALSE.  
 
     fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
     fiDataDigger-2:SCREEN-VALUE = 'Build {&build}'.
@@ -1205,9 +1213,9 @@ PROCEDURE setTime :
   Notes:       
 ------------------------------------------------------------------------------*/
 
-  DO WITH FRAME {&FRAME-NAME}:
-    fiTime:SCREEN-VALUE = STRING((MTIME - giGameStarted) / 1000,'>>>9.9').    
-  END.
+/*   DO WITH FRAME {&FRAME-NAME}: */
+/*     fiTime:SCREEN-VALUE = STRING((MTIME - giGameStarted) / 1000,'>>>9.9'). */
+/*   END. */
 
 END PROCEDURE.
 
