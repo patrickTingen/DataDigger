@@ -400,6 +400,16 @@ END.
 &ANALYZE-RESUME
 
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
+ON F9 OF FRAME DEFAULT-FRAME
+DO:
+  RUN moveBall.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define FRAME-NAME frHint
 &Scoped-define SELF-NAME btGotIt
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
@@ -810,12 +820,12 @@ PROCEDURE moveBall :
   Notes:       
 ------------------------------------------------------------------------------*/
 
-  DEFINE VARIABLE iBallX1 AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iBallX2 AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iBallY1 AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iBallY2 AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iFrameHeight AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iFrameWidth  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iNewX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iNewY AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMinY AS INTEGER NO-UNDO INITIAL 7.
+  DEFINE VARIABLE iMaxY AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMinX AS INTEGER NO-UNDO INITIAL 7.
+  DEFINE VARIABLE iMaxX AS INTEGER NO-UNDO.
 
   DEFINE BUFFER bfBlock FOR ttBlock.
 
@@ -826,110 +836,94 @@ PROCEDURE moveBall :
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    iBallX1      = rcBall:X.
-    iBallX2      = iBallX1 + rcBall:WIDTH-PIXELS.
-    iBallY1      = rcBall:Y.
-    iBallY2      = iBallY1 + rcBall:HEIGHT-PIXELS.
-    iFrameHeight = FRAME {&FRAME-NAME}:HEIGHT-PIXELS.
-    iFrameWidth  = FRAME {&FRAME-NAME}:WIDTH-PIXELS.
+    iNewX = rcBall:X + 7.
+    iNewY = rcBall:Y + 7.
+    iMaxY = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 7.
+    iMaxX = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 7.
 
-    /* New pos for the ball */
-    iBallX1 = iBallX1 + giBallX.
-    iBallX2 = iBallX2 + giBallX.
-    iBallY1 = iBallY1 + giBallY.
-    iBallY2 = iBallY2 + giBallY.
-
-    /* Hit top or bottom? */
-    IF iBallY1 < 0 OR iBallY2 >= iFrameHeight THEN 
-    DO:
-      /* flash when bottom is hit */
-      IF iBallY2 >= iFrameHeight THEN FRAME {&FRAME-NAME}:BGCOLOR = 14.
-      giBallY = giBallY * -1.
-      RETURN.
-    END.
+    /* New X-pos for the ball */
+    iNewX = iNewX + giBallX.
 
     /* Gonna hit the wall? */
-    IF iBallX1 < 0 OR iBallX2 > iFrameWidth THEN 
+    IF iNewX <= iMinX OR iNewX >= iMaxX THEN 
     DO:
       giBallX = giBallX * -1.
       RETURN.
     END.
-
-    IF giBallY < 0 THEN /* Hit brick from below? */
-      FIND FIRST bfBlock
-        WHERE iBallY1 > bfBlock.y1
-          AND iBallY1 < bfBlock.y2
-          AND iBallX1 + 7 > bfBlock.x1
-          AND iBallX1 + 7 < bfBlock.x2 NO-ERROR.
-    ELSE /* Hit brick from above? */
-      FIND FIRST bfBlock
-        WHERE iBallY2 > bfBlock.y1
-          AND iBallY2 < bfBlock.y2
-          AND iBallX1 + 7 > bfBlock.x1
-          AND iBallX1 + 7 < bfBlock.x2 NO-ERROR.
-
-    IF AVAILABLE bfBlock THEN
+    ELSE 
     DO:
+      FIND FIRST bfBlock
+        WHERE iNewX > bfBlock.x1 AND iNewX < bfBlock.x2
+          AND iNewY > bfBlock.y1 AND iNewY < bfBlock.y2 NO-ERROR.
+
+      IF AVAILABLE bfBlock THEN
+      DO:
+        giBallX = giBallX * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN.
+      END.
+    END.
+
+    /* new Y-pos for the ball */
+    iNewY = iNewY + giBallY.
+
+    /* Hit top or bottom? */
+    IF iNewY <= iMinY OR iNewY >= iMaxY THEN 
+    DO:
+      /* flash when bottom is hit */
+      IF iNewY >= iMaxY THEN FRAME {&FRAME-NAME}:BGCOLOR = 14.
       giBallY = giBallY * -1.
-      DELETE OBJECT bfBlock.hButton.
-      DELETE bfBlock.
       RETURN.
     END.
-
-    IF giBallX < 0 THEN /* Hit brick from right? */
-      FIND FIRST bfBlock
-        WHERE iBallX1 > bfBlock.x1
-          AND iBallX1 < bfBlock.x2
-          AND iBallY1 + 7 > bfBlock.y1
-          AND iBallY1 + 7 < bfBlock.y2 NO-ERROR.
-    ELSE /* Hit brick from left? */
-      FIND FIRST bfBlock
-        WHERE iBallX2 > bfBlock.x1
-          AND iBallX2 < bfBlock.x2
-          AND iBallY1 + 7 > bfBlock.y1
-          AND iBallY1 + 7 < bfBlock.y2 NO-ERROR.
-
-    IF AVAILABLE bfBlock THEN
+    ELSE 
     DO:
-      giBallX = giBallX * -1.
-      DELETE OBJECT bfBlock.hButton.
-      DELETE bfBlock.
-      RETURN.
+      FIND FIRST bfBlock
+        WHERE iNewX > bfBlock.x1 AND iNewX < bfBlock.x2 
+          AND iNewY > bfBlock.y1 AND iNewY < bfBlock.y2 NO-ERROR.
+  
+      IF AVAILABLE bfBlock THEN
+      DO:
+        giBallY = giBallY * -1.
+        DELETE OBJECT bfBlock.hButton.
+        DELETE bfBlock.
+        RETURN.
+      END.
     END.
 
     /* hit the bat? */
-    IF    iBallY2 > rcBar:Y 
-      AND iBallY2 < rcBar:Y + rcBall:HEIGHT-PIXELS 
-      AND iBallX1 + 7 >= rcBar:X 
-      AND iBallX1 + 7 <= rcBar:X + 70 THEN
+    IF    iNewY >= rcBar:Y 
+      AND iNewY <= rcBar:Y + rcBall:HEIGHT-PIXELS 
+      AND iNewX >= rcBar:X 
+      AND iNewX <= rcBar:X + 70 THEN
     DO:
 
       /* Right side ball hits left side of bat */
-      IF    iBallX1 + 7 >= rcBar:X 
-        AND iBallX1 + 7 <= rcBar:X + 20 THEN 
+      IF    iNewX >= rcBar:X 
+        AND iNewX <= rcBar:X + 20 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = -3 - (RANDOM(1,3) * 2).
 
       ELSE
       /* Ball hits center of bat */
-      IF    iBallX1 + 7 >= rcBar:X + 20
-        AND iBallX1 + 7 <= rcBar:X + 50 THEN 
+      IF    iNewX >= rcBar:X + 20
+        AND iNewX <= rcBar:X + 50 THEN 
         ASSIGN 
           giBallY = giBallY * -1.
 
       ELSE
       /* Left side of ball hits right side of bat */
-      IF    iBallX1 + 7 >= rcBar:X + 50
-        AND iBallX1 + 7 <= rcBar:X + 70 THEN 
+      IF    iNewX >= rcBar:X + 50
+        AND iNewX <= rcBar:X + 70 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = 3 + (RANDOM(1,3) * 2).
 
     END.
 
-    rcBall:X = iBallX1.
-    rcBall:Y = iBallY1.
+    rcBall:X = iNewX - 7.
+    rcBall:Y = iNewY - 7.
   END.
 
 END PROCEDURE. /* moveBall */
