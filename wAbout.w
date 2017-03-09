@@ -37,7 +37,6 @@ CREATE WIDGET-POOL.
 DEFINE TEMP-TABLE ttBlock NO-UNDO
   FIELD cBlockId AS CHARACTER 
   FIELD cDesc    AS CHARACTER
-  FIELD iScore   AS INTEGER
   FIELD hButton  AS HANDLE 
   FIELD iLine    AS INTEGER
   FIELD x1       AS INTEGER
@@ -556,7 +555,7 @@ PROCEDURE buildBlocks :
  yy = 90.
  iBlockLine = 1.
 
- FOR EACH bfBlock BY bfBlock.iScore DESCENDING:
+ FOR EACH bfBlock:
 
    CREATE BUTTON bfBlock.hButton
      ASSIGN
@@ -811,46 +810,63 @@ PROCEDURE moveBall :
   Notes:       
 ------------------------------------------------------------------------------*/
 
+  DEFINE VARIABLE iBallX1 AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iBallX2 AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iBallY1 AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iBallY2 AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iFrameHeight AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iFrameWidth  AS INTEGER NO-UNDO.
+
   DEFINE BUFFER bfBlock FOR ttBlock.
 
-  FRAME {&FRAME-NAME}:BGCOLOR = ?.
+  IF FRAME {&FRAME-NAME}:BGCOLOR <> ? THEN FRAME {&FRAME-NAME}:BGCOLOR = ?.
 
   /* Turn off events when we're running */
   IF cGameStatus <> 'running' THEN RETURN.
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    /* Gonna hit the top or bottom? */
-    IF (rcBall:Y + giBallY) < 0 
-      OR (rcBall:Y + rcBall:HEIGHT-PIXELS + giBallY) > FRAME {&FRAME-NAME}:HEIGHT-PIXELS THEN 
+    iBallX1      = rcBall:X.
+    iBallX2      = iBallX1 + rcBall:WIDTH-PIXELS.
+    iBallY1      = rcBall:Y.
+    iBallY2      = iBallY1 + rcBall:HEIGHT-PIXELS.
+    iFrameHeight = FRAME {&FRAME-NAME}:HEIGHT-PIXELS.
+    iFrameWidth  = FRAME {&FRAME-NAME}:WIDTH-PIXELS.
+
+    /* New pos for the ball */
+    iBallX1 = iBallX1 + giBallX.
+    iBallX2 = iBallX2 + giBallX.
+    iBallY1 = iBallY1 + giBallY.
+    iBallY2 = iBallY2 + giBallY.
+
+    /* Hit top or bottom? */
+    IF iBallY1 < 0 OR iBallY2 >= iFrameHeight THEN 
     DO:
       /* flash when bottom is hit */
-      IF rcBall:Y > rcBar:Y THEN FRAME {&FRAME-NAME}:BGCOLOR = 14.
+      IF iBallY2 >= iFrameHeight THEN FRAME {&FRAME-NAME}:BGCOLOR = 14.
       giBallY = giBallY * -1.
       RETURN.
     END.
 
     /* Gonna hit the wall? */
-    IF (rcBall:X + giBallX) < 0 
-      OR (rcBall:X + giBallX) > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBall:WIDTH-PIXELS) THEN 
+    IF iBallX1 < 0 OR iBallX2 > iFrameWidth THEN 
     DO:
       giBallX = giBallX * -1.
       RETURN.
     END.
 
-    rcBall:Y = rcBall:Y + giBallY.
     IF giBallY < 0 THEN /* Hit brick from below? */
       FIND FIRST bfBlock
-        WHERE rcBall:Y > bfBlock.y1
-          AND rcBall:Y < bfBlock.y2
-          AND rcBall:X + 7 > bfBlock.x1
-          AND rcBall:X + 7 < bfBlock.x2 NO-ERROR.
+        WHERE iBallY1 > bfBlock.y1
+          AND iBallY1 < bfBlock.y2
+          AND iBallX1 + 7 > bfBlock.x1
+          AND iBallX1 + 7 < bfBlock.x2 NO-ERROR.
     ELSE /* Hit brick from above? */
       FIND FIRST bfBlock
-        WHERE rcBall:Y + rcBall:HEIGHT-PIXELS > bfBlock.y1
-          AND rcBall:Y + rcBall:HEIGHT-PIXELS < bfBlock.y2
-          AND rcBall:X + 7 > bfBlock.x1
-          AND rcBall:X + 7 < bfBlock.x2 NO-ERROR.
+        WHERE iBallY2 > bfBlock.y1
+          AND iBallY2 < bfBlock.y2
+          AND iBallX1 + 7 > bfBlock.x1
+          AND iBallX1 + 7 < bfBlock.x2 NO-ERROR.
 
     IF AVAILABLE bfBlock THEN
     DO:
@@ -860,19 +876,18 @@ PROCEDURE moveBall :
       RETURN.
     END.
 
-    rcBall:X = rcBall:X + giBallX.
     IF giBallX < 0 THEN /* Hit brick from right? */
       FIND FIRST bfBlock
-        WHERE rcBall:X > bfBlock.x1
-          AND rcBall:X < bfBlock.x2
-          AND rcBall:Y + 7 > bfBlock.y1
-          AND rcBall:Y + 7 < bfBlock.y2 NO-ERROR.
+        WHERE iBallX1 > bfBlock.x1
+          AND iBallX1 < bfBlock.x2
+          AND iBallY1 + 7 > bfBlock.y1
+          AND iBallY1 + 7 < bfBlock.y2 NO-ERROR.
     ELSE /* Hit brick from left? */
       FIND FIRST bfBlock
-        WHERE rcBall:X + rcBall:WIDTH-PIXELS > bfBlock.x1
-          AND rcBall:X + rcBall:WIDTH-PIXELS < bfBlock.x2
-          AND rcBall:Y + 7 > bfBlock.y1
-          AND rcBall:Y + 7 < bfBlock.y2 NO-ERROR.
+        WHERE iBallX2 > bfBlock.x1
+          AND iBallX2 < bfBlock.x2
+          AND iBallY1 + 7 > bfBlock.y1
+          AND iBallY1 + 7 < bfBlock.y2 NO-ERROR.
 
     IF AVAILABLE bfBlock THEN
     DO:
@@ -883,33 +898,38 @@ PROCEDURE moveBall :
     END.
 
     /* hit the bat? */
-    IF    rcBall:Y + rcBall:HEIGHT-PIXELS > rcBar:Y 
-      AND rcBall:Y + rcBall:HEIGHT-PIXELS < rcBar:Y + rcBall:HEIGHT-PIXELS THEN
+    IF    iBallY2 > rcBar:Y 
+      AND iBallY2 < rcBar:Y + rcBall:HEIGHT-PIXELS 
+      AND iBallX1 + 7 >= rcBar:X 
+      AND iBallX1 + 7 <= rcBar:X + 70 THEN
     DO:
 
       /* Right side ball hits left side of bat */
-      IF    rcBall:X + 7 >= rcBar:X 
-        AND rcBall:X + 7 <= rcBar:X + 20 THEN 
+      IF    iBallX1 + 7 >= rcBar:X 
+        AND iBallX1 + 7 <= rcBar:X + 20 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = -3 - (RANDOM(1,3) * 2).
 
       ELSE
       /* Ball hits center of bat */
-      IF    rcBall:X + 7 >= rcBar:X + 20
-        AND rcBall:X + 7 <= rcBar:X + 50 THEN 
+      IF    iBallX1 + 7 >= rcBar:X + 20
+        AND iBallX1 + 7 <= rcBar:X + 50 THEN 
         ASSIGN 
           giBallY = giBallY * -1.
 
       ELSE
       /* Left side of ball hits right side of bat */
-      IF    rcBall:X + 7 >= rcBar:X + 50
-        AND rcBall:X + 7 <= rcBar:X + 70 THEN 
+      IF    iBallX1 + 7 >= rcBar:X + 50
+        AND iBallX1 + 7 <= rcBar:X + 70 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = 3 + (RANDOM(1,3) * 2).
 
     END.
+
+    rcBall:X = iBallX1.
+    rcBall:Y = iBallY1.
   END.
 
 END PROCEDURE. /* moveBall */
@@ -1067,8 +1087,7 @@ PROCEDURE readAboutFile :
     END.
 
     ASSIGN 
-      bfBlock.cDesc  = TRIM(bfBlock.cDesc + '~n' + REPLACE(cLine,'(' + cName + ')', ''), '~n')
-      bfBlock.iScore = bfBlock.iScore + 1.
+      bfBlock.cDesc  = TRIM(bfBlock.cDesc + '~n' + REPLACE(cLine,'(' + cName + ')', ''), '~n').
   END.
   
   INPUT CLOSE. 
