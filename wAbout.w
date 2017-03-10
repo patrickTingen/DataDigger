@@ -54,7 +54,6 @@ DEFINE TEMP-TABLE ttScores NO-UNDO
   INDEX iPrim IS PRIMARY iRank
   .
 
-DEFINE VARIABLE cGameStatus AS CHARACTER NO-UNDO.
 
 /* For debugging in the UIB */
 &IF DEFINED(UIB_is_Running) <> 0 &THEN
@@ -87,10 +86,12 @@ END PROCEDURE. /* startDiggerLib */
 
 &ENDIF
 
-DEFINE VARIABLE giBallX       AS INTEGER NO-UNDO INITIAL -5.
-DEFINE VARIABLE giBallY       AS INTEGER NO-UNDO INITIAL -5.
-DEFINE VARIABLE giGameStarted AS INTEGER NO-UNDO.
-DEFINE VARIABLE giOldMouseX   AS INTEGER NO-UNDO.
+DEFINE VARIABLE giBallX       AS INTEGER   NO-UNDO INITIAL -5.
+DEFINE VARIABLE giBallY       AS INTEGER   NO-UNDO INITIAL -5.
+DEFINE VARIABLE giGameStarted AS INTEGER   NO-UNDO.
+DEFINE VARIABLE giOldMouseX   AS INTEGER   NO-UNDO.
+DEFINE VARIABLE gcGameStatus  AS CHARACTER NO-UNDO.
+DEFINE VARIABLE glClickedLogo AS LOGICAL     NO-UNDO.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -107,9 +108,9 @@ DEFINE VARIABLE giOldMouseX   AS INTEGER NO-UNDO.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog btnTabAbout ~
-btnTabChanges 
-&Scoped-Define DISPLAYED-OBJECTS edChangelog fiDataDigger-1 fiDataDigger-2 
+&Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog fiWebsite 
+&Scoped-Define DISPLAYED-OBJECTS edChangelog fiDataDigger-1 fiDataDigger-2 ~
+fiWebsite 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -129,22 +130,14 @@ DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
 DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnDataDigger  NO-FOCUS FLAT-BUTTON
+DEFINE BUTTON btnDataDigger  NO-FOCUS
      LABEL "D" 
-     SIZE 6 BY 1.43.
+     SIZE-PIXELS 30 BY 30.
 
 DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
      LABEL "OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
-
-DEFINE BUTTON btnTabAbout  NO-FOCUS FLAT-BUTTON
-     LABEL "About" 
-     SIZE 19 BY 1.24.
-
-DEFINE BUTTON btnTabChanges  NO-FOCUS FLAT-BUTTON
-     LABEL "Changes" 
-     SIZE 19 BY 1.24.
 
 DEFINE VARIABLE edChangelog AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-VERTICAL LARGE
@@ -164,16 +157,21 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 DEFINE VARIABLE fiTime AS CHARACTER FORMAT "X(256)":U 
      LABEL "Time" 
      VIEW-AS FILL-IN NATIVE 
-     SIZE 14 BY 1 NO-UNDO.
+     SIZE-PIXELS 70 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadigger.wordpress.com/" 
+      VIEW-AS TEXT 
+     SIZE-PIXELS 210 BY 20
+     FGCOLOR 9  NO-UNDO.
 
 DEFINE RECTANGLE rcBall
      EDGE-PIXELS 8    ROUNDED 
-     SIZE 3 BY .62
+     SIZE-PIXELS 15 BY 13
      BGCOLOR 12 FGCOLOR 12 .
 
 DEFINE RECTANGLE rcBar
      EDGE-PIXELS 0    ROUNDED 
-     SIZE 14 BY .43
+     SIZE-PIXELS 70 BY 9
      BGCOLOR 1 .
 
 DEFINE BUTTON btGotIt 
@@ -189,20 +187,19 @@ DEFINE VARIABLE edHint AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnDataDigger AT ROW 1.24 COL 2 WIDGET-ID 82
-     fiTime AT ROW 1.24 COL 92 COLON-ALIGNED WIDGET-ID 294
+     btnDataDigger AT Y 5 X 5 WIDGET-ID 82
+     fiTime AT Y 5 X 455 COLON-ALIGNED WIDGET-ID 294
      BtnOK AT Y 5 X 545 WIDGET-ID 48
      edChangelog AT Y 70 X 0 NO-LABEL WIDGET-ID 72
-     btnTabAbout AT ROW 3.19 COL 1 WIDGET-ID 78
-     btnTabChanges AT ROW 3.19 COL 20 WIDGET-ID 80
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-     rcBar AT ROW 3.14 COL 52 WIDGET-ID 84
-     rcBall AT ROW 2.43 COL 58 WIDGET-ID 92
+     fiWebsite AT Y 415 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     rcBar AT Y 45 X 255 WIDGET-ID 84
+     rcBall AT Y 30 X 285 WIDGET-ID 92
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 126.6 BY 19.33 WIDGET-ID 100.
+         SIZE 126.6 BY 21.29 WIDGET-ID 100.
 
 DEFINE FRAME frHint
      edHint AT Y 10 X 25 NO-LABEL WIDGET-ID 2
@@ -231,7 +228,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wAbout ASSIGN
          HIDDEN             = YES
          TITLE              = "About the DataDigger"
-         HEIGHT             = 19.33
+         HEIGHT             = 21.29
          WIDTH              = 126.6
          MAX-HEIGHT         = 54
          MAX-WIDTH          = 384
@@ -355,6 +352,13 @@ END.
 ON WINDOW-RESIZED OF wAbout /* About the DataDigger */
 DO:
   
+  IF gcGameStatus = '' THEN 
+  DO:
+    wAbout:HEIGHT-PIXELS = 447.
+    wAbout:WIDTH-PIXELS = 633.
+    RETURN NO-APPLY.
+  END.
+
   FRAME {&FRAME-NAME}:HEIGHT-PIXELS = wAbout:HEIGHT-PIXELS.
   FRAME {&FRAME-NAME}:WIDTH-PIXELS = wAbout:WIDTH-PIXELS.
 
@@ -415,7 +419,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wAbout
 ON CHOOSE OF btGotIt IN FRAME frHint /* I Got it */
 DO:
-  cGameStatus = 'running'.
+  gcGameStatus = 'running'.
   FRAME frHint:VISIBLE = FALSE.
 
   /* Enable ball mover */
@@ -435,7 +439,12 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
-  RUN showLog.
+  IF NOT glClickedLogo THEN 
+    RUN blinkLogo.
+  ELSE 
+    RUN showLog.
+
+  glClickedLogo = TRUE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -447,30 +456,6 @@ END.
 ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
 DO:
   APPLY 'CLOSE' TO THIS-PROCEDURE.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnTabAbout
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabAbout wAbout
-ON CHOOSE OF btnTabAbout IN FRAME DEFAULT-FRAME /* About */
-or 'ctrl-1' of frame {&frame-name} anywhere
-DO:
-  run setPage(1).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnTabChanges
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabChanges wAbout
-ON CHOOSE OF btnTabChanges IN FRAME DEFAULT-FRAME /* Changes */
-or 'ctrl-2' of frame {&frame-name} anywhere
-DO:
-  run setPage(2).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -495,6 +480,19 @@ etime(yes).
   END.
 
 END PROCEDURE. /* OCX.Tick */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME fiWebsite
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiWebsite wAbout
+ON MOUSE-SELECT-CLICK OF fiWebsite IN FRAME DEFAULT-FRAME
+DO:
+  
+  OS-COMMAND NO-WAIT START VALUE(SELF:SCREEN-VALUE).
+
+END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -529,6 +527,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN enable_UI.
   RUN initializeObject.
   FRAME {&FRAME-NAME}:HIDDEN = NO.
+  RUN blinkLogo.
   
   RUN fadeWindow(0,240).
   WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS edChangelog.
@@ -539,6 +538,67 @@ END.
 
 
 /* **********************  Internal Procedures  *********************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE blinkLogo wAbout 
+PROCEDURE blinkLogo :
+/* Blink the DD logo
+*/
+  DEFINE VARIABLE ii   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
+  DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
+  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT -5. /* hor speed */
+  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0.  /* ver speed */
+  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    btnDataDigger:MOVE-TO-TOP().
+    btnDataDigger:X = 600.
+    btnDataDigger:Y = 0.
+    btnDataDigger:VISIBLE = FALSE.
+
+    yy = btnDataDigger:Y.
+    xx = btnDataDigger:X.
+
+    RUN justWait(1000).
+    btnDataDigger:VISIBLE = TRUE.
+  END.
+
+  REPEAT:
+    /* Normal flow */
+    dy = dy + grav.
+    xx = xx + dx.
+    yy = yy + dy.
+    
+    /* Bounce at bottom of frame */
+    IF yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - btnDataDigger:HEIGHT-PIXELS) THEN
+    DO:
+      yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - btnDataDigger:HEIGHT-PIXELS.
+      dy = -1 * dy.
+    END.
+    IF xx <= 5 THEN LEAVE. 
+
+    btnDataDigger:X = xx.
+    btnDataDigger:Y = yy.
+
+    RUN justWait(10). 
+  END. 
+
+  btnDataDigger:X = 5.
+  btnDataDigger:Y = 5.
+
+  DO ii = 1 TO 3:
+    btnDataDigger:SENSITIVE = NO.
+    RUN justWait(300). 
+    btnDataDigger:SENSITIVE = YES.
+    RUN justWait(300). 
+  END.
+
+
+END PROCEDURE. /* blinkLogo */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE buildBlocks wAbout 
 PROCEDURE buildBlocks :
@@ -717,9 +777,9 @@ PROCEDURE enable_UI :
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   RUN control_load.
-  DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 
+  DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 fiWebsite 
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
-  ENABLE btnDataDigger BtnOK edChangelog btnTabAbout btnTabChanges 
+  ENABLE btnDataDigger BtnOK edChangelog fiWebsite 
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   DISPLAY edHint 
@@ -768,21 +828,25 @@ PROCEDURE initializeObject :
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    /* Disable ball mover */
-    chCtrlFrame:BallTimer:ENABLED = FALSE.  
-
-    fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
-    fiDataDigger-2:SCREEN-VALUE = 'Build {&build}'.
-    
+    /* Prepare frame */
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
     fiDataDigger-1:FONT      = getFont('Fixed').
     fiDataDigger-2:FONT      = getFont('Fixed').
     edChangelog:FONT         = getFont('Fixed').
     fiTime:FONT              = getFont('Fixed').
-
     btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
     
-    RUN setPage(1).
+    /* Disable ball mover */
+    chCtrlFrame:BallTimer:ENABLED = FALSE.  
+
+    /* Set version name */
+    fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
+    fiDataDigger-2:SCREEN-VALUE = 'Build {&build}'.
+
+    /* Load changelog */
+    edChangeLog:INSERT-FILE(getProgramDir() + 'DataDigger.txt').
+    edChangeLog:CURSOR-OFFSET = 1.
+
     RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
     
     /* For some reasons, these #*$&# scrollbars keep coming back */
@@ -832,7 +896,7 @@ PROCEDURE moveBall :
   IF FRAME {&FRAME-NAME}:BGCOLOR <> ? THEN FRAME {&FRAME-NAME}:BGCOLOR = ?.
 
   /* Turn off events when we're running */
-  IF cGameStatus <> 'running' THEN RETURN.
+  IF gcGameStatus <> 'running' THEN RETURN.
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -963,7 +1027,7 @@ PROCEDURE playGame :
     ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveBar(-20).
 
     /* Wait for game to start via 'I get it' button */
-    REPEAT WHILE cGameStatus = '':
+    REPEAT WHILE gcGameStatus = '':
       PROCESS EVENTS. 
     END.
 
@@ -1005,8 +1069,6 @@ PROCEDURE prepareWindow :
   DEFINE VARIABLE iNumSteps AS INTEGER     NO-UNDO INITIAL 50.
 
   DO WITH FRAME {&FRAME-NAME}:
-    btnTabAbout:VISIBLE = NO.
-    btnTabChanges:VISIBLE = NO.
     BtnOK:VISIBLE = NO.
 
     ASSIGN 
@@ -1044,10 +1106,10 @@ PROCEDURE prepareWindow :
       RUN justWait(5).
     END.
 
-    edChangelog:VISIBLE = FALSE.
+    edChangelog:VISIBLE   = FALSE.
     edChangelog:SENSITIVE = FALSE.
-    fiTime:VISIBLE = TRUE.
-
+    fiTime:VISIBLE        = TRUE.
+    fiWebsite:VISIBLE     = FALSE.
   END.
 
 END PROCEDURE. /* prepareWindow */
@@ -1093,7 +1155,9 @@ END PROCEDURE. /* readAboutFile */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBall wAbout 
 PROCEDURE setBall :
-DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
+/* Set the ball to its place with a nice bounce 
+*/  
+  DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT 1. /* hor speed */
   DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0. /* ver speed */
@@ -1176,44 +1240,6 @@ DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
   END.
 
 END PROCEDURE. /* setBar */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wAbout 
-PROCEDURE setPage :
-/*------------------------------------------------------------------------
-  Name         : setPage
-  Description  : Activate either the About or the Changes tab
-
-  ----------------------------------------------------------------------
-  7-9-2012 pti Created
-  ----------------------------------------------------------------------*/
-  DEFINE INPUT PARAMETER piPage AS INTEGER     NO-UNDO.
-
-  DO WITH FRAME {&FRAME-NAME}:
-    edChangelog:SCREEN-VALUE = "".
-
-    CASE piPage:
-      WHEN 1 THEN DO:
-        btnTabAbout  :LOAD-IMAGE( getImagePath('tab_about_active.gif'    )).
-        btnTabChanges:LOAD-IMAGE( getImagePath('tab_changes_inactive.gif' )).
-
-        edChangeLog:INSERT-FILE(getProgramDir() + 'DataDiggerAbout.txt').
-        edChangeLog:CURSOR-OFFSET = 1.
-      END.
-  
-      WHEN 2 THEN DO:
-        btnTabAbout  :LOAD-IMAGE( getImagePath('tab_about_inactive.gif'    )).
-        btnTabChanges:LOAD-IMAGE( getImagePath('tab_changes_active.gif' )).
-
-        edChangeLog:INSERT-FILE(getProgramDir() + 'DataDigger.txt').
-        edChangeLog:CURSOR-OFFSET = 1.
-      END.                                          
-    END CASE. /* piPage */
-  END.
-  
-END PROCEDURE. /* setPage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
