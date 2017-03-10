@@ -19,7 +19,7 @@
 /* ***************************  Definitions  ************************** */
 
 &GLOBAL-DEFINE version {version.i}
-&GLOBAL-DEFINE edition Titanium
+&GLOBAL-DEFINE edition Easter Egg
 &GLOBAL-DEFINE build {build.i}
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 &GLOBAL-DEFINE timerStart PUBLISH "timerCommand" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).

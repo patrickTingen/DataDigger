@@ -1,11 +1,11 @@
- ____    __   ____   __    ____  ____  ___   ___  ____  ____
-(  _ \  /__\ (_  _) /__\  (  _ \(_  _)/ __) / __)( ___)(  _ \
- )(_) )/(__)\  )(  /(__)\  )(_) )_)(_( (_-.( (_-. )__)  )   /
-(____/(__)(__)(__)(__)(__)(____/(____)\___/ \___/(____)(_)\_)
+       ____     __    ____    __     ____   ____   ___    ___   ____   ____
+      (  _ \   /__\  (_  _)  /__\   (  _ \ (_  _) / __)  / __) ( ___) (  _ \
+       )(_) ) /(__)\   )(   /(__)\   )(_) ) _)(_ ( (_-. ( (_-.  )__)   )   /
+      (____/ (__)(__) (__) (__)(__) (____/ (____) \___/  \___/ (____) (_)\_)
+      
+=====================================================================================
 
-====================================================================================================
-
-DataDigger version 23
+DataDigger version 23 - 17 apr 2017 (Easter Egg)
 
 - Solved: Query-open errors were not shown in tooltip of query fill-in
 - Solved: High nr of decimals on non-decimal fields could cause errors. See PKB P185263
@@ -18,14 +18,14 @@ DataDigger version 23
 - New   : Multi-sort on data columns now possible
 - New   : Row coloring now depending on chosen sort
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
-
-====================================================================================================
+-
+=====================================================================================
 
 DataDigger version 22 - 20 feb 2017 (Titanium)
 
 - Solved: Compilation errors on Progress 10.1B (Cherian George)
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
 
@@ -43,7 +43,7 @@ DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
 
 - New   : The check on new versions of DataDigger is back.
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 20 - 29 september 2016 (Coffee Version)
 
@@ -122,7 +122,7 @@ DataDigger version 20 - 29 september 2016 (Coffee Version)
 - New   : Date picker added to edit window
 - New   : Track database changes and give a warning to restart DataDigger when schema changes
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 19 - 22 jul 2014 (Straight A's)
 
@@ -206,7 +206,7 @@ DataDigger version 19 - 22 jul 2014 (Straight A's)
 - New   : Columns in fields browse can be hidden
 - New   : Resize the fields/index browse with the drag bar
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 18 - 01-06-2013
 
@@ -280,7 +280,7 @@ DataDigger version 18 - 01-06-2013
 - New   : Settings for making backup-on-delete are checked at startup (Jeroen Beugels)
 - New   : Guided tour for new users
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 17 - 6 sep 2012 (Haiku)
 
@@ -368,7 +368,7 @@ DataDigger version 17 - 6 sep 2012 (Haiku)
 - New   : When changing the order of fields, the data browse is updated immediately
 - New   : Column widths of data browse is now saved in INI file
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 16 - 18 mar 2011 (Sweet-16 edition)
 
@@ -440,7 +440,7 @@ Special thanks to the following people for testing and suggestion. Great job guy
 - New   : fields of type int64 can be shown using time format like normal integers
 - New   : CTRL-A and CTRL-D select/deselect all records in the data browse
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 15 - 18 mar 2010 (Bregje-15 Edition)
 
@@ -461,7 +461,7 @@ DataDigger version 15 - 18 mar 2010 (Bregje-15 Edition)
 - Solved: When toggling 'Show Hidden Tables' the table browse is not refreshed
 - Solved: When saving changes on an even nr of records, DataBrowse swaps colors
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 14 - 03 mar 2010 (Election Day Edition)
 
@@ -493,7 +493,7 @@ DataDigger version 14 - 03 mar 2010 (Election Day Edition)
 - New   : Warn when trying to dump empty browse or empty selection
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 13 - 13 jan 2010 (Bad Luck Edition)
 
@@ -514,7 +514,7 @@ New: It is now possible to include OS Environment Variables in the settings Dump
 New: Added possibility to sort connections in ConnectionWindow
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 12 - 6 jan 2010
 
@@ -534,7 +534,7 @@ New: Show number of exectuted queries on a table.
 New: Added Alt-w to jump to Where-editor
 New: Added Count button to count total number of records of the query
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 11 - 12 dec 2009 (Double Dozen Edition)
 
@@ -571,7 +571,7 @@ NOTE: To support multiple history of queries on a table, this version of DataDig
 - New   : Added buttons to change order of fields
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 10 - 21 oct 2009 (Progression revisited Edition)
 
@@ -596,7 +596,7 @@ DataDigger version 10 - 21 oct 2009 (Progression revisited Edition)
        AddDataColumnForRowid=no      : Do not add rowid column to DataBrowse
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 9 - 16 oct 2009 (Revolution nr 9 edition)
 
@@ -629,7 +629,7 @@ NOTE: This version uses a different naming convention for the .ini file.
 - New   : Right-click on index inserts a query that uses all fields of that index.
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 8 - 22 sep 2009 (Brand New Day edition)
 
@@ -643,7 +643,7 @@ DataDigger version 8 - 22 sep 2009 (Brand New Day edition)
 - New   : Button 'Clear query' also clears query from ini file.
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 7 - 18 sep 2009 (Mullerman edition)
 
@@ -672,7 +672,7 @@ Known issues:
 - View on table _UserLock view data gives "Array subscript 0 is out of range (26)"
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 6 - 9 sep 2009 (Triple-9 version)
 
@@ -697,7 +697,7 @@ DataDigger version 6 - 9 sep 2009 (Triple-9 version)
 - When the query editor is small, ENTER acts as 'execute query'
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 5 - 16 jul 2009 (Bugleman edition)
 
@@ -708,7 +708,7 @@ DataDigger version 5 - 16 jul 2009 (Bugleman edition)
 - Save/restore selected fields in INI
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 4 - 14 jul 2009 (France Liberty Edition)
 
@@ -723,7 +723,7 @@ DataDigger version 4 - 14 jul 2009 (France Liberty Edition)
 - Close INI file on close of program to avoid font errors
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 3 - 9 jul 2009
 
@@ -750,7 +750,7 @@ DataDigger version 3 - 9 jul 2009
 - Add tooltip to EDITOR if query is invalid
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 2 - 6 feb 2009 (Mother-in-law edition)
 
@@ -766,7 +766,7 @@ DataDigger version 2 - 6 feb 2009 (Mother-in-law edition)
 - Removed table quickselect fill-in
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 1 - jan 2009
 
@@ -786,7 +786,7 @@ DataDigger version 1 - jan 2009
 - Added possibility to change field format
 
 
-====================================================================================================
+=====================================================================================
 
 DataDigger version 0 - dec 2008
 
