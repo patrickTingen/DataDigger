@@ -34,10 +34,9 @@ CREATE WIDGET-POOL.
 
 { datadigger.i }
 
-DEFINE TEMP-TABLE ttBlock NO-UNDO
+DEFINE TEMP-TABLE ttBrick NO-UNDO
   FIELD cBlockId AS CHARACTER 
-  FIELD cDesc    AS CHARACTER
-  FIELD hButton  AS HANDLE 
+  FIELD hBrick   AS HANDLE 
   FIELD iLine    AS INTEGER
   FIELD x1       AS INTEGER
   FIELD x2       AS INTEGER
@@ -53,7 +52,6 @@ DEFINE TEMP-TABLE ttScores NO-UNDO
   FIELD cTime AS CHARACTER
   INDEX iPrim IS PRIMARY iRank
   .
-
 
 /* For debugging in the UIB */
 &IF DEFINED(UIB_is_Running) <> 0 &THEN
@@ -91,7 +89,8 @@ DEFINE VARIABLE giBallY       AS INTEGER   NO-UNDO INITIAL -5.
 DEFINE VARIABLE giGameStarted AS INTEGER   NO-UNDO.
 DEFINE VARIABLE giOldMouseX   AS INTEGER   NO-UNDO.
 DEFINE VARIABLE gcGameStatus  AS CHARACTER NO-UNDO.
-DEFINE VARIABLE glClickedLogo AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE glDebugRun    AS LOGICAL   NO-UNDO INITIAL YES.
+DEFINE VARIABLE giNumLives    AS INTEGER   NO-UNDO INITIAL 3.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -164,15 +163,28 @@ DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadi
      SIZE-PIXELS 210 BY 20
      FGCOLOR 9  NO-UNDO.
 
-DEFINE RECTANGLE rcBall
-     EDGE-PIXELS 8    ROUNDED 
-     SIZE-PIXELS 15 BY 13
-     BGCOLOR 12 FGCOLOR 12 .
+DEFINE IMAGE imgBall
+     FILENAME "adeicon/blank":U TRANSPARENT
+     SIZE-PIXELS 15 BY 15.
 
-DEFINE RECTANGLE rcBar
-     EDGE-PIXELS 0    ROUNDED 
-     SIZE-PIXELS 70 BY 9
-     BGCOLOR 1 .
+DEFINE IMAGE imgPaddle
+     FILENAME "adeicon/blank":U TRANSPARENT
+     SIZE-PIXELS 70 BY 15.
+
+DEFINE IMAGE imgPaddle-2
+     FILENAME "adeicon/blank":U
+     STRETCH-TO-FIT TRANSPARENT
+     SIZE-PIXELS 20 BY 10.
+
+DEFINE IMAGE imgPaddle-3
+     FILENAME "adeicon/blank":U
+     STRETCH-TO-FIT TRANSPARENT
+     SIZE-PIXELS 20 BY 10.
+
+DEFINE IMAGE imgPaddle-4
+     FILENAME "adeicon/blank":U
+     STRETCH-TO-FIT TRANSPARENT
+     SIZE-PIXELS 20 BY 10.
 
 DEFINE BUTTON btGotIt 
      LABEL "I &Got it" 
@@ -194,8 +206,11 @@ DEFINE FRAME DEFAULT-FRAME
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
      fiWebsite AT Y 415 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     rcBar AT Y 45 X 255 WIDGET-ID 84
-     rcBall AT Y 30 X 285 WIDGET-ID 92
+     imgPaddle AT Y 15 X 325 WIDGET-ID 300
+     imgBall AT Y 15 X 305 WIDGET-ID 302
+     imgPaddle-2 AT Y 35 X 325 WIDGET-ID 308
+     imgPaddle-3 AT Y 35 X 350 WIDGET-ID 310
+     imgPaddle-4 AT Y 35 X 375 WIDGET-ID 312
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
@@ -260,6 +275,9 @@ ASSIGN FRAME frHint:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 ASSIGN 
+       FRAME DEFAULT-FRAME:HIDDEN           = TRUE.
+
+ASSIGN 
        edChangelog:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDataDigger-1 IN FRAME DEFAULT-FRAME
@@ -271,15 +289,30 @@ ASSIGN
 ASSIGN 
        fiTime:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
-/* SETTINGS FOR RECTANGLE rcBall IN FRAME DEFAULT-FRAME
+/* SETTINGS FOR IMAGE imgBall IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
 ASSIGN 
-       rcBall:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+       imgBall:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
-/* SETTINGS FOR RECTANGLE rcBar IN FRAME DEFAULT-FRAME
+/* SETTINGS FOR IMAGE imgPaddle IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
 ASSIGN 
-       rcBar:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+       imgPaddle:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+
+/* SETTINGS FOR IMAGE imgPaddle-2 IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+ASSIGN 
+       imgPaddle-2:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+
+/* SETTINGS FOR IMAGE imgPaddle-3 IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+ASSIGN 
+       imgPaddle-3:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+
+/* SETTINGS FOR IMAGE imgPaddle-4 IN FRAME DEFAULT-FRAME
+   NO-ENABLE                                                            */
+ASSIGN 
+       imgPaddle-4:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR FRAME frHint
    NOT-VISIBLE                                                          */
@@ -352,7 +385,9 @@ END.
 ON WINDOW-RESIZED OF wAbout /* About the DataDigger */
 DO:
   
-  IF gcGameStatus = '' THEN 
+  IF   wAbout:HEIGHT-PIXELS < 447 
+    OR wAbout:WIDTH-PIXELS  < 633 
+    OR gcGameStatus = '' THEN 
   DO:
     wAbout:HEIGHT-PIXELS = 447.
     wAbout:WIDTH-PIXELS = 633.
@@ -361,6 +396,7 @@ DO:
 
   FRAME {&FRAME-NAME}:HEIGHT-PIXELS = wAbout:HEIGHT-PIXELS.
   FRAME {&FRAME-NAME}:WIDTH-PIXELS = wAbout:WIDTH-PIXELS.
+  RUN setBricks.
 
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
 
@@ -439,12 +475,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
-  IF NOT glClickedLogo THEN 
-    RUN blinkLogo.
-  ELSE 
-    RUN showLog.
-
-  glClickedLogo = TRUE.
+  RUN showLog.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -470,15 +501,10 @@ PROCEDURE CtrlFrame.BallTimer.Tick .
     Desc : Move the ball
   ------------------------------------------------------------------------------*/
 
-etime(yes).
-  RUN setBar.
+  RUN setPaddle.
   RUN moveBall.
   RUN setTime.
   
-  DO WITH FRAME {&FRAME-NAME}:
-    fiTime:SCREEN-VALUE = STRING(eTIME).
-  END.
-
 END PROCEDURE. /* OCX.Tick */
 
 /* _UIB-CODE-BLOCK-END */
@@ -527,9 +553,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN enable_UI.
   RUN initializeObject.
   FRAME {&FRAME-NAME}:HIDDEN = NO.
-  RUN blinkLogo.
+  RUN blinkLogo. 
   
-  RUN fadeWindow(0,240).
   WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS edChangelog.
 END.
 
@@ -549,6 +574,14 @@ PROCEDURE blinkLogo :
   DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT -5. /* hor speed */
   DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0.  /* ver speed */
   DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
+
+  /* debug */
+  IF glDebugRun THEN
+  DO WITH FRAME {&FRAME-NAME}:
+    btnDataDigger:X = 5.
+    btnDataDigger:Y = 5.
+    RETURN. 
+  END. 
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -600,114 +633,6 @@ END PROCEDURE. /* blinkLogo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE buildBlocks wAbout 
-PROCEDURE buildBlocks :
-/* Build blocks on the screen via button widgets
- */
- DEFINE BUFFER bfBlock FOR ttBlock.
- 
- &GLOBAL-DEFINE Border      30
- &GLOBAL-DEFINE RowMargin   10
- &GLOBAL-DEFINE BlockMargin  0
- 
- DEFINE VARIABLE xx AS INTEGER NO-UNDO.
- DEFINE VARIABLE yy AS INTEGER NO-UNDO.
- DEFINE VARIABLE ii AS INTEGER NO-UNDO.
-
- DEFINE VARIABLE iBlockLine  AS INTEGER     NO-UNDO.
- DEFINE VARIABLE iNumLines   AS INTEGER     NO-UNDO.
- DEFINE VARIABLE iNumBlocks  AS INTEGER     NO-UNDO.
- DEFINE VARIABLE iTotalWidth AS INTEGER     NO-UNDO.
- DEFINE VARIABLE iSpace      AS INTEGER     NO-UNDO.
- DEFINE VARIABLE iRest       AS INTEGER     NO-UNDO.
-
- xx = {&border}.
- yy = 90.
- iBlockLine = 1.
-
- FOR EACH bfBlock:
-
-   CREATE BUTTON bfBlock.hButton
-     ASSIGN
-       X             = 1
-       Y             = 1
-       LABEL         = bfBlock.cBlockId
-       FRAME         = FRAME {&FRAME-NAME}:HANDLE
-       SENSITIVE     = TRUE
-       VISIBLE       = TRUE
-       WIDTH-PIXELS  = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBlock.cBlockId, getFont('default')) + 15
-       HEIGHT-PIXELS = 30
-       .
-   ON 'CHOOSE' OF bfBlock.hButton PERSISTENT RUN showDesc(bfBlock.cDesc).
-
-   /* Round width up to nearest multiple of 20 */
-   bfBlock.hButton:WIDTH-PIXELS = (TRUNCATE(bfBlock.hButton:WIDTH-PIXELS / 20,0) + 1) * 20.
-
-   /* See where it fits */
-   IF xx + bfBlock.hButton:WIDTH-PIXELS > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - {&border}) THEN
-   DO:
-     xx = {&border}.
-     yy = yy + bfBlock.hButton:HEIGHT-PIXELS + {&RowMargin}.
-     iBlockLine = iBlockLine + 1.
-     iNumLines = iBlockLine.
-   END.
-
-   bfBlock.hButton:X = xx.
-   bfBlock.hButton:Y = yy.
-   bfBlock.iLine = iBlockLine.
-   xx = xx + bfBlock.hButton:WIDTH-PIXELS + {&BlockMargin}.
-
- END.
-
- SESSION:DEBUG-ALERT = TRUE.
-
- /* Justify blocks */
- DO ii = 1 TO iNumLines:
-
-   /* How much buttons on a row */
-   iTotalWidth = 0.
-   iNumBlocks = 0.
-   FOR EACH bfBlock WHERE bfBlock.iLine = ii:
-     iTotalWidth = iTotalWidth + bfBlock.hButton:WIDTH-PIXELS.
-     iNumBlocks = iNumBlocks + 1.
-   END.
-
-   /* Extra space */
-   IF iNumBlocks > 0 THEN
-     iSpace = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth) / (iNumBlocks ).
-   ELSE 
-     iSpace = 0.
-
-   iRest = FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth - (iNumBlocks * iSpace).
-
-   /* Redraw buttons */
-   xx = {&border}.
-   FOR EACH bfBlock WHERE bfBlock.iLine = ii:
-
-     bfBlock.hButton:X = 1. /* to avoid errors while resizing */
-     bfBlock.hButton:WIDTH-PIXELS = bfBlock.hButton:WIDTH-PIXELS + iSpace + iRest.
-     iRest = 0.
-     bfBlock.hButton:X = xx.
-     xx = xx + bfBlock.hButton:WIDTH-PIXELS.
-
-     /* Register exact position */
-     ASSIGN 
-       bfBlock.x1 = bfBlock.hButton:X
-       bfBlock.y1 = bfBlock.hButton:Y 
-       bfBlock.x2 = bfBlock.hButton:X + bfBlock.hButton:WIDTH-PIXELS
-       bfBlock.y2 = bfBlock.hButton:Y + bfBlock.hButton:HEIGHT-PIXELS
-       .
-
-   END.
- END.
-
-/*  TEMP-TABLE bfBlock:WRITE-XML('file', 'c:\temp\TempTable.xml',YES,'utf-8', ?). */
-
-END PROCEDURE. /* buildBlocks */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load wAbout  _CONTROL-LOAD
 PROCEDURE control_load :
 /*------------------------------------------------------------------------------
@@ -742,6 +667,34 @@ ELSE MESSAGE "wAbout.wrx":U SKIP(1)
 &ENDIF
 
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createBricks wAbout 
+PROCEDURE createBricks :
+/* Build blocks on the screen via button widgets
+ */
+ DEFINE BUFFER bfBrick FOR ttBrick.
+ 
+ FOR EACH bfBrick:
+
+   CREATE FILL-IN bfBrick.hBrick
+     ASSIGN
+       X             = 1
+       Y             = 1
+       FONT          = getFont('fixed')
+       FRAME         = FRAME {&FRAME-NAME}:HANDLE
+       SENSITIVE     = TRUE
+       VISIBLE       = TRUE
+       WIDTH-PIXELS  = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBrick.cBlockId, getFont('fixed')) + 15
+       HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont('fixed')) + 8
+       FORMAT        = 'X(100)'
+       .
+
+ END.
+
+END PROCEDURE. /* createBricks */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -781,6 +734,7 @@ PROCEDURE enable_UI :
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   ENABLE btnDataDigger BtnOK edChangelog fiWebsite 
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
+  VIEW FRAME DEFAULT-FRAME IN WINDOW wAbout.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   DISPLAY edHint 
       WITH FRAME frHint IN WINDOW wAbout.
@@ -793,26 +747,53 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fadeWindow wAbout 
-PROCEDURE fadeWindow :
-DEFINE INPUT PARAMETER piStartValue AS INTEGER NO-UNDO.
-  DEFINE INPUT PARAMETER piEndValue   AS INTEGER NO-UNDO.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE gameOver wAbout 
+PROCEDURE gameOver :
+/* Game over
+ **/
+ gcGameStatus = 'Game Over'.
+ 
+ /* Disable ball mover */
+ chCtrlFrame:BallTimer:ENABLED = FALSE.  
+ MESSAGE 'Game Over' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+ 
+ RUN showTopScores.
+ APPLY 'CLOSE' TO THIS-PROCEDURE. 
 
-  DEFINE VARIABLE iTranparency AS INTEGER NO-UNDO.
+END PROCEDURE. /* gameOver */
 
-  IF piEndValue > piStartValue THEN 
-  DO iTranparency = piStartValue TO piEndValue by 24:
-    RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
-    RUN justWait(20).
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hitBottom wAbout 
+PROCEDURE hitBottom :
+/*------------------------------------------------------------------------------
+  Purpose:     
+  Parameters:  <none>
+  Notes:       
+------------------------------------------------------------------------------*/
+
+  DEFINE VARIABLE ii AS INTEGER     NO-UNDO.
+
+  DO ii = 1 TO 3:
+    RUN justWait(100).
+    FRAME {&FRAME-NAME}:BGCOLOR = 14.
+    RUN justWait(100).
+    FRAME {&FRAME-NAME}:BGCOLOR = ?.
   END.
 
-  ELSE
-  DO iTranparency = piStartValue TO piEndValue by -24:
-    RUN setTransparency( INPUT FRAME {&FRAME-NAME}:HANDLE, iTranparency).
-    RUN justWait(20).
+  giNumLives = giNumLives - 1.
+  IF giNumLives = 0 THEN 
+  DO:
+    RUN gameOver.
+  END.
+  ELSE 
+  DO:
+    RUN setBall(NO).
+    WAIT-FOR 'MOUSE-SELECT-CLICK' OF wAbout.
   END.
 
-END PROCEDURE. /* fadeWindow */
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -834,7 +815,14 @@ PROCEDURE initializeObject :
     fiDataDigger-2:FONT      = getFont('Fixed').
     edChangelog:FONT         = getFont('Fixed').
     fiTime:FONT              = getFont('Fixed').
+
     btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
+    imgBall:LOAD-IMAGE(getImagePath('Ball.gif')).
+    imgPaddle:LOAD-IMAGE(getImagePath('Paddle.gif')).
+
+    imgPaddle-2:LOAD-IMAGE(getImagePath('Paddle.gif')).
+    imgPaddle-3:LOAD-IMAGE(getImagePath('Paddle.gif')).
+    imgPaddle-4:LOAD-IMAGE(getImagePath('Paddle.gif')).
     
     /* Disable ball mover */
     chCtrlFrame:BallTimer:ENABLED = FALSE.  
@@ -884,24 +872,24 @@ PROCEDURE moveBall :
   Notes:       
 ------------------------------------------------------------------------------*/
 
-  DEFINE VARIABLE iNewX AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iNewY AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iMinY AS INTEGER NO-UNDO INITIAL 7.
-  DEFINE VARIABLE iMaxY AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iMinX AS INTEGER NO-UNDO INITIAL 7.
-  DEFINE VARIABLE iMaxX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iNewX    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iNewY    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMinY    AS INTEGER NO-UNDO INITIAL 7.
+  DEFINE VARIABLE iMaxY    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMinX    AS INTEGER NO-UNDO INITIAL 7.
+  DEFINE VARIABLE iMaxX    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iPaddleX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iPaddleY AS INTEGER NO-UNDO.
 
-  DEFINE BUFFER bfBlock FOR ttBlock.
-
-  IF FRAME {&FRAME-NAME}:BGCOLOR <> ? THEN FRAME {&FRAME-NAME}:BGCOLOR = ?.
+  DEFINE BUFFER bfBrick FOR ttBrick.
 
   /* Turn off events when we're running */
   IF gcGameStatus <> 'running' THEN RETURN.
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    iNewX = rcBall:X + 7.
-    iNewY = rcBall:Y + 7.
+    iNewX = imgBall:X + 7.
+    iNewY = imgBall:Y + 7.
     iMaxY = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 7.
     iMaxX = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 7.
 
@@ -916,15 +904,15 @@ PROCEDURE moveBall :
     END.
     ELSE 
     DO:
-      FIND FIRST bfBlock
-        WHERE iNewX > bfBlock.x1 AND iNewX < bfBlock.x2
-          AND iNewY > bfBlock.y1 AND iNewY < bfBlock.y2 NO-ERROR.
+      FIND FIRST bfBrick
+        WHERE iNewX > bfBrick.x1 AND iNewX < bfBrick.x2
+          AND iNewY > bfBrick.y1 AND iNewY < bfBrick.y2 NO-ERROR.
 
-      IF AVAILABLE bfBlock THEN
+      IF AVAILABLE bfBrick THEN
       DO:
         giBallX = giBallX * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
+        DELETE OBJECT bfBrick.hBrick.
+        DELETE bfBrick.
         RETURN.
       END.
     END.
@@ -936,58 +924,62 @@ PROCEDURE moveBall :
     IF iNewY <= iMinY OR iNewY >= iMaxY THEN 
     DO:
       /* flash when bottom is hit */
-      IF iNewY >= iMaxY THEN FRAME {&FRAME-NAME}:BGCOLOR = 14.
+      IF iNewY >= iMaxY THEN RUN hitBottom.
       giBallY = giBallY * -1.
       RETURN.
     END.
     ELSE 
     DO:
-      FIND FIRST bfBlock
-        WHERE iNewX > bfBlock.x1 AND iNewX < bfBlock.x2 
-          AND iNewY > bfBlock.y1 AND iNewY < bfBlock.y2 NO-ERROR.
+      FIND FIRST bfBrick
+        WHERE iNewX > bfBrick.x1 AND iNewX < bfBrick.x2 
+          AND iNewY > bfBrick.y1 AND iNewY < bfBrick.y2 NO-ERROR.
   
-      IF AVAILABLE bfBlock THEN
+      IF AVAILABLE bfBrick THEN
       DO:
         giBallY = giBallY * -1.
-        DELETE OBJECT bfBlock.hButton.
-        DELETE bfBlock.
+        DELETE OBJECT bfBrick.hBrick.
+        DELETE bfBrick.
         RETURN.
       END.
     END.
 
-    /* hit the bat? */
-    IF    iNewY >= rcBar:Y 
-      AND iNewY <= rcBar:Y + rcBall:HEIGHT-PIXELS 
-      AND iNewX >= rcBar:X 
-      AND iNewX <= rcBar:X + 70 THEN
+    /* hit the paddle? */
+    ASSIGN 
+      iPaddleX = imgPaddle:X 
+      iPaddleY = imgPaddle:Y.
+
+    IF    iNewY >= iPaddleY - 10
+      AND iNewY <= iPaddleY + imgBall:HEIGHT-PIXELS 
+      AND iNewX >= iPaddleX 
+      AND iNewX <= iPaddleX + 70 THEN
     DO:
 
-      /* Right side ball hits left side of bat */
-      IF    iNewX >= rcBar:X 
-        AND iNewX <= rcBar:X + 20 THEN 
+      /* Right side ball hits left side of paddle */
+      IF    iNewX >= iPaddleX 
+        AND iNewX <= iPaddleX + 20 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = -3 - (RANDOM(1,3) * 2).
 
       ELSE
-      /* Ball hits center of bat */
-      IF    iNewX >= rcBar:X + 20
-        AND iNewX <= rcBar:X + 50 THEN 
+      /* Ball hits center of paddle */
+      IF    iNewX >= iPaddleX + 20
+        AND iNewX <= iPaddleX + 50 THEN 
         ASSIGN 
           giBallY = giBallY * -1.
 
       ELSE
-      /* Left side of ball hits right side of bat */
-      IF    iNewX >= rcBar:X + 50
-        AND iNewX <= rcBar:X + 70 THEN 
+      /* Left side of ball hits right side of paddle */
+      IF    iNewX >= iPaddleX + 50
+        AND iNewX <= iPaddleX + 70 THEN 
         ASSIGN 
           giBallY = giBallY * -1
           giBallX = 3 + (RANDOM(1,3) * 2).
 
     END.
 
-    rcBall:X = iNewX - 7.
-    rcBall:Y = iNewY - 7.
+    imgBall:X = iNewX - 7.
+    imgBall:Y = iNewY - 7.
   END.
 
 END PROCEDURE. /* moveBall */
@@ -995,8 +987,8 @@ END PROCEDURE. /* moveBall */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBar wAbout 
-PROCEDURE moveBar :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE movePaddle wAbout 
+PROCEDURE movePaddle :
 /*------------------------------------------------------------------------------
   Purpose:     
   Parameters:  <none>
@@ -1005,46 +997,12 @@ PROCEDURE moveBar :
   DEFINE INPUT PARAMETER piMove AS INTEGER NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
-    IF    rcBar:X + piMove > 0 
-      AND rcBar:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - rcBar:WIDTH-PIXELS - 10) THEN
-      rcBar:X = rcBar:X + piMove.
+    IF    imgPaddle:X + piMove > 0 
+      AND imgPaddle:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - imgPaddle:WIDTH-PIXELS - 10) THEN
+      imgPaddle:X = imgPaddle:X + piMove.
   END.
 
-END PROCEDURE. /* moveBar */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE playGame wAbout 
-PROCEDURE playGame :
-/* Play some game ...
- */  
-
-  DO WITH FRAME {&FRAME-NAME}:
-
-    /* Enable cursor movement of bar */
-    ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveBar(+20).
-    ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN moveBar(-20).
-
-    /* Wait for game to start via 'I get it' button */
-    REPEAT WHILE gcGameStatus = '':
-      PROCESS EVENTS. 
-    END.
-
-    /* Game is on! */
-    #Game:
-    REPEAT:
-      IF NOT FRAME {&FRAME-NAME}:VISIBLE THEN LEAVE #Game.
-
-      PROCESS EVENTS. 
-/*       RUN justWait(5). */
-      
-
-    END.
-
-  END.
-
-END PROCEDURE. /* playGame */
+END PROCEDURE. /* movePaddle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1068,8 +1026,12 @@ PROCEDURE prepareWindow :
   DEFINE VARIABLE iEndEdW   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumSteps AS INTEGER     NO-UNDO INITIAL 50.
 
+  /* debug */
+  IF glDebugRun THEN iNumSteps = 1. 
+
   DO WITH FRAME {&FRAME-NAME}:
-    BtnOK:VISIBLE = NO.
+    BtnOK:VISIBLE         = NO.
+    fiWebsite:VISIBLE     = FALSE.
 
     ASSIGN 
       iStartH = wAbout:HEIGHT-PIXELS
@@ -1106,10 +1068,8 @@ PROCEDURE prepareWindow :
       RUN justWait(5).
     END.
 
-    edChangelog:VISIBLE   = FALSE.
-    edChangelog:SENSITIVE = FALSE.
-    fiTime:VISIBLE        = TRUE.
-    fiWebsite:VISIBLE     = FALSE.
+    fiTime:VISIBLE = TRUE.
+    edChangelog:VISIBLE = FALSE.
   END.
 
 END PROCEDURE. /* prepareWindow */
@@ -1121,12 +1081,16 @@ END PROCEDURE. /* prepareWindow */
 PROCEDURE readAboutFile :
 /* Build blocks with names of all contributors 
  **/
-  DEFINE VARIABLE cLine     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName     AS CHARACTER   NO-UNDO.
-  DEFINE BUFFER bfBlock FOR ttBlock.
+  DEFINE VARIABLE cLine  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE ii     AS INTEGER     NO-UNDO.
+  DEFINE BUFFER bfBrick FOR ttBrick.
 
   INPUT FROM 'DataDigger.txt'.
-  SEEK INPUT TO 300. /* random nr after header */
+  REPEAT:
+    IMPORT UNFORMATTED cLine.
+    IF cLine BEGINS '====' THEN LEAVE. 
+  END.
   
   REPEAT:
     IMPORT UNFORMATTED cLine.
@@ -1135,15 +1099,14 @@ PROCEDURE readAboutFile :
     cName = TRIM( ENTRY(NUM-ENTRIES(cLine,'('),cLine,'(' ), ')').
     IF cName = '' THEN NEXT.  /* blank name */
 
-    FIND bfBlock WHERE bfBlock.cBlockId = cName NO-ERROR.
-    IF NOT AVAILABLE bfBlock THEN
-    DO:
-      CREATE bfBlock.
-      ASSIGN bfBlock.cBlockId = cName. 
+    DO ii = 1 TO NUM-ENTRIES(cName):
+      FIND bfBrick WHERE bfBrick.cBlockId = ENTRY(ii,cName) NO-ERROR.
+      IF NOT AVAILABLE bfBrick THEN
+      DO:
+        CREATE bfBrick.
+        ASSIGN bfBrick.cBlockId = ENTRY(ii,cName). 
+      END.
     END.
-
-    ASSIGN 
-      bfBlock.cDesc  = TRIM(bfBlock.cDesc + '~n' + REPLACE(cLine,'(' + cName + ')', ''), '~n').
   END.
   
   INPUT CLOSE. 
@@ -1157,6 +1120,8 @@ END PROCEDURE. /* readAboutFile */
 PROCEDURE setBall :
 /* Set the ball to its place with a nice bounce 
 */  
+  DEFINE INPUT  PARAMETER plBounceBall AS LOGICAL NO-UNDO.
+
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT 1. /* hor speed */
@@ -1165,18 +1130,19 @@ PROCEDURE setBall :
   DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
 
   DO WITH FRAME {&FRAME-NAME}:
-    rcBar:X = 280.
-    rcBar:Y = 766.
-    rcBar:VISIBLE = TRUE.
+    imgPaddle:X = 280.
+    imgPaddle:Y = 766.
+    imgPaddle:VISIBLE = TRUE.
 
-    rcBall:X = 1.
-    rcBall:Y = 575.
-    rcBall:VISIBLE = TRUE.
+    imgBall:X = 1.
+    imgBall:Y = 575.
+    imgBall:VISIBLE = TRUE.
 
-    yy = rcBall:Y.
-    xx = rcBall:X.
+    yy = imgBall:Y.
+    xx = imgBall:X.
   END.
 
+  IF plBounceBall THEN
   REPEAT:
     /* Normal flow */
     dy = dy + grav.
@@ -1184,46 +1150,176 @@ PROCEDURE setBall :
     yy = yy + dy.
     
     /* Bounce at bottom of frame */
-    IF xx < 280 AND yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS) THEN
+    IF xx < 280 AND yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - imgBall:HEIGHT-PIXELS) THEN
     DO:
-      yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - rcBall:HEIGHT-PIXELS.
+      yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - imgBall:HEIGHT-PIXELS.
       dy = -1 * dy.
       dy = dy * elas.
       IF xx > 305 THEN LEAVE. 
     END.
 
     /* Bounce at the bat */
-    IF xx > 280 AND yy > (rcBar:Y - rcBall:HEIGHT-PIXELS) THEN
+    IF xx > 280 AND yy > (imgPaddle:Y - imgBall:HEIGHT-PIXELS) THEN
     DO:
-      yy = rcBar:Y - rcBall:HEIGHT-PIXELS.
+      yy = imgPaddle:Y - imgBall:HEIGHT-PIXELS.
       dy = -1 * dy.
       dy = dy * elas * elas * elas.
       dx = dx * elas.
       IF xx > 305 THEN LEAVE. 
     END.
 
-    rcBall:X = xx.
-    rcBall:Y = yy.
+    imgBall:X = xx.
+    imgBall:Y = yy.
 
-    .RUN justWait(12).
+    /* debug */
+    IF NOT glDebugRun THEN RUN justWait(9).
   END. 
 
-  rcBall:X = 305.
+  imgBall:X = 305.
+  imgBall:Y = imgPaddle:Y - imgBall:HEIGHT-PIXELS.
+  RUN justWait(500).
 
-  /* Move ball and bat to center */
-  REPEAT WHILE rcBall:X < (FRAME {&FRAME-NAME}:WIDTH-PIXELS / 2):
-    rcBall:X = rcBall:X + 5.
-    rcBar:X = rcBar:X + 5.
-    .RUN justWait(12).
+  /* Move ball and paddle to center */
+  REPEAT WHILE imgBall:X < (FRAME {&FRAME-NAME}:WIDTH-PIXELS / 2):
+    imgBall:X = imgBall:X + 5.
+    imgPaddle:X = imgPaddle:X + 5.
+    IF NOT glDebugRun THEN RUN justWait(12).
   END.
+
+  /* Show spare paddles */
+  imgPaddle-2:X = 10.
+  imgPaddle-2:Y = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 15.
+  imgPaddle-2:VISIBLE = (giNumLives >= 1).
+
+  imgPaddle-3:X = imgPaddle-2:X + 30.
+  imgPaddle-3:Y = imgPaddle-2:Y.
+  imgPaddle-3:VISIBLE = (giNumLives >= 2).
+
+  imgPaddle-4:X = imgPaddle-3:X + 30.
+  imgPaddle-4:Y = imgPaddle-3:Y.
+  imgPaddle-4:VISIBLE = (giNumLives >= 3).
+
+  /* Enable cursor movement of paddle */
+  ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN movePaddle(+20).
+  ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN movePaddle(-20).
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBar wAbout 
-PROCEDURE setBar :
-DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBricks wAbout 
+PROCEDURE setBricks :
+/* Build blocks on the screen via button widgets
+ */
+ DEFINE BUFFER bfBrick FOR ttBrick.
+ 
+ &GLOBAL-DEFINE Border      30
+ &GLOBAL-DEFINE RowMargin   10
+ &GLOBAL-DEFINE BlockMargin 10
+ 
+ DEFINE VARIABLE xx AS INTEGER NO-UNDO.
+ DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+ DEFINE VARIABLE ii AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iBgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [10,11,12,13,14,2,9].
+ DEFINE VARIABLE iFgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [0,0,0,0,0,15,15].
+ DEFINE VARIABLE iColor   AS INTEGER NO-UNDO.
+
+ DEFINE VARIABLE iBlockLine  AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iNumLines   AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iNumBlocks  AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iTotalWidth AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iFreeSpace  AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iRest       AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iSpaces     AS INTEGER     NO-UNDO.
+
+ xx = {&border}.
+ yy = 90.
+ iBlockLine = 1.
+
+ FOR EACH bfBrick:
+
+   /* Set brick to a safe position so we can resize it */
+   bfBrick.hBrick:X = 1.
+   bfBrick.hBrick:Y = 1.
+
+   bfBrick.hBrick:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBrick.cBlockId, getFont('fixed')) + 10.
+   bfBrick.hBrick:SCREEN-VALUE = bfBrick.cBlockId.
+
+   /* See where it fits */
+   IF xx + bfBrick.hBrick:WIDTH-PIXELS > (FRAME {&FRAME-NAME}:WIDTH-PIXELS - {&border}) THEN
+   DO:
+     xx = {&border}.
+     yy = yy + bfBrick.hBrick:HEIGHT-PIXELS + {&RowMargin}.
+     iBlockLine = iBlockLine + 1.
+     iNumLines = iBlockLine.
+   END.
+
+   iColor = (iBlockLine MOD 7) + 1.
+   bfBrick.hBrick:BGCOLOR = iBgColor[iColor].
+   bfBrick.hBrick:FGCOLOR = iFgColor[iColor].
+
+   bfBrick.hBrick:X = xx.
+   bfBrick.hBrick:Y = yy.
+   bfBrick.iLine = iBlockLine.
+   xx = xx + bfBrick.hBrick:WIDTH-PIXELS + {&BlockMargin}.
+ END.
+
+ /* Justify blocks */
+ DO ii = 1 TO iNumLines:
+
+   /* How much buttons on a row */
+   iTotalWidth = 0.
+   iNumBlocks = 0.
+   FOR EACH bfBrick WHERE bfBrick.iLine = ii:
+     iTotalWidth = iTotalWidth + bfBrick.hBrick:WIDTH-PIXELS.
+     iNumBlocks = iNumBlocks + 1.
+   END.
+
+   /* Extra space */
+   IF iNumBlocks > 0 THEN
+     iFreeSpace = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth) / (iNumBlocks ).
+   ELSE 
+     iFreeSpace = 0.
+
+   iRest = FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth - (iNumBlocks * iFreeSpace).
+
+   /* Redraw buttons */
+   xx = {&border}.
+   FOR EACH bfBrick WHERE bfBrick.iLine = ii:
+
+     bfBrick.hBrick:X = 1. /* to avoid errors while resizing */
+     bfBrick.hBrick:WIDTH-PIXELS = bfBrick.hBrick:WIDTH-PIXELS + iFreeSpace + iRest.
+     iRest = 0.
+     bfBrick.hBrick:X = xx.
+     xx = xx + bfBrick.hBrick:WIDTH-PIXELS.
+
+     /* Justify text */
+     iSpaces = ((bfBrick.hBrick:WIDTH-PIXELS - FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBrick.cBlockId, getFont('fixed'))) / 2)
+               / FONT-TABLE:GET-TEXT-WIDTH-PIXELS(' ', getFont('fixed')).
+
+     bfBrick.hBrick:SCREEN-VALUE = FILL(' ', iSpaces) + bfBrick.cBlockId.
+
+     /* Register exact position */
+     ASSIGN 
+       bfBrick.x1 = bfBrick.hBrick:X
+       bfBrick.y1 = bfBrick.hBrick:Y 
+       bfBrick.x2 = bfBrick.hBrick:X + bfBrick.hBrick:WIDTH-PIXELS
+       bfBrick.y2 = bfBrick.hBrick:Y + bfBrick.hBrick:HEIGHT-PIXELS
+       .
+   END.
+ END.
+
+END PROCEDURE. /* setBricks */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPaddle wAbout 
+PROCEDURE setPaddle :
+/* Adjust paddle position to mouse
+  */
+  DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
@@ -1231,45 +1327,29 @@ DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
     RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
 
     IF giOldMouseX <> iMouseX
-      AND iMouseX > (rcBar:WIDTH-PIXELS / 2) 
-      AND iMouseX < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (rcBar:WIDTH-PIXELS / 2)) THEN 
+      AND iMouseX > (imgPaddle:WIDTH-PIXELS / 2) 
+      AND iMouseX < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (imgPaddle:WIDTH-PIXELS / 2)) THEN 
     DO:
-      rcBar:X = iMouseX - (rcBar:WIDTH-PIXELS / 2).
+      imgPaddle:X = iMouseX - (imgPaddle:WIDTH-PIXELS / 2).
       giOldMouseX = iMouseX.
     END.                   
   END.
 
-END PROCEDURE. /* setBar */
+END PROCEDURE. /* setPaddle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTime wAbout 
 PROCEDURE setTime :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Show elapsed time since start of game
+ **/
 
-/*   DO WITH FRAME {&FRAME-NAME}: */
-/*     fiTime:SCREEN-VALUE = STRING((MTIME - giGameStarted) / 1000,'>>>9.9'). */
-/*   END. */
+  DO WITH FRAME {&FRAME-NAME}:
+    fiTime:SCREEN-VALUE = STRING((MTIME - giGameStarted) / 1000,'>>>9.9').
+  END.
 
 END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDesc wAbout 
-PROCEDURE showDesc :
-/* Show contributions of a user
- */
-  DEFINE INPUT PARAMETER pcText AS CHARACTER NO-UNDO.
-
-  MESSAGE pcText VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
-END PROCEDURE. /* showDesc */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1297,14 +1377,32 @@ END PROCEDURE.
 PROCEDURE showLog :
 /* Play arkanoid-like game 
  */ 
+  gcGameStatus = 'waiting'.
+
   RUN prepareWindow.
   RUN readAboutFile.
-  RUN buildBlocks.
-  RUN setBall.
+  RUN createBricks.
+  RUN setBricks.
+  RUN setBall(YES).
   RUN showHint.
-  RUN playGame.
   
 END PROCEDURE. /* showLog */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTopScores wAbout 
+PROCEDURE showTopScores :
+/*------------------------------------------------------------------------------
+  Purpose:     
+  Parameters:  <none>
+  Notes:       
+------------------------------------------------------------------------------*/
+
+  MESSAGE 'Top scores go here'
+    VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
