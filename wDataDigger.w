@@ -2259,7 +2259,7 @@ OR "CTRL-SHIFT-A" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("About"). /* user behaviour */
   HIDE FRAME frSettings.
-  RUN value(getProgramDir() + 'dAbout.w') PERSISTENT.
+  RUN value(getProgramDir() + 'wAbout.w').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -5246,7 +5246,23 @@ PROCEDURE convertSettings :
     WHEN 20 THEN
     DO:
       OS-DELETE wEdit.wrx.
-    END.
+    END. /* 20 */
+    
+    WHEN 21 THEN
+    DO:
+      /* Nothing for version 21 */
+    END. /* 21 */
+    
+    WHEN 22 THEN
+    DO:
+      OS-DELETE dAbout.w.
+      OS-DELETE dAbout.r.
+      OS-DELETE images/default_Tab_About_Active.gif.
+      OS-DELETE images/default_Tab_About_Inactive.gif.
+      OS-DELETE images/default_Tab_Changes_Active.gif.
+      OS-DELETE images/default_Tab_Changes_Inactive.gif.
+    END. /* 22 */
+    
   END CASE. /* old version */
 
   SESSION:SET-WAIT-STATE("").
@@ -12006,4 +12022,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
