@@ -32,7 +32,8 @@ DO:
 END.
     
 ELSE
-IF (cRemoteBuildNr > cLocalBuildNr)
+IF    (cRemoteVersion = cLocalVersion)
+  AND (cRemoteBuildNr > cLocalBuildNr)
   AND (plManualCheck OR piChannel = {&CHECK-BETA}) THEN
 DO:
   OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
@@ -42,8 +43,8 @@ END.
 /* In case of a manual check, report what is found */
 ELSE
 IF plManualCheck
-  AND cRemoteVersion = cLocalVersion
-  AND cRemoteBuildNr = cLocalBuildNr THEN
+  AND cRemoteVersion <= cLocalVersion
+  AND cRemoteBuildNr <= cLocalBuildNr THEN
 DO:
   MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
 END.

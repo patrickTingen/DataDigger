@@ -23,10 +23,18 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 { resizable_dict.i } /* thanks to Sebastien Lacroix */
 
+/* Constants for page numbers */
 &GLOBAL-DEFINE PAGE-TABLES     1
 &GLOBAL-DEFINE PAGE-FAVOURITES 2
 &GLOBAL-DEFINE PAGE-FIELDS     3
 &GLOBAL-DEFINE PAGE-INDEXES    4
+
+/* Constants for arrows in hint frame */
+&GLOBAL-DEFINE ARROW-NONE       0
+&GLOBAL-DEFINE ARROW-LEFT-UP    1
+&GLOBAL-DEFINE ARROW-RIGHT-UP   2
+&GLOBAL-DEFINE ARROW-RIGHT-DOWN 3
+&GLOBAL-DEFINE ARROW-LEFT-DOWN  4
 
 /* TT for the generic timer OCX */
 DEFINE TEMP-TABLE ttTimer NO-UNDO RCODE-INFORMATION
@@ -7692,10 +7700,8 @@ PROCEDURE initializeSettingsFile :
   IF   getRegistry("DataDigger:Backup", "BackupDir") = ?
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<PROGDIR>\Backup\").
 
-  /* Update check, set to check on STABLE (to BETA for the beta testers) */
-  IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN
-    IF '{&version}' = '20' THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
-                           ELSE setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
+  /* Update check, set to check on STABLE */
+  IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
 
   {&timerStop}
 END PROCEDURE. /* initializeSettingsFile */
@@ -10692,32 +10698,32 @@ PROCEDURE showHint :
     RUN showScrollBars(FRAME frHint:HANDLE, NO, NO).
 
     FRAME frHint:PRIVATE-DATA = STRING(phWidget).
-    FRAME frHint:VISIBLE = TRUE.
+    FRAME frHint:VISIBLE = FALSE.
     FRAME frHint:MOVE-TO-TOP().
 
     CASE piLayout:
       /* point nowhere */
-      WHEN 0 THEN ASSIGN
+      WHEN {&ARROW-NONE} THEN ASSIGN
                     iOffsetX = (phWidget:WIDTH-PIXELS - FRAME frHint:WIDTH-PIXELS) / 2
                     iOffsetY = (phWidget:HEIGHT-PIXELS - FRAME frHint:HEIGHT-PIXELS) / 2.
 
       /* point left up */
-      WHEN 1 THEN ASSIGN
+      WHEN {&ARROW-LEFT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right up */
-      WHEN 2 THEN ASSIGN
+      WHEN {&ARROW-RIGHT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right down */
-      WHEN 3 THEN ASSIGN
+      WHEN {&ARROW-RIGHT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.
 
       /* point left down */
-      WHEN 4 THEN ASSIGN
+      WHEN {&ARROW-LEFT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.
     END CASE.
@@ -10748,7 +10754,7 @@ PROCEDURE showHint :
      * correct position. Then, relocate the editor if needed.
      */
     CASE piLayout:
-      WHEN 0 THEN
+      WHEN {&ARROW-NONE} THEN
       DO:
         imgArrow:LOAD-IMAGE(getImagePath("DataDigger24x24.gif")).
         ASSIGN
@@ -10758,7 +10764,7 @@ PROCEDURE showHint :
           .
       END.
 
-      WHEN 1 THEN
+      WHEN {&ARROW-LEFT-UP} THEN
       DO:
         imgArrow:LOAD-IMAGE(getImagePath("LeftUp.gif")).
         ASSIGN
@@ -10768,7 +10774,7 @@ PROCEDURE showHint :
           .
       END.
 
-      WHEN 2 THEN
+      WHEN {&ARROW-RIGHT-UP} THEN
       DO:
         imgArrow:LOAD-IMAGE(getImagePath("RightUp.gif")).
         ASSIGN
@@ -10778,7 +10784,7 @@ PROCEDURE showHint :
           .
       END.
 
-      WHEN 3 THEN
+      WHEN {&ARROW-RIGHT-DOWN} THEN
       DO:
         imgArrow:LOAD-IMAGE(getImagePath("RightDown.gif")).
         ASSIGN
@@ -10788,7 +10794,7 @@ PROCEDURE showHint :
           .
       END.
 
-      WHEN 4 THEN
+      WHEN {&ARROW-LEFT-DOWN} THEN
       DO:
         imgArrow:LOAD-IMAGE(getImagePath("LeftDown.gif")).
         ASSIGN
@@ -10800,7 +10806,7 @@ PROCEDURE showHint :
     END CASE.
 
     /* Button label */
-    IF piLayout = 0 THEN
+    IF piLayout = {&ARROW-NONE} THEN
       btGotIt:LABEL = "Ok".
     ELSE
       btGotIt:LABEL = "I Got it".
@@ -10809,14 +10815,15 @@ PROCEDURE showHint :
     btGotIt:WIDTH = LENGTH(btGotIt:LABEL) + 4.
     btGotIt:X = (FRAME frHint:WIDTH-PIXELS / 2 - btGotIt:WIDTH-PIXELS / 2).
 
+    edHint:SCREEN-VALUE IN FRAME frHint = pcText.
+    FRAME frHint:VISIBLE = TRUE. 
+
     /* Animation. Needless, but fun to program :) */
     DO iStep = 1 TO 25:
       RUN doNothing(10).
       FRAME frHint:X = FRAME frHint:X + ((iTargetX - FRAME frHint:X) / 25 * iStep).
       FRAME frHint:Y = FRAME frHint:Y + ((iTargetY - FRAME frHint:Y) / 25 * iStep).
     END.
-
-    edHint:SCREEN-VALUE IN FRAME frHint = pcText.
 
     WAIT-FOR "choose" OF btGotIt IN FRAME frHint
       OR CLOSE OF THIS-PROCEDURE
@@ -10847,47 +10854,46 @@ PROCEDURE showNewFeatures :
     /* This will be checked within showHint */
     glHintCancelled = FALSE.
 
-    RUN showHint(C-Win:HANDLE, 0, "~nWelcome to the new Digger!~n~nLet's see what's new").
+    /* New in 23 
+    
+    - New : Support for SQL Server
+    - New : Multi-sort on data columns now possible
+    - New : Row coloring now depending on chosen sort
+    - New : Right-click on data browse now shows total, min, max, avg of selected rows
+
+    &GLOBAL-DEFINE ARROW-NONE       0
+    &GLOBAL-DEFINE ARROW-LEFT-UP    1
+    &GLOBAL-DEFINE ARROW-RIGHT-UP   2
+    &GLOBAL-DEFINE ARROW-RIGHT-DOWN 3
+    &GLOBAL-DEFINE ARROW-LEFT-DOWN  4
+    */
+
+    /* Multi-sort on data columns now possible */
+    FOR EACH bColumn:
+      IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
+      iColumnNr = iColumnNr + 1.
+      IF iColumnNr > 1 THEN 
+      DO:
+        RUN showHint(bColumn.hColumn, {&ARROW-LEFT-UP}, "~nUse CONTROL + CLICK to add up to 9 sort levels").
+        IF glHintCancelled THEN LEAVE demoLoop.
+        LEAVE.
+      END.
+    END.
+
+    /* Sort button */
+    RUN showHint(btnDataSort:HANDLE IN FRAME frData, {&ARROW-LEFT-DOWN}, "~nOr maintain them here").
     IF glHintCancelled THEN LEAVE demoLoop.
 
-    /* Tools manu */
-    RUN showHint(btnTools:HANDLE, 1, "~nThe tool buttons have been moved to their own menu").
+    /* Right-click on data browse now shows total, min, max, avg of selected rows */
+    RUN showHint(ghDataBrowse, {&ARROW-RIGHT-DOWN}, "~nShow Total/Min/Max/Avg of selected rows on right-click").
     IF glHintCancelled THEN LEAVE demoLoop.
-    APPLY 'choose' TO btnTools.
-    RUN setTimer("hideSettingsFrame",0). /* to disable the auto-hide */
-    RUN showHint(btnDataAdmin-txt:HANDLE IN FRAME frSettings, 1, "~nAnd the menu has been cleaned up a bit").
-    APPLY 'choose' TO btnTools.
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* Clone options */
-    RUN showHint(brTables:HANDLE, 1, "~nRight-click on a table name to dump a table .df or to clone the database structure").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* Edit screen */
-    RUN setPage({&PAGE-TABLES}).
-    RUN showHint(btnEdit:HANDLE, 4, "~nThe edit screen has been improved and now also includes a date picker ").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* Load data */
-    RUN showHint(btnLoad:HANDLE, 4, "~nYes, you can now actually LOAD data into the database").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* Favorite tables */
-    RUN setPage({&PAGE-TABLES}).
-    RUN showHint(btnTabFavourites:HANDLE, 1, "~nSet your favourite tables and switch between all tables and favourites view.").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    RUN setPage({&PAGE-FAVOURITES}).
-    RUN showHint(btnFavourite:HANDLE, 4, "~nThis star shows when a table is also a favourite. Click to add or remove a table from the favourites.").
-    RUN setPage({&PAGE-TABLES}).
-    IF glHintCancelled THEN LEAVE demoLoop.
-
+    
     /* feedback */
-    RUN showHint(fiFeedback:HANDLE, 3, "~nGot some tips, bugs, questions or something to say? Click this one to mail me").
+    RUN showHint(fiFeedback:HANDLE, 3, "~nGot some feedback? ~nClick here to mail me").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* Done! */
-    RUN showHint(C-Win:HANDLE, 0, "~n That's it, happy Digging!").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
   END.
 
   /* back to normal */
@@ -10993,24 +10999,22 @@ PROCEDURE showTour :
    */
   hintBlock:
   DO WITH FRAME frMain:
-    RUN showHint(C-Win:HANDLE, 0, "~nWelcome to the DataDigger!~n~nGet ready for the 1-minute-tour").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nWelcome to the DataDigger 1 minute tour").
     IF glHintCancelled THEN LEAVE hintBlock.
 
     /* Select a table and show data */
     RUN setPage({&PAGE-TABLES}).
 
-    RUN showHint(brTables:HANDLE     , 1, "~nHere are all tables of the currently connected databases").
-    RUN showHint(fiTableFilter:HANDLE, 1, "~nType in (a part of) the table name to filter the browse").
-    RUN showHint(btnViewData:HANDLE  , 3, "~nThen press enter or click this button to show the data in this table").
+    RUN showHint(brTables:HANDLE     , {&ARROW-LEFT-UP}   , "~nHere are all tables of the currently connected databases").
+    RUN showHint(fiTableFilter:HANDLE, {&ARROW-LEFT-UP}   , "~nType in (a part of) the table name to filter the browse").
+    RUN showHint(btnFavourite:HANDLE , {&ARROW-LEFT-DOWN} , "~nMark tables as favourite").
+    RUN showHint(ficWhere:HANDLE,      {&ARROW-RIGHT-UP}  , "~nYour custom query goes here ...").
+    RUN showHint(btnViewData:HANDLE  , {&ARROW-RIGHT-DOWN}, "~nPress enter or click this button to show the data").
 
     /* Filter fields */
-    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(1), 1, "~nHide fields from the data browse by deselecting them here").
-
-    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(5), 2, "~nClick on the format to change it on the fly").
-    RUN showHint(btnReset:HANDLE                     , 2, "~nRe-arrange fields with the buttons in this panel").
-
-    /* Filter data */
-    RUN showHint(ficWhere:handle, 4 , "~nYour custom query goes here ...").
+    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(1), {&ARROW-LEFT-UP}, "~nHide fields by deselecting them here").
+    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(5), {&ARROW-RIGHT-UP}, "~nClick on the format to change it on the fly").
+    RUN showHint(btnReset:HANDLE                     , {&ARROW-RIGHT-UP}, "~nRe-arrange fields with the buttons in this panel").
 
     /* Let the hint frame point to the 2nd visible filter instead of the 1st */
     FOR EACH bColumn:
@@ -11018,40 +11022,42 @@ PROCEDURE showTour :
       iColumn = iColumn + 1.
       IF iColumn > 1 THEN
       DO:
-        RUN showHint(bColumn.hFilter, 1, "~nOr simply filter data by filling in one of the filter boxes. Your filters are saved for easy re-use").
+        RUN showHint(bColumn.hFilter, {&ARROW-LEFT-UP}, "~nFilter data by filling in the filter boxes. Your filters are saved for re-use").
         LEAVE.
       END.
     END.
 
     /* Confess the lie */
-    RUN showHint(C-Win:HANDLE, 0, "~nOk, I lied~n~nIt takes more than 1 minute, but you're almost done now!").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nOk, I lied :)~nIt's more than 1 minute, but you're almost done!").
 
     /* Resize bar */
-    RUN showHint(btnResizeVer:HANDLE, 2, "~nDrag this bar up and down to change the size of the upper browse.").
+    RUN showHint(btnResizeVer:HANDLE, {&ARROW-RIGHT-UP}, "~nDrag this bar up and down to change the size of the upper browse.").
 
     iColumn = 0.
     FOR EACH bColumn:
       IF NOT bColumn.hColumn:VISIBLE THEN NEXT.
       iColumn = iColumn + 1.
-      IF iColumn = 1 THEN
-        RUN showHint(bColumn.hColumn, 4, "~nClick on a column header to sort on that column. Again to change the sort").
+      IF iColumn = 1 THEN DO:
+        RUN showHint(bColumn.hColumn,   {&ARROW-LEFT-DOWN}, "~nClick on a column header to sort on that column. Again to change the sort").
+        RUN showHint(btnDataSort:HANDLE IN FRAME frData,{&ARROW-LEFT-UP}, "~nUse CONTROL + CLICK or this button to add up to 9 sort levels").
+      END.
       ELSE
       IF iColumn = 2 THEN
-        RUN showHint(bColumn.hColumn, 4, "~nOr grab the side of a column to resize it.").
+        RUN showHint(bColumn.hColumn, {&ARROW-LEFT-DOWN}, "~nGrab the side of a column to resize it.").
       ELSE
         LEAVE.
     END.
 
-    RUN showHint(btnQueries:HANDLE, 2, "~nYour queries are saved here for re-use (hint: try PGUP/PGDN in the query box)").
+    RUN showHint(btnQueries:HANDLE, {&ARROW-RIGHT-UP}, "~nQueries are saved here for re-use (hint: try PGUP / PGDN in the query box)").
 
     /* Manipulate data */
-    RUN showHint(btnEdit:HANDLE   , 4, "~nAdd, update, clone, delete, dump records easily using these buttons").
+    RUN showHint(btnEdit:HANDLE   , {&ARROW-LEFT-DOWN}, "~nAdd, update, clone, delete, dump records easily using these buttons").
 
     /* Extra options */
-    RUN showHint(btnTools:HANDLE  , 1, "~nOk, last tip. Use this one for settings and extra tools").
+    RUN showHint(btnTools:HANDLE  , {&ARROW-LEFT-UP}, "~nOk, last tip. Use this for settings and extra tools").
 
     /* Done! */
-    RUN showHint(C-Win:HANDLE, 0, "~n That's it, happy Digging!").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
 
     FRAME frHint:VISIBLE = FALSE.
   END.
@@ -12022,3 +12028,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
