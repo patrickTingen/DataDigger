@@ -1216,7 +1216,7 @@ PROCEDURE setBricks :
  
  &GLOBAL-DEFINE Border      30
  &GLOBAL-DEFINE RowMargin   10
- &GLOBAL-DEFINE BlockMargin 10
+ &GLOBAL-DEFINE BlockMargin 50
  
  DEFINE VARIABLE xx AS INTEGER NO-UNDO.
  DEFINE VARIABLE yy AS INTEGER NO-UNDO.
@@ -1227,11 +1227,11 @@ PROCEDURE setBricks :
 
  DEFINE VARIABLE iBlockLine  AS INTEGER NO-UNDO.
  DEFINE VARIABLE iNumLines   AS INTEGER NO-UNDO.
- DEFINE VARIABLE iNumBlocks  AS INTEGER NO-UNDO.
+ DEFINE VARIABLE iNumBricks  AS INTEGER NO-UNDO.
  DEFINE VARIABLE iTotalWidth AS INTEGER NO-UNDO.
  DEFINE VARIABLE iFreeSpace  AS INTEGER NO-UNDO.
  DEFINE VARIABLE iRest       AS INTEGER NO-UNDO.
- DEFINE VARIABLE iSpaces     AS INTEGER     NO-UNDO.
+ DEFINE VARIABLE iSpaces     AS INTEGER NO-UNDO.
 
  xx = {&border}.
  yy = 90.
@@ -1268,21 +1268,21 @@ PROCEDURE setBricks :
  /* Justify blocks */
  DO ii = 1 TO iNumLines:
 
-   /* How much buttons on a row */
+   /* How much bricks per row */
    iTotalWidth = 0.
-   iNumBlocks = 0.
+   iNumBricks = 0.
    FOR EACH bfBrick WHERE bfBrick.iLine = ii:
-     iTotalWidth = iTotalWidth + bfBrick.hBrick:WIDTH-PIXELS.
-     iNumBlocks = iNumBlocks + 1.
+     iTotalWidth = iTotalWidth + bfBrick.hBrick:WIDTH-PIXELS + {&BlockMargin}.
+     iNumBricks = iNumBricks + 1.
    END.
 
    /* Extra space */
-   IF iNumBlocks > 0 THEN
-     iFreeSpace = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth) / (iNumBlocks ).
+   IF iNumBricks > 1 THEN
+     iFreeSpace = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth - ((iNumBricks - 1) * {&BlockMargin}) ) / (iNumBricks ).
    ELSE 
      iFreeSpace = 0.
 
-   iRest = FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth - (iNumBlocks * iFreeSpace).
+   iRest = FRAME {&FRAME-NAME}:WIDTH-PIXELS - (2 * {&border}) - iTotalWidth - (iNumBricks * iFreeSpace).
 
    /* Redraw buttons */
    xx = {&border}.
@@ -1292,7 +1292,8 @@ PROCEDURE setBricks :
      bfBrick.hBrick:WIDTH-PIXELS = bfBrick.hBrick:WIDTH-PIXELS + iFreeSpace + iRest.
      iRest = 0.
      bfBrick.hBrick:X = xx.
-     xx = xx + bfBrick.hBrick:WIDTH-PIXELS.
+     xx = xx + bfBrick.hBrick:WIDTH-PIXELS + {&BlockMargin}.
+     bfBrick.hBrick:SENSITIVE = NO.
 
      /* Justify text */
      iSpaces = ((bfBrick.hBrick:WIDTH-PIXELS - FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBrick.cBlockId, getFont('fixed'))) / 2)

@@ -14,6 +14,7 @@ DataDigger version 23 - 17 apr 2017 (Easter Egg)
 - Solved: Fields with % or # in their name cannot be dumped as XML (Damir Pem)
 - Solved: Curly brace could break query
 - Solved: Resize error in large window with resize bar
+- Solved: Check on updates reports new BETA although set to check on STABLE
 
 - New   : Multi-sort on data columns now possible
 - New   : Row coloring now depending on chosen sort
