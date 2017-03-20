@@ -89,8 +89,9 @@ DEFINE VARIABLE giBallY       AS INTEGER   NO-UNDO INITIAL -5.
 DEFINE VARIABLE giGameStarted AS INTEGER   NO-UNDO INITIAL ?.
 DEFINE VARIABLE giOldMouseX   AS INTEGER   NO-UNDO.
 DEFINE VARIABLE gcGameStatus  AS CHARACTER NO-UNDO.
-DEFINE VARIABLE glDebugRun    AS LOGICAL   NO-UNDO INITIAL YES.
+DEFINE VARIABLE glDebugRun    AS LOGICAL   NO-UNDO INITIAL NO.
 DEFINE VARIABLE giNumLives    AS INTEGER   NO-UNDO INITIAL 3.
+DEFINE VARIABLE giNumTicks    AS INTEGER     NO-UNDO.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -153,10 +154,10 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
      SIZE-PIXELS 155 BY 13
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE fiTime AS CHARACTER FORMAT "X(256)":U 
-     LABEL "Time" 
-     VIEW-AS FILL-IN NATIVE 
-     SIZE-PIXELS 70 BY 21 NO-UNDO.
+DEFINE VARIABLE fiMsg AS CHARACTER FORMAT "X(256)":U INITIAL "(Click to close window)" 
+      VIEW-AS TEXT 
+     SIZE-PIXELS 170 BY 20
+     BGCOLOR 14 FGCOLOR 9  NO-UNDO.
 
 DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadigger.wordpress.com/" 
       VIEW-AS TEXT 
@@ -196,11 +197,11 @@ DEFINE IMAGE imgTitle
 
 DEFINE FRAME DEFAULT-FRAME
      btnDataDigger AT Y 5 X 5 WIDGET-ID 82
-     fiTime AT Y 5 X 455 COLON-ALIGNED WIDGET-ID 294
      BtnOK AT Y 5 X 545 WIDGET-ID 48
      edChangelog AT Y 70 X 0 NO-LABEL WIDGET-ID 72
      fiDataDigger-1 AT Y 5 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 20 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 76
+     fiMsg AT Y 190 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 320
      fiWebsite AT Y 415 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 298
      imgPaddle AT Y 15 X 325 WIDGET-ID 300
      imgBall AT Y 15 X 305 WIDGET-ID 302
@@ -271,10 +272,11 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FILL-IN fiDataDigger-2 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-/* SETTINGS FOR FILL-IN fiTime IN FRAME DEFAULT-FRAME
+/* SETTINGS FOR FILL-IN fiMsg IN FRAME DEFAULT-FRAME
    NO-DISPLAY NO-ENABLE                                                 */
 ASSIGN 
-       fiTime:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
+       fiMsg:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE
+       fiMsg:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 /* SETTINGS FOR IMAGE imgBall IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
@@ -365,6 +367,19 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME DEFAULT-FRAME
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL DEFAULT-FRAME wAbout
+ON F12 OF FRAME DEFAULT-FRAME
+ANYWHERE DO:
+
+  RUN gameOver(YES).
+  
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME btnDataDigger
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
@@ -395,9 +410,11 @@ PROCEDURE CtrlFrame.BallTimer.Tick .
     Desc : Move the ball
   ------------------------------------------------------------------------------*/
 
-  RUN setPaddle.
+  /* set paddle only once every few ticks */
+  IF giNumTicks MODULO 2 = 0 THEN RUN setPaddle.
+  giNumTicks = giNumTicks + 1.
+
   RUN moveBall.
-  RUN setTime.
   
 END PROCEDURE. /* OCX.Tick */
 
@@ -580,7 +597,7 @@ PROCEDURE createBricks :
        FONT          = getFont('fixed')
        FRAME         = FRAME {&FRAME-NAME}:HANDLE
        SENSITIVE     = TRUE
-       VISIBLE       = TRUE
+       VISIBLE       = FALSE
        WIDTH-PIXELS  = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bfBrick.cBlockId, getFont('fixed')) + 15
        HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont('fixed')) + 8
        FORMAT        = 'X(100)'
@@ -640,20 +657,40 @@ END PROCEDURE.
 PROCEDURE gameOver :
 /* Game over
  **/
+ DEFINE INPUT PARAMETER plPlayerLost AS LOGICAL NO-UNDO.
+
  DO WITH FRAME {&FRAME-NAME}:
    gcGameStatus = 'Game Over'.
    
    /* Disable ball mover */
    chCtrlFrame:BallTimer:ENABLED = FALSE.  
 
-   imgTitle:LOAD-IMAGE(getImagePath('AboutTitle2.gif')).
-   imgTitle:VISIBLE IN FRAME DEFAULT-FRAME = TRUE.
+   /* Load proper image: 'Game Over' or 'Good Job' */
+   IF plPlayerLost THEN
+     imgTitle:LOAD-IMAGE(getImagePath('AboutTitle2.gif')).
+   ELSE 
+     imgTitle:LOAD-IMAGE(getImagePath('AboutTitle3.gif')).
+
    imgTitle:WIDTH-PIXELS = 600.
    imgTitle:HEIGHT-PIXELS = 100.
    imgTitle:X = 250.
+   imgTitle:Y = 300.
+   imgTitle:VISIBLE = TRUE.
+
+   /* Show 'Click to close' message */
+   RUN justWait(1000).
+   ASSIGN 
+     fiMsg:FONT          = getFont('fixed')
+     fiMsg:SCREEN-VALUE  = '(Click to close window)'
+     fiMsg:WIDTH-PIXELS  = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiMsg:SCREEN-VALUE, getFont('fixed')) + 10
+     fiMsg:HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(getFont('fixed'))
+     fiMsg:X             = (FRAME {&FRAME-NAME}:WIDTH-PIXELS - fiMsg:WIDTH-PIXELS) / 2
+     fiMsg:Y             = 450
+     fiMsg:VISIBLE       = YES.
+     fiMsg:SENSITIVE     = YES
+     .
+
  END.
- 
- APPLY 'CLOSE' TO THIS-PROCEDURE. 
 
 END PROCEDURE. /* gameOver */
 
@@ -680,7 +717,7 @@ PROCEDURE hitBottom :
   giNumLives = giNumLives - 1.
   IF giNumLives = 0 THEN 
   DO:
-    RUN gameOver.
+    RUN gameOver(YES).
   END.
   ELSE 
   DO:
@@ -708,7 +745,6 @@ PROCEDURE initializeObject :
     fiDataDigger-1:FONT      = getFont('Fixed').
     fiDataDigger-2:FONT      = getFont('Fixed').
     edChangelog:FONT         = getFont('Fixed').
-    fiTime:FONT              = getFont('Fixed').
 
     btnDataDigger:LOAD-IMAGE(getImagePath('DataDigger24x24.gif')).
     imgBall:LOAD-IMAGE(getImagePath('Ball.gif')).
@@ -764,12 +800,8 @@ END PROCEDURE. /* justWait */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBall wAbout 
 PROCEDURE moveBall :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+/* Move the ball and detect collisions 
+  */
   DEFINE VARIABLE iNewX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iNewY    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMinY    AS INTEGER NO-UNDO INITIAL 7.
@@ -811,6 +843,7 @@ PROCEDURE moveBall :
         giBallX = giBallX * -1.
         DELETE OBJECT bfBrick.hBrick.
         DELETE bfBrick.
+        IF NOT CAN-FIND(FIRST bfBrick) THEN RUN gameOver(NO).
         RETURN.
       END.
     END.
@@ -837,6 +870,7 @@ PROCEDURE moveBall :
         giBallY = giBallY * -1.
         DELETE OBJECT bfBrick.hBrick.
         DELETE bfBrick.
+        IF NOT CAN-FIND(FIRST bfBrick) THEN RUN gameOver(NO).
         RETURN.
       END.
     END.
@@ -928,8 +962,8 @@ PROCEDURE prepareWindow :
   IF glDebugRun THEN iNumSteps = 1. 
 
   DO WITH FRAME {&FRAME-NAME}:
-    BtnOK:VISIBLE         = NO.
-    fiWebsite:VISIBLE     = FALSE.
+    BtnOK:VISIBLE     = NO.
+    fiWebsite:VISIBLE = FALSE.
 
     ASSIGN 
       iStartH = wAbout:HEIGHT-PIXELS
@@ -966,7 +1000,6 @@ PROCEDURE prepareWindow :
       RUN justWait(5).
     END.
 
-    fiTime:VISIBLE = TRUE.
     edChangelog:VISIBLE = FALSE.
   END.
 
@@ -1016,12 +1049,14 @@ END PROCEDURE. /* readAboutFile */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resumeGame wAbout 
 PROCEDURE resumeGame :
-/* Let the ball move again*/
-  
+/* Game is waiting for the user to click so it can resume */                                                
   IF gcGameStatus = 'waiting' THEN gcGameStatus = 'running'.
   imgTitle:VISIBLE IN FRAME DEFAULT-FRAME = FALSE.
+
+  /* After the game has ended, close the screen */
+  IF gcGameStatus = "Game Over" THEN APPLY "close" TO THIS-PROCEDURE. 
   
-END PROCEDURE.
+END PROCEDURE. /* resumeGame */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1054,6 +1089,8 @@ PROCEDURE setBall :
 
   IF plBounceBall THEN
   REPEAT:
+    gcGameStatus = 'intro'.
+
     /* Normal flow */
     dy = dy + grav.
     xx = xx + dx.
@@ -1118,7 +1155,7 @@ PROCEDURE setBall :
   /* Start timer */
   IF plBounceBall THEN giGameStarted = MTIME.
   
-END.
+END PROCEDURE. /* setBall */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1247,6 +1284,9 @@ PROCEDURE setPaddle :
   DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
 
+  /* Don't move paddle while bouncing */
+  IF gcGameStatus = 'intro' THEN RETURN. 
+
   DO WITH FRAME {&FRAME-NAME}:
     
     RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
@@ -1269,34 +1309,16 @@ END PROCEDURE. /* setPaddle */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTime wAbout 
-PROCEDURE setTime :
-/* Show elapsed time since start of game
- **/
-  IF gcGameStatus <> 'running' AND gcGameStatus <> 'waiting' THEN RETURN.
-  IF giGameStarted = ? THEN RETURN. 
-   
-  DO WITH FRAME {&FRAME-NAME}:
-    fiTime:SCREEN-VALUE = STRING((MTIME - giGameStarted) / 1000,'>>>9.9').
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showBricks wAbout 
+PROCEDURE showBricks :
+/* Make bricks visible */
+  DEFINE BUFFER bfBrick FOR ttBrick.
+
+  FOR EACH bfBrick:
+    bfBrick.hBrick:VISIBLE = TRUE.
   END.
 
-END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showEndTitle wAbout 
-PROCEDURE showEndTitle :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
-   MESSAGE 'Okay, that was fun, but move along now, nothing to see here anymore....'
-     VIEW-AS ALERT-BOX INFO BUTTONS OK.
-   
-END PROCEDURE.
+END PROCEDURE. /* showBricks */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1311,6 +1333,7 @@ PROCEDURE showLog :
   RUN readAboutFile.
   RUN createBricks.
   RUN setBricks.
+  RUN showBricks.
   RUN showTitle.
   RUN setBall(YES).
   
@@ -1323,26 +1346,27 @@ END PROCEDURE. /* showLog */
 PROCEDURE showTitle :
 /* Show DiggerNoid title */
   DEFINE VARIABLE ii AS INTEGER NO-UNDO.
+  &GLOBAL-DEFINE step 5
   
   DO WITH FRAME {&FRAME-NAME}:
     imgTitle:LOAD-IMAGE(getImagePath('AboutTitle.gif')).
-    imgTitle:WIDTH-PIXELS = 725.
+    imgTitle:WIDTH-PIXELS = 600.
     imgTitle:HEIGHT-PIXELS = 1.
-    imgTitle:X = 188.
+    imgTitle:X = 250.
     imgTitle:Y = 1.
     imgTitle:VISIBLE = FALSE.
     
-    DO ii = 1 TO 300 BY 10:
+    DO ii = 1 TO 300 BY {&step}:
       imgTitle:Y = ii.
       imgTitle:VISIBLE = TRUE.
-      IF ii <= 219 THEN imgTitle:HEIGHT-PIXELS = ii.
+      IF ii <= 250 THEN imgTitle:HEIGHT-PIXELS = ii.
       RUN justWait(2).
     END. 
 
-    DO ii = 1 TO 100 BY 20:
-      imgTitle:Y = imgTitle:Y + 20.
+    DO ii = 1 TO 100 BY {&step}:
+      imgTitle:Y = imgTitle:Y + {&step}.
       imgTitle:VISIBLE = TRUE.
-      imgTitle:HEIGHT-PIXELS = imgTitle:HEIGHT-PIXELS - 20.
+      imgTitle:HEIGHT-PIXELS = imgTitle:HEIGHT-PIXELS - {&step}.
       RUN justWait(2).
     END. 
   END. 
