@@ -259,7 +259,7 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR WINDOW wAbout
-  VISIBLE,,RUN-PERSISTENT                                               */
+  NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 ASSIGN 
@@ -309,7 +309,7 @@ ASSIGN
        imgTitle:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
-THEN wAbout:HIDDEN = no.
+THEN wAbout:HIDDEN = yes.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
@@ -647,7 +647,6 @@ PROCEDURE enable_UI :
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
   VIEW FRAME DEFAULT-FRAME IN WINDOW wAbout.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
-  VIEW wAbout.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -731,14 +730,17 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wAbout 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Init frame
+*/
   DEFINE BUFFER bQuery FOR ttQuery.
 
   DO WITH FRAME {&FRAME-NAME}:
+
+    wAbout:VISIBLE = FALSE. 
+
+    /* Position frame relative to main window */
+    wAbout:X = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
+    wAbout:Y = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
 
     /* Prepare frame */
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
@@ -774,6 +776,7 @@ PROCEDURE initializeObject :
     /* For some reasons, these #*$&# scrollbars keep coming back */
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
 
+    wAbout:VISIBLE = TRUE. 
   END.
 
 END PROCEDURE. /* initializeObject. */

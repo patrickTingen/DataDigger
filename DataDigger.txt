@@ -19,7 +19,14 @@ DataDigger version 23 - 17 apr 2017 (Easter Egg)
 - New   : Multi-sort on data columns now possible
 - New   : Row coloring now depending on chosen sort
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
--
+
+Fixed on beta 20170320:
+- Solved: Filter window looks weird with large font
+- Solved: Query result always shows that query is incomplete (Mike Derrick)
+- Solved: First hint on upgrading does not show
+- Solved: Obsolete images of v18 and older were not cleaned up
+- Solved: Version upgrade logic does not run on new beta version
+
 =====================================================================================
 
 DataDigger version 22 - 20 feb 2017 (Titanium)

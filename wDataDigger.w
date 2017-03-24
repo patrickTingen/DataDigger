@@ -956,54 +956,6 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 10.67 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
-
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
      cbAndOr AT Y 5 X 40 COLON-ALIGNED WIDGET-ID 10
@@ -1036,6 +988,54 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 10.67 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1335,7 +1335,7 @@ DO:
 
   /* Start debugger if found */
   cDebuggerPath = getRegistry('debugger', 'path').
-  IF SEARCH(cDebuggerPath) = ? THEN RUN value(cDebuggerPath).
+  IF SEARCH(cDebuggerPath) = ? THEN RUN VALUE(cDebuggerPath).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2267,7 +2267,7 @@ OR "CTRL-SHIFT-A" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("About"). /* user behaviour */
   HIDE FRAME frSettings.
-  RUN value(getProgramDir() + 'wAbout.w').
+  RUN VALUE(getProgramDir() + 'wAbout.w').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2869,7 +2869,7 @@ OR "CTRL-Q" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("QueryTester"). /* user behaviour */
   HIDE FRAME frSettings.
-  RUN value(getProgramDir() + 'query-tester.w') (INPUT-OUTPUT table ttTestQuery BY-REFERENCE).
+  RUN VALUE(getProgramDir() + 'query-tester.w') (INPUT-OUTPUT TABLE ttTestQuery BY-REFERENCE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -5265,10 +5265,27 @@ PROCEDURE convertSettings :
     DO:
       OS-DELETE dAbout.w.
       OS-DELETE dAbout.r.
-      OS-DELETE images/default_Tab_About_Active.gif.
-      OS-DELETE images/default_Tab_About_Inactive.gif.
-      OS-DELETE images/default_Tab_Changes_Active.gif.
-      OS-DELETE images/default_Tab_Changes_Inactive.gif.
+      OS-DELETE image/default_Tab_About_Active.gif.
+      OS-DELETE image/default_Tab_About_Inactive.gif.
+      OS-DELETE image/default_Tab_Changes_Active.gif.
+      OS-DELETE image/default_Tab_Changes_Inactive.gif.
+      
+      /* A typo in DD19 prevented these from deletion */
+      OS-DELETE image/default_ReleaseNotes.gif.
+      OS-DELETE image/default_FilterCombo.gif.
+      OS-DELETE image/default_FilterComboRed.gif.
+      OS-DELETE image/default_Star.gif.
+      OS-DELETE image/default_Tables.gif.
+      OS-DELETE image/default_PrevQuery.gif.
+      OS-DELETE image/default_NextQuery.gif.
+      OS-DELETE image/default_ViewAsList.gif.
+      OS-DELETE image/default_Pinned.gif.
+      OS-DELETE image/default_Unpinned.gif.
+      OS-DELETE image/default_Undock.gif.
+      OS-DELETE image/default_Dock.gif.
+      OS-DELETE image/default_Tab_Favorites_Active.gif.
+      OS-DELETE image/default_Tab_Favorites_Inactive.gif.
+
     END. /* 22 */
     
   END CASE. /* old version */
@@ -8458,6 +8475,7 @@ PROCEDURE reopenDataBrowse :
   DEFINE VARIABLE iStartTime     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lPrepare       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
+  DEFINE VARIABLE lQueryComplete AS LOGICAL     NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
   {&timerStart}
@@ -8573,10 +8591,10 @@ PROCEDURE reopenDataBrowse :
       ghDataQuery:GET-NEXT.
       iNumRecords = iNumRecords + 1.
     END.
+    lQueryComplete = ghDataQuery:QUERY-OFF-END.
 
     /* query might have gotten off end, so: */
-    IF ghDataQuery:QUERY-OFF-END THEN
-      ghDataQuery:QUERY-OPEN().
+    IF lQueryComplete THEN ghDataQuery:QUERY-OPEN().
 
     /* Show nr of records
      * Sometimes opening of the query takes some time so no records can be counted in
@@ -8598,7 +8616,7 @@ PROCEDURE reopenDataBrowse :
     setUpdatePanel('display').
   END.
 
-  RUN showNumRecords(iNumRecords, ghDataQuery:QUERY-OFF-END).
+  RUN showNumRecords(iNumRecords, lQueryComplete).
   RUN showNumSelected.
 
   /* Show or hide red line around filters */
@@ -10868,11 +10886,14 @@ PROCEDURE showNewFeatures :
     &GLOBAL-DEFINE ARROW-LEFT-DOWN  4
     */
 
+    /* Wait until databrowse is ready (due to timer) */
+    DO WHILE NOT VALID-HANDLE(ghDataBrowse): PROCESS EVENTS. END.
+
     /* Multi-sort on data columns now possible */
     FOR EACH bColumn:
-      IF NOT bColumn.hColumn:VISIBLE THEN NEXT. 
+      IF NOT bColumn.hColumn:VISIBLE THEN NEXT.
       iColumnNr = iColumnNr + 1.
-      IF iColumnNr > 1 THEN 
+      IF iColumnNr > 1 THEN
       DO:
         RUN showHint(bColumn.hColumn, {&ARROW-LEFT-UP}, "~nUse CONTROL + CLICK to add up to 9 sort levels").
         IF glHintCancelled THEN LEAVE demoLoop.
@@ -11239,7 +11260,7 @@ PROCEDURE startSession :
   OS-DELETE VALUE( "dDump.w").
   OS-DELETE VALUE( "dDump.r").
 
-  IF iVersion <> {&VERSION} THEN
+  IF iVersion <> {&VERSION} OR cBuild <> '{&build}' THEN
   DO:
     lUpgraded = TRUE.
 
@@ -12028,4 +12049,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
