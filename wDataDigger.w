@@ -11220,6 +11220,7 @@ PROCEDURE startDiggerLib :
     SESSION:ADD-SUPER-PROCEDURE(hDiggerLib, SEARCH-TARGET).
 
     SUBSCRIBE PROCEDURE hDiggerLib TO "customDump"   ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "customFormat" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "CustomGetFilterValue" ANYWHERE.
