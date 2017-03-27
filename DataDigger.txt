@@ -27,6 +27,10 @@ Fixed on beta 20170320:
 - Solved: Obsolete images of v18 and older were not cleaned up
 - Solved: Version upgrade logic does not run on new beta version
 
+Fixed in beta 201703xx
+- Solved: Custom hook customFormat did not fire
+- Solved: Data Administration accessible in readonly mode (Curtis Schroer)
+
 =====================================================================================
 
 DataDigger version 22 - 20 feb 2017 (Titanium)

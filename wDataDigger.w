@@ -7323,10 +7323,12 @@ PROCEDURE initializeObjects :
       /* Disable these WHEN plReadOnlyDigger */
       IF plReadOnlyDigger THEN
         ASSIGN
-          btnDict        :SENSITIVE = FALSE
-          btnDict-txt    :SENSITIVE = FALSE
-          btnProcEdit    :SENSITIVE = FALSE
-          btnProcEdit-txt:SENSITIVE = FALSE
+          btnDict         :SENSITIVE = FALSE
+          btnDict-txt     :SENSITIVE = FALSE
+          btnDataAdmin    :SENSITIVE = FALSE
+          btnDataAdmin-txt:SENSITIVE = FALSE
+          btnProcEdit     :SENSITIVE = FALSE
+          btnProcEdit-txt :SENSITIVE = FALSE
         .
     END.
 
@@ -11345,6 +11347,9 @@ PROCEDURE startTool :
 
   /* Return if no db connected */
   IF NUM-DBS = 0 THEN RETURN.
+  
+  /* Don't allow in read only mode */
+  IF plReadOnlyDigger THEN RETURN.
 
   HIDE FRAME frSettings.
   CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
