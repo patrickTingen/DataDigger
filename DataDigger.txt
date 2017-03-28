@@ -30,6 +30,8 @@ Fixed on beta 20170320:
 Fixed in beta 201703xx
 - Solved: Custom hook customFormat did not fire
 - Solved: Data Administration accessible in readonly mode (Curtis Schroer)
+- Solved: About-window not accessible without timer (Frans Hoekstra)
+- Solved: Several shortcuts conflicted (Frans Hoekstra)
 
 =====================================================================================
 
