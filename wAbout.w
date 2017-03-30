@@ -830,12 +830,21 @@ PROCEDURE justWait :
 /* Wait a few miliseconds 
  */
   DEFINE INPUT  PARAMETER piWait AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStart    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lUseTimer AS LOGICAL NO-UNDO.
    
   iStart = ETIME.
+  
+  /* For the duration of the wait, switch off 
+   * the timer to avoid deep loops */
+  lUseTimer = chCtrlFrame:BallTimer:ENABLED.
+  chCtrlFrame:BallTimer:ENABLED = FALSE.
+
   DO WHILE ETIME < iStart + piWait: 
     PROCESS EVENTS.
   END. 
+
+  chCtrlFrame:BallTimer:ENABLED = lUseTimer.
 
 END PROCEDURE. /* justWait */
 

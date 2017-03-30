@@ -173,14 +173,14 @@ DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in Da
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnTools rctQuery btnFavourite rctEdit ~
-fiTableFilter cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
+&Scoped-Define ENABLED-OBJECTS rctQuery btnTools rctEdit fiTableFilter ~
+cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
-btnQueries btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad ~
-btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnDelete ~
-btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnQueries btnClipboard ficWhere btnFavourite btnNextQuery btnPrevQuery ~
+btnDump btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables ~
+btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
 fiFeedback 
@@ -360,7 +360,7 @@ DEFINE BUTTON btnClearDataFilter
 
 DEFINE BUTTON btnDataSort 
      LABEL "S" 
-     SIZE-PIXELS 16 BY 21 TOOLTIP "set sorting".
+     SIZE-PIXELS 15 BY 21 TOOLTIP "set sorting".
 
 DEFINE VARIABLE fiNumRecords AS CHARACTER FORMAT "X(256)":U 
       VIEW-AS TEXT 
@@ -903,7 +903,6 @@ ttTable.iNumQueries
 
 DEFINE FRAME frMain
      btnTools AT Y 4 X 2 WIDGET-ID 264
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      fiTableFilter AT Y 4 X 38 NO-LABEL
      cbDatabaseFilter AT Y 4 X 99 COLON-ALIGNED NO-LABEL
      btnClearTableFilter AT Y 4 X 219 WIDGET-ID 222
@@ -931,6 +930,7 @@ DEFINE FRAME frMain
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
@@ -955,54 +955,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1039,6 +991,54 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 9.48 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -2425,6 +2425,7 @@ DO:
   setFilterFieldColor(cbDatabaseFilter:HANDLE).
 
   RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+  RUN setWindowTitle. 
 
   /* Get table properties from the INI file */
   RUN getTableStats(INPUT-OUTPUT TABLE ttTable).
@@ -2551,10 +2552,6 @@ ON CHOOSE OF btnDataSort IN FRAME frData /* S */
 OR 'ALT-S' OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("SortData"). /* user behaviour */
-
-  IF KEYLABEL(LASTKEY) <> "ALT-S" THEN 
-    RUN showHelp('DataSortShortCut', '').
-
   RUN btnDataSortChoose.
 END.
 
@@ -6128,19 +6125,19 @@ PROCEDURE enable_UI :
   DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
           fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE btnTools rctQuery btnFavourite rctEdit fiTableFilter cbDatabaseFilter 
+  ENABLE rctQuery btnTools rctEdit fiTableFilter cbDatabaseFilter 
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
-         btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump btnLoad 
-         btnTabFavourites btnTabFields btnTabIndexes btnTabTables btnDelete 
-         btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+         btnClipboard ficWhere btnFavourite btnNextQuery btnPrevQuery btnDump 
+         btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables 
+         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnAbout-txt 
-         btnProcEdit btnDict btnDataAdmin btnQueries-3 btnQueryTester btnHelp 
-         btnAbout btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
+  ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
+         btnDict btnDataAdmin btnQueries-3 btnQueryTester btnHelp btnAbout 
+         btnAbout-txt btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
          btnDict-txt btnHelp-txt btnProcEdit-txt btnQueries-txt 
          btnQueryTester-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
@@ -7863,7 +7860,7 @@ PROCEDURE initializeVisuals :
     FRAME frWhere:FONT = giDefaultFont.
 
     BROWSE brTables:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
-    BROWSE BRFIELDS:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
+    BROWSE brFields:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
     BROWSE brIndexes:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
 
     cbAnDOr:FONT     = giFixedFont.
@@ -7903,9 +7900,10 @@ PROCEDURE initializeVisuals :
     /* Additional tooltips */
     ficValue     :TOOLTIP = ficValue:TOOLTIP + "~n~n(CTRL-ENTER) execute".
     ficWhere     :TOOLTIP = ficWhere:TOOLTIP + "~n~n(CTRL-ENTER) execute".
-    brFields     :TOOLTIP = brFields:TOOLTIP + "~n~n(RIGHT-CLICK) insert field+value".
+    brFields     :TOOLTIP = "fields of selected table" + "~n~n(RIGHT-CLICK) insert field+value".
     brFields     :TOOLTIP = brFields:TOOLTIP + "~n(CTRL-RIGHT-CLICK) insert field".
     brFields     :TOOLTIP = brFields:TOOLTIP + "~n(CTRL-ENTER) execute".
+    brIndexes    :TOOLTIP = "indexes of the table" + "~n~n(RIGHT CLICK) use-index" + "~n(DOUBLE CLICK) use index in WHERE".
 
     /* Filter box around tables, fields and indexes */
     rcTableFilter:BGCOLOR = getColor("FilterBox:bg").
@@ -10550,9 +10548,37 @@ END PROCEDURE. /* setViewType */
 PROCEDURE setWindowTitle :
 /* Set the title of the DataDigger window
  */
-  DEFINE VARIABLE cTitle       AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hParent      AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE hOwner       AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cTitle  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hParent AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE hOwner  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cFilter AS CHARACTER   NO-UNDO.
+
+  DEFINE VARIABLE cNameShow  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cNameHide  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cFieldShow AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cFieldHide AS CHARACTER   NO-UNDO.
+
+  FIND ttTableFilter.
+  ASSIGN
+    cNameShow  = ttTableFilter.cTableNameShow
+    cNameHide  = ttTableFilter.cTableNameHide 
+    cFieldShow = ttTableFilter.cTableFieldShow
+    cFieldHide = ttTableFilter.cTableFieldHide.
+
+  /* Reset the filters to sane values if needed */
+  IF cNameShow  = '*' OR cNameShow  = ? THEN cNameShow  = ''.
+  IF cNameHide  = '*' OR cNameHide  = ? THEN cNameHide  = '' .
+  IF cFieldShow = '*' OR cFieldShow = ? THEN cFieldShow = ''.
+  IF cFieldHide = '*' OR cFieldHide = ? THEN cFieldHide = ''.
+
+  /* Move elements starting with "!" from pos-list to neg-list */
+  RUN correctFilterList(INPUT-OUTPUT cNameShow, INPUT-OUTPUT cNameHide).
+  RUN correctFilterList(INPUT-OUTPUT cFieldShow, INPUT-OUTPUT cFieldHide).
+
+  IF cNameShow  <> '' THEN cFilter = SUBSTITUTE('Show tables: &1', cNameShow).
+  IF cNameHide  <> '' THEN cFilter = TRIM(SUBSTITUTE('&1 |  Hide tables: &2', cFilter, cNameHide),' |').
+  IF cFieldShow <> '' THEN cFilter = TRIM(SUBSTITUTE('&1 |  Has fields: &2', cFilter, cFieldShow),' |').
+  IF cFieldHide <> '' THEN cFilter = TRIM(SUBSTITUTE('&1 |  Has not fields: &2', cFilter, cFieldHide),' |').
 
   /*
   ** Display the current database and table name in the windowtitle
@@ -10565,7 +10591,7 @@ PROCEDURE setWindowTitle :
                      , (IF SESSION:PARAMETER <> '' THEN '- ' + SESSION:PARAMETER ELSE '')
                      , gcCurrentDatabase
                      , gcCurrentTable
-                     , (IF gcFieldFilterList <> '' THEN '(' + gcFieldFilterList + ')'  ELSE '')
+                     , (IF cFilter <> '' THEN '(' + cFilter + ')'  ELSE '')
                      ).
 
   /* Add warning for read-only mode */
