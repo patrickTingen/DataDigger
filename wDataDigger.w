@@ -9954,8 +9954,6 @@ PROCEDURE setFilterFieldTabOrder :
   DEFINE VARIABLE hPrevFilter AS HANDLE  NO-UNDO.
   DEFINE BUFFER bColumn FOR ttColumn.
 
-  PUBLISH 'debugMessage' (1, 'Yooooo!' ).
-
   /* Set the TAB order of the filter to after the previous filter field */
   FOR EACH bColumn BY bColumn.iColumnNr:
     IF NOT bColumn.hColumn:VISIBLE THEN NEXT.

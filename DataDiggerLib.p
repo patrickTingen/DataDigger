@@ -118,10 +118,7 @@ END PROCEDURE.
 DEFINE TEMP-TABLE ttWidget NO-UNDO RCODE-INFORMATION
   FIELD hWidget   AS HANDLE
   FIELD iPosX     AS INTEGER
-  FIELD iPosY     AS INTEGER
   FIELD iWidth    AS INTEGER
-  FIELD iHeight   AS INTEGER
-  FIELD lVisible  AS LOGICAL 
   INDEX iPrim AS PRIMARY hWidget.
 
 /* If you have trouble with the cache, disable it in the settings screen */
@@ -4879,41 +4876,28 @@ FUNCTION isWidgetChanged RETURNS LOGICAL
   find ttWidget where ttWidget.hWidget = phWidget no-error.
   IF NOT AVAILABLE ttWidget THEN 
   DO:
-    PUBLISH "debugMessage" (2, SUBSTITUTE("New widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
     CREATE ttWidget.
     ASSIGN ttWidget.hWidget = phWidget.
   END.
-  ELSE
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("  iPosX     &1 - &2", ttWidget.iPosX    , phWidget:X           )).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("  iPosY     &1 - &2", ttWidget.iPosY    , phWidget:Y           )).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("  iWidth    &1 - &2", ttWidget.iWidth   , phWidget:WIDTH-PIXELS)).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("  iHeight   &1 - &2", ttWidget.iHeight  , phWidget:HEIGHT-PIXELS)).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("  lVisible  &1 - &2", ttWidget.lVisible , phWidget:VISIBLE)).
+  PUBLISH "debugMessage" (3, SUBSTITUTE("Widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
 
   IF ttWidget.iPosX     <> phWidget:X
-/*  or ttWidget.iPosY     <> phWidget:y */
-  OR ttWidget.iWidth    <> phWidget:WIDTH-PIXELS
-/*  or ttWidget.iHeight   <> phWidget:height-pixels 
-  or ttWidget.lVisible  <> phWidget:visible */
-    THEN
+  OR ttWidget.iWidth <> phWidget:WIDTH-PIXELS THEN
   DO:
     ASSIGN
       ttWidget.iPosX     = phWidget:X
-      ttWidget.iPosY     = phWidget:Y
       ttWidget.iWidth    = phWidget:WIDTH-PIXELS
-      ttWidget.iHeight   = phWidget:HEIGHT-PIXELS
-/*       ttWidget.hFirstCol = hFirstColumn */
-      ttWidget.lVisible  = phWIdget:VISIBLE
       lChangeDetected    = TRUE.
   END.
 
   PUBLISH "debugMessage" (2, SUBSTITUTE("  Widget changed: &1", lChangeDetected)).
 
-  {&TimerStop}
   return lChangeDetected.
 
+  FINALLY:
+    {&TimerStop}
+  END FINALLY.
 END FUNCTION. /* isWidgetChanged */
 
 /* _UIB-CODE-BLOCK-END */
