@@ -20,24 +20,24 @@ DataDigger version 23 - 17 apr 2017 (Easter Egg)
 - New   : Row coloring now depending on chosen sort
 - New   : Right-click on data browse now shows total, min, max, avg of selected rows
 
-Fixed on beta 20170320:
+Changes in beta 20170320:
 - Solved: Filter window looks weird with large font
 - Solved: Query result always shows that query is incomplete (Mike Derrick)
 - Solved: First hint on upgrading does not show
 - Solved: Obsolete images of v18 and older were not cleaned up
 - Solved: Version upgrade logic does not run on new beta version
 
-Fixed in beta 20170330
+Changes in beta 20170330
 - Solved: Custom hook customFormat did not fire
 - Solved: Data Administration accessible in readonly mode (Curtis Schroer)
 - Solved: About-window not accessible without timer (Frans Hoekstra)
 - Solved: Several shortcuts conflicted (Frans Hoekstra)
 - Solved: Window title not cleared after resetting filter (Dirk Vreken)
 
-Fixed in beta 
+Changes in beta XX
 - Solved: Check on new version is done on each start, now once a day
 - Solved: Availability of a new version is shown on each start (Jeroen Beugels)
-
+- New: set physical database name in title (Edwin Schutten)
 
 =====================================================================================
 
