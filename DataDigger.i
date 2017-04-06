@@ -428,6 +428,9 @@ function setRegistry returns character
     , pcValue   as character
     ) in super.
 
+FUNCTION isValidCodePage RETURNS LOGICAL
+  (pcCodepage AS CHARACTER) in super.
+
 /* Initialize */
 gcThisProcedure = THIS-PROCEDURE:FILE-NAME.
 gcThisProcedure = ENTRY(NUM-ENTRIES(gcThisProcedure,"\"),gcThisProcedure,"\").

@@ -495,6 +495,17 @@ FUNCTION isTableFilterUsed RETURNS LOGICAL
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-isValidCodePage) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isValidCodePage Procedure 
+FUNCTION isValidCodePage RETURNS LOGICAL
+  (pcCodepage AS CHARACTER) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-isWidgetChanged) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isWidgetChanged Procedure 
@@ -1498,14 +1509,15 @@ PROCEDURE getDumpFileName :
   IF VALID-HANDLE(hBuffer) THEN
   DO:
     hBuffer:FIND-UNIQUE(SUBSTITUTE('where _file-name = &1 and _File._File-Number < 32768', QUOTER(pcTable)),NO-LOCK).
-    IF hBuffer:AVAILABLE THEN 
+    IF hBuffer:AVAILABLE THEN
       cDumpName = hBuffer::_dump-name.
     ELSE 
       cDumpName = pcTable.
   END.
   ELSE 
     cDumpName = pcTable.
-
+  IF cDumpName = ? THEN cDumpName = pcTable.
+  
   PUBLISH "debugMessage" (3, SUBSTITUTE("DumpDir  : &1", cDumpDir)).
   PUBLISH "debugMessage" (3, SUBSTITUTE("BackupDir: &1", cBackupDir)).
   PUBLISH "debugMessage" (3, SUBSTITUTE("LastDir  : &1", cLastDir)).
@@ -4811,8 +4823,7 @@ END FUNCTION. /* isMouseOver */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isTableFilterUsed Procedure 
 FUNCTION isTableFilterUsed RETURNS LOGICAL
   ( INPUT TABLE ttTableFilter ) :
-  /* 
-   * Returns whether any setting is used for table filtering 
+  /* Returns whether any setting is used for table filtering 
    */
   FIND ttTableFilter NO-ERROR.
   IF NOT AVAILABLE ttTableFilter THEN RETURN FALSE. 
@@ -4848,6 +4859,27 @@ FUNCTION isTableFilterUsed RETURNS LOGICAL
   RETURN FALSE. 
 
 END FUNCTION. /* isTableFilterUsed */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-isValidCodePage) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isValidCodePage Procedure 
+FUNCTION isValidCodePage RETURNS LOGICAL
+  (pcCodepage AS CHARACTER):
+  /* Returns whether pcCodePage is valid
+  */
+  DEFINE VARIABLE cDummy AS LONGCHAR NO-UNDO.
+  
+  IF pcCodePage = '' THEN RETURN TRUE.
+
+  FIX-CODEPAGE(cDummy) = pcCodepage NO-ERROR.
+  RETURN NOT ERROR-STATUS:ERROR.
+
+END FUNCTION. /* isValidCodePage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5221,3 +5253,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+
