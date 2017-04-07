@@ -31,6 +31,9 @@
 &GLOBAL-DEFINE CHECK-STABLE 1
 &GLOBAL-DEFINE CHECK-BETA   2
 
+/* Constant for collecting statistics */
+&GLOBAL-DEFINE PINGBACKURL https://goo.gl/24deK3
+
 DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
 
 /* TT for field data to link DataDiggers to each other */
