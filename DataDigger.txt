@@ -40,6 +40,7 @@ Changes in beta XX
 - Solved: Dumping data from VST tables result in unknown dump file name (Edwin Schutten)
 - Solved: Dumping data with non-existing code page results in crash (Edwin Schutten)
 - Solved: Edit window closes when it loses focus (Edwin Schutten)
+- Solved: Error when updating record when no fields are visible (Edwin Schutten)
 
 - New: set physical database name in title (Edwin Schutten)
 - New: toggle selection of all fields in edit window
