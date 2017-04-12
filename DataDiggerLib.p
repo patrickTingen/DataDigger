@@ -1746,7 +1746,7 @@ PROCEDURE getFields :
               
   REPEAT WHILE NOT hQuery:QUERY-OFF-END:
 
-CREATE bField.
+    CREATE bField.
     ASSIGN 
       iFieldOrder          = iFieldOrder + 1
       bField.cTableCacheId = bTable.cCacheId
@@ -1833,7 +1833,7 @@ CREATE bField.
     bField.cTablename    = pcTableName
     bField.cFieldName    = "RECID"
                           
-    bField.lShow         = lShowRecidField
+    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRecidField ELSE LOOKUP('RECID',cSelectedFields) > 0)
     bField.iOrder        = iFieldOrder
     bField.iOrderOrg     = iFieldOrder
     bField.cFullName     = 'RECID'
@@ -1868,7 +1868,7 @@ CREATE bField.
     bField.cTablename    = pcTableName
     bField.cFieldName    = "ROWID"
                           
-    bField.lShow         = lShowRowidField
+    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRowidField ELSE LOOKUP('ROWID',cSelectedFields) > 0)
     bField.iOrder        = iFieldOrder
     bField.iOrderOrg     = iFieldOrder
     bField.cFieldName    = 'ROWID'
@@ -3502,8 +3502,8 @@ PROCEDURE updateFields :
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
 
     /* RECID / ROWID field visibility might be changed */
-    IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN
-      bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)).
+/*     IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN                                          */
+/*       bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)). */
 
   END. /* f/e bField */
 

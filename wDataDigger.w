@@ -5174,8 +5174,10 @@ DO:
   ASSIGN
     chCtrlFrame = CtrlFrame:COM-HANDLE
     UIB_S = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U)
-    CtrlFrame:NAME = "CtrlFrame":U
+    CtrlFrame:NAME = "CtrlFrame":U NO-ERROR.
   .
+  IF ERROR-STATUS:ERROR THEN MESSAGE 'helaas pindakaas' VIEW-AS ALERT-BOX.
+  
   RUN initialize-controls IN THIS-PROCEDURE NO-ERROR.
 END.
 ELSE MESSAGE "wDataDigger.wrx":U SKIP(1)
@@ -7754,10 +7756,20 @@ PROCEDURE initializeUi :
   DO:
     ASSIGN
       chCtrlFrame    = CtrlFrame:COM-HANDLE
-      UIB_S          = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U)
-      CtrlFrame:NAME = "CtrlFrame":U
+      CtrlFrame:NAME = "CtrlFrame":U 
+      UIB_S          = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U) NO-ERROR
     .
-    glUseTimer = TRUE.
+    
+    /* Check for message 6087:
+     * Specified ActiveX control is not registered or the .ocx file was moved from where it was registered.
+     * Error occurred in procedure: <procedure name> (6087)
+     * This error occurred while trying to load an ActiveX control.  
+     * It is possible that the control was not properly installed or that the .ocx file was moved or deleted.
+     */
+    IF ERROR-STATUS:GET-NUMBER(1) = 6087 THEN 
+      glUseTimer = NO.
+    ELSE
+      glUseTimer = NO.
   END.
 
   /* FRAME frMain */
@@ -10224,6 +10236,10 @@ PROCEDURE setTable :
   ELSE
     cTable = pcSelectedText.
 
+  /* If it contains multiple words, forget it, it's not gonna be a table */
+  IF NUM-ENTRIES(cTable,' ') > 1 THEN cTable = ''.
+  IF LENGTH(cTable) < 3 THEN cTable = ''.
+
   /* Now see if we can do anything with the text */
   IF cTable <> "" THEN
   DO:
@@ -10233,22 +10249,23 @@ PROCEDURE setTable :
       SESSION:SET-WAIT-STATE("general").
       setWindowFreeze(TRUE).
 
-      fiTableFilter:screen-value = cTable.
-      APPLY 'value-changed' TO fiTableFilter.
-
-      RUN reopenTableBrowse(?).
-
       /* If we have a full match on table name, for example when text "ORDER"
        * is selected, make sure table is set to "ORDER" and not "ORDERLINE"
        */
-      FIND ttTable WHERE ttTable.cTableName = cTable NO-ERROR.
-      IF AVAILABLE ttTable THEN
-      DO:
-        brTables:query:reposition-to-rowid( ROWID(ttTable)).
-        brTables:refresh().
-      END.
-      APPLY 'value-changed' TO brTables.
+      FIND FIRST ttTable WHERE ttTable.cTableName MATCHES '*' + cTable + '*' AND ttTable.lShowInList NO-ERROR.
+      IF AVAILABLE ttTable THEN 
+      DO: 
+        /* Set db and file name */
+        cbDatabaseFilter:SCREEN-VALUE = ''.
+        fiTableFilter:SCREEN-VALUE = cTable.
+        RUN reopenTableBrowse(?).
 
+        brTables:QUERY:REPOSITION-TO-ROWID( ROWID(ttTable)).
+        brTables:REFRESH().
+      END.
+                 
+      APPLY 'value-changed' TO brTables.
+                       
       IF gcCurrentTable <> "" THEN
       DO:
         RUN setTableContext(INPUT gcCurrentTable ).
@@ -10256,13 +10273,13 @@ PROCEDURE setTable :
       END.
       ELSE
       DO:
-        fiTableFilter:screen-value = "".
+        fiTableFilter:SCREEN-VALUE = "".
         APPLY 'value-changed' TO fiTableFilter.
         RUN reopenTableBrowse(?).
       END.
 
-      APPLY 'value-changed' TO brTables.
-
+      APPLY 'entry' TO brTables.
+                  
       setWindowFreeze(NO).
       SESSION:SET-WAIT-STATE("").
     END.

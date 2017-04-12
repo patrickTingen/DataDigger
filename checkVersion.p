@@ -24,6 +24,15 @@ DEFINE VARIABLE lAutoCheck     AS LOGICAL     NO-UNDO.
 
 RUN getVersionInfo.p(OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
 
+/* If version cannot be determined then don't bother. Unless this
+ * is a manual check. Then report it.
+ */
+IF cRemoteBuildNr = '' THEN
+DO:
+  IF plManualCheck THEN MESSAGE 'Cannot reach version the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  RETURN.
+END.
+
 /* If remote build is different than local, but we have already 
  * noticed this before, then do not report new version
  * Unless - of course - when doing a manual check

@@ -45,6 +45,8 @@ FUNCTION getRemoteFile RETURNS CHARACTER (pcRemoteFile AS CHARACTER):
   RUN DeleteURLCacheEntry (INPUT pcRemoteFile).
   RUN urlDownloadToFileA (0, pcRemoteFile, cLocalFile, 0, 0, OUTPUT iResult).
 
-  COPY-LOB FILE cLocalFile TO cContents.
+  IF SEARCH(cLocalFile) <> ? THEN
+    COPY-LOB FILE cLocalFile TO cContents.
+    
   RETURN STRING(cContents).
 END FUNCTION. /* getRemoteFile */
