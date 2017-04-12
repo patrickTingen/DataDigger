@@ -34,7 +34,7 @@ Changes in beta 20170330
 - Solved: Several shortcuts conflicted (Frans Hoekstra)
 - Solved: Window title not cleared after resetting filter (Dirk Vreken)
 
-Changes in beta XX
+Changes in beta 20170412
 - Solved: Check on new version is done on each start, now once a day
 - Solved: Availability of a new version is shown on each start (Jeroen Beugels)
 - Solved: Dumping data from VST tables result in unknown dump file name (Edwin Schutten)
