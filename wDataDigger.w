@@ -5359,7 +5359,7 @@ PROCEDURE createMenuDataBrowse :
 
   /* Filter on this field only */
   hMenuItem = createMenuItem(hMenu,"Item","Clear Filters","clearFilter").
-  ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnClearDataFilterChoose IN THIS-PROCEDURE (YES).
+  ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnClearDataFilterChoose IN THIS-PROCEDURE.
 
   /* Set data sorting */
   hMenuItem = createMenuItem(hMenu,"Item","Set Sorting","SortData").
@@ -12132,4 +12132,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

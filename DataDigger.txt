@@ -49,6 +49,11 @@ Changes in beta 20170412
 - New: toggle selection of all fields in edit window
 - New: optional pingback of DataDigger
 
+Changes
+- Solved: error when clearing data filters from data context menu (Dirk Vreken)
+- Solved: dictionary not resizable anymore (Dirk Vreken)
+- Solved: timer not functioning at all
+
 =====================================================================================
 
 DataDigger version 22 - 20 feb 2017 (Titanium)
