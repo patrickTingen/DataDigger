@@ -186,13 +186,14 @@ END PROCEDURE. /* URLDownloadToFileA */
 cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
-btnQueries btnFavourite btnClipboard ficWhere btnNextQuery btnPrevQuery ~
-btnDump btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables ~
-btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
+btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
+btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
-fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
-fiFeedback 
+fiIndexNameFilter fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ~
+ficWhere fiFeedback 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -535,6 +536,12 @@ DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U
      LIST-ITEMS "Item 1" 
      DROP-DOWN-LIST
      SIZE-PIXELS 59 BY 21 TOOLTIP "filter on database" NO-UNDO.
+
+DEFINE VARIABLE cbFavouriteSet AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS COMBO-BOX INNER-LINES 10
+     LIST-ITEMS "Customers","Sales","Employee stuff","------------------------------------------","Create new set","Maintain sets" 
+     DROP-DOWN-LIST
+     SIZE-PIXELS 200 BY 21 NO-UNDO.
 
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
@@ -931,17 +938,18 @@ DEFINE FRAME frMain
      btnReset AT Y 72 X 760 WIDGET-ID 196
      btnMoveDown AT Y 94 X 760 WIDGET-ID 194
      btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
+     cbFavouriteSet AT Y 236 X 29 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -1775,25 +1783,27 @@ END.
 ON RETURN OF brFields IN FRAME frMain
 OR " "           OF ttField.lShow IN BROWSE brFields
 OR VALUE-CHANGED OF ttField.lShow IN BROWSE brFields
+OR " "           OF BROWSE brFields
 DO:
   DEFINE BUFFER ttField FOR ttField.
   DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
 
   PUBLISH "setUsage" ("hideField"). /* user behaviour */
 
-  DO WITH FRAME {&frame-name}:
+  DO WITH FRAME {&FRAME-NAME}:
 
-    FIND ttField WHERE ttField.cFullName = brFields:get-browse-column(3):screen-value NO-ERROR.
+    FIND ttField WHERE ttField.cFullName = brFields:GET-BROWSE-COLUMN(3):SCREEN-VALUE NO-ERROR.
     ttField.lShow = NOT ttField.lShow.
     cField = ttField.cFieldName.
 
     /* This will include all extents */
     IF ttField.iExtent > 0 THEN cField = cField + '*'.
 
-    brFields:get-browse-column(1):checked = ttField.lShow.
+    brFields:GET-BROWSE-COLUMN(1):CHECKED = ttField.lShow.
 
     RUN showField( INPUT cField, INPUT ttField.lShow).
   END.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2081,6 +2091,17 @@ END.
 
 &Scoped-define BROWSE-NAME brTables
 &Scoped-define SELF-NAME brTables
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON CTRL-CURSOR-DOWN OF brTables IN FRAME frMain
+DO:
+  IF giCurrentPage = {&PAGE-FAVOURITES} THEN
+    APPLY 'ENTRY' TO cbFavouriteSet.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON MOUSE-SELECT-CLICK OF brTables IN FRAME frMain
 DO:
@@ -6138,16 +6159,18 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   RUN control_load.
   DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
-          fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere fiFeedback 
+          fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ficWhere 
+          fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE rctQuery btnTools rctEdit fiTableFilter cbDatabaseFilter 
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
-         btnFavourite btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump 
-         btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables 
-         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+         btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
+         btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
+         btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
@@ -6252,9 +6275,16 @@ PROCEDURE endResize :
       fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS
       fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS
 
+      cbFavouriteSet:X = fiTableDesc:X
+      cbFavouriteSet:Y = fiTableDesc:Y
+      cbFavouriteSet:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS
+
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
       btnFavourite:Y = fiTableDesc:Y
       NO-ERROR.
+    cbFavouriteSet:MOVE-TO-TOP().
+    cbFavouriteSet:SENSITIVE = YES.
+
 
     /* Data */
     DO WITH FRAME frData:
@@ -10058,6 +10088,8 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_active.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_inactive.gif' )).
         btnTableFilter:SENSITIVE = TRUE.
+        cbFavouriteSet:SENSITIVE = FALSE.
+        cbFavouriteSet:VISIBLE = FALSE.
         RUN setTableView(NO,NO).
       END.
 
@@ -10066,6 +10098,8 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_active.gif' )).
         btnTableFilter:SENSITIVE = FALSE.
+        cbFavouriteSet:SENSITIVE = TRUE.
+        cbFavouriteSet:VISIBLE = TRUE.
         RUN setTableView(YES,NO).
       END.
     END CASE. /* piPage */
@@ -12132,3 +12166,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
