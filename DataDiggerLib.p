@@ -230,6 +230,19 @@ FUNCTION getEscapedData RETURNS CHARACTER
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getFieldList) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList Procedure 
+FUNCTION getFieldList RETURNS CHARACTER
+  ( pcDatabase AS CHARACTER
+  , pcFile     AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getFileCategory) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFileCategory Procedure 
@@ -629,7 +642,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 45
+         HEIGHT             = 32.43
          WIDTH              = 45.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -2005,15 +2018,9 @@ PROCEDURE getTables :
   DEFINE OUTPUT PARAMETER TABLE FOR ttTable. 
 
   DEFINE VARIABLE cCacheFile      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabaseName   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cIniFile        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLine           AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cQuery          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSection        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hDbBuffer       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hDbStatusBuffer AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileBuffer     AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFieldBuffer    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileQuery      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldQuery     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
@@ -2025,10 +2032,9 @@ PROCEDURE getTables :
   CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
 
   DO iDatabase = 1 TO NUM-DBS:
-    /* NelsonAlcala added */
     IF DBTYPE(iDatabase) <> "PROGRESS" THEN NEXT.
 
-    /* Calculate the name of the cache file */
+    /* Compose name of the cache file. Use date/time of last schema change in the name */
     IF glCacheTableDefs THEN
     DO:
       CREATE BUFFER hDbStatusBuffer FOR TABLE LDBNAME(iDatabase) + "._DbStatus" IN WIDGET-POOL "metaInfo".
@@ -2055,20 +2061,16 @@ PROCEDURE getTables :
       /* To get all tables */
       CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".
       CREATE BUFFER hFileBuffer  FOR TABLE LDBNAME(iDatabase) + "._file"  IN WIDGET-POOL "metaInfo".
-      CREATE BUFFER hFieldBuffer FOR TABLE LDBNAME(iDatabase) + "._field" IN WIDGET-POOL "metaInfo".
       CREATE QUERY hFileQuery  IN WIDGET-POOL "metaInfo".
   
       hFileQuery:SET-BUFFERS(hDbBuffer, hFileBuffer).
       hFileQuery:QUERY-PREPARE( "FOR EACH _Db NO-LOCK "
+                              + "   WHERE _Db._Db-local = TRUE"
                               + ",   EACH _File NO-LOCK"
                               + "   WHERE _File._Db-recid    = RECID(_Db)"
                               + "     AND _File._File-Number < 32768"
                               + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"
                               ).
-
-      /* To get all fields */
-      CREATE QUERY hFieldQuery IN WIDGET-POOL "metaInfo".
-      hFieldQuery:SET-BUFFERS(hFieldBuffer).
 
       hFileQuery:QUERY-OPEN().
       REPEAT:
@@ -2089,26 +2091,13 @@ PROCEDURE getTables :
         ASSIGN
           ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name)
           .
-
-        /* Build field list */
-        hFieldQuery:QUERY-PREPARE(SUBSTITUTE("FOR EACH _Field NO-LOCK WHERE _Field._File-Recid = &1", hFileBuffer:RECID) ).
-        hFieldQuery:QUERY-OPEN().
-
-        REPEAT:
-          hFieldQuery:GET-NEXT().
-          IF hFieldQuery:QUERY-OFF-END THEN LEAVE.
-          ttTable.cFields = ttTable.cFields + "," + hFieldBuffer::_Field-name.
-        END.
-
-        ttTable.cFields = TRIM(ttTable.cFields, ",").
-        hFieldQuery:QUERY-CLOSE().
+        ASSIGN 
+          ttTable.cFields     = getFieldList(LDBNAME(iDatabase), hFileBuffer::_file-name)
+          .
       END.
 
-      hFieldQuery:QUERY-CLOSE().
       hFileQuery:QUERY-CLOSE().
-      DELETE OBJECT hFieldQuery.
       DELETE OBJECT hFileQuery.
-      DELETE OBJECT hFieldBuffer.
       DELETE OBJECT hFileBuffer.
       DELETE OBJECT hDbBuffer.
 
@@ -2119,22 +2108,21 @@ PROCEDURE getTables :
         EMPTY TEMP-TABLE ttTableXml.
 
         CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
-
-        CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".
+        CREATE BUFFER hDbBuffer FOR TABLE LDBNAME(iDatabase) + "._Db" IN WIDGET-POOL "metaInfo".
 
         hFileQuery:SET-BUFFERS(hDbBuffer).
-        hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK ").
+        hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK WHERE _Db._Db-local = TRUE").
 
         hFileQuery:QUERY-OPEN().
         REPEAT:
-           hFileQuery:GET-NEXT().
-           IF hFileQuery:QUERY-OFF-END THEN LEAVE.
+          hFileQuery:GET-NEXT().
+          IF hFileQuery:QUERY-OFF-END THEN LEAVE.
 
-           FOR EACH ttTable 
-              WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
-          CREATE ttTableXml.
-          BUFFER-COPY ttTable TO ttTableXml.
-        END.
+          FOR EACH ttTable 
+            WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
+            CREATE ttTableXml.
+            BUFFER-COPY ttTable TO ttTableXml.
+          END.
         END.
 
         hFileQuery:QUERY-CLOSE().
@@ -2149,10 +2137,7 @@ PROCEDURE getTables :
 
   DELETE WIDGET-POOL "metaInfo".
 
-/*   /* By default, show all tables */ */
-/*   FOR EACH ttTable:                 */
-/*     ttTable.lShowInList = TRUE.     */
-/*   END.                              */
+  /* Apply filter to collection of tables */
   RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
 
   /* Get table properties from the INI file */
@@ -3822,13 +3807,8 @@ END FUNCTION. /* getColumnWidthList */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDatabaseList Procedure 
 FUNCTION getDatabaseList RETURNS CHARACTER:
 
-/*------------------------------------------------------------------------
-  Name         : getDatabaseList
-  Description  : Return a comma separated list of all connected datbases
-  ---------------------------------------------------------------------- 
-  22-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-  
+/* Return a comma separated list of all connected datbases
+ */
   DEFINE VARIABLE cDatabaseList  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSchemaHolders AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iCount         AS INTEGER     NO-UNDO.
@@ -3898,6 +3878,53 @@ FUNCTION getEscapedData RETURNS CHARACTER
   RETURN pcString.
 
 END FUNCTION. /* getEscapedData */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getFieldList) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList Procedure 
+FUNCTION getFieldList RETURNS CHARACTER
+  ( pcDatabase AS CHARACTER
+  , pcFile     AS CHARACTER
+  ):
+
+  /* Return a comma separated list of all fields 
+   * of a specific table in the database.
+   */
+  DEFINE VARIABLE hQuery  AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hFile   AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hField  AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cFields AS CHARACTER NO-UNDO.
+
+  CREATE BUFFER hFile FOR TABLE pcDatabase + "._file".
+  CREATE BUFFER hField FOR TABLE pcDatabase + "._field".
+  
+  CREATE QUERY hQuery.
+  hQuery:SET-BUFFERS(hFile,hField).
+  hQuery:QUERY-PREPARE(SUBSTITUTE('FOR EACH _File WHERE _File-name = &1, EACH _Field OF _File', QUOTER(pcFile))).
+  hQuery:QUERY-OPEN().
+
+  #CollectFields:
+  REPEAT:
+    hQuery:GET-NEXT().
+    IF hQuery:QUERY-OFF-END THEN LEAVE #CollectFields.
+    cFields = cFields + "," + hField::_Field-name.
+  END. /* #CollectFields */
+
+  RETURN TRIM(cFields, ",").
+
+  FINALLY:
+    hQuery:QUERY-CLOSE().
+    DELETE OBJECT hField.
+    DELETE OBJECT hFile.
+    DELETE OBJECT hQuery.
+  END FINALLY.
+
+END FUNCTION. /* getFieldList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

@@ -7,6 +7,13 @@
 
 DataDigger version 23 - 15 apr 2017 (Easter Egg)
 
+- Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
+
+
+=====================================================================================
+
+DataDigger version 23 - 15 apr 2017 (Easter Egg)
+
 - Solved: Query-open errors were not shown in tooltip of query fill-in
 - Solved: High nr of decimals on non-decimal fields could cause errors. See PKB P185263
 - Solved: Errors on SQL Server dataserver tables (Edwin Schutten)
