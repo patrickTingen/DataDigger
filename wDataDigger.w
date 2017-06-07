@@ -856,7 +856,7 @@ DEFINE QUERY brTables FOR
 DEFINE BROWSE brFields
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brFields C-Win _FREEFORM
   QUERY brFields DISPLAY
-      ttField.lShow VIEW-AS TOGGLE-BOX
+      ttField.lShow VIEW-AS TOGGLE-BOX 
   ttField.iOrder
   ttField.cFieldName
   (IF ttField.iExtent > 0
@@ -879,7 +879,7 @@ DEFINE BROWSE brFields
   ttField.cViewAs
 
   ENABLE
-  ttField.lShow
+  ttField.lShow 
   ttField.cFormat
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -929,7 +929,7 @@ DEFINE FRAME frMain
      fiFlagsFilter AT Y 5 X 860 COLON-ALIGNED NO-LABEL WIDGET-ID 164
      fiFieldsFilter AT Y 5 X 915 COLON-ALIGNED NO-LABEL WIDGET-ID 166
      btnClearIndexFilter AT Y 5 X 1065 WIDGET-ID 160
-     tgDebugMode AT Y 25 X 5 WIDGET-ID 238
+     tgDebugMode AT Y 25 X 5 WIDGET-ID 238 NO-TAB-STOP 
      brTables AT Y 27 X 38 WIDGET-ID 300
      brFields AT Y 27 X 295 WIDGET-ID 100
      btnMoveTop AT Y 28 X 760 WIDGET-ID 198
@@ -946,8 +946,8 @@ DEFINE FRAME frMain
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
@@ -972,54 +972,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1056,6 +1008,54 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 9.48 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1687,6 +1687,7 @@ DO:
   DEFINE VARIABLE lSelected AS LOGICAL NO-UNDO.
   DEFINE VARIABLE hOldFocus AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iBlink    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cField    AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -1706,10 +1707,18 @@ DO:
 
     hOldFocus = FOCUS:HANDLE.
 
-    /* make the column temporarily updatable and set focus to
-     * the column. This will make the browse shift to the left
-     * or the right if needed. Then apply focus back to where
-     * it was, make the column readonly again.
+    /* If the column is not visible, make it visible */
+    IF NOT bField.lShow THEN 
+    DO:
+      cField = bField.cFieldName.
+      IF bField.iExtent > 0 THEN cField = cField + '*'.
+
+      RUN showField(cField, TRUE).
+    END.
+
+    /* Make the column temporarily updatable and set focus to the column. 
+     * This will make the browse shift to the left or the right if needed. 
+     * Then apply focus back to where it was, make the column readonly again.
      * Setting focus back is needed, otherwise the browse row
      * cannot be selected using "select-focused-row"
      */
@@ -1728,7 +1737,7 @@ DO:
     setWindowFreeze(NO).
 
     /* Blink the filter field */
-    DO iBlink = 1 TO 3:
+    DO iBlink = 1 TO 2:
       IF iBlink > 1 THEN RUN doNothing(400).
       bColumn.hFilter:BGCOLOR = 14.
       RUN doNothing(400).
@@ -1738,7 +1747,6 @@ DO:
     gcLastDataField = bColumn.cFullName.
 
     APPLY "entry" TO bColumn.hColumn.
-    .run dataOffHome.
   END.
 END.
 
@@ -1785,25 +1793,23 @@ OR " "           OF ttField.lShow IN BROWSE brFields
 OR VALUE-CHANGED OF ttField.lShow IN BROWSE brFields
 OR " "           OF BROWSE brFields
 DO:
-  DEFINE BUFFER ttField FOR ttField.
+  DEFINE BUFFER bField FOR ttField.
   DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
 
   PUBLISH "setUsage" ("hideField"). /* user behaviour */
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    FIND ttField WHERE ttField.cFullName = brFields:GET-BROWSE-COLUMN(3):SCREEN-VALUE NO-ERROR.
-    ttField.lShow = NOT ttField.lShow.
-    cField = ttField.cFieldName.
+    FIND bField WHERE bField.cFullName = brFields:GET-BROWSE-COLUMN(3):SCREEN-VALUE NO-ERROR.
+    bField.lShow = NOT bField.lShow.
+    brFields:GET-BROWSE-COLUMN(1):CHECKED = bField.lShow.
 
-    /* This will include all extents */
-    IF ttField.iExtent > 0 THEN cField = cField + '*'.
+    /* Adjust name for extents */
+    cField = bField.cFieldName.
+    IF bField.iExtent > 0 THEN cField = cField + '*'.
 
-    brFields:GET-BROWSE-COLUMN(1):CHECKED = ttField.lShow.
-
-    RUN showField( INPUT cField, INPUT ttField.lShow).
+    RUN showField( INPUT cField, INPUT bField.lShow).
   END.
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3316,9 +3322,9 @@ PROCEDURE CtrlFrame.PSTimer.Tick .
   /* Find the timer that caused the event */
   DEFINE BUFFER bTimer FOR ttTimer.
 
-  /* Turn off events when we're running */
   IF NOT glUseTimer THEN RETURN.
 
+  /* Turn off events while handling events */
   chCtrlFrame:pstimer:ENABLED = FALSE.
 
   /* No timer stuff in debug mode */
@@ -7820,6 +7826,7 @@ PROCEDURE initializeUi :
 
     WITH FRAME frMain IN WINDOW C-Win.
 
+
   /* FRAME frHint */
   DISPLAY
     edHint
@@ -11863,11 +11870,11 @@ FUNCTION getSelectedFields RETURNS CHARACTER
 /* Return all selected fields.
  */
   DEFINE VARIABLE cSelectedFields AS CHARACTER  NO-UNDO.
-  DEFINE BUFFER ttField FOR ttField.
+  DEFINE BUFFER bField FOR ttField.
 
   /* All selected fields */
-  FOR EACH ttField WHERE ttField.lShow = TRUE BY ttField.iOrder:
-    cSelectedFields = cSelectedFields + ',' + ttField.cFullName.
+  FOR EACH bField WHERE bField.lShow = TRUE BY bField.iOrder:
+    cSelectedFields = cSelectedFields + ',' + bField.cFullName.
     IF LENGTH(cSelectedFields) > 20000 THEN LEAVE.
   END.
 

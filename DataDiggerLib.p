@@ -1846,7 +1846,7 @@ PROCEDURE getFields :
     bField.cTablename    = pcTableName
     bField.cFieldName    = "RECID"
                           
-    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRecidField ELSE LOOKUP('RECID',cSelectedFields) > 0)
+    bField.lShow         = lShowRecidField
     bField.iOrder        = iFieldOrder
     bField.iOrderOrg     = iFieldOrder
     bField.cFullName     = 'RECID'
@@ -1881,7 +1881,7 @@ PROCEDURE getFields :
     bField.cTablename    = pcTableName
     bField.cFieldName    = "ROWID"
                           
-    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRowidField ELSE LOOKUP('ROWID',cSelectedFields) > 0)
+    bField.lShow         = lShowRowidField
     bField.iOrder        = iFieldOrder
     bField.iOrderOrg     = iFieldOrder
     bField.cFieldName    = 'ROWID'
@@ -3487,8 +3487,8 @@ PROCEDURE updateFields :
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
 
     /* RECID / ROWID field visibility might be changed */
-/*     IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN                                          */
-/*       bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)). */
+    IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN
+      bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)).
 
   END. /* f/e bField */
 
@@ -4126,7 +4126,7 @@ FUNCTION getKeyList RETURNS CHARACTER
   ----------------------------------------------------------------------*/
 
   DEFINE VARIABLE L-KBSTATE AS MEMPTR NO-UNDO. 
-  DEFINE VARIABLE L-RETURNVALUE AS INTEGER NO-UNDO. 
+  DEFINE VARIABLE L-RETURNVALUE AS INT64 NO-UNDO.
   DEFINE VARIABLE L-SHIFTLIST AS CHARACTER NO-UNDO. 
   
   SET-SIZE(L-KBSTATE) = 256.
@@ -5280,4 +5280,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-
