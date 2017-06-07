@@ -14,6 +14,7 @@
            DD18: customDump moved here instead of having its own .p
            DD20: customShowField added
            DD21: customSaveFilterValue / customGetFilterValue added, customFilter removed
+           DD24: added support for events 'query' and 'datadigger'
 
  *************************************************************************/
 
@@ -210,3 +211,56 @@ PROCEDURE customSaveFilterValue:
   /* IF pcField MATCHES "*_domain" THEN global_domain = pcFilterValue. */
 
 END PROCEDURE. /* customSaveFilterValue */
+
+
+PROCEDURE DataDigger:
+  /*
+   * Name: DataDigger
+   * Desc: Called on open and close of a DataDigger window.
+   * 
+   * When DD is started and closed, this event is published 
+   * with piNumber = 1 for opening and -1 for closing. 
+   */
+  DEFINE INPUT PARAMETER piNumber AS INTEGER.
+  
+  /* Check if we are allowed to start */
+  IF piNumber = 1 
+    AND SEARCH('db-maintenance.txt') <> ? THEN 
+  DO:
+    MESSAGE 'Sorry, db is in maintenance, please try again later' VIEW-AS ALERT-BOX.
+    QUIT.
+  END.
+
+END PROCEDURE. /* DataDigger */
+
+
+PROCEDURE queryOpen:
+  /* 
+   * Name: queryOpen
+   * Desc: Receive the full query that is executed
+   */
+  DEFINE INPUT PARAMETER pcQuery AS CHARACTER NO-UNDO. 
+  
+  /* DEFINE VARIABLE iWord  AS INTEGER   NO-UNDO.                     */
+  /* DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.                     */
+  /*                                                                  */
+  /* /* Remove double spaces */                                       */
+  /* DO WHILE REPLACE(pcQuery,'  ', ' ') <> pcQuery:                  */
+  /*   pcQuery = REPLACE(pcQuery,'  ', ' ').                          */
+  /* END.                                                             */
+  /*                                                                  */
+  /* /* Parse the query word by word and look for the domain field    */
+  /*  * If the domain field is used in an equality match, filter out  */
+  /*  * the value and save that as the new global_domain              */
+  /*  */                                                              */
+  /* DO iWord = 1 TO NUM-ENTRIES(pcQuery,' ') - 2:                    */
+  /*   IF ENTRY(iWord,pcQuery,' ') MATCHES '*_domain'                 */
+  /*     AND ENTRY(iWord + 1,pcQuery,' ') = '=' THEN                  */
+  /*   DO:                                                            */
+  /*     cValue = ENTRY(iWord + 2,pcQuery,' ').                       */
+  /*     cValue = TRIM(cValue,'()"~'').                               */
+  /*     IF cValue > '' THEN global_domain = cValue.                  */
+  /*   END.                                                           */
+  /* END.                                                             */
+  
+END PROCEDURE. /* queryOpen */
