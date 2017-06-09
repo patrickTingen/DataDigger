@@ -187,8 +187,8 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnQueries btnFavourite btnClipboard btnNextQuery ~
-ficWhere btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -944,12 +944,12 @@ DEFINE FRAME frMain
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -972,54 +972,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1056,6 +1008,54 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 9.48 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -5317,8 +5317,14 @@ PROCEDURE convertSettings :
       OS-DELETE image/default_Dock.gif.
       OS-DELETE image/default_Tab_Favorites_Active.gif.
       OS-DELETE image/default_Tab_Favorites_Inactive.gif.
-
     END. /* 22 */
+
+    WHEN 23 THEN
+    DO:
+      /* Settings removed */
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRecid" VALUE ? NO-ERROR.
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRowid" VALUE ? NO-ERROR.
+    END. /* 23 */
     
   END CASE. /* old version */
 
@@ -6173,7 +6179,7 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnQueries btnFavourite btnClipboard btnNextQuery ficWhere 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
          btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
          btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
          btnAdd btnEdit fiFeedback 
@@ -7534,6 +7540,8 @@ PROCEDURE initializeObjects :
     cSetting = getRegistry("DataDigger","ColumnSortFields").
     IF cSetting <> ? THEN
       brFields:SET-SORT-ARROW(INTEGER(ENTRY(1,cSetting)), LOGICAL(ENTRY(2,cSetting)) ).
+    ELSE 
+      brFields:SET-SORT-ARROW(2, TRUE ). /* default sort on nr */
 
     /* Get sort for indexes */
     cSetting = getRegistry("DataDigger","ColumnSortIndexes").
@@ -9172,8 +9180,8 @@ PROCEDURE reopenFieldBrowse :
     IF pcSortField = '' THEN pcSortField = ?.
 
     /* Remember record we're on */
-    IF brFields:num-selected-rows > 0 THEN
-      rCurrentRecord = brFields:query:get-buffer-handle(1):rowid.
+    IF brFields:NUM-SELECTED-ROWS > 0 THEN
+      rCurrentRecord = brFields:QUERY:GET-BUFFER-HANDLE(1):ROWID.
 
     /* Find out what the current sort is */
     RUN getColumnSort(INPUT brFields:handle, OUTPUT cOldSort, OUTPUT lAscending).
@@ -9200,16 +9208,16 @@ PROCEDURE reopenFieldBrowse :
     IF plAscending <> ? THEN lAscending = plAscending.
 
     /* Wich column should have what arrow? */
-    RUN setSortArrow(brFields:handle, cNewSort, lAscending).
+    RUN setSortArrow(brFields:HANDLE, cNewSort, lAscending).
 
     /* If - and only if - the sort is on 'Order', the buttons for moving are enabled */
-    btnMoveUp:sensitive     = (cNewSort = "iOrder").
-    btnMoveDown:sensitive   = (cNewSort = "iOrder").
-    btnMoveTop:sensitive    = (cNewSort = "iOrder").
-    btnMoveBottom:sensitive = (cNewSort = "iOrder").
+    btnMoveUp:SENSITIVE     = (cNewSort = "iOrder").
+    btnMoveDown:SENSITIVE   = (cNewSort = "iOrder").
+    btnMoveTop:SENSITIVE    = (cNewSort = "iOrder").
+    btnMoveBottom:SENSITIVE = (cNewSort = "iOrder").
 
     /* Close open query */
-    IF VALID-HANDLE(brFields:query) THEN brFields:query:query-close().
+    IF VALID-HANDLE(brFields:QUERY) THEN brFields:QUERY:QUERY-CLOSE().
 
     /* Build the query */
     CREATE QUERY hQuery.
@@ -9243,11 +9251,11 @@ PROCEDURE reopenFieldBrowse :
                            , bFilter.cFieldName
                            , cOperator
                            , QUOTER(cFilterValue)
-                           , IF VALID-HANDLE(bFilter.hColumn) THEN bFilter.hColumn:data-type ELSE "?"
+                           , IF VALID-HANDLE(bFilter.hColumn) THEN bFilter.hColumn:DATA-TYPE ELSE "?"
                            , "&1"
                            ).
         /* Show red line */
-        rcFieldFilter:visible = TRUE.
+        rcFieldFilter:VISIBLE = TRUE.
       END.
     END.
 
@@ -11329,8 +11337,11 @@ PROCEDURE startDiggerLib :
     SUBSCRIBE PROCEDURE hDiggerLib TO "customFormat" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "CustomGetFilterValue" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "customGetFilterValue" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
+
 
   END.
 END PROCEDURE. /* startDiggerLib */

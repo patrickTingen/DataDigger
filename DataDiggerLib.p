@@ -642,7 +642,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 32.43
+         HEIGHT             = 38
          WIDTH              = 45.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -1198,11 +1198,8 @@ PROCEDURE dumpRecord :
       
   IF plContinue <> ? THEN
   DO:
-    IF cMessage <> "" THEN 
-      MESSAGE cMessage VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-
-    IF NOT lDefaultDump OR NOT plContinue THEN
-      RETURN. 
+    IF cMessage <> "" THEN MESSAGE cMessage VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+    IF NOT lDefaultDump OR NOT plContinue THEN RETURN.
   END.
 
   plContinue = hExportTT:WRITE-XML
@@ -1615,9 +1612,8 @@ PROCEDURE getFields :
   DEFINE VARIABLE iFieldExtent       AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iFieldOrder        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lDataField         AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShowRecidField    AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShowRowidField    AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iDataOrder         AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE i                  AS INTEGER     NO-UNDO.
 
   DEFINE BUFFER bTable       FOR ttTable. 
   DEFINE BUFFER bField       FOR ttField. 
@@ -1756,7 +1752,7 @@ PROCEDURE getFields :
 
   /* Get field ordering */
   cFieldOrder = getRegistry(SUBSTITUTE('DB:&1',pcDatabase), SUBSTITUTE('&1:FieldOrder',pcTableName)).
-              
+
   REPEAT WHILE NOT hQuery:QUERY-OFF-END:
 
     CREATE bField.
@@ -1834,80 +1830,45 @@ PROCEDURE getFields :
   /* Fieldlist */
   bTable.cFields = SUBSTRING(bTable.cFields,2).
 
-  /* Add a column for the recid */
-  lShowRecidField = LOGICAL(getRegistry ("DataDigger", "AddDataColumnForRecid")).
-  lShowRowidField = LOGICAL(getRegistry ("DataDigger", "AddDataColumnForRowid")).
+  /* Add columns for recid/rowid */                 
+  DO i = 1 TO 2:
 
-  CREATE bField.
-  ASSIGN 
-    iFieldOrder          = iFieldOrder + 1
-    bField.cTableCacheId = bTable.cCacheId
-    bField.cDatabase     = pcDatabase
-    bField.cTablename    = pcTableName
-    bField.cFieldName    = "RECID"
-                          
-    bField.lShow         = lShowRecidField
-    bField.iOrder        = iFieldOrder
-    bField.iOrderOrg     = iFieldOrder
-    bField.cFullName     = 'RECID'
-    bField.cDataType     = 'character'
-    bField.cInitial      = ''
-    bField.cFormat       = 'X(14)'
-    bField.cFormatOrg    = 'X(14)'
-    bField.cLabel        = 'RECID'
-    bField.lPrimary      = NO
-    bField.iExtent       = 0
-    .
-  iDataOrder = iDataOrder + 1. 
-  CREATE bColumn.
-  ASSIGN
-    bColumn.cTableCacheId = bField.cTableCacheId
-    bColumn.cDatabase     = bField.cDatabase
-    bColumn.cTableName    = bField.cTablename
-    bColumn.cFieldName    = bField.cFieldName
-    bColumn.iExtent       = 0
-    bColumn.cFullName     = bField.cFieldName
-    bColumn.iColumnNr     = iDataOrder
-    bColumn.iOrder        = bField.iOrder
-    bColumn.cLabel        = bField.cLabel
-    .
+    CREATE bField.
+    ASSIGN
+      iFieldOrder          = iFieldOrder + 1
+      bField.cTableCacheId = bTable.cCacheId
+      bField.cDatabase     = pcDatabase
+      bField.cTablename    = pcTableName
+      bField.cFieldName    = ENTRY(i,"RECID,ROWID")
+      bField.lShow         = FALSE
+      bField.iOrder        = iFieldOrder
+      bField.iOrderOrg     = iFieldOrder
+      bField.cFieldName    = bField.cFieldName
+      bField.cFullName     = bField.cFieldName
+      bField.cDataType     = 'character'
+      bField.cInitial      = ''
+      bField.cFormat       = ENTRY(i,"X(14),X(30)")
+      bField.cFormatOrg    = bField.cFormat
+      bField.cLabel        = bField.cFieldName
+      bField.lPrimary      = NO
+      bField.iExtent       = 0
+      .
 
-  /* Add a column for the rowid */
-  CREATE bField.
-  ASSIGN 
-    iFieldOrder           = iFieldOrder + 1
-    bField.cTableCacheId = bTable.cCacheId
-    bField.cDatabase     = pcDatabase
-    bField.cTablename    = pcTableName
-    bField.cFieldName    = "ROWID"
-                          
-    bField.lShow         = lShowRowidField
-    bField.iOrder        = iFieldOrder
-    bField.iOrderOrg     = iFieldOrder
-    bField.cFieldName    = 'ROWID'
-    bField.cFullName     = 'ROWID'
-    bField.cDataType     = 'character'
-    bField.cInitial      = ''
-    bField.cFormat       = 'X(30)'
-    bField.cFormatOrg    = 'X(30)'
-    bField.cLabel        = 'ROWID'
-    bField.lPrimary      = NO
-    bField.iExtent       = 0
-    .
-  iDataOrder = iDataOrder + 1. 
-  CREATE bColumn.
-  ASSIGN
-    bColumn.cTableCacheId = bField.cTableCacheId
-    bColumn.cDatabase     = bField.cDatabase
-    bColumn.cTableName    = bField.cTablename
-    bColumn.cFieldName    = bField.cFieldName
-    bColumn.iExtent       = 0
-    bColumn.cFullName     = bField.cFieldName
-    bColumn.iColumnNr     = iDataOrder
-    bColumn.iOrder        = bField.iOrder
-    bColumn.cLabel        = bField.cLabel
-    .
-    
+    iDataOrder = iDataOrder + 1.
+    CREATE bColumn.
+    ASSIGN
+      bColumn.cTableCacheId = bField.cTableCacheId
+      bColumn.cDatabase     = bField.cDatabase
+      bColumn.cTableName    = bField.cTablename
+      bColumn.cFieldName    = bField.cFieldName
+      bColumn.iExtent       = 0
+      bColumn.cFullName     = bField.cFieldName
+      bColumn.iColumnNr     = iDataOrder
+      bColumn.iOrder        = bField.iOrder
+      bColumn.cLabel        = bField.cLabel
+      .                                            
+  END.
+
   /* Update the cache */
   IF glCacheFieldDefs THEN
   DO:
@@ -1926,8 +1887,6 @@ PROCEDURE getFields :
       CREATE bColumnCache.
       BUFFER-COPY bColumn TO bColumnCache.
     END.
-
-    /* Update table cache */
   END.
 
   /* Update fields with settings from registry */
@@ -3426,7 +3385,6 @@ PROCEDURE updateFields :
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldOrder        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lSaveDataFilters   AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShow              AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iColumnOrder       AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iFieldOrder        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxExtent         AS INTEGER     NO-UNDO.
@@ -3441,7 +3399,7 @@ PROCEDURE updateFields :
 
   /* Get list of all previously selected fields */
   cSelectedFields = getRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:fields",pcTableName)).
-  IF cSelectedFields = ? THEN cSelectedFields = '*'.
+  IF cSelectedFields = ? THEN cSelectedFields = '!RECID,!ROWID,*'.
 
   /* Get field ordering */
   cFieldOrder = getRegistry(SUBSTITUTE('DB:&1',pcDatabase), SUBSTITUTE('&1:fieldOrder',pcTableName)).
@@ -3486,10 +3444,6 @@ PROCEDURE updateFields :
     /* Keep track of highest nr */
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
 
-    /* RECID / ROWID field visibility might be changed */
-    IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN
-      bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)).
-
   END. /* f/e bField */
 
   /* Only show first X of an extent */
@@ -3499,7 +3453,6 @@ PROCEDURE updateFields :
   FOR EACH bColumn WHERE bColumn.iExtent > iMaxExtent:
     DELETE bColumn.
   END.
-
 
   IF CAN-FIND(FIRST bField WHERE bField.iOrder = 0) THEN
   DO:
