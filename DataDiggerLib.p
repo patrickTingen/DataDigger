@@ -2187,11 +2187,11 @@ PROCEDURE getTablesFiltered :
      * Virtual system tables: _file-number < -16384
      * SQL catalog tables   : _file-name BEGINS "_sys"
      */
-    IF NOT lNormal AND ttTable.cCategory = 'Application' THEN NEXT tableLoop.
-    IF NOT lSchema AND ttTable.cCategory = 'Schema'      THEN NEXT tableLoop.
-    IF NOT lVst    AND ttTable.cCategory = 'VST'         THEN NEXT tableLoop.
-    IF NOT lSql    AND ttTable.cCategory = 'SQL'         THEN NEXT tableLoop.
-    IF NOT lOther  AND ttTable.cCategory = 'Other'       THEN NEXT tableLoop.
+    IF NOT lNormal AND ttTable.cCategory = 'Normal' THEN NEXT tableLoop.
+    IF NOT lSchema AND ttTable.cCategory = 'Schema' THEN NEXT tableLoop.
+    IF NOT lVst    AND ttTable.cCategory = 'VST'    THEN NEXT tableLoop.
+    IF NOT lSql    AND ttTable.cCategory = 'SQL'    THEN NEXT tableLoop.
+    IF NOT lOther  AND ttTable.cCategory = 'Other'  THEN NEXT tableLoop.
 
     /* Handling for Hidden and Frozen apply only to user tables otherwise it will be too confusing
      * because Schema, VST and SQL tables are all by default hidden and frozen. 
