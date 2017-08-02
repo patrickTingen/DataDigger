@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- How to execute : ant -lib %DLC%\pct\dist\PCT.jar -DDLC=%DLC% clean build -->
+<project name="DataDigger" >
+  <taskdef resource="PCT.properties" />
+  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" />
+
+  <target name="clean">
+    <delete dir="target" />
+  </target>
+
+  <target name="init">
+    <mkdir dir="target/build" />
+    <mkdir dir="target/db" />
+    <PCTVersion />
+    <ProgressVersion dlcHome="${DLC}" fullVersion="dlc.version.full" />
+    <echo message="${dlc.version.full}" />
+    <sports2000 destDir="target/db" dlcHome="${DLC}" />
+  </target>
+
+  <target name="build">
+    <PCTCompile destdir="target/build" graphicalMode="true" dlcHome="${DLC}" cpinternal="utf-8" cpstream="utf-8" listing="true" relativePaths="true" xmlXref="true" keepXref="true" requireFullKeywords="false" requireFullNames="true" requireFieldQualifiers="true">
+      <fileset dir="." includes="*.p,*.w,*.cls" />
+      <DbConnection dbDir="target/db" dbName="sports2000" readOnly="true" />
+      <propath>
+        <pathelement location="." />
+      </propath>
+    </PCTCompile>
+  </target>
+
+  <target name="test">
+    <mkdir dir="profiler" />
+    <ABLUnit dlcHome="${DLC}" graphicalMode="true">
+      <fileset dir="unitTest" includes="*.cls" />
+      <DbConnection dbDir="target/db" dbName="sports2000" readOnly="true" />
+      <Profiler enabled="true" coverage="true" outputDir="profiler" />
+      <propath>
+        <pathelement path="unitTest" />
+      </propath>
+    </ABLUnit>
+    <xmltask source="results.xml" dest="sonar.xml">
+      <rename path="//testsuites" to="testExecutions" />
+      <attr path="//testExecutions" attr="version" value="1" />
+      <rename path="//testsuite" to="file" />
+      <rename path="//file/@name" to="path" />
+      <rename path="//testcase" to="testCase" />
+      <remove path="//testCase/@time" />
+      <attr path="//testCase" attr="duration" value="0" />
+    </xmltask>
+  </target>
+
+  <target name="dist">
+    <zip destFile="target/DataDigger.zip">
+      <fileset dir="target/build" includes="*.r" />
+      <fileset dir="." includes="*.wrx" />
+      <fileset dir="." includes="*.bat,*.ini,*.txt,image/*" />
+    </zip>
+    <touch file="empty_schema.df" />
+  </target>
+
+</project>
