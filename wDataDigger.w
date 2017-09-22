@@ -3480,8 +3480,8 @@ DO:
   /* If you enter the field and you have not put in a filter,
    * clear out the field so you can type something yourself
    */
-  IF SELF:screen-value = SELF:private-data THEN
-    SELF:screen-value = ''.
+  IF SELF:SCREEN-VALUE = SELF:PRIVATE-DATA AND SELF:MODIFIED = FALSE THEN
+    SELF:SCREEN-VALUE = ''.
 
   setFilterFieldColor(SELF:handle).
 END.
@@ -3495,8 +3495,12 @@ ON LEAVE OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
-  IF SELF:SCREEN-VALUE = '' THEN SELF:SCREEN-VALUE = SELF:PRIVATE-DATA.
-  setFilterFieldColor(SELF:handle).
+  IF SELF:SCREEN-VALUE = '' THEN 
+    ASSIGN 
+      SELF:SCREEN-VALUE = SELF:PRIVATE-DATA
+      SELF:MODIFIED = FALSE
+      .
+  setFilterFieldColor(SELF:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4895,9 +4899,9 @@ PROCEDURE clearIndexFilter :
 /* Reset the index filters to the blank values
  */
   DO WITH FRAME frMain:
-    fiIndexNameFilter:screen-value = fiIndexNameFilter:private-data.
-    fiFlagsFilter    :screen-value = fiFlagsFilter    :private-data.
-    fiFieldsFilter   :screen-value = fiFieldsFilter   :private-data.
+    fiIndexNameFilter:screen-value = fiIndexNameFilter:PRIVATE-DATA.
+    fiFlagsFilter    :screen-value = fiFlagsFilter    :PRIVATE-DATA.
+    fiFieldsFilter   :screen-value = fiFieldsFilter   :PRIVATE-DATA.
 
     setFilterFieldColor(fiIndexNameFilter:handle).
     setFilterFieldColor(fiFlagsFilter    :handle).
@@ -6179,7 +6183,7 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnQueries btnFavourite btnClipboard btnNextQuery ficWhere 
          btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
          btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
          btnAdd btnEdit fiFeedback 
@@ -8984,6 +8988,7 @@ PROCEDURE reopenDataBrowse-create :
             FORMAT        = "x(40)"
             PRIVATE-DATA  = bColumn.cFullName
             SCREEN-VALUE  = bColumn.cFullName
+            MODIFIED      = NO /*170901*/
           .
       ELSE
       DO:
@@ -9002,6 +9007,7 @@ PROCEDURE reopenDataBrowse-create :
             SCREEN-VALUE  = bColumn.cFullName
             INNER-LINES   = MINIMUM(10,giMaxFilterHistory)
             DELIMITER     = CHR(1)
+            MODIFIED      = NO /*170901*/
             .
 
         /* Place search history in the combo */
@@ -9244,7 +9250,8 @@ PROCEDURE reopenFieldBrowse :
       IF    cFilterValue <> ""
         AND cFilterValue <> "*"
         AND cFilterValue <> ?
-        AND cFilterValue <> bFilter.hFilter:private-data THEN
+        AND cFilterValue <> bFilter.hFilter:private-data 
+        AND bFilter.hFilter:MODIFIED THEN /*170901*/
       DO:
         cQuery = SUBSTITUTE("&1 and substitute('&6',ttField.&2) &3 &4 /* &5 */"
                            , cQuery
@@ -10176,7 +10183,8 @@ PROCEDURE setRedLines :
           IF    cFilterValue <> ""
             AND cFilterValue <> "*"
             AND cFilterValue <> ?
-            AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA THEN
+            AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA 
+            AND bFilter.hFilter:MODIFIED THEN /*170901*/
           DO:
             /* Show red line */
             rcFieldFilter:VISIBLE = TRUE.
@@ -12188,4 +12196,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
