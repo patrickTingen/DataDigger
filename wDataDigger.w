@@ -187,8 +187,8 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
-btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
+btnWhere btnClear btnQueries btnFavourite btnClipboard btnNextQuery ~
+ficWhere btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -944,12 +944,12 @@ DEFINE FRAME frMain
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnClipboard AT Y 265 X 735 WIDGET-ID 178
-     ficWhere AT Y 266 X 50 NO-LABEL
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnFavourite AT Y 239 X 238 WIDGET-ID 310
+     btnClipboard AT Y 265 X 735 WIDGET-ID 178
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     ficWhere AT Y 266 X 50 NO-LABEL
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -7047,11 +7047,11 @@ PROCEDURE getSortFromQuery :
   END.
 
   /* Split query on the word ' BY ' */
-  pcQuery = REPLACE(pcQuery,' BY ', '|').
+  pcQuery = REPLACE(pcQuery,' BY ', CHR(1)).
 
   IndexLoop:
-  DO iPart = 2 TO NUM-ENTRIES(pcQuery,'|'):
-    cPart = TRIM(ENTRY(iPart,pcQuery,'|')).
+  DO iPart = 2 TO NUM-ENTRIES(pcQuery,CHR(1)):
+    cPart = TRIM(ENTRY(iPart,pcQuery,CHR(1))).
 
     CREATE bfQuerySort.
     ASSIGN
@@ -11458,7 +11458,8 @@ PROCEDURE startSession :
 
     /* Check for new versions on GitHub */
     iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
-    RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
+    IF iChannel <> {&CHECK-MANUAL} THEN
+      RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
 
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
   END.

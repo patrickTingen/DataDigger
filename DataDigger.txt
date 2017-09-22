@@ -11,6 +11,8 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Double-click on hidden field does not show the field
 - Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendörfer)
 - Solved: Extra filter refused to hide normal tables (Edwin Schutten)
+- Solved: Query fails when search condition contains pipe symbol (Mike Raschendörfer)
+- Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 
