@@ -187,8 +187,8 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnQueries btnFavourite btnClipboard btnNextQuery ~
-ficWhere btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -944,12 +944,12 @@ DEFINE FRAME frMain
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      ficWhere AT Y 266 X 50 NO-LABEL
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -6183,7 +6183,7 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnQueries btnFavourite btnClipboard btnNextQuery ficWhere 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
          btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
          btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
          btnAdd btnEdit fiFeedback 
@@ -7763,8 +7763,8 @@ PROCEDURE initializeSettingsFile :
   END.
 
   /* Turn backups on by default */
-  setRegistry("DataDigger:Backup","BackupOnUpdate", "YES").
-  setRegistry("DataDigger:Backup","BackupOnDelete", "YES").
+  IF getRegistry("DataDigger:Backup","BackupOnUpdate") = ? THEN setRegistry("DataDigger:Backup","BackupOnUpdate", "YES").
+  IF getRegistry("DataDigger:Backup","BackupOnDelete") = ? THEN setRegistry("DataDigger:Backup","BackupOnDelete", "YES").
 
   IF   getRegistry("DumpAndLoad", "DumpDir") = ?
     OR getRegistry("DumpAndLoad", "DumpDir") = '' THEN setRegistry("DumpAndLoad", "DumpDir", "<PROGDIR>\Dump\").
@@ -12196,3 +12196,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

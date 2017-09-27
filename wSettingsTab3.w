@@ -72,20 +72,24 @@ btnMM btnMonth btnSS btnTime btnTimestamp btnYear
 DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
+DEFINE RECTANGLE RECT-17
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 560 BY 30.
+
 DEFINE VARIABLE tgBackupOnCreate AS LOGICAL INITIAL no 
      LABEL "Backup on &Create" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 120 BY 17 TOOLTIP "save a copy of the record as xml on creation" NO-UNDO.
+     SIZE-PIXELS 174 BY 17 TOOLTIP "save a copy of the record as xml on creation" NO-UNDO.
 
 DEFINE VARIABLE tgBackupOnDelete AS LOGICAL INITIAL no 
      LABEL "Backup on &Delete" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 115 BY 17 TOOLTIP "save a copy of the record as xml on deletion" NO-UNDO.
+     SIZE-PIXELS 160 BY 17 TOOLTIP "save a copy of the record as xml on deletion" NO-UNDO.
 
 DEFINE VARIABLE tgBackupOnUpdate AS LOGICAL INITIAL no 
      LABEL "Backup on &Update" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 120 BY 17 TOOLTIP "save a copy of the record as xml on change" NO-UNDO.
+     SIZE-PIXELS 175 BY 17 TOOLTIP "save a copy of the record as xml on change" NO-UNDO.
 
 DEFINE BUTTON btnAction  NO-FOCUS
      LABEL "<ACTION>" 
@@ -193,11 +197,11 @@ DEFINE VARIABLE fiFileTemplate AS CHARACTER
 
 DEFINE RECTANGLE RECT-14
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 560 BY 300.
+     SIZE-PIXELS 560 BY 315.
 
 DEFINE RECTANGLE RECT-15
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 560 BY 202.
+     SIZE-PIXELS 560 BY 208.
 
 DEFINE RECTANGLE RECT-16
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
@@ -212,65 +216,66 @@ DEFINE FRAME DEFAULT-FRAME
          AT X 0 Y 0
          SIZE-PIXELS 586 BY 556 WIDGET-ID 100.
 
+DEFINE FRAME FRAME-O
+     btnSeq AT Y 298 X 450 WIDGET-ID 210
+     fiDirTemplate AT Y 23 X 30 NO-LABEL WIDGET-ID 166
+     fiFileTemplate AT Y 48 X 30 NO-LABEL WIDGET-ID 176
+     fiFileExample AT Y 74 X 30 NO-LABEL WIDGET-ID 212
+     btnAction AT Y 298 X 240 WIDGET-ID 196
+     fiDumpDirTemplate AT Y 127 X 30 NO-LABEL WIDGET-ID 178
+     fiDumpFileTemplate AT Y 152 X 30 NO-LABEL WIDGET-ID 182
+     fiDumpFileExample AT Y 176 X 30 NO-LABEL WIDGET-ID 214
+     btnDb AT Y 232 X 345 WIDGET-ID 200
+     btnDumpName AT Y 276 X 450 WIDGET-ID 204
+     btnExt AT Y 298 X 345 WIDGET-ID 198
+     btnLastDir AT Y 254 X 450 WIDGET-ID 208
+     btnProgDir AT Y 232 X 450 WIDGET-ID 206
+     btnTable AT Y 254 X 345 WIDGET-ID 202
+     btnUserid AT Y 276 X 345 WIDGET-ID 194
+     btnWeekday AT Y 298 X 30 WIDGET-ID 148
+     btnDate AT Y 254 X 30 WIDGET-ID 140
+     btnDay AT Y 276 X 135 WIDGET-ID 156
+     btnDayName AT Y 298 X 135 WIDGET-ID 150
+     btnHH AT Y 232 X 240 WIDGET-ID 158
+     btnMM AT Y 254 X 240 WIDGET-ID 160
+     btnMonth AT Y 254 X 135 WIDGET-ID 154
+     btnSS AT Y 276 X 240 WIDGET-ID 162
+     btnTime AT Y 276 X 30 WIDGET-ID 142
+     btnTimestamp AT Y 232 X 30 WIDGET-ID 138
+     btnYear AT Y 232 X 135 WIDGET-ID 152
+     "Backup template" VIEW-AS TEXT
+          SIZE-PIXELS 111 BY 13 AT Y 5 X 14 WIDGET-ID 172
+     "Use these fields for templates :" VIEW-AS TEXT
+          SIZE-PIXELS 185 BY 13 AT Y 210 X 10 WIDGET-ID 146
+     "File:" VIEW-AS TEXT
+          SIZE-PIXELS 23 BY 13 AT Y 56 X 7 WIDGET-ID 174
+     "File:" VIEW-AS TEXT
+          SIZE-PIXELS 23 BY 13 AT Y 158 X 5 WIDGET-ID 184
+     "Dir:" VIEW-AS TEXT
+          SIZE-PIXELS 23 BY 13 AT Y 28 X 7 WIDGET-ID 168
+     "Dump template" VIEW-AS TEXT
+          SIZE-PIXELS 100 BY 13 AT Y 109 X 10 WIDGET-ID 190
+     "Dir:" VIEW-AS TEXT
+          SIZE-PIXELS 23 BY 13 AT Y 131 X 5 WIDGET-ID 186
+     RECT-14 AT Y 10 X 0 WIDGET-ID 170
+     RECT-15 AT Y 117 X 0 WIDGET-ID 188
+     RECT-16 AT Y 218 X 0 WIDGET-ID 192
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 59
+         SIZE-PIXELS 565 BY 368
+         TITLE "3" WIDGET-ID 1600.
+
 DEFINE FRAME FRAME-K
-     tgBackupOnCreate AT Y 0 X 120 WIDGET-ID 126
-     tgBackupOnUpdate AT Y 0 X 255 WIDGET-ID 130
-     tgBackupOnDelete AT Y 0 X 400 WIDGET-ID 132
+     tgBackupOnCreate AT Y 5 X 31 WIDGET-ID 126
+     tgBackupOnUpdate AT Y 5 X 215 WIDGET-ID 130
+     tgBackupOnDelete AT Y 5 X 395 WIDGET-ID 132
+     RECT-17 AT Y 0 X 0 WIDGET-ID 134
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 5 Y 0
-         SIZE-PIXELS 565 BY 40
+         SIZE-PIXELS 565 BY 60
          TITLE "3" WIDGET-ID 1300.
-
-DEFINE FRAME FRAME-O
-     btnSeq AT Y 273 X 450 WIDGET-ID 210
-     btnAction AT Y 273 X 240 WIDGET-ID 196
-     btnDb AT Y 213 X 345 WIDGET-ID 200
-     fiDirTemplate AT Y 18 X 30 NO-LABEL WIDGET-ID 166
-     btnDumpName AT Y 253 X 450 WIDGET-ID 204
-     fiFileTemplate AT Y 41 X 30 NO-LABEL WIDGET-ID 176
-     fiFileExample AT Y 65 X 30 NO-LABEL WIDGET-ID 212
-     fiDumpDirTemplate AT Y 116 X 30 NO-LABEL WIDGET-ID 178
-     fiDumpFileTemplate AT Y 139 X 30 NO-LABEL WIDGET-ID 182
-     btnExt AT Y 273 X 345 WIDGET-ID 198
-     fiDumpFileExample AT Y 161 X 30 NO-LABEL WIDGET-ID 214
-     btnLastDir AT Y 233 X 450 WIDGET-ID 208
-     btnProgDir AT Y 213 X 450 WIDGET-ID 206
-     btnTable AT Y 233 X 345 WIDGET-ID 202
-     btnUserid AT Y 253 X 345 WIDGET-ID 194
-     btnWeekday AT Y 273 X 30 WIDGET-ID 148
-     btnDate AT Y 233 X 30 WIDGET-ID 140
-     btnDay AT Y 253 X 135 WIDGET-ID 156
-     btnDayName AT Y 273 X 135 WIDGET-ID 150
-     btnHH AT Y 213 X 240 WIDGET-ID 158
-     btnMM AT Y 233 X 240 WIDGET-ID 160
-     btnMonth AT Y 233 X 135 WIDGET-ID 154
-     btnSS AT Y 253 X 240 WIDGET-ID 162
-     btnTime AT Y 253 X 30 WIDGET-ID 142
-     btnTimestamp AT Y 213 X 30 WIDGET-ID 138
-     btnYear AT Y 213 X 135 WIDGET-ID 152
-     "Dir:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 23 X 7 WIDGET-ID 168
-     "Dump template" VIEW-AS TEXT
-          SIZE-PIXELS 80 BY 13 AT Y 98 X 10 WIDGET-ID 190
-     "Dir:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 120 X 5 WIDGET-ID 186
-     "Backup template" VIEW-AS TEXT
-          SIZE-PIXELS 85 BY 13 AT Y 0 X 14 WIDGET-ID 172
-     "File:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 145 X 5 WIDGET-ID 184
-     "File:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 49 X 7 WIDGET-ID 174
-     "Use these fields for templates :" VIEW-AS TEXT
-          SIZE-PIXELS 140 BY 13 AT Y 193 X 10 WIDGET-ID 146
-     RECT-14 AT Y 5 X 0 WIDGET-ID 170
-     RECT-15 AT Y 103 X 0 WIDGET-ID 188
-     RECT-16 AT Y 198 X 0 WIDGET-ID 192
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 42
-         SIZE-PIXELS 565 BY 335
-         TITLE "3" WIDGET-ID 1600.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -647,7 +652,7 @@ PROCEDURE enable_UI :
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   DISPLAY tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete 
       WITH FRAME FRAME-K IN WINDOW C-Win.
-  ENABLE tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete 
+  ENABLE RECT-17 tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete 
       WITH FRAME FRAME-K IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-K}
   DISPLAY fiDirTemplate fiFileTemplate fiFileExample fiDumpDirTemplate 

@@ -50,6 +50,7 @@ define variable gcPageButtons    as character no-undo.
 define variable giLastActivePage as integer   no-undo. 
 define variable giWinX           as integer   no-undo. 
 define variable giWinY           as integer   no-undo. 
+DEFINE VARIABLE giCurrentPage    AS INTEGER   NO-UNDO.
 
 define temp-table ttFrame no-undo rcode-info
   field cFrame   as character
@@ -169,7 +170,7 @@ DEFINE FRAME DEFAULT-FRAME
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 154 Y 65
+         AT X 155 Y 65
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
          TITLE "" WIDGET-ID 200.
 
@@ -244,6 +245,48 @@ THEN wSettings:HIDDEN = yes.
 /* ************************  Control Triggers  ************************ */
 
 &Scoped-define SELF-NAME wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-DOWN OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+  
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'fiSearch' THEN
+      APPLY 'entry' TO btPage1.
+    ELSE 
+    CASE giCurrentPage:
+      WHEN 1 THEN APPLY 'entry' TO btPage2.
+      WHEN 2 THEN APPLY 'entry' TO btPage3.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-UP OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+  
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'btPage1' THEN
+      APPLY 'entry' TO fiSearch.
+    ELSE 
+    CASE giCurrentPage:
+      WHEN 2 THEN APPLY 'entry' TO btPage1.
+      WHEN 3 THEN APPLY 'entry' TO btPage2.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
 ON END-ERROR OF wSettings /* DataDigger Settings */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
@@ -320,7 +363,7 @@ END.
 ON CURSOR-DOWN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
 , fiSearch ,btPage2
 DO:
-
+  
   case self:name:
     when 'fiSearch' then apply 'entry' to btPage1.
     when 'btPage1'  then apply 'entry' to btPage2.
@@ -817,7 +860,9 @@ PROCEDURE setPage :
   define variable iPage   as integer no-undo. 
 
   /* Remember the last active page */
-  if piPageNr <> 0 then giLastActivePage = piPageNr.
+  if piPageNr <> 0 then 
+    ASSIGN giLastActivePage = piPageNr
+           giCurrentPage = piPageNr.
 
   do iPage = 1 to num-entries(gcPageButtons):
     hButton = widget-handle( entry(iPage,gcPageButtons) ).

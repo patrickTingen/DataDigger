@@ -1538,7 +1538,6 @@ PROCEDURE DumpDataCSV :
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cFieldFormat        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hField              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
@@ -1574,22 +1573,17 @@ PROCEDURE DumpDataCSV :
     IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
     iField = iField + 1.
     
-    /* Take regular field name or including extent */
-    cName = (IF hField:EXTENT > 1 
-               THEN SUBSTITUTE('&1[&2]',hField:NAME, hField:EXTENT) 
-               ELSE hField:LABEL ).
-
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
       PUT STREAM strDump UNFORMATTED 
         (IF iCurField = 1 AND iExtent = 1 THEN "" ELSE cSeparator)
-        SUBSTITUTE('&1[&2]',hField:LABEL, iExtent).
+        SUBSTITUTE('&1[&2]',hField:NAME, iExtent).
     END.
     ELSE
     DO:
       PUT STREAM strDump UNFORMATTED
        (IF iCurField = 1 THEN "" ELSE cSeparator)
-       hField:LABEL.
+       hField:NAME.
     END.
   END.
   PUT STREAM strDump UNFORMATTED SKIP.

@@ -13,8 +13,13 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Extra filter refused to hide normal tables (Edwin Schutten)
 - Solved: Query fails when search condition contains pipe symbol (Mike Raschendörfer)
 - Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
+- Solved: Setting for backup-on-delete is always set to TRUE (fixes #12)
+- Solved: Backups not saved with default myDataDigger code (fixes #11)
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
+- Change: Export to csv now uses field names instead of labels (fixes #13)
+- Change: Tabs on settings page now react to CTRL+PgUp/PgDn (fixes #14)
+- Change: Layout fixes for larger fonts on settings screen
 
 =====================================================================================
 
