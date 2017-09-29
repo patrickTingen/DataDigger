@@ -315,17 +315,6 @@ FUNCTION getLinkInfo RETURNS CHARACTER
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-getMatchesValue) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMatchesValue Procedure 
-FUNCTION getMatchesValue RETURNS CHARACTER
-  ( hFillIn AS HANDLE )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-getMaxLength) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMaxLength Procedure 
@@ -580,17 +569,6 @@ FUNCTION resolveSequence RETURNS CHARACTER
 FUNCTION setColumnWidthList RETURNS LOGICAL
   ( INPUT phBrowse    AS HANDLE 
   , INPUT pcWidthList AS CHARACTER) FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-setFilterFieldColor) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setFilterFieldColor Procedure 
-FUNCTION setFilterFieldColor RETURNS LOGICAL
-  ( phWidget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4132,41 +4110,6 @@ END FUNCTION. /* getLinkInfo */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-getMatchesValue) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMatchesValue Procedure 
-FUNCTION getMatchesValue RETURNS CHARACTER
-  ( hFillIn AS HANDLE ) :
-
-/*------------------------------------------------------------------------
-  Name         : getMatchesValue
-  Description  : Transform the value of a fillin to something we can use
-                 with the MATCHES function. 
-
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO. 
-
-  cValue = hFillIn:SCREEN-VALUE. 
-  IF cValue = hFillIn:PRIVATE-DATA THEN cValue = ''.
-
-  IF cValue = ? OR cValue = '' THEN cValue = '*'.
-  ELSE 
-  IF    INDEX(cValue,'*') = 0 
-    AND index(cValue,'.') = 0 THEN 
-    cValue = '*' + cValue + '*'.
-
-  RETURN cValue.   /* Function return value. */
-
-END FUNCTION. /* getMatchesValue */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-getMaxLength) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMaxLength Procedure 
@@ -5111,39 +5054,6 @@ END FUNCTION. /* setColumnWidthList */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-setFilterFieldColor) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setFilterFieldColor Procedure 
-FUNCTION setFilterFieldColor RETURNS LOGICAL
-  ( phWidget AS HANDLE ) :
-
-/*------------------------------------------------------------------------
-  Name         : setFilterFieldColor
-  Description  : If you enter the field and you have not put in a filter
-                 clear out the field so you can type something yourself. 
-                 
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  IF NOT VALID-HANDLE(phWidget) THEN MESSAGE "DEBUG ALARM" VIEW-AS ALERT-BOX.
-  
-  IF phWidget:SCREEN-VALUE = phWidget:PRIVATE-DATA THEN 
-    phWidget:FGCOLOR = 7.
-  ELSE 
-    phWidget:FGCOLOR = ?.
-    
-  /* phWidget:bgcolor = ?. */
-
-  RETURN TRUE.
-
-END FUNCTION. /* setFilterFieldColor */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-setLinkInfo) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setLinkInfo Procedure 
@@ -5233,3 +5143,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

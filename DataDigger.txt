@@ -13,9 +13,10 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Extra filter refused to hide normal tables (Edwin Schutten)
 - Solved: Query fails when search condition contains pipe symbol (Mike Raschendörfer)
 - Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
-- Solved: Table browse shows normal tables when disabled in filter (fixes #8) (Edwin Schutten)
-- Solved: Backups not saved with default myDataDigger code (fixes #11)
-- Solved: Setting for backup-on-delete is always set to TRUE (fixes #12)
+- Solved: Table browse shows normal tables when disabled in filter #8 (Edwin Schutten)
+- Solved: Backups not saved with default myDataDigger code #11
+- Solved: Setting for backup-on-delete is always set to TRUE #12
+- Solved: Cannot filter field name with "name" #10
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
