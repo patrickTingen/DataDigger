@@ -10185,14 +10185,7 @@ PROCEDURE setFilterFieldTabOrder :
 
   /* Set the TAB order of the filter to after the previous filter field */
   FOR EACH bColumn BY bColumn.iColumnNr:
-    IF NOT bColumn.hColumn:VISIBLE THEN NEXT.
-
-    PUBLISH 'debugMessage' (1, SUBSTITUTE('&1 &2 &3 (&4)'
-      , bColumn.iColumnNr
-      , bColumn.cFullName
-      , bColumn.hColumn:VISIBLE
-      , (IF VALID-HANDLE(hPrevFilter) THEN hPrevFilter:NAME ELSE '')
-      )).
+    IF NOT VALID-HANDLE(bColumn.hColumn) OR NOT bColumn.hColumn:VISIBLE THEN NEXT.
 
     IF VALID-HANDLE(hPrevFilter) THEN bColumn.hFilter:MOVE-AFTER-TAB-ITEM(hPrevFilter).
     hPrevFilter = bColumn.hFilter.
