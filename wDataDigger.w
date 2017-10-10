@@ -10157,13 +10157,18 @@ PROCEDURE setDataFilter :
        * value. Otherwise see if we need to blank other fields.
        */
       IF bColumn.cFullName = cColumnName THEN
+      DO:
         bColumn.hFilter:SCREEN-VALUE = cColumnValue.
+        FilterModified(bColumn.hFilter,TRUE).
+      END.
       ELSE
       IF plClearOtherFilters THEN
+      DO:
         bColumn.hFilter:SCREEN-VALUE = bColumn.hFilter:PRIVATE-DATA.
+        FilterModified(bColumn.hFilter,FALSE).
+      END. 
 
       setFilterFieldColor(bColumn.hFilter).
-      RUN filterFieldValueChanged(bColumn.hFilter,NO).
     END.
 
     RUN reopenDataBrowse.
