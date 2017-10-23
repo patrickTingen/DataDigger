@@ -19,6 +19,7 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Cannot filter field name with "name" #10
 - Solved: Invalid-handle error on tables with lots of fields #15 (Johan Heling)
 - Solved: Clone button active when more than one record is selected #16
+- Solved: Character fields limited to current width on editing #17
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen

@@ -1412,9 +1412,10 @@ PROCEDURE initializeObject :
         ttColumn.lShow     = TRUE. 
 
       /* If the data is longer than the format allows, adjust format */
-      IF ttField.cDatatype = 'character'
-        AND LENGTH(ttColumn.cNewValue) > LENGTH( STRING(ttColumn.cNewValue,ttField.cFormat)) THEN
-        ttField.cFormat = SUBSTITUTE('x(&1)', LENGTH(ttColumn.cNewValue)).
+      IF ttField.cDatatype = 'character' THEN 
+        ttField.cFormat = SUBSTITUTE('x(&1)', MAXIMUM( LENGTH(STRING(ttColumn.cNewValue,ttField.cFormat))
+                                                     , LENGTH(ttColumn.cNewValue)
+                                                     ) * 2).
 
     END.
   END.
