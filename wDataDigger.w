@@ -5395,8 +5395,12 @@ PROCEDURE convertSettings :
       /* Settings removed */
       PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRecid" VALUE ? NO-ERROR.
       PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRowid" VALUE ? NO-ERROR.
+
+      /* dHint.w is not used */
+      OS-DELETE dHint.w.
+      OS-DELETE dHint.r.
     END. /* 23 */
-    
+
   END CASE. /* old version */
 
   SESSION:SET-WAIT-STATE("").

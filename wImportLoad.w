@@ -908,7 +908,7 @@ PROCEDURE loadData :
     DELETE OBJECT hXmlQuery.
     DELETE OBJECT hDbBuffer.
 
-    IF NOT plKeepData THEN UNDO TransBlock.
+    IF NOT plKeepData THEN UNDO TransBlock, LEAVE TransBlock.
     lOk = TRUE.
   END. /* transaction */
 
