@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 /* ***************************  Definitions  ************************** */
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 DEFINE INPUT PARAMETER TABLE FOR ttColumn.
@@ -449,7 +449,7 @@ PROCEDURE btnOkChoose :
   DO i = 1 TO 9:
     IF LOOKUP(ghSortField[i]:SCREEN-VALUE, ghSortField[i]:LIST-ITEMS) = 0 THEN
     DO:
-      MESSAGE 'Sorting' i 'does not seem to be a valid field name' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE 'Sorting' i 'does not seem to be a valid field name' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       APPLY 'entry' TO ghSortField[i].
       RETURN NO-APPLY.
     END.
@@ -575,4 +575,3 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

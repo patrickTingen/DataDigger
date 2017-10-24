@@ -187,8 +187,8 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnFavourite btnNextQuery btnQueries btnPrevQuery ~
-btnClipboard ficWhere btnDump btnLoad btnTabFavourites btnTabFields ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -363,7 +363,7 @@ FUNCTION trimList RETURNS CHARACTER
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
 DEFINE MENU POPUP-MENU-brTables 
@@ -965,17 +965,17 @@ DEFINE FRAME frMain
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
      btnTabFields AT Y 45 X 271 WIDGET-ID 156
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnTabIndexes AT Y 122 X 271 WIDGET-ID 158
      btnTabTables AT Y 45 X 13 WIDGET-ID 300
      btnDelete AT Y 520 X 250
@@ -1569,7 +1569,7 @@ ANYWHERE DO:
 
   MESSAGE
     cWidgets SKIP(0) 'Final pos:' iTargetX ',' iTargetY
-    VIEW-AS ALERT-BOX INFO BUTTONS OK TITLE ' Debug info '.
+    VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE ' Debug info '.
 
   &ENDIF
 
@@ -4216,7 +4216,7 @@ PROCEDURE btnCloneChoose :
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0 THEN
     ghDataBrowse:SELECT-FOCUSED-ROW().
 
-  IF NOT ghDataBrowse:QUERY:get-buffer-handle(1):available THEN
+  IF NOT ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN
   DO:
     RUN showHelp('RecordGone', '').
     ghDataBrowse:REFRESH().
@@ -4365,12 +4365,12 @@ PROCEDURE btnDeleteChoose :
         SKIP    "DataDigger would generate a small program and compile "
         SKIP    "it but your Progress version does not allow this.     "
         SKIP(1) "So I'm sorry, but the" STRING(ghDataBrowse:NUM-SELECTED-ROWS = 1,"record/records") "could not be deleted :("
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
       DELETE OBJECT hFileBuffer.
     END.
     ELSE
-      MESSAGE 'Sorry, could not delete record.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE 'Sorry, could not delete record.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
   RUN reopenDataBrowse.
 
@@ -4741,7 +4741,7 @@ PROCEDURE btnViewChoose :
   IF SEARCH(cFileName) <> ?
     AND isFileLocked(cFileName) THEN
   DO:
-    MESSAGE 'Error opening temporary file.~nDo you have it open for editing?~n~n' cFilename VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE 'Error opening temporary file.~nDo you have it open for editing?~n~n' cFilename VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN.
   END.
 
@@ -5118,7 +5118,7 @@ PROCEDURE connectDatabase :
     cDatabasesOld = getDatabaseList().
     RUN value(cProgDir + 'wConnections.w') (INPUT 'CONNECT', INPUT pcDatabase, OUTPUT cError).
     IF cError <> '' THEN
-      MESSAGE cError VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
     /* Get all connected databases */
     cDatabases = getDatabaseList().
@@ -5178,7 +5178,7 @@ PROCEDURE connectDroppedDatabase :
   CONNECT VALUE(pcDatabase) VALUE(SUBSTITUTE('-ld &1 -1', cLdbName)) NO-ERROR.
   IF ERROR-STATUS:ERROR THEN
   DO:
-    MESSAGE ERROR-STATUS:GET-MESSAGE(1) VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE ERROR-STATUS:GET-MESSAGE(1) VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN.
   END.
 
@@ -6257,10 +6257,10 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnFavourite btnNextQuery btnQueries btnPrevQuery btnClipboard 
-         ficWhere btnDump btnLoad btnTabFavourites btnTabFields btnTabIndexes 
-         btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd btnEdit 
-         fiFeedback 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
+         btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
+         btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
@@ -11418,10 +11418,10 @@ PROCEDURE showValue :
     MESSAGE
       'Total of' ghDataBrowse:NUM-SELECTED-ROWS 'rows~t:' dColumnTotal SKIP
       'Min / Max / Avg~t:' dMinValue ' / ' dMaxValue ' / ' dAvgValue
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
   ELSE
   IF cColumnValue <> '' AND cColumnValue <> ? THEN
-    MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
 END PROCEDURE. /* showValue */
 
@@ -12410,4 +12410,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

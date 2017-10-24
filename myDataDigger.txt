@@ -178,7 +178,7 @@ PROCEDURE CustomDump:
   /*   IF pcAction = 'Delete' THEN                                                              */
   /*   DO:                                                                                      */
   /*     MESSAGE 'Are you really really really sure you want to delete these precious records?' */
-  /*       VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE plContinue.                             */
+  /*       VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE plContinue.                      */
   /*   END.                                                                                     */
   /*                                                                                            */
   /*   ELSE                                                                                     */

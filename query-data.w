@@ -76,11 +76,11 @@ CREATE WIDGET-POOL.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
 DEFINE MENU MENU-BAR-C-Win MENUBAR
-       MENU-ITEM m_Print        LABEL "Print":U         .
+       MENU-ITEM m_Print LABEL "Print":U .
 
 
 /* Definitions of the field level widgets                               */
@@ -372,4 +372,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

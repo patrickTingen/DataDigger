@@ -33,7 +33,7 @@ CREATE WIDGET-POOL.
 /* ***************************  Definitions  ************************** */
 
 /* Datadigger */
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 define input-output parameter table for ttTestQuery.
@@ -134,7 +134,7 @@ btn-test-qry-2 resultset btn-test-qry-3
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btn-clear 
@@ -336,9 +336,8 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btn-test-qry-3 C-Win
 ON CHOOSE OF btn-test-qry-3 IN FRAME DEFAULT-FRAME /* Pop out */
 DO:
-  DEFINE VARIABLE lhDummy AS HANDLE NO-UNDO.
   SESSION:SET-WAIT-STATE("GENERAL":U).
-  RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT SET lhDummy
+  RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT
     (INPUT ed-qry,
      INPUT resultset:SCREEN-VALUE).
   SESSION:SET-WAIT-STATE("":U).  
@@ -391,7 +390,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   RUN enable_UI.
 
-  DEF VAR lhFrameHdl AS HANDLE NO-UNDO.
+  DEF VARIABLE lhFrameHdl AS HANDLE NO-UNDO.
   lhFrameHdl = FRAME {&FRAME-NAME}:HANDLE.
   OPEN QUERY q1 FOR EACH ttTestQuery NO-LOCK.
 
@@ -454,38 +453,32 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE ask-table-from-user C-Win 
 PROCEDURE ask-table-from-user PRIVATE :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-DEFINE INPUT PARAMETER ipc-current-name AS CHARACTER NO-UNDO.
-DEFINE OUTPUT PARAMETER opc-TableName AS CHARACTER NO-UNDO.
-
-DEFINE VARIABLE lcDataBase AS CHARACTER NO-UNDO.
-DEFINE VARIABLE lOkUsed AS LOGICAL NO-UNDO.
-DEFINE VARIABLE iDictDb AS INTEGER NO-UNDO.
-
-MESSAGE 
-  "Unable to determine which table in which database is meant with" ipc-current-name
-  VIEW-AS ALERT-BOX INFO BUTTONS OK.
-
-ASSIGN lcDataBase = ""
-       opc-TableName = ""
-       .
-
-RUN adecomm\_tblsel.r (INPUT FALSE, /* one and only one to be selected */
-                       INPUT ?,    /* no temp-tables to be passed */
-                       INPUT-OUTPUT lcDataBase, /* all database are to be used */
-                       INPUT-OUTPUT opc-TableName,
-                       OUTPUT lOkUsed).
-
-IF lOkUsed THEN ASSIGN opc-TableName = SUBSTITUTE("&1.&2",
-                                                  lcDataBase,
-                                                  opc-TableName).
-
-
-END PROCEDURE.
+/*
+ * Let user select a table
+ */
+  DEFINE INPUT PARAMETER ipc-current-name AS CHARACTER NO-UNDO.
+  DEFINE OUTPUT PARAMETER opc-TableName AS CHARACTER NO-UNDO.
+  
+  DEFINE VARIABLE lcDataBase AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE lOkUsed AS LOGICAL NO-UNDO.
+  
+  MESSAGE 
+    "Unable to determine which table in which database is meant with" ipc-current-name
+    VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+  
+  ASSIGN lcDataBase = ""
+         opc-TableName = ""
+         .
+  
+  RUN adecomm\_tblsel.r (INPUT FALSE, /* one and only one to be selected */
+                         INPUT ?,    /* no temp-tables to be passed */
+                         INPUT-OUTPUT lcDataBase, /* all database are to be used */
+                         INPUT-OUTPUT opc-TableName,
+                         OUTPUT lOkUsed).
+  
+  IF lOkUsed THEN ASSIGN opc-TableName = SUBSTITUTE("&1.&2", lcDataBase, opc-TableName).
+  
+END PROCEDURE. /* ask-table-from-user */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -546,7 +539,7 @@ PROCEDURE enableButtons :
   Purpose: Set the sensitivity of the buttons according to the contents of
            the screen.    
 ------------------------------------------------------------------------------*/
-  DEF VAR hTt AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hTt AS HANDLE NO-UNDO.
 
   ASSIGN hTt = TEMP-TABLE ttTestQuery:HANDLE.
 
@@ -605,10 +598,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win 
 PROCEDURE processQuery :
-DEFINE INPUT PARAMETER ipcQueryString AS CHAR NO-UNDO.
+  DEFINE INPUT PARAMETER ipcQueryString AS CHARACTER NO-UNDO.
   
   DEFINE VARIABLE lcOldString AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iLastQuery  AS INTEGER   NO-UNDO.
   
   DEFINE BUFFER bf-ttTestQuery FOR ttTestQuery.
   
@@ -689,9 +681,9 @@ PROCEDURE resizeFrame :
 
   define input parameter wfram# as widget-handle no-undo.
 
-  def var whand# as widget-handle no-undo. /* general purpose widget handle */
-  def var afacthori# as decimal decimals 10 no-undo.
-  def var afactvert# as decimal decimals 10 no-undo.
+  DEFINE VARIABLE whand# as widget-handle no-undo. /* general purpose widget handle */
+  DEFINE VARIABLE afacthori# as decimal decimals 10 no-undo.
+  DEFINE VARIABLE afactvert# as decimal decimals 10 no-undo.
 
   assign wfram#:scrollable = true
          afacthori# = {&WINDOW-NAME}:width-pixels / wfram#:width-pixels
@@ -765,118 +757,118 @@ PROCEDURE scanVST PRIVATE :
   Parameters:  <none>
   Notes:       
 ------------------------------------------------------------------------------*/
-DEFINE INPUT PARAMETER iplInitialData AS LOGICAL NO-UNDO. /* get the initial data or get the number of reads from the query */
-DEFINE BUFFER bf-ttBuffer FOR ttBuffer.
-DEFINE BUFFER bf-ttVstTableInfo FOR ttVstTableInfo.
-DEFINE BUFFER bf-ttVstIndexInfo FOR ttVstIndexInfo.
+  DEFINE INPUT PARAMETER iplInitialData AS LOGICAL NO-UNDO. /* get the initial data or get the number of reads from the query */
 
-DEFINE VARIABLE hQry AS HANDLE NO-UNDO.
-DEFINE VARIABLE hBufferVstTable AS HANDLE NO-UNDO.
-DEFINE VARIABLE hBufferVstIndex AS HANDLE NO-UNDO.
-DEFINE VARIABLE hBuffer_index AS HANDLE NO-UNDO.
-DEFINE VARIABLE hBuffer_file AS HANDLE NO-UNDO.
-
-DEFINE VARIABLE hFieldVstTableName AS HANDLE NO-UNDO.
-DEFINE VARIABLE hFieldVstIndexName AS HANDLE NO-UNDO.
-DEFINE VARIABLE hFieldVstTableRead AS HANDLE NO-UNDO.
-DEFINE VARIABLE hFieldVstIndexRead AS HANDLE NO-UNDO.
-
-FOR EACH bf-ttBuffer 
-  NO-LOCK:
-
-  CREATE BUFFER hBufferVstTable FOR TABLE SUBSTITUTE("&1._tablestat",bf-ttBuffer.hBuffer:DBNAME). /* this is the information on a table */
-
-
-  CREATE QUERY hQry.
-  hQry:SET-BUFFERS(hBufferVstTable).
-  hQry:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1.&2 WHERE &1.&2._tablestat-id EQ &3",hBufferVstTable:DBNAME,hBufferVstTable:TABLE,bf-ttBuffer.hBuffer:TABLE-NUMBER)).
-  hQry:QUERY-OPEN().
-  hQry:GET-FIRST().
-  IF NOT hQry:QUERY-OFF-END THEN DO:
-    hFieldVstTableRead = hBufferVstTable:BUFFER-FIELD("_tablestat-read":U). /* only interested in reads */
-    FIND bf-ttVstTableInfo 
-      WHERE bf-ttVstTableInfo.cDatabase EQ bf-ttBuffer.hBuffer:DBNAME
-      AND bf-ttVstTableInfo.cTableName EQ bf-ttBuffer.hBuffer:TABLE
-    NO-ERROR.
-    IF iplInitialData THEN DO:
-      IF NOT AVAILABLE bf-ttVstTableInfo THEN DO:
-        CREATE bf-ttVstTableInfo.
-        ASSIGN 
-          bf-ttVstTableInfo.cDatabase = bf-ttBuffer.hBuffer:DBNAME
-          bf-ttVstTableInfo.cTableName = bf-ttBuffer.hBuffer:TABLE
-          bf-ttVstTableInfo.iTableRead = hFieldVstTableRead:BUFFER-VALUE.
+  DEFINE BUFFER bf-ttBuffer FOR ttBuffer.
+  DEFINE BUFFER bf-ttVstTableInfo FOR ttVstTableInfo.
+  DEFINE BUFFER bf-ttVstIndexInfo FOR ttVstIndexInfo.
+  
+  DEFINE VARIABLE hQry AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hBufferVstTable AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hBufferVstIndex AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hBuffer_index AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hBuffer_file AS HANDLE NO-UNDO.
+  
+  DEFINE VARIABLE hFieldVstIndexName AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hFieldVstTableRead AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hFieldVstIndexRead AS HANDLE NO-UNDO.
+  
+  FOR EACH bf-ttBuffer 
+    NO-LOCK:
+  
+    CREATE BUFFER hBufferVstTable FOR TABLE SUBSTITUTE("&1._tablestat",bf-ttBuffer.hBuffer:DBNAME). /* this is the information on a table */
+  
+  
+    CREATE QUERY hQry.
+    hQry:SET-BUFFERS(hBufferVstTable).
+    hQry:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1.&2 WHERE &1.&2._tablestat-id EQ &3",hBufferVstTable:DBNAME,hBufferVstTable:TABLE,bf-ttBuffer.hBuffer:TABLE-NUMBER)).
+    hQry:QUERY-OPEN().
+    hQry:GET-FIRST().
+    IF NOT hQry:QUERY-OFF-END THEN DO:
+      hFieldVstTableRead = hBufferVstTable:BUFFER-FIELD("_tablestat-read":U). /* only interested in reads */
+      FIND bf-ttVstTableInfo 
+        WHERE bf-ttVstTableInfo.cDatabase EQ bf-ttBuffer.hBuffer:DBNAME
+        AND bf-ttVstTableInfo.cTableName EQ bf-ttBuffer.hBuffer:TABLE
+      NO-ERROR.
+      IF iplInitialData THEN DO:
+        IF NOT AVAILABLE bf-ttVstTableInfo THEN DO:
+          CREATE bf-ttVstTableInfo.
+          ASSIGN 
+            bf-ttVstTableInfo.cDatabase = bf-ttBuffer.hBuffer:DBNAME
+            bf-ttVstTableInfo.cTableName = bf-ttBuffer.hBuffer:TABLE
+            bf-ttVstTableInfo.iTableRead = hFieldVstTableRead:BUFFER-VALUE.
+        END.
       END.
+      ELSE IF AVAILABLE bf-ttVstTableInfo AND bf-ttVstTableInfo.lDataFetched EQ FALSE
+      THEN DO:
+        ASSIGN
+          bf-ttVstTableInfo.lDataFetched = TRUE
+          bf-ttVstTableInfo.iTableRead = hFieldVstTableRead:BUFFER-VALUE - bf-ttVstTableInfo.iTableRead.
+      END.  
     END.
-    ELSE IF AVAILABLE bf-ttVstTableInfo AND bf-ttVstTableInfo.lDataFetched EQ FALSE
-    THEN DO:
-      ASSIGN
-        bf-ttVstTableInfo.lDataFetched = TRUE
-        bf-ttVstTableInfo.iTableRead = hFieldVstTableRead:BUFFER-VALUE - bf-ttVstTableInfo.iTableRead.
-    END.  
-  END.
-
-  hQry:QUERY-CLOSE().
   
-  DELETE OBJECT hQry NO-ERROR.
-
-  CREATE QUERY hQry.
-
-  /* index data is not yet finished */
-  CREATE BUFFER hBufferVstIndex FOR TABLE SUBSTITUTE("&1._indexstat",bf-ttBuffer.hBuffer:DBNAME). /* this is the information on a index */
-  CREATE BUFFER hBuffer_index FOR TABLE SUBSTITUTE("&1._index",bf-ttBuffer.hBuffer:DBNAME).       /* this is the _index table */
-  CREATE BUFFER hBuffer_file FOR TABLE SUBSTITUTE("&1._file",bf-ttBuffer.hBuffer:DBNAME).         /* this is the _file table */
-
-  hQry:SET-BUFFERS(hBuffer_file,
-                   hBuffer_index,
-                   hBufferVstIndex).
-
-  hQry:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1.&2 WHERE &1.&2._file-number EQ &3 NO-LOCK, EACH &1.&4 OF &1.&2 NO-LOCK, EACH &1.&5 WHERE &1.&5._indexstat-id EQ &1.&4._idx-num":U,
-                                bf-ttBuffer.hBuffer:DBNAME,
-                                hBuffer_file:NAME,
-                                bf-ttBuffer.hBuffer:TABLE-NUMBER,
-                                hBuffer_index:NAME,
-                                hBufferVstIndex:NAME)).
+    hQry:QUERY-CLOSE().
+    
+    DELETE OBJECT hQry NO-ERROR.
   
-  ASSIGN hFieldVstIndexName = hBuffer_index:BUFFER-FIELD("_index-name":U)
-         hFieldVstIndexRead = hBufferVstIndex:BUFFER-FIELD("_indexstat-read":U).
+    CREATE QUERY hQry.
   
-  hQry:QUERY-OPEN().
-  hQry:GET-FIRST(NO-LOCK).
-  REPEAT WHILE hQry:QUERY-OFF-END EQ FALSE:
-    FIND bf-ttVstIndexInfo 
-      WHERE bf-ttVstIndexInfo.cDatabase EQ bf-ttBuffer.hBuffer:DBNAME
-      AND bf-ttVstIndexInfo.cTableName EQ bf-ttBuffer.hBuffer:TABLE
-      AND bf-ttVstIndexInfo.cIndexName EQ hFieldVstIndexName:BUFFER-VALUE
-    NO-ERROR.
-    IF iplInitialData THEN DO:
-      IF NOT AVAILABLE bf-ttVstIndexInfo THEN DO:
-        CREATE bf-ttVstIndexInfo.
-        ASSIGN 
-          bf-ttVstIndexInfo.cDatabase = bf-ttBuffer.hBuffer:DBNAME
-          bf-ttVstIndexInfo.cTableName = bf-ttBuffer.hBuffer:TABLE
-          bf-ttVstIndexInfo.cIndexName = hFieldVstIndexName:BUFFER-VALUE
-          bf-ttVstIndexInfo.iIndexRead = hFieldVstIndexRead:BUFFER-VALUE.
+    /* index data is not yet finished */
+    CREATE BUFFER hBufferVstIndex FOR TABLE SUBSTITUTE("&1._indexstat",bf-ttBuffer.hBuffer:DBNAME). /* this is the information on a index */
+    CREATE BUFFER hBuffer_index FOR TABLE SUBSTITUTE("&1._index",bf-ttBuffer.hBuffer:DBNAME).       /* this is the _index table */
+    CREATE BUFFER hBuffer_file FOR TABLE SUBSTITUTE("&1._file",bf-ttBuffer.hBuffer:DBNAME).         /* this is the _file table */
+  
+    hQry:SET-BUFFERS(hBuffer_file,
+                     hBuffer_index,
+                     hBufferVstIndex).
+  
+    hQry:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1.&2 WHERE &1.&2._file-number EQ &3 NO-LOCK, EACH &1.&4 OF &1.&2 NO-LOCK, EACH &1.&5 WHERE &1.&5._indexstat-id EQ &1.&4._idx-num":U,
+                                  bf-ttBuffer.hBuffer:DBNAME,
+                                  hBuffer_file:NAME,
+                                  bf-ttBuffer.hBuffer:TABLE-NUMBER,
+                                  hBuffer_index:NAME,
+                                  hBufferVstIndex:NAME)).
+    
+    ASSIGN hFieldVstIndexName = hBuffer_index:BUFFER-FIELD("_index-name":U)
+           hFieldVstIndexRead = hBufferVstIndex:BUFFER-FIELD("_indexstat-read":U).
+    
+    hQry:QUERY-OPEN().
+    hQry:GET-FIRST(NO-LOCK).
+    REPEAT WHILE hQry:QUERY-OFF-END EQ FALSE:
+      FIND bf-ttVstIndexInfo 
+        WHERE bf-ttVstIndexInfo.cDatabase EQ bf-ttBuffer.hBuffer:DBNAME
+        AND bf-ttVstIndexInfo.cTableName EQ bf-ttBuffer.hBuffer:TABLE
+        AND bf-ttVstIndexInfo.cIndexName EQ hFieldVstIndexName:BUFFER-VALUE
+      NO-ERROR.
+      IF iplInitialData THEN DO:
+        IF NOT AVAILABLE bf-ttVstIndexInfo THEN DO:
+          CREATE bf-ttVstIndexInfo.
+          ASSIGN 
+            bf-ttVstIndexInfo.cDatabase = bf-ttBuffer.hBuffer:DBNAME
+            bf-ttVstIndexInfo.cTableName = bf-ttBuffer.hBuffer:TABLE
+            bf-ttVstIndexInfo.cIndexName = hFieldVstIndexName:BUFFER-VALUE
+            bf-ttVstIndexInfo.iIndexRead = hFieldVstIndexRead:BUFFER-VALUE.
+        END.
       END.
+      ELSE IF AVAILABLE bf-ttVstIndexInfo  AND bf-ttVstIndexInfo.lDataFetched EQ FALSE
+      THEN DO:
+        ASSIGN
+          bf-ttVstIndexInfo.lDataFetched = TRUE
+          bf-ttVstIndexInfo.iIndexRead = hFieldVstIndexRead:BUFFER-VALUE - bf-ttVstIndexInfo.iIndexRead.
+      END.
+  
+      hQry:GET-NEXT(NO-LOCK).
     END.
-    ELSE IF AVAILABLE bf-ttVstIndexInfo  AND bf-ttVstIndexInfo.lDataFetched EQ FALSE
-    THEN DO:
-      ASSIGN
-        bf-ttVstIndexInfo.lDataFetched = TRUE
-        bf-ttVstIndexInfo.iIndexRead = hFieldVstIndexRead:BUFFER-VALUE - bf-ttVstIndexInfo.iIndexRead.
-    END.
-
-    hQry:GET-NEXT(NO-LOCK).
+  
+    DELETE OBJECT hQry NO-ERROR.
+  
+    DELETE OBJECT hBufferVstTable NO-ERROR.
+    DELETE OBJECT hBufferVstIndex NO-ERROR.
+    DELETE OBJECT hBuffer_index NO-ERROR.
+    DELETE OBJECT hBuffer_file NO-ERROR.
+  
   END.
-
-  DELETE OBJECT hQry NO-ERROR.
-
-  DELETE OBJECT hBufferVstTable NO-ERROR.
-  DELETE OBJECT hBufferVstIndex NO-ERROR.
-  DELETE OBJECT hBuffer_index NO-ERROR.
-  DELETE OBJECT hBuffer_file NO-ERROR.
-
-END.
-
+  
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -903,7 +895,6 @@ PROCEDURE test-query PRIVATE :
   DEFINE VARIABLE lcCurrentName AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lcPrevName    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lhBuffer      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE lhDummy       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE liNumWords    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE liSeconds     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE liWord        AS INTEGER     NO-UNDO.
@@ -1122,12 +1113,8 @@ PROCEDURE test-query PRIVATE :
     ASSIGN oplErrorOccured = FALSE.
   
     /* <BEU> */
-    /*   IF iplShowQuery THEN                    */
-    /*   RUN query-data.w PERSISTENT SET lhDummy */
-    /*     (INPUT ed-qry,                        */
-    /*      INPUT resultset:SCREEN-VALUE).       */
     IF iplShowQuery THEN
-      RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT SET lhDummy
+      RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT
         ( INPUT ed-qry
         , INPUT resultset:SCREEN-VALUE
         ).
@@ -1139,4 +1126,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

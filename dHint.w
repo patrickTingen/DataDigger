@@ -24,7 +24,7 @@
 
 /* ***************************  Definitions  ************************** */
 
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 
@@ -32,18 +32,18 @@
 
 /* Transparency */
 PROCEDURE SetWindowLongA EXTERNAL "user32.dll":
- def INPUT PARAM HWND AS LONG.
- def INPUT PARAM nIndex AS LONG.
- def INPUT PARAM dwNewLong AS LONG.
- DEF RETURN PARAM stat AS LONG.
+ DEFINE INPUT PARAM HWND      AS LONG.
+ DEFINE INPUT PARAM nIndex    AS LONG.
+ DEFINE INPUT PARAM dwNewLong AS LONG.
+ DEFINE RETURN PARAM stat     AS LONG.
 END.
 
 PROCEDURE SetLayeredWindowAttributes EXTERNAL "user32.dll":
- def INPUT PARAM HWND AS LONG.
- def INPUT PARAM crKey AS LONG.
- def INPUT PARAM bAlpha AS SHORT.
- def INPUT PARAM dwFlagsas AS LONG.
- DEF RETURN PARAM stat AS SHORT.
+ DEFINE INPUT PARAM HWND      AS LONG.
+ DEFINE INPUT PARAM crKey     AS LONG.
+ DEFINE INPUT PARAM bAlpha    AS SHORT.
+ DEFINE INPUT PARAM dwFlagsas AS LONG.
+ DEFINE RETURN PARAM stat     AS SHORT.
 END.
 
 PROCEDURE setTransparency :
@@ -55,10 +55,10 @@ PROCEDURE setTransparency :
   define input  parameter phFrame as handle     no-undo.
   define input  parameter piLevel as integer    no-undo.
   
-  &scop GWL_EXSTYLE         -20
-  &scop WS_EX_LAYERED       524288
-  &scop LWA_ALPHA           2
-  &scop WS_EX_TRANSPARENT   32
+  &SCOPED-DEFINE GWL_EXSTYLE         -20
+  &SCOPED-DEFINE WS_EX_LAYERED       524288
+  &SCOPED-DEFINE LWA_ALPHA           2
+  &SCOPED-DEFINE WS_EX_TRANSPARENT   32
   
   DEFINE VARIABLE stat AS INTEGER    NO-UNDO.
 
@@ -259,14 +259,18 @@ define input parameter piStartValue as integer no-undo.
   do iTranparency = piStartValue to piEndValue by 24:
     run setTransparency( input frame Dialog-Frame:handle, iTranparency).
     iStartTime = etime.
-    do while etime < iStartTime + 40: end.
+    DO WHILE ETIME < iStartTime + 40: 
+      PROCESS EVENTS. 
+    END.
   end.
 
   else
   do iTranparency = piStartValue to piEndValue by -24:
     run setTransparency( input frame Dialog-Frame:handle, iTranparency).
     iStartTime = etime.
-    do while etime < iStartTime + 40: end.
+    DO WHILE ETIME < iStartTime + 40: 
+      PROCESS EVENTS. 
+    END.
   end.
 
 END PROCEDURE. /* fadeWindow */
@@ -306,4 +310,3 @@ end procedure. /* initializeObject. */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

@@ -29,7 +29,7 @@ RUN getVersionInfo.p(OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
  */
 IF cRemoteBuildNr = '' THEN
 DO:
-  IF plManualCheck THEN MESSAGE 'Cannot reach version the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  IF plManualCheck THEN MESSAGE 'Cannot reach version the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
   RETURN.
 END.
 
@@ -48,7 +48,7 @@ IF (cRemoteVersion > cLocalVersion)
        OR piChannel = {&CHECK-BETA}) THEN
 DO:
   OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
-  MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 END.
     
 ELSE
@@ -58,7 +58,7 @@ IF    (cRemoteVersion = cLocalVersion)
        OR piChannel = {&CHECK-BETA}) THEN
 DO:
   OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
-  MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 END.
   
 /* In case of a manual check, report what is found */
@@ -67,5 +67,5 @@ IF plManualCheck
   AND cRemoteVersion <= cLocalVersion
   AND cRemoteBuildNr <= cLocalBuildNr THEN
 DO:
-  MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 END.

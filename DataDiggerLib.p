@@ -964,7 +964,7 @@ PROCEDURE collectQueryInfo :
    cSetting = getRegistry( SUBSTITUTE("DB:&1", pcDatabase)
                          , SUBSTITUTE('&1:query:&2', pcTable, iLoop )).
 
-   IF cSetting = '<Empty>' THEN NEXT.
+   IF cSetting = '<Empty>' THEN NEXT collectQueries.
 
    IF cSetting <> ? THEN
    DO:
@@ -1073,8 +1073,6 @@ PROCEDURE dumpRecord :
   DEFINE VARIABLE cError          AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cMessage        AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iRow            AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cDumpProg       AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lContinue       AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lDefaultDump    AS LOGICAL   NO-UNDO.
 
   IF NOT VALID-HANDLE(phSource) THEN RETURN.
@@ -1214,7 +1212,6 @@ PROCEDURE dynamicDump :
   DEFINE INPUT PARAMETER pihBrowse AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER picFile   AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cDataType  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTimeStamp AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer    AS HANDLE      NO-UNDO EXTENT 5.
   DEFINE VARIABLE hColumn    AS HANDLE      NO-UNDO.
@@ -1281,7 +1278,7 @@ PROCEDURE dynamicDump :
       /* If no column found, something weird happened */
       IF hField = ? THEN NEXT browseColumn.
 
-      IF hField:DATA-TYPE = "recid":u THEN NEXT.
+      IF hField:DATA-TYPE = "recid":u THEN NEXT browseColumn.
   
       IF lFirst THEN
         lFirst = FALSE.
@@ -1334,60 +1331,6 @@ END PROCEDURE. /* dynamicDump */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-dynamicLoad) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dynamicLoad Procedure 
-PROCEDURE dynamicLoad :
-/*------------------------------------------------------------------------
-  Name         : dynamicLoad
-  Description  : Load data from a file into a buffer.
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE INPUT  PARAMETER hTable AS HANDLE      NO-UNDO.
-  DEFINE INPUT  PARAMETER cDelim AS CHARACTER   NO-UNDO.
-
-  DEFINE VARIABLE cImport AS CHARACTER   NO-UNDO EXTENT 2800.
-  DEFINE VARIABLE iImp    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iCnt    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iExtnt  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE hFld    AS HANDLE      NO-UNDO.
-
-  IF hTable:TYPE <> "BUFFER" THEN RETURN.
-  
-  REPEAT:
-    ASSIGN cImport = ""
-           iImp = 0.
-
-    IMPORT cImport.
-    hTable:BUFFER-CREATE().
-
-    DO iCnt = 1 TO hTable:NUM-FIELDS:
-      ASSIGN hFld = hTable:BUFFER-FIELD(iCnt).
-
-      IF hFld:EXTENT = 0 THEN 
-      DO:
-        ASSIGN iImp = iImp + 1
-               hFld:BUFFER-VALUE = cImport[iImp].
-      END.
-      ELSE 
-      DO iExtnt = 1 TO hFld:EXTENT:
-        ASSIGN iImp = iImp + 1
-               hFld:BUFFER-VALUE(iExtnt) = cImport[iImp].
-      END.
-    END.
-
-    hTable:BUFFER-VALIDATE().
-  END.
-
-END PROCEDURE. /* dynamicLoad */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-getColumnSort) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getColumnSort Procedure 
@@ -1405,13 +1348,16 @@ PROCEDURE getColumnSort :
   
   {&timerStart}
 
+  #BrowseColumns:
   do iColumn = 1 to phBrowse:num-columns:
     hColumn = phBrowse:get-browse-column(iColumn).
-    IF hColumn:SORT-ASCENDING <> ? THEN DO:
+    IF hColumn:SORT-ASCENDING <> ? THEN
+    DO:
       ASSIGN
         pcColumn    = hColumn:NAME
-        plAscending = hColumn:SORT-ASCENDING.
-      LEAVE.
+        plAscending = hColumn:SORT-ASCENDING
+        .
+      LEAVE #BrowseColumns.
     END.
   END.
 
@@ -1451,9 +1397,7 @@ PROCEDURE getDumpFileName :
   DEFINE VARIABLE cDayOfWeek    AS CHARACTER   NO-UNDO EXTENT 7 INITIAL ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].
   DEFINE VARIABLE cDumpName     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDumpDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDumpFile     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBackupDir    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cBackupFile   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer       AS HANDLE      NO-UNDO.
 
   /* Checks */
@@ -1576,12 +1520,9 @@ PROCEDURE getFields :
   DEFINE OUTPUT PARAMETER DATASET FOR dsFields.
 
   DEFINE VARIABLE cCacheFile         AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFieldOrder        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFields            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cPrimIndexFields   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery             AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cTableCacheId      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUniqueIndexFields AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSDBName           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBufferField       AS HANDLE      NO-UNDO.
@@ -1675,11 +1616,11 @@ PROCEDURE getFields :
       IF TEMP-TABLE bField:HAS-RECORDS THEN
       DO:
         PUBLISH "debugMessage" (3, SUBSTITUTE("Add to first-level cache")).
-        FOR EACH bField:
+        FOR EACH bField TABLE-SCAN:
           CREATE bFieldCache.
           BUFFER-COPY bField TO bFieldCache.
         END.
-        FOR EACH bColumn:
+        FOR EACH bColumn TABLE-SCAN:
           CREATE bColumnCache.
           BUFFER-COPY bColumn TO bColumnCache.
         END.
@@ -1727,9 +1668,6 @@ PROCEDURE getFields :
 
   /* If none selected, set mask to 'all' */
   IF cSelectedFields = ? THEN cSelectedFields = '*'.
-
-  /* Get field ordering */
-  cFieldOrder = getRegistry(SUBSTITUTE('DB:&1',pcDatabase), SUBSTITUTE('&1:FieldOrder',pcTableName)).
 
   REPEAT WHILE NOT hQuery:QUERY-OFF-END:
 
@@ -1856,12 +1794,12 @@ PROCEDURE getFields :
     
     /* Add to memory cache */
     PUBLISH "debugMessage" (3, SUBSTITUTE("Add to first-level cache.")).
-    FOR EACH bField:
+    FOR EACH bField TABLE-SCAN:
       CREATE bFieldCache.
       BUFFER-COPY bField TO bFieldCache.
     END.
 
-    FOR EACH bColumn:
+    FOR EACH bColumn TABLE-SCAN:
       CREATE bColumnCache.
       BUFFER-COPY bColumn TO bColumnCache.
     END.
@@ -1959,6 +1897,7 @@ PROCEDURE getTables :
   DEFINE VARIABLE hDbStatusBuffer AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileBuffer     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileQuery      AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hDbQuery        AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldQuery     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
 
@@ -1968,8 +1907,9 @@ PROCEDURE getTables :
   CREATE WIDGET-POOL "metaInfo".
   CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
 
+  #Database:
   DO iDatabase = 1 TO NUM-DBS:
-    IF DBTYPE(iDatabase) <> "PROGRESS" THEN NEXT.
+    IF DBTYPE(iDatabase) <> "PROGRESS" THEN NEXT #Database.
 
     /* Compose name of the cache file. Use date/time of last schema change in the name */
     IF glCacheTableDefs THEN
@@ -2008,11 +1948,12 @@ PROCEDURE getTables :
                               + "     AND _File._File-Number < 32768"
                               + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"
                               ).
-
       hFileQuery:QUERY-OPEN().
+      
+      #File:
       REPEAT:
         hFileQuery:GET-NEXT().
-        IF hFileQuery:QUERY-OFF-END THEN LEAVE.
+        IF hFileQuery:QUERY-OFF-END THEN LEAVE #File.
 
         CREATE ttTable.
         ASSIGN 
@@ -2044,16 +1985,17 @@ PROCEDURE getTables :
         /* Move the tables of the current db to a separate tt so we can dump it. */
         EMPTY TEMP-TABLE ttTableXml.
 
-        CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
+        CREATE QUERY hDbQuery IN WIDGET-POOL "metaInfo".
         CREATE BUFFER hDbBuffer FOR TABLE LDBNAME(iDatabase) + "._Db" IN WIDGET-POOL "metaInfo".
 
-        hFileQuery:SET-BUFFERS(hDbBuffer).
-        hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK WHERE _Db._Db-local = TRUE").
-
-        hFileQuery:QUERY-OPEN().
+        hDbQuery:SET-BUFFERS(hDbBuffer).
+        hDbQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK WHERE _Db._Db-local = TRUE").
+        hDbQuery:QUERY-OPEN().
+        
+        #DB:
         REPEAT:
-          hFileQuery:GET-NEXT().
-          IF hFileQuery:QUERY-OFF-END THEN LEAVE.
+          hDbQuery:GET-NEXT().
+          IF hDbQuery:QUERY-OFF-END THEN LEAVE #DB.
 
           FOR EACH ttTable 
             WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
@@ -2062,8 +2004,8 @@ PROCEDURE getTables :
           END.
         END.
 
-        hFileQuery:QUERY-CLOSE().
-        DELETE OBJECT hFileQuery.
+        hDbQuery:QUERY-CLOSE().
+        DELETE OBJECT hDbQuery.
         DELETE OBJECT hDbBuffer.
 
         TEMP-TABLE ttTableXml:WRITE-XML("file", cCacheFile, YES, ?, ?, NO, NO).
@@ -2120,9 +2062,7 @@ PROCEDURE getTablesFiltered :
   DEFINE VARIABLE cFieldShow  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldHide  AS CHARACTER   NO-UNDO.
 
-  /* This table **SHOULD** exist 
-   * and have exactly 1 record 
-   */
+  /* This table **SHOULD** exist and have exactly 1 record */
   FIND ttTableFilter. 
 
   ASSIGN 
@@ -2149,33 +2089,33 @@ PROCEDURE getTablesFiltered :
   RUN correctFilterList(INPUT-OUTPUT cNameShow, INPUT-OUTPUT cNameHide).
   RUN correctFilterList(INPUT-OUTPUT cFieldShow, INPUT-OUTPUT cFieldHide).
 
-  tableLoop:
-  FOR EACH ttTable:
+  #Table:
+  FOR EACH ttTable TABLE-SCAN:
     /* Init table to false until proven otherwise */
     ASSIGN ttTable.lShowInList = FALSE.
     
     /* Check against filter-to-hide */
-    IF CAN-DO(cNameHide,ttTable.cTableName) THEN NEXT tableLoop.
+    IF CAN-DO(cNameHide,ttTable.cTableName) THEN NEXT #Table.
     
     /* Check against filter-to-show */
-    IF NOT CAN-DO(cNameShow,ttTable.cTableName) THEN NEXT tableLoop.
+    IF NOT CAN-DO(cNameShow,ttTable.cTableName) THEN NEXT #Table.
     
     /* User tables          : _file-number > 0   AND _file-number < 32000
      * Schema tables        : _file-number > -80 AND _file-number < 0
      * Virtual system tables: _file-number < -16384
      * SQL catalog tables   : _file-name BEGINS "_sys"
      */
-    IF NOT lNormal AND ttTable.cCategory = 'Normal' THEN NEXT tableLoop.
-    IF NOT lSchema AND ttTable.cCategory = 'Schema' THEN NEXT tableLoop.
-    IF NOT lVst    AND ttTable.cCategory = 'VST'    THEN NEXT tableLoop.
-    IF NOT lSql    AND ttTable.cCategory = 'SQL'    THEN NEXT tableLoop.
-    IF NOT lOther  AND ttTable.cCategory = 'Other'  THEN NEXT tableLoop.
+    IF NOT lNormal AND ttTable.cCategory = 'Normal' THEN NEXT #Table.
+    IF NOT lSchema AND ttTable.cCategory = 'Schema' THEN NEXT #Table.
+    IF NOT lVst    AND ttTable.cCategory = 'VST'    THEN NEXT #Table.
+    IF NOT lSql    AND ttTable.cCategory = 'SQL'    THEN NEXT #Table.
+    IF NOT lOther  AND ttTable.cCategory = 'Other'  THEN NEXT #Table.
 
     /* Handling for Hidden and Frozen apply only to user tables otherwise it will be too confusing
      * because Schema, VST and SQL tables are all by default hidden and frozen. 
      */
-    IF NOT lHidden AND ttTable.cCategory = 'Application' AND ttTable.lHidden = TRUE THEN NEXT tableLoop.
-    IF NOT lFrozen AND ttTable.cCategory = 'Application' AND ttTable.lFrozen = TRUE THEN NEXT tableLoop.
+    IF NOT lHidden AND ttTable.cCategory = 'Application' AND ttTable.lHidden = TRUE THEN NEXT #Table.
+    IF NOT lFrozen AND ttTable.cCategory = 'Application' AND ttTable.lFrozen = TRUE THEN NEXT #Table.
     
     /* Fields that must be in the list */
     DO iSearch = 1 TO NUM-ENTRIES(cFieldShow):
@@ -2184,20 +2124,22 @@ PROCEDURE getTablesFiltered :
       /* If no wildcards used, we can simply CAN-DO */
       IF INDEX(cSearchFld,"*") = 0 THEN
       DO:
-        IF NOT CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT tableLoop.
+        IF NOT CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT #Table.
       END.
       ELSE 
       DO:
         lFieldFound = FALSE.
+        
+        #Field:
         DO iField = 1 TO NUM-ENTRIES(ttTable.cFields):
           cThisField = ENTRY(iField,ttTable.cFields).
           IF CAN-DO(cSearchFld,cThisField) THEN 
           DO: 
             lFieldFound = TRUE.
-            LEAVE.
+            LEAVE #Field.
           END. 
         END.
-        IF NOT lFieldFound THEN NEXT tableLoop.
+        IF NOT lFieldFound THEN NEXT #Table.
       END.
     END.       
     
@@ -2208,7 +2150,7 @@ PROCEDURE getTablesFiltered :
       /* If no wildcards used, we can simply CAN-DO */
       IF INDEX(cSearchFld,"*") = 0 THEN
       DO:
-        IF CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT tableLoop.
+        IF CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT #Table.
       END.
       ELSE 
       DO:
@@ -2221,7 +2163,7 @@ PROCEDURE getTablesFiltered :
             LEAVE.
           END. 
         END.
-        IF lRejected THEN NEXT tableLoop.
+        IF lRejected THEN NEXT #Table.
       END.
     END.
     
@@ -2266,12 +2208,14 @@ PROCEDURE getTableStats :
 
   cIniFile = substitute('&1DataDigger-&2.ini', getProgramDir(), getUserName() ).
   INPUT from value(cIniFile).
+  
+  #ReadLine:
   REPEAT:
     /* Sometimes lines get screwed up and are waaaay too long
      * for the import statement. So just ignore those. 
      */
     IMPORT UNFORMATTED cLine NO-ERROR.
-    IF ERROR-STATUS:ERROR THEN NEXT.
+    IF ERROR-STATUS:ERROR THEN NEXT #ReadLine.
 
     /* Find DB sections */
     IF cLine MATCHES '[DB:*]' THEN 
@@ -2281,10 +2225,10 @@ PROCEDURE getTableStats :
     END. 
 
     /* Only process lines of database-sections */
-    IF NOT cSection BEGINS "DB:" THEN NEXT.
+    IF NOT cSection BEGINS "DB:" THEN NEXT #ReadLine.
 
     /* Only process setting lines */
-    IF NOT cLine MATCHES '*:*=*' THEN NEXT.
+    IF NOT cLine MATCHES '*:*=*' THEN NEXT #ReadLine.
     
     /* Filter out some settings */
     IF cLine MATCHES "*:QueriesServed=*" THEN
@@ -2327,7 +2271,7 @@ PROCEDURE getTableStats :
     END. /* favourite */
 
   END. /* repeat */
-  INPUT close. 
+  INPUT CLOSE.
 
   {&timerStop}
 
@@ -2547,8 +2491,7 @@ PROCEDURE resizeFilterFields :
   DEFINE VARIABLE hButton       AS HANDLE  NO-UNDO. 
   DEFINE VARIABLE hFilterField  AS HANDLE  NO-UNDO. 
   DEFINE VARIABLE iFilter       AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE lChangeDetected AS LOGICAL NO-UNDO. 
-  
+
   /* Find out if there has been a change in the browse or in one of
    * its columns. If no changes, save a little time by not redrawing
    */
@@ -2594,17 +2537,17 @@ PROCEDURE resizeFilterFields :
     END.
   END.
 
-  PUBLISH "timerCommand" ("start", "resizeFilterFields:fieldLoop").
-  fieldLoop:
+  PUBLISH "timerCommand" ("start", "resizeFilterFields:#Field").
+  #Field:
   DO iField = 1 TO phBrowse:NUM-COLUMNS:
 
     hColumn = phBrowse:GET-BROWSE-COLUMN(iField):handle.
     
     /* Some types cannot have a filter */
-    IF hColumn:DATA-TYPE = 'raw' THEN NEXT. 
+    IF hColumn:DATA-TYPE = 'raw' THEN NEXT #Field.
 
     iFilter = iFilter + 1.
-    IF iFilter > num-entries(pcFilterFields) THEN LEAVE fieldLoop.
+    IF iFilter > num-entries(pcFilterFields) THEN LEAVE #Field.
 
     /* Determine the handle of the filterfield */
     hFilterField = HANDLE(ENTRY(iFilter, pcFilterFields)).
@@ -2613,17 +2556,17 @@ PROCEDURE resizeFilterFields :
     IF NOT hColumn:VISIBLE THEN 
     DO:
       hFilterField:VISIBLE = NO.
-      NEXT fieldLoop. 
+      NEXT #Field.
     END.
 
     /* Where *are* we ?? */
     iCurrentPos = phBrowse:X + hColumn:X.
 
     /* If the columns have been resized, some columns might have fallen off the screen */
-    IF hColumn:X < 1 THEN NEXT. 
+    IF hColumn:X < 1 THEN NEXT #Field.
 
     /* Does it fit on the screen? */
-    IF iCurrentPos >= iRightEdge - 5 THEN LEAVE fieldLoop. /* accept some margin */
+    IF iCurrentPos >= iRightEdge - 5 THEN LEAVE #Field. /* accept some margin */
 
     /* Where will this field end? And does it fit? */
     iWidth = hColumn:WIDTH-PIXELS + 4.
@@ -2635,7 +2578,7 @@ PROCEDURE resizeFilterFields :
     iCurrentPos               = iCurrentPos + iWidth.
     hFilterField:VISIBLE      = phBrowse:VISIBLE. /* take over the visibility of the browse */
   END.
-  PUBLISH "timerCommand" ("stop", "resizeFilterFields:fieldLoop").
+  PUBLISH "timerCommand" ("stop", "resizeFilterFields:#Field").
   
   /* Finally, set the lead button to the utmost left */
   IF VALID-HANDLE(phLeadButton) THEN
@@ -2862,20 +2805,20 @@ PROCEDURE saveQueryTable :
 
   iQuery = 1.
 
-  saveQuery:
+  #SaveQuery:
   FOR EACH bQuery 
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable 
        BY bQuery.iQueryNr:
     
     cSetting = bQuery.cQueryTxt.
-    IF cSetting = '' THEN NEXT. /* cSetting = '<empty>' */
+    IF cSetting = '' THEN NEXT #SaveQuery.
 
     setRegistry( SUBSTITUTE("DB:&1", pcDatabase)
                , SUBSTITUTE('&1:query:&2', pcTable, iQuery)
                , cSetting).
     iQuery = iQuery + 1.
-    IF iQuery > iMaxQueryHistory THEN LEAVE saveQuery.
+    IF iQuery > iMaxQueryHistory THEN LEAVE #SaveQuery.
   END.
 
   /* Delete higher nrs than MaxQueryHistory */
@@ -3024,10 +2967,10 @@ PROCEDURE setTransparency :
   DEFINE INPUT  PARAMETER phFrame AS HANDLE     NO-UNDO.
   DEFINE INPUT  PARAMETER piLevel AS INTEGER    NO-UNDO.
   
-  &scop GWL_EXSTYLE         -20
-  &scop WS_EX_LAYERED       524288
-  &scop LWA_ALPHA           2
-  &scop WS_EX_TRANSPARENT   32
+  &SCOPED-DEFINE GWL_EXSTYLE         -20
+  &SCOPED-DEFINE WS_EX_LAYERED       524288
+  &SCOPED-DEFINE LWA_ALPHA           2
+  &SCOPED-DEFINE WS_EX_TRANSPARENT   32
   
   DEFINE VARIABLE stat AS INTEGER    NO-UNDO.
 
@@ -3133,19 +3076,17 @@ END PROCEDURE. /* setXmlNodeNames */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHelp Procedure 
 PROCEDURE showHelp :
-DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
-  DEFINE INPUT  PARAMETER pcStrings AS CHARACTER   NO-UNDO.
+DEFINE INPUT PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcStrings AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cButtons       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cMessage       AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cMsg           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cPrg           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTitle         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cType          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUrl           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cCanHide       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iButtonPressed AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lAnswer        AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lDontShowAgain AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lCanHide       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lHidden        AS LOGICAL     NO-UNDO.
@@ -3347,14 +3288,9 @@ END PROCEDURE. /* unlockWindow */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE updateFields Procedure 
 PROCEDURE updateFields :
-/*------------------------------------------------------------------------
-  Name         : updateFields
-  Description  : Update the fields temp-table with settings from registry
-  ---------------------------------------------------------------------- 
-  22-10-2012 pti Created
-  24-10-2014 pti Place newly created fields at the bottom
-  ----------------------------------------------------------------------*/
-  
+/* 
+ * Update the fields temp-table with settings from registry
+ */
   DEFINE INPUT PARAMETER pcDatabase    AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcTableName   AS CHARACTER   NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttField.
@@ -3362,7 +3298,6 @@ PROCEDURE updateFields :
   DEFINE VARIABLE cCustomFormat      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldOrder        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lSaveDataFilters   AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iColumnOrder       AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iFieldOrder        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxExtent         AS INTEGER     NO-UNDO.
@@ -3390,10 +3325,7 @@ PROCEDURE updateFields :
     PUBLISH "debugMessage" (3, SUBSTITUTE("Rowid/recid at the end for table &1: &2", pcTableName, lRecRowAtEnd)).
   END.
 
-  /* Saved data filters? */
-  lSaveDataFilters = LOGICAL(getRegistry ("DataDigger", "SaveDataFilters")).
-
-  FOR EACH bField:
+  FOR EACH bField TABLE-SCAN:
 
     /* Due to a bug the nr of decimals may be set on non-decimal fields
      * See PKB P185263 (article 18087) for more information
@@ -3453,7 +3385,7 @@ PROCEDURE updateFields :
 
   /* Reorder fields to get rid of gaps */
   iFieldOrder = 0.
-  REPEAT PRESELECT EACH bField BY bField.iOrder:
+  REPEAT PRESELECT EACH bField TABLE-SCAN BY bField.iOrder:
     FIND NEXT bField.
     ASSIGN 
       iFieldOrder   = iFieldOrder + 1
@@ -3462,7 +3394,7 @@ PROCEDURE updateFields :
 
   /* Assign order nrs to columns to handle extents */
   iColumnOrder = 0.
-  FOR EACH bField BY bField.iOrder:
+  FOR EACH bField TABLE-SCAN BY bField.iOrder:
     FOR EACH bColumn WHERE bColumn.cFieldName =  bField.cFieldName BY bColumn.cFieldName:
       iColumnOrder = iColumnOrder + 1.
       bColumn.iColumnNr = iColumnOrder.
@@ -3515,11 +3447,12 @@ PROCEDURE updateMemoryCache :
   END.
 
   /* Create new */
-  FOR EACH bField:
+  FOR EACH bField TABLE-SCAN:
     CREATE bFieldCache.
     BUFFER-COPY bField TO bFieldCache.
   END.
-  FOR EACH bColumn:
+  
+  FOR EACH bColumn TABLE-SCAN:
     CREATE bColumnCache.
     BUFFER-COPY bColumn TO bColumnCache.
   END.
@@ -3753,8 +3686,9 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
 
   /* And a list of all databases. If a database is in the list of schemaholders
    * we don't want to see it here. */
+  #Db:
   DO iCount = 1 to NUM-DBS:
-    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT.
+    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT #Db.
     cDatabaseList = cDatabaseList + ',' + LDBNAME(iCount).
   END.
 
@@ -4819,10 +4753,6 @@ FUNCTION isWidgetChanged RETURNS LOGICAL
     Notes:  
 ------------------------------------------------------------------------------*/
   DEFINE VARIABLE lChangeDetected AS LOGICAL NO-UNDO. 
-  DEFINE VARIABLE iField          AS INTEGER NO-UNDO.
-  DEFINE VARIABLE hColumn         AS HANDLE  NO-UNDO.
-  DEFINE VARIABLE hFirstColumn    AS HANDLE  NO-UNDO.
-
   DEFINE BUFFER ttWidget FOR ttWidget.
 
   IF NOT VALID-HANDLE(phWidget) THEN RETURN FALSE. 
@@ -4837,7 +4767,7 @@ FUNCTION isWidgetChanged RETURNS LOGICAL
 
   PUBLISH "debugMessage" (3, SUBSTITUTE("Widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
 
-  IF ttWidget.iPosX     <> phWidget:X
+  IF ttWidget.iPosX  <> phWidget:X
   OR ttWidget.iWidth <> phWidget:WIDTH-PIXELS THEN
   DO:
     ASSIGN

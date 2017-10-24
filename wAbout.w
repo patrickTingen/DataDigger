@@ -32,7 +32,7 @@ CREATE WIDGET-POOL.
 
 /* ***************************  Definitions  ************************** */
 
-{ datadigger.i }
+{ DataDigger.i }
 
 DEFINE TEMP-TABLE ttBrick NO-UNDO
   FIELD cBlockId AS CHARACTER 
@@ -124,7 +124,7 @@ fiWebsite
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wAbout AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wAbout AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of handles for OCX Containers                            */
 DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
@@ -484,9 +484,9 @@ PROCEDURE blinkLogo :
   DEFINE VARIABLE ii   AS INTEGER NO-UNDO.
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
-  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT -5. /* hor speed */
-  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0.  /* ver speed */
-  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
+  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INITIAL -5. /* hor speed */
+  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INITIAL 0.  /* ver speed */
+  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INITIAL .2. /* gravity acceleration */
 
   /* debug */
   IF glDebugRun OR NOT glUseTimer THEN
@@ -1109,10 +1109,10 @@ PROCEDURE setBall :
 
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
-  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INIT 1. /* hor speed */
-  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INIT 0. /* ver speed */
-  DEFINE VARIABLE elas AS DECIMAL NO-UNDO INIT .85. /* perc speed left after bounce */
-  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INIT .2. /* gravity acceleration */
+  DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INITIAL 1. /* hor speed */
+  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INITIAL 0. /* ver speed */
+  DEFINE VARIABLE elas AS DECIMAL NO-UNDO INITIAL .85. /* perc speed left after bounce */
+  DEFINE VARIABLE grav AS DECIMAL NO-UNDO INITIAL .2. /* gravity acceleration */
 
   DO WITH FRAME {&FRAME-NAME}:
     imgPaddle:X = 280.
@@ -1418,4 +1418,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

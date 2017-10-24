@@ -46,11 +46,11 @@
   DEFINE INPUT PARAMETER  pcMessage       AS CHARACTER  no-undo initial 'Do you want to disconnect user "&1" from database "&2"?'.
   DEFINE INPUT PARAMETER  pcButtons       AS CHARACTER  no-undo initial '&Yes,&No'.
   DEFINE INPUT PARAMETER  plCanHide       as logical    no-undo initial true.
-  DEFINE OUTPUT PARAMETER piButton        AS integer    NO-UNDO INIT ?.
-  DEFINE OUTPUT PARAMETER plDontShowAgain AS logical    NO-UNDO INIT ?.
+  DEFINE OUTPUT PARAMETER piButton        AS integer    NO-UNDO INITIAL ?.
+  DEFINE OUTPUT PARAMETER plDontShowAgain AS logical    NO-UNDO INITIAL ?.
 &ENDIF
 
-{ datadigger.i } 
+{ DataDigger.i }
 
 /* Allow testing */
 &IF DEFINED(UIB_is_running) <> 0 &THEN
@@ -347,112 +347,106 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-   DEFINE VARIABLE lYesNoCancel  AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE lOkCancel     AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE lOk           AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE iNumButtons   AS INTEGER    NO-UNDO.
-   DEFINE VARIABLE dMargin       AS DECIMAL    NO-UNDO.
-   DEFINE VARIABLE iVertMargin   AS INTEGER    NO-UNDO.
-   DEFINE VARIABLE cYesLabel     AS CHARACTER  NO-UNDO.
-   DEFINE VARIABLE cNoLabel      AS CHARACTER  NO-UNDO.
-   DEFINE VARIABLE cCancelLabel  AS CHARACTER  NO-UNDO.
-   define variable iFrameHeight  as integer    no-undo. 
+/*
+ * Init vars and frame
+ */
+  DEFINE VARIABLE iNumButtons   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE dMargin       AS DECIMAL    NO-UNDO.
+  DEFINE VARIABLE iVertMargin   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE cYesLabel     AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cNoLabel      AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cCancelLabel  AS CHARACTER  NO-UNDO.
 
-   DO WITH FRAME {&FRAME-NAME}:
+  DO WITH FRAME {&FRAME-NAME}:
 
-     /* Get fonts */
-     frame {&frame-name}:font = getFont('Default').
+    /* Get fonts */
+    frame {&frame-name}:font = getFont('Default').
 
-     iNumButtons  = NUM-ENTRIES(pcButtons).   
-     IF pcButtons = '' THEN pcButtons = 'OK'.
+    iNumButtons  = NUM-ENTRIES(pcButtons).   
+    IF pcButtons = '' THEN pcButtons = 'OK'.
 
-     /* Show Question-image or DD-logo */
-     if pcMessage matches "*?" then
-       imgQuestion:load-image( getImagePath('Question.gif')) no-error.
-     else 
-       imgQuestion:load-image( getImagePath("DataDigger24x24.gif")) no-error.
+    /* Show Question-image or DD-logo */
+    if pcMessage matches "*?" then
+      imgQuestion:load-image( getImagePath('Question.gif')) no-error.
+    else 
+      imgQuestion:load-image( getImagePath("DataDigger24x24.gif")) no-error.
      
-     /* Replace fake NEWLINES with chr(10) */
-     pcMessage = replace(pcMessage,'~~n',chr(10)).
+    /* Replace fake NEWLINES with chr(10) */
+    pcMessage = replace(pcMessage,'~~n',chr(10)).
 
-     /* Strip leading spaces */
-     pcMessage = TRIM(pcMessage).
+    /* Strip leading spaces */
+    pcMessage = TRIM(pcMessage).
 
-     PUBLISH "debugMessage" (1, pcMessage).
+    PUBLISH "debugMessage" (1, pcMessage).
 
-     /* Make some room in the frame for moving around with widgets */
-     FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS * 2.
+    /* Make some room in the frame for moving around with widgets */
+    FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS * 2.
 
-     ASSIGN            
-       FRAME {&FRAME-NAME}:TITLE  = IF pcTitle > '' THEN pcTitle ELSE FRAME {&FRAME-NAME}:TITLE  
-       edMessage:SCREEN-VALUE     = RIGHT-TRIM(pcMessage,CHR(10))
-       edMessage:INNER-LINES      = edMessage:NUM-LINES
-       dMargin                    = imgQuestion:COL /* Use the editor Y as margin template */
-       iVertMargin                = edMessage:Y 
-       btnYes:Y                   = edMessage:Y + edMessage:HEIGHT-PIXELS + iVertMargin
-       btnNo:Y                    = btnYes:Y 
-       btnCancel:y                = btnYes:Y 
-       .
+    ASSIGN            
+      FRAME {&FRAME-NAME}:TITLE  = IF pcTitle > '' THEN pcTitle ELSE FRAME {&FRAME-NAME}:TITLE  
+      edMessage:SCREEN-VALUE     = RIGHT-TRIM(pcMessage,CHR(10))
+      edMessage:INNER-LINES      = edMessage:NUM-LINES
+      dMargin                    = imgQuestion:COL /* Use the editor Y as margin template */
+      iVertMargin                = edMessage:Y 
+      btnYes:Y                   = edMessage:Y + edMessage:HEIGHT-PIXELS + iVertMargin
+      btnNo:Y                    = btnYes:Y 
+      btnCancel:y                = btnYes:Y 
+      .
                  
-     /* Toggle for Don't Show Again is optional */
-     if plCanHide then
-     do:
-       tgDontShowAgain:visible = plCanHide.
-       tgDontShowAgain:sensitive = plCanHide. 
-       tgDontShowAgain:y = btnYes:Y + btnYes:height-pixels + iVertMargin.
+    /* Toggle for Don't Show Again is optional */
+    if plCanHide then
+    do:
+      tgDontShowAgain:visible = plCanHide.
+      tgDontShowAgain:sensitive = plCanHide. 
+      tgDontShowAgain:y = btnYes:Y + btnYes:height-pixels + iVertMargin.
       
-       /* Add border top and bottom to ensure min heigth  */
-       FRAME {&FRAME-NAME}:HEIGHT-PIXELS = tgDontShowAgain:Y + tgDontShowAgain:HEIGHT-PIXELS
-                                         + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS 
-                                         + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
-                                         + INTEGER(iVertMargin / 2) NO-ERROR.
-     end.
-     else 
-     do:
-       tgDontShowAgain:visible = plCanHide.
-       tgDontShowAgain:sensitive = plCanHide. 
-       tgDontShowAgain:y = 1.
+      /* Add border top and bottom to ensure min heigth  */
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = tgDontShowAgain:Y + tgDontShowAgain:HEIGHT-PIXELS
+                                        + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS 
+                                        + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
+                                        + INTEGER(iVertMargin / 2) NO-ERROR.
+    end.
+    else 
+    do:
+      tgDontShowAgain:visible = plCanHide.
+      tgDontShowAgain:sensitive = plCanHide. 
+      tgDontShowAgain:y = 1.
 
-       FRAME {&FRAME-NAME}:HEIGHT-P = btnYes:Y + btnYes:height-pixels
-                                    + FRAME {&FRAME-NAME}:BORDER-TOP-P 
-                                    + FRAME {&FRAME-NAME}:BORDER-BOTTOM-P
-                                    + INT(iVertMargin / 2) NO-ERROR.
+      FRAME {&FRAME-NAME}:HEIGHT-P = btnYes:Y + btnYes:height-pixels
+                                   + FRAME {&FRAME-NAME}:BORDER-TOP-P 
+                                   + FRAME {&FRAME-NAME}:BORDER-BOTTOM-P
+                                   + INTEGER(iVertMargin / 2) NO-ERROR.
 
-     end.
+    end.
     
-     ASSIGN 
-       btnNo:HIDDEN           = iNumButtons < 2
-       btnCancel:HIDDEN       = iNumButtons < 3
-       btnNo:SENSITIVE        = NOT btnNo:HIDDEN
-       btnCancel:SENSITIVE    = NOT btnCancel:HIDDEN
+    ASSIGN 
+      btnNo:HIDDEN           = iNumButtons < 2
+      btnCancel:HIDDEN       = iNumButtons < 3
+      btnNo:SENSITIVE        = NOT btnNo:HIDDEN
+      btnCancel:SENSITIVE    = NOT btnCancel:HIDDEN
       
-       cYesLabel              = ENTRY(1,pcButtons)
-       cNoLabel               = ENTRY(2,pcButtons) WHEN iNumButtons >= 2
-       cCancelLabel           = ENTRY(3,pcButtons) WHEN iNumButtons >= 3
+      cYesLabel              = ENTRY(1,pcButtons)
+      cNoLabel               = ENTRY(2,pcButtons) WHEN iNumButtons >= 2
+      cCancelLabel           = ENTRY(3,pcButtons) WHEN iNumButtons >= 3
       
-       btnYes:LABEL           = IF cYesLabel > '':U THEN cYesLabel 
+      btnYes:LABEL           = IF cYesLabel > '':U THEN cYesLabel 
                                   ELSE IF iNumButtons = 1 THEN 'OK' ELSE btnYes:LABEL
-       btnNo:LABEL            = IF cNoLabel > '':U THEN cNoLabel ELSE btnNo:LABEL
-       btnCancel:LABEL        = IF cCancelLabel > '':U THEN cCancelLabel ELSE btnCancel:LABEL
-       btnYes:width           = MAX(btnYes:width,FONT-TABLE:GET-TEXT-width(btnYes:LABEL) + 1.5) 
-       btnNo:width            = MAX(btnNo:width,FONT-TABLE:GET-TEXT-width(btnNo:LABEL) + 1.5) 
-       btnCancel:width        = MAX(btnCancel:width,FONT-TABLE:get-text-width(btnCancel:LABEL) + 1.5) 
-       btnCancel:COL          = FRAME {&FRAME-NAME}:width - (btnCancel:width + dMargin)
-       btnNo:COL              = IF btnCancel:HIDDEN  
-                                  THEN FRAME {&FRAME-NAME}:width - (btnNo:width + dMargin) 
-                                  ELSE btnCancel:COL - (btnNo:width + (dMargin / 2))
-       btnYes:COL             = MAX(1, IF btnNo:HIDDEN  
-                                      THEN FRAME {&FRAME-NAME}:width - (btnYes:width + dMargin) 
-                                      ELSE btnNo:COL - (btnYes:width + (dMargin / 2)) ).
+      btnNo:LABEL            = IF cNoLabel > '':U THEN cNoLabel ELSE btnNo:LABEL
+      btnCancel:LABEL        = IF cCancelLabel > '':U THEN cCancelLabel ELSE btnCancel:LABEL
+      btnYes:width           = MAX(btnYes:width,FONT-TABLE:GET-TEXT-width(btnYes:LABEL) + 1.5) 
+      btnNo:width            = MAX(btnNo:width,FONT-TABLE:GET-TEXT-width(btnNo:LABEL) + 1.5) 
+      btnCancel:width        = MAX(btnCancel:width,FONT-TABLE:get-text-width(btnCancel:LABEL) + 1.5) 
+      btnCancel:COL          = FRAME {&FRAME-NAME}:width - (btnCancel:width + dMargin)
+      btnNo:COL              = IF btnCancel:HIDDEN  
+                                 THEN FRAME {&FRAME-NAME}:width - (btnNo:width + dMargin) 
+                                 ELSE btnCancel:COL - (btnNo:width + (dMargin / 2))
+      btnYes:COL             = MAX(1, IF btnNo:HIDDEN  
+                                 THEN FRAME {&FRAME-NAME}:width - (btnYes:width + dMargin) 
+                                 ELSE btnNo:COL - (btnYes:width + (dMargin / 2)) ).
       
-     /* For some reasons, these #*$&# scrollbars keep coming back */
-     run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */
-   END.
+    /* For some reasons, these #*$&# scrollbars keep coming back */
+    run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */
+  END.
 
 END PROCEDURE.
 

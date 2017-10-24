@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 /* ***************************  Definitions  ************************** */
-{datadigger.i}
+{ DataDigger.i }
 
 /* Parameters Definitions */
 DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
@@ -398,15 +398,14 @@ PROCEDURE populateCombo :
   Purpose: Set items in a combo box
 ------------------------------------------------------------------------------*/
 
-  DEFINE INPUT  PARAMETER phCombo   AS HANDLE      NO-UNDO.
-  DEFINE INPUT  PARAMETER pcSetting AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER phCombo   AS HANDLE      NO-UNDO.
+  DEFINE INPUT PARAMETER pcSetting AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE iMaxFilterHistory AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cFilterList       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cComboList        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iPos              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cThisValue        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValue            AS CHARACTER   NO-UNDO.
 
   /* Place search history in the combo */
   phCombo:DELIMITER = CHR(1).
@@ -493,4 +492,3 @@ END PROCEDURE. /* saveComboValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

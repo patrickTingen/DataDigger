@@ -32,7 +32,7 @@ CREATE WIDGET-POOL.
 
 /* ***************************  Definitions  ************************** */
 
-{datadigger.i}
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
@@ -66,7 +66,7 @@ DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wEditor AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wEditor AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnCancel AUTO-END-KEY 
@@ -383,4 +383,3 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

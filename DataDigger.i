@@ -72,6 +72,7 @@ DEFINE TEMP-TABLE ttQuery NO-UNDO RCODE-INFORMATION
   FIELD iQueryNr  AS INTEGER
   FIELD cQueryTxt AS CHARACTER
   INDEX idxQueryPrim IS PRIMARY iQueryNr
+  INDEX idxTable cDatabase cTable
   .
 
 /* TT for the fields of a table */
@@ -147,6 +148,7 @@ DEFINE TEMP-TABLE ttColumn NO-UNDO RCODE-INFORMATION
   INDEX idxField cFieldName
   INDEX idxColNr iColumnNr
   INDEX idxSort  cTableCacheId cFieldName iColumnNr
+  INDEX idxTable cDatabase cTablename
   .
 
 /* TTs Used for preCaching */
@@ -344,7 +346,7 @@ function getIndexFields returns character
 
 function getKeyList      returns character in super.
 
-function getLinkInfo          returns character
+function getLinkInfo     returns character
   ( input pcFieldName as character
   ) in super.
 
@@ -373,7 +375,7 @@ function getRegistry returns character
   , pcKey     AS CHARACTER 
   ) in super.
 
-function getStackSize returns intege 
+function getStackSize returns integer
   () in super.
 
 function getTableList returns character

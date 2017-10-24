@@ -82,7 +82,7 @@ end procedure.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rcSettings btnSettings ficSettingsFile ~
+&Scoped-Define ENABLED-OBJECTS btnSettings rcSettings ficSettingsFile ~
 btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK 
 &Scoped-Define DISPLAYED-OBJECTS ficSettingsFile fiSearch 
 
@@ -97,7 +97,7 @@ btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wSettings AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wSettings AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON BtnCancel-2 AUTO-END-KEY DEFAULT 
@@ -170,7 +170,7 @@ DEFINE FRAME DEFAULT-FRAME
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 155 Y 65
+         AT X 155 Y 64
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
          TITLE "" WIDGET-ID 200.
 
@@ -434,19 +434,6 @@ END PROCEDURE.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btPage1 wSettings
-ON RETURN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
-,btPage2, btPage3
-DO:
-
-  .apply 'entry' to frame frSettings.
-  
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define SELF-NAME fiSearch
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiSearch wSettings
 ON ENTRY OF fiSearch IN FRAME DEFAULT-FRAME
@@ -603,7 +590,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY ficSettingsFile fiSearch 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
-  ENABLE rcSettings btnSettings ficSettingsFile btnRawEdit fiSearch btPage1 
+  ENABLE btnSettings rcSettings ficSettingsFile btnRawEdit fiSearch btPage1 
          btPage2 btPage3 BtnCancel-2 BtnOK 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
@@ -621,11 +608,10 @@ PROCEDURE initializeObject :
   Description  : Do initialisation
   ----------------------------------------------------------------------*/
   
-  define variable hWidget    as handle      no-undo.
-  define variable cValue     as character   no-undo.
-  define variable iMaxHeight as integer     no-undo.
-  define variable iScreen    as integer     no-undo. 
-  define variable hProg      as handle      no-undo extent 3.
+  define variable hWidget    as handle  no-undo.
+  define variable iMaxHeight as integer no-undo.
+  define variable iScreen    as integer no-undo. 
+  define variable hProg      as handle  no-undo extent 3.
 
   /* Load decoration stuff */
   do with frame {&frame-name}:
@@ -796,10 +782,8 @@ PROCEDURE saveSettings :
   ----------------------------------------------------------------------*/
 
   DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iColor   AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cSection AS CHARACTER NO-UNDO. 
   DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
 
   FOR EACH ttFrame:
 
@@ -918,7 +902,7 @@ PROCEDURE showFrames :
   frame frSettings:height-pixels = 390.
 
   /* Make frames visible based on whether the tags match */
-  for each ttFrame by ttFrame.iOrder:
+  for each ttFrame TABLE-SCAN by ttFrame.iOrder:
 
     ttFrame.hFrame:visible = ( ttFrame.cTags matches '*' + pcTag + '*' ).
 
@@ -980,4 +964,3 @@ END PROCEDURE. /* ShowScrollbars */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

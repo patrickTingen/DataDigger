@@ -80,7 +80,7 @@ btnBack BtnNext fiText
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wImportSel AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wImportSel AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnAddFile 
@@ -441,14 +441,14 @@ PROCEDURE addFile :
     IF FILE-INFO:FULL-PATHNAME = ? THEN
     DO:
       MESSAGE SUBSTITUTE("Cannot find file '&1', please retry.",pcFilename)
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       RETURN. 
     END.
 
     /* Only accept regular files */
     IF NOT FILE-INFO:FILE-TYPE BEGINS "F" THEN 
     DO:
-      MESSAGE "This is not a regular file, please retry." VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE "This is not a regular file, please retry." VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       RETURN. 
     END.
   
@@ -508,19 +508,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImportSel 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------
-  Name         : initializeObject
-  Description  : Setup
-  ----------------------------------------------------------------------*/
-  
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
-  
+/* 
+ * Setup
+ */
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Get fonts */
@@ -549,4 +539,3 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

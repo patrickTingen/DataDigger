@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 /* ***************************  Definitions  ************************** */
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
@@ -162,8 +162,6 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnChooseDumpFile Dialog-Frame
 ON CHOOSE OF btnChooseDumpFile IN FRAME Dialog-Frame /* ... */
 do:
-
-  define variable lOkay as logical    no-undo.
   define variable cDir  as character  no-undo.
 
   cDir = fiDir:screen-value.
@@ -186,8 +184,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_OK Dialog-Frame
 ON CHOOSE OF Btn_OK IN FRAME Dialog-Frame /* OK */
 DO:
-  DEFINE VARIABLE cDumpFile   AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cDumpSource AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDumpFile AS CHARACTER NO-UNDO.
 
   /* Create full folder structure */
   RUN createFolder(fiDir:SCREEN-VALUE). 
