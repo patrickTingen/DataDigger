@@ -2332,7 +2332,8 @@ PROCEDURE getTableStats :
   DEFINE VARIABLE cLine       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSection    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDatabase   AS CHARACTER   NO-UNDO.
-
+  define variable cSettingsDir as character no-undo.
+  
   /* Read the ini file as plain text and parse the lines. 
    * 
    * The normal way would be to do a FOR-EACH on the _file table and 
@@ -2342,7 +2343,8 @@ PROCEDURE getTableStats :
    */
   {&timerStart}
 
-  cIniFile = substitute('&1DataDigger-&2.ini', getProgramDir(), getUserName() ).
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+  cIniFile = substitute('&1DataDigger-&2.ini', cSettingsDir, getUserName() ).
   INPUT from value(cIniFile).
   REPEAT:
     /* Sometimes lines get screwed up and are waaaay too long
@@ -2777,9 +2779,12 @@ PROCEDURE saveConfigFileSorted :
  * Save settings file sorted
  */
   DEFINE VARIABLE cUserConfigFile AS CHARACTER NO-UNDO.
+  define variable cSettingsDir as character no-undo.
+  
   DEFINE BUFFER bfConfig FOR ttConfig.
 
-  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getProgramDir(), getUserName() ).
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", cSettingsDir, getUserName() ).
 
   /* Config table holds data from 3 .ini sources, so start fresh */
   EMPTY TEMP-TABLE bfConfig. 
@@ -4389,7 +4394,8 @@ FUNCTION getRegistry RETURNS CHARACTER
 
   DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
   DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
-
+  define variable cSettingsDir as character no-undo.
+  
   {&timerStart}
   DEFINE BUFFER bfConfig FOR ttConfig.
 
@@ -4411,12 +4417,13 @@ FUNCTION getRegistry RETURNS CHARACTER
                                     , getProgramDir()
                                     )).
       /* General DD settings */
+      cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
       RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini"
-                                    , getProgramDir()
+                                    , cSettingsDir
                                     )).
       /* Per-user settings */
       RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini"
-                                    , getProgramDir()
+                                    , cSettingsDir
                                     , getUserName()
                                     )).
   
@@ -5253,4 +5260,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

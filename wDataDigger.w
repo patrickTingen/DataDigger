@@ -2974,12 +2974,14 @@ END.
 ON MOUSE-MENU-CLICK OF btnSettings IN FRAME frSettings /* Set */
 DO:
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
+  define variable cSettingsDir as character no-undo.
 
   PUBLISH "setUsage" ("EditSettings"). /* user behaviour */
   HIDE FRAME frSettings.
 
   /* Load or create personalized ini file */
-  cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini', getProgramDir(), getUserName()).
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+  cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini', cSettingsDir, getUserName()).
 
   /* Start default editor for ini file */
   OS-COMMAND NO-WAIT START VALUE( cEnvironment ).
@@ -4489,10 +4491,12 @@ PROCEDURE btnSettingsChoose :
  */
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lOkClicked   AS LOGICAL     NO-UNDO.
+  define variable cSettingsDir as character no-undo.
 
   /* Load or create personalized ini file */
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
   cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini'
-                           , getProgramDir()
+                           , cSettingsDir
                            , getUserName()
                            ).
 
@@ -7566,19 +7570,25 @@ PROCEDURE initializeSettingsFile :
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
+  define variable cSettingsDir as character   no-undo.
 
   /* Find out where DataDigger is installed and how we"re logged on */
   cProgDir = getProgramDir().
 
+  /* See if general ini has moved. In that case use that folder for all settings */
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+
   /* If the general ini file does not exist, create it */
-  IF SEARCH(cProgDir + "DataDigger.ini") = ? THEN
+  IF cSettingsDir = ? THEN
   DO:
     OUTPUT TO VALUE(cProgDir + "DataDigger.ini").
     OUTPUT CLOSE.
+    cSettingsDir = cProgDir.
   END.
-  LOAD "DataDigger" DIR cProgDir BASE-KEY "ini" NO-ERROR.
+
+  LOAD "DataDigger" DIR cSettingsDir BASE-KEY "ini" NO-ERROR.
   IF ERROR-STATUS:ERROR THEN
-    LOAD "DataDigger" DIR cProgDir NEW BASE-KEY "ini" NO-ERROR.
+    LOAD "DataDigger" DIR cSettingsDir NEW BASE-KEY "ini" NO-ERROR.
 
 
   /* Same for the helpfile (though it SHOULD exist!) */
@@ -7591,19 +7601,18 @@ PROCEDURE initializeSettingsFile :
   IF ERROR-STATUS:ERROR THEN
     LOAD "DataDiggerHelp" DIR cProgDir NEW BASE-KEY "ini" NO-ERROR.
 
-
   /* Load or create personalized ini file */
   cEnvironment = SUBSTITUTE("DataDigger-&1", getUserName() ).
 
   /* If not exist, create it */
-  IF SEARCH(cProgDir + cEnvironment + ".ini") = ? THEN
+  IF SEARCH(cSettingsDir + cEnvironment + ".ini") = ? THEN
   DO:
-    OUTPUT TO VALUE(cProgDir + cEnvironment + ".ini").
+    OUTPUT TO VALUE(cSettingsDir + cEnvironment + ".ini").
     OUTPUT CLOSE.
   END.
-  LOAD cEnvironment DIR cProgDir BASE-KEY "ini" NO-ERROR.
+  LOAD cEnvironment DIR cSettingsDir BASE-KEY "ini" NO-ERROR.
   IF ERROR-STATUS:ERROR THEN
-    LOAD cEnvironment DIR cProgDir NEW BASE-KEY "ini" NO-ERROR.
+    LOAD cEnvironment DIR cSettingsDir NEW BASE-KEY "ini" NO-ERROR.
 
   /*
    * Set some settings to default values

@@ -322,7 +322,8 @@ PROCEDURE initializeObject :
   ----------------------------------------------------------------------*/
   
   DEFINE VARIABLE cDebuggerStart AS CHARACTER   NO-UNDO.
-
+  define variable cSettingsDir as character no-undo.
+  
   /* Are we at least 10.1B ? */
   IF PROVERSION < "10.1B" THEN
   DO:
@@ -341,15 +342,19 @@ PROCEDURE initializeObject :
   IF SEARCH('datadigger.txt') = ? THEN
     PROPATH = gcProgramDir + ',' + PROPATH.
 
+  /* See if general ini has moved. In that case use that folder for all settings */
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+
   /* If the general ini file does not exist, create it */
-  IF SEARCH(gcProgramDir + 'DataDigger.ini') = ? THEN
+  IF cSettingsDir = ? THEN
   DO:
-    OUTPUT TO VALUE(gcProgramDir + 'DataDigger.ini').
-    OUTPUT CLOSE. 
+    OUTPUT TO VALUE(gcProgramDir + "DataDigger.ini").
+    OUTPUT CLOSE.
+    cSettingsDir = gcProgramDir.
   END.
 
   /* In any case, load it */
-  LOAD 'DataDigger' DIR gcProgramDir BASE-KEY 'ini' NO-ERROR.
+  LOAD 'DataDigger' DIR cSettingsDir BASE-KEY 'ini' NO-ERROR.
 
   /* See if we should start the DD-Debugger */
   cDebuggerStart = getRegistry('debugger', 'start').
