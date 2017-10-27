@@ -25,7 +25,7 @@
 /* ***************************  Definitions  ************************** */
 
 /* Parameters Definitions ---                                           */
-{ datadigger.i } 
+{ DataDigger.i }
 
 /* Local Variable Definitions ---                                       */
 define {&invar}  piColorOld as integer no-undo.
@@ -35,6 +35,7 @@ define temp-table ttButton no-undo
   field x as integer
   field y as integer
   field h as handle
+  INDEX idxPrim IS PRIMARY x y
   .
 
 /* _UIB-CODE-BLOCK-END */
@@ -367,12 +368,13 @@ DO:
   define variable hTarget as handle no-undo. 
   define buffer bButton for ttButton.
 
+  #Button:
   for each bButton 
     where bButton.x = self:x 
       and bButton.y > self:y 
        by bButton.y:
     hTarget = bButton.h.
-    leave.
+    leave #Button.
   end. 
 
   if valid-handle(hTarget) then
@@ -394,12 +396,13 @@ DO:
   define variable hTarget as handle no-undo. 
   define buffer bButton for ttButton.
 
+  #Button:
   for each bButton 
     where bButton.y = self:y 
       and bButton.x < self:x 
        by bButton.x descending:
     hTarget = bButton.h.
-    leave.
+    leave #Button.
   end. 
 
   if valid-handle(hTarget) then
@@ -626,10 +629,12 @@ PROCEDURE initializeObjects :
   frame {&frame-name}:font = getFont('Default').
 
   hButton = frame {&frame-name}:first-child:first-child. /* rectangle */
+  
+  #Button:
   repeat:
     hButton = hButton:next-sibling.
-    if not valid-handle(hButton) then leave. 
-    if not hButton:name matches 'btn-*' then next.
+    if not valid-handle(hButton) then leave #Button.
+    if not hButton:name matches 'btn-*' then next #Button.
 
     iButtonNr = integer(entry(2,hButton:name,'-')).
 
@@ -658,4 +663,3 @@ end procedure. /* initializeObjects */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

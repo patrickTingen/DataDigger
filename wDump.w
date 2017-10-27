@@ -744,14 +744,14 @@ PROCEDURE btnDumpChoose :
 
     IF NOT isValidCodePage(cbCodePage:SCREEN-VALUE) THEN
     DO:
-      MESSAGE cbCodePage:SCREEN-VALUE 'is not a valid code page' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE cbCodePage:SCREEN-VALUE 'is not a valid code page' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       RETURN. 
     END.
     
     RUN checkDir(INPUT ficFileName:SCREEN-VALUE, OUTPUT cError).
     IF cError <> '' THEN 
     DO:
-      MESSAGE cError VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       RETURN. 
     END.
 
@@ -806,7 +806,7 @@ PROCEDURE btnOpenLastDumpDirChoose :
       OS-COMMAND NO-WAIT explorer /n, /e, VALUE(FILE-INFO:FULL-PATHNAME).
     ELSE
       MESSAGE SUBSTITUTE("Last used dir '&1' not found.", cDumpDir)
-        VIEW-AS ALERT-BOX INFO BUTTONS OK TITLE "Invalid Dir" .
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE "Invalid Dir" .
   END.
 
 END PROCEDURE.
@@ -1103,7 +1103,6 @@ PROCEDURE dumpData :
   DEFINE INPUT PARAMETER    piiFieldSelection   AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER    picFile             AS CHARACTER   NO-UNDO.
   
-  DEFINE VARIABLE cDumpDir            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iNumRecs            AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cTtField            AS CHARACTER   NO-UNDO.
@@ -1197,7 +1196,7 @@ PROCEDURE dumpData :
 
       DELETE OBJECT hExportQueryBuffer.
     END. /* when 2 then */
-  END. /* case piiFieldSelection: */
+  END CASE. /* case piiFieldSelection: */
 
   /* Prepare the TempTable... */
   hExportTt:TEMP-TABLE-PREPARE(SUBSTITUTE("&1",gcTable)).
@@ -1255,7 +1254,7 @@ PROCEDURE dumpData :
 
       END. /* when 3 then */
     END.
-  END. /* case piiRecordSelection: */
+  END CASE. /* case piiRecordSelection: */
 
   /* Dump the TempTable... */
   SESSION:NUMERIC-FORMAT = cbNumericFormat.
@@ -1300,7 +1299,6 @@ PROCEDURE dumpData :
             ( INPUT  picFile
             , INPUT  hExportTt
             , INPUT  iNumRecs
-            , INPUT  cbCodePage
             ).
 
     WHEN "P" THEN 
@@ -1346,10 +1344,6 @@ PROCEDURE dumpData :
 
     RUN setStatusMessage( INPUT NOW, INPUT cStatus ).
 
-    ASSIGN
-      cDumpDir = SUBSTRING(picFile, 1, R-INDEX(picFile,"~\"))
-      .
-
     setRegistry( "DumpAndLoad", "DumpExportType"      , cbDumpType).
     setRegistry( "DumpAndLoad", "DumpFilter"          , STRING(cbiRecordSelection) ).
     setRegistry( "DumpAndLoad", "DumpFilterFields"    , STRING(cbiFieldSelection) ).
@@ -1389,11 +1383,9 @@ PROCEDURE DumpData4GL :
   DEFINE VARIABLE iMaxLength          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumFields          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iLength             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cKeyFields          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLine               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iExtBegin           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtEnd             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cFieldName          AS CHARACTER   NO-UNDO.
@@ -1538,7 +1530,6 @@ PROCEDURE DumpDataCSV :
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cFieldFormat        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hField              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
@@ -1574,22 +1565,17 @@ PROCEDURE DumpDataCSV :
     IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
     iField = iField + 1.
     
-    /* Take regular field name or including extent */
-    cName = (IF hField:EXTENT > 1 
-               THEN SUBSTITUTE('&1[&2]',hField:NAME, hField:EXTENT) 
-               ELSE hField:LABEL ).
-
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
       PUT STREAM strDump UNFORMATTED 
         (IF iCurField = 1 AND iExtent = 1 THEN "" ELSE cSeparator)
-        SUBSTITUTE('&1[&2]',hField:LABEL, iExtent).
+        SUBSTITUTE('&1[&2]',hField:NAME, iExtent).
     END.
     ELSE
     DO:
       PUT STREAM strDump UNFORMATTED
        (IF iCurField = 1 THEN "" ELSE cSeparator)
-       hField:LABEL.
+       hField:NAME.
     END.
   END.
   PUT STREAM strDump UNFORMATTED SKIP.
@@ -1670,7 +1656,6 @@ PROCEDURE DumpDataExcel :
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cColumnRange        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hExcel              AS COM-HANDLE  NO-UNDO.
   DEFINE VARIABLE hWorkbook           AS COM-HANDLE  NO-UNDO.
   DEFINE VARIABLE hWorksheet          AS COM-HANDLE  NO-UNDO.
@@ -2152,7 +2137,6 @@ PROCEDURE DumpDataXml :
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cTargetType      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFile            AS CHARACTER   NO-UNDO.
@@ -2362,7 +2346,6 @@ PROCEDURE setDumpFileName :
   Notes:       
 ------------------------------------------------------------------------------*/
   
-  DEFINE VARIABLE cError    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFileName AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME {&frame-name}:

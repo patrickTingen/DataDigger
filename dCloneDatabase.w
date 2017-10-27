@@ -23,7 +23,7 @@
 /*----------------------------------------------------------------------*/
 
 /* ***************************  Definitions  ************************** */
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 DEFINE INPUT-OUTPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
@@ -158,9 +158,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnChooseDumpFile Dialog-Frame
 ON CHOOSE OF btnChooseDumpFile IN FRAME Dialog-Frame /* ... */
 do:
-
-  define variable lOkay as logical    no-undo.
-  define variable cDir  as character  no-undo.
+  define variable cDir as character  no-undo.
 
   cDir = fiDir:screen-value.
 
@@ -246,7 +244,7 @@ PROCEDURE clearCache :
   Desc: if you create a local db with a name that has been used before, DD
         will see a difference in the schema. To avoid this, remove old cache
 ------------------------------------------------------------------------------*/
-  DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcDbName AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE cFile AS CHARACTER NO-UNDO EXTENT 3.
 
@@ -255,7 +253,7 @@ PROCEDURE clearCache :
   INPUT FROM OS-DIR(getProgramdir() + "cache").
   REPEAT:
     IMPORT cFile.
-    IF cFile[1] MATCHES SUBSTITUTE('db.&1.*.xml', pcDatabase) THEN OS-DELETE VALUE( cFile[2]).
+    IF cFile[1] MATCHES SUBSTITUTE('db.&1.*.xml', pcDbName) THEN OS-DELETE VALUE( cFile[2]).
   END.
   INPUT CLOSE. 
 
@@ -270,7 +268,7 @@ PROCEDURE cloneDatabase :
   Purpose: Clone the current database
  ------------------------------------------------------------------------------*/
 
-  DEFINE INPUT PARAMETER pcDatabase      AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcDbName        AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcFolder        AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER plStayConnected AS LOGICAL     NO-UNDO.
   DEFINE OUTPUT PARAMETER pcLogicalName  AS CHARACTER   NO-UNDO.
@@ -283,12 +281,12 @@ PROCEDURE cloneDatabase :
   DEFINE VARIABLE hProc        AS HANDLE      NO-UNDO.
 
   IF NUM-DBS = 0 THEN DO:
-    MESSAGE 'No databases connected' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE 'No databases connected' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN. 
   END.
 
-  IF CONNECTED(pcDatabase) <> TRUE THEN DO:
-    MESSAGE 'Database' pcDatabase 'not connected' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  IF CONNECTED(pcDbName) <> TRUE THEN DO:
+    MESSAGE 'Database' pcDbName 'not connected' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN. 
   END.
 
@@ -298,18 +296,18 @@ PROCEDURE cloneDatabase :
            cDlc = SUBSTRING(cDlc,1,LENGTH(cDlc,'CHARACTER':U) - 9,'CHARACTER':U).
 
   /* Point to the proper database */
-  CREATE ALIAS 'dictdb' FOR DATABASE VALUE(pcDatabase).
+  CREATE ALIAS 'dictdb' FOR DATABASE VALUE(pcDbName).
 
   /* Exist? */
-  IF SEARCH(SUBSTITUTE('&1\&2.db', pcFolder, pcDatabase)) <> ? THEN
+  IF SEARCH(SUBSTITUTE('&1\&2.db', pcFolder, pcDbName)) <> ? THEN
   DO:
     MESSAGE 'Database already exists. Replace?' 
-        VIEW-AS ALERT-BOX INFO BUTTONS YES-NO-CANCEL UPDATE lDelete.
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lDelete.
     IF lDelete <> TRUE THEN RETURN. 
 
     /* Delete existing database */
     cCommand[1] = SUBSTITUTE('cd /d &1', pcFolder).
-    cCommand[2] = SUBSTITUTE('echo y|&1\bin\prodel &2', cDlc, pcDatabase).
+    cCommand[2] = SUBSTITUTE('echo y|&1\bin\prodel &2', cDlc, pcDbName).
     cCmd = SUBSTITUTE('&1 && &2', cCommand[1], cCommand[2]).
     OS-COMMAND SILENT VALUE(cCmd).
   END.
@@ -317,32 +315,32 @@ PROCEDURE cloneDatabase :
   /* If the new db is already connected, disconnect it first, before 
    * we are going to replace it. 
    */
-  pcLogicalName = SUBSTITUTE('my&1&2', CAPS(SUBSTRING(pcDatabase,1,1)), LOWER(SUBSTRING(pcDatabase,2))).
+  pcLogicalName = SUBSTITUTE('my&1&2', CAPS(SUBSTRING(pcDbName,1,1)), LOWER(SUBSTRING(pcDbName,2))).
   IF CONNECTED(pcLogicalName) THEN DISCONNECT VALUE(pcLogicalName).
 
   /* Create structure */
-  RUN createStructureFile(pcDatabase,pcFolder).
+  RUN createStructureFile(pcDbName,pcFolder).
   
   /* Create empty db */
   cCommand[1] = SUBSTITUTE('cd /d &1', pcFolder).
-  cCommand[2] = SUBSTITUTE('&1\bin\prostrct create &2', cDlc, pcDatabase).
-  cCommand[3] = SUBSTITUTE('&1\bin\procopy &1\empty &2', cDlc, pcDatabase).
+  cCommand[2] = SUBSTITUTE('&1\bin\prostrct create &2', cDlc, pcDbName).
+  cCommand[3] = SUBSTITUTE('&1\bin\procopy &1\empty &2', cDlc, pcDbName).
   cCmd = SUBSTITUTE('&1 && &2 && &3', cCommand[1], cCommand[2], cCommand[3]).
   OS-COMMAND SILENT VALUE(cCmd).
   
   /* Do a silent dump df of old db */
-  cDf = SUBSTITUTE('&1\&2.df', pcFolder, pcDatabase).
+  cDf = SUBSTITUTE('&1\&2.df', pcFolder, pcDbName).
   RUN prodict/dump_df.p PERSISTENT SET hProc (INPUT 'ALL', INPUT cDf, INPUT '1252').
   RUN setSilent IN hProc(YES) NO-ERROR. /* setSilent not avail in all versions */
   RUN doDump IN hProc.
   DELETE PROCEDURE hProc. 
 
   /* Connect new db */
-  CONNECT VALUE(SUBSTITUTE('-db &1\&2.db -ld &3 -1', pcFolder, pcDatabase, pcLogicalName)).
+  CONNECT VALUE(SUBSTITUTE('-db &1\&2.db -ld &3 -1', pcFolder, pcDbName, pcLogicalName)).
 
   /* Load in new db */
   CREATE ALIAS 'dictdb' FOR DATABASE VALUE(pcLogicalName).
-  RUN prodict/load_df.p (INPUT SUBSTITUTE('&1\&2.df', pcFolder, pcDatabase)).
+  RUN prodict/load_df.p (INPUT SUBSTITUTE('&1\&2.df', pcFolder, pcDbName)).
 
   /* Let it remain connected or not */
   IF NOT plStayConnected THEN DISCONNECT VALUE(pcLogicalName).
@@ -357,44 +355,45 @@ PROCEDURE createStructureFile :
 /*------------------------------------------------------------------------------
   Purpose:     Create an .st file for the currently connected database
  ------------------------------------------------------------------------------*/
-    DEFINE INPUT PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
-    DEFINE INPUT PARAMETER pcFolder   AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcDbName AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcFolder   AS CHARACTER   NO-UNDO.
     
-    DEFINE VARIABLE hBuffer AS HANDLE NO-UNDO.
-    DEFINE VARIABLE hQuery  AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hBuffer AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hQuery  AS HANDLE NO-UNDO.
     
-    CREATE BUFFER hBuffer FOR TABLE SUBSTITUTE('&1._Area',pcDatabase).
-    IF NOT VALID-HANDLE(hBuffer) THEN NEXT.
+  CREATE BUFFER hBuffer FOR TABLE SUBSTITUTE('&1._Area',pcDbName).
+  IF NOT VALID-HANDLE(hBuffer) THEN NEXT.
     
-    CREATE QUERY hQuery.
-    hQuery:SET-BUFFERS(hBuffer).
-    hQuery:QUERY-PREPARE('FOR EACH _Area WHERE (_Area-type = 3 AND _Area-number > 1) OR  (_Area-type = 6 AND _Area-number > 1)').
-    IF NOT hQuery:QUERY-OPEN THEN RETURN.
+  CREATE QUERY hQuery.
+  hQuery:SET-BUFFERS(hBuffer).
+  hQuery:QUERY-PREPARE('FOR EACH _Area WHERE (_Area-type = 3 AND _Area-number > 1) OR  (_Area-type = 6 AND _Area-number > 1)').
+  IF NOT hQuery:QUERY-OPEN THEN RETURN.
     
-    OUTPUT TO VALUE(SUBSTITUTE('&1\&2.st',pcFolder, pcDatabase)).
-    PUT UNFORMATTED 
-        '#' SKIP 
-        '# Structure file for database ' pcDatabase SKIP 
-        '# Generated from DataDigger on ' STRING(TODAY) SKIP
-        .
+  OUTPUT TO VALUE(SUBSTITUTE('&1\&2.st',pcFolder, pcDbName)).
+  PUT UNFORMATTED
+      '#' SKIP
+      '# Structure file for database ' pcDbName SKIP
+      '# Generated from DataDigger on ' STRING(TODAY) SKIP
+      .
 
-    REPEAT:
-        hQuery:GET-NEXT(NO-LOCK).
-        IF hQuery:QUERY-OFF-END THEN LEAVE.
-        
-        IF hBuffer::_Area-type = 3 THEN 
-          PUT UNFORMATTED '#' SKIP
-                          'b .' SKIP.
-        ELSE
-          PUT UNFORMATTED '#' SKIP
-                          SUBSTITUTE( 'd "&1":&2,&3 .'
-                               , hBuffer::_Area-name
-                               , hBuffer::_Area-number
-                               , hBuffer::_Area-clustersize)
-                               SKIP.
-    END.
-    OUTPUT CLOSE.
-    DELETE OBJECT hBuffer NO-ERROR.
+  #Area:
+  REPEAT:
+    hQuery:GET-NEXT(NO-LOCK).
+    IF hQuery:QUERY-OFF-END THEN LEAVE #Area.
+    
+    IF hBuffer::_Area-type = 3 THEN
+      PUT UNFORMATTED '#' SKIP
+                      'b .' SKIP.
+    ELSE
+      PUT UNFORMATTED '#' SKIP
+                      SUBSTITUTE( 'd "&1":&2,&3 .'
+                                , hBuffer::_Area-name
+                                , hBuffer::_Area-number
+                                , hBuffer::_Area-clustersize)
+                                SKIP.
+  END.
+  OUTPUT CLOSE.
+  DELETE OBJECT hBuffer NO-ERROR.
     
 END PROCEDURE. /* createStructureFile */
 

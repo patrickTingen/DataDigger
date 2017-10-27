@@ -84,7 +84,7 @@ DEFINE VARIABLE giMaxFilterHistory AS INTEGER NO-UNDO.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wImportLoad AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wImportLoad AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnBack 
@@ -365,7 +365,7 @@ PROCEDURE btnFinishChoose :
 
   IF lErrorsFound THEN 
   DO:
-    MESSAGE "Your data was loaded, but with errors" VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE "Your data was loaded, but with errors" VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     ASSIGN plSuccess = NO.
   END. 
 
@@ -694,13 +694,7 @@ PROCEDURE initializeObject :
   Description  : Setup
   ----------------------------------------------------------------------*/
   
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE cSetting AS CHARACTER   NO-UNDO.
 
   VIEW wImportLoad.
 
@@ -729,11 +723,6 @@ PROCEDURE initializeObject :
   giMaxFilterHistory = INTEGER(getRegistry("DataDigger", "MaxFilterHistory")).
   IF giMaxFilterHistory = ? THEN giMaxFilterHistory = 10.
   
-  /* Find out max fieldname length */
-  FOR EACH ttColumn: 
-    iMaxFieldLength = MAXIMUM(iMaxFieldLength,LENGTH(ttColumn.cFullName)).
-  END.
-
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Use triggers or not? */
@@ -793,8 +782,8 @@ PROCEDURE loadData :
   Description  : Write changes to database, optionally roll back
   ----------------------------------------------------------------------*/
 
-  DEFINE INPUT  PARAMETER plKeepData    AS LOGICAL     NO-UNDO.
-  DEFINE OUTPUT PARAMETER plErrorsFound AS LOGICAL     NO-UNDO.
+  DEFINE INPUT  PARAMETER plKeepData    AS LOGICAL NO-UNDO.
+  DEFINE OUTPUT PARAMETER plErrorsFound AS LOGICAL NO-UNDO.
 
   DEFINE VARIABLE hXmlQuery       AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hXmlBuffer      AS HANDLE    NO-UNDO.
@@ -814,6 +803,7 @@ PROCEDURE loadData :
   DO:
     RUN showHelp("CannotEditVst", "").
     APPLY "close" TO THIS-PROCEDURE. 
+    plErrorsFound = TRUE. 
     RETURN.
   END.
 
@@ -905,7 +895,7 @@ PROCEDURE loadData :
       hDbBuffer:BUFFER-COPY(hXmlBuffer) NO-ERROR.
       IF ERROR-STATUS:ERROR THEN
       DO:
-        MESSAGE "Copy to database failed :(" VIEW-AS ALERT-BOX INFO.
+        MESSAGE "Copy to database failed :(" VIEW-AS ALERT-BOX INFORMATION.
         /* Copy failed */
         NEXT XmlLoop.
       END.
@@ -918,7 +908,7 @@ PROCEDURE loadData :
     DELETE OBJECT hXmlQuery.
     DELETE OBJECT hDbBuffer.
 
-    IF NOT plKeepData THEN UNDO TransBlock.
+    IF NOT plKeepData THEN UNDO TransBlock, LEAVE TransBlock.
     lOk = TRUE.
   END. /* transaction */
 
@@ -929,4 +919,3 @@ END PROCEDURE. /* loadData */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

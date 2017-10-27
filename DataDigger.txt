@@ -5,6 +5,29 @@
       
 =====================================================================================
 
+DataDigger version 24 - dd MMM 2017 
+
+- Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
+- Solved: Double-click on hidden field does not show the field
+- Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendörfer)
+- Solved: Extra filter refused to hide normal tables (Edwin Schutten)
+- Solved: Query fails when search condition contains pipe symbol (Mike Raschendörfer)
+- Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
+- Solved: Table browse shows normal tables when disabled in filter #8 (Edwin Schutten)
+- Solved: Backups not saved with default myDataDigger code #11
+- Solved: Setting for backup-on-delete is always set to TRUE #12
+- Solved: Cannot filter field name with "name" #10
+- Solved: Invalid-handle error on tables with lots of fields #15 (Johan Heling)
+- Solved: Clone button active when more than one record is selected #16
+- Solved: Character fields limited to current width on editing #17
+
+- Change: Setting for 'Show Column For Recid/Rowid' removed
+- Change: Layout fixes for larger fonts on settings screen
+- Change: Export to csv now uses field names instead of labels (fixes #13)
+- Change: Tabs on settings page now react to CTRL+PgUp/PgDn (fixes #14)
+
+=====================================================================================
+
 DataDigger version 23 - 15 apr 2017 (Easter Egg)
 
 - Solved: Query-open errors were not shown in tooltip of query fill-in

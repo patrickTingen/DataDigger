@@ -595,11 +595,10 @@ PROCEDURE changeMonth :
     tNewDate = DATE(MONTH(ptBaseDate),15,YEAR(ptBaseDate))+ (20 * piDeltaDays).
 
   /* Correct day nr, for days that have less than 31 days */
+  #Day:
   DO iDayCorrection = 0 TO 3:
-    ASSIGN 
-      tNewDate = DATE(MONTH(tNewDate), DAY(ptBaseDate) - iDayCorrection, YEAR(tNewDate)) NO-ERROR.
-
-    IF NOT ERROR-STATUS:ERROR THEN LEAVE. 
+    ASSIGN tNewDate = DATE(MONTH(tNewDate), DAY(ptBaseDate) - iDayCorrection, YEAR(tNewDate)) NO-ERROR.
+    IF NOT ERROR-STATUS:ERROR THEN LEAVE #Day.
   END.
 
   RUN setDate(INPUT tNewDate).
@@ -1027,4 +1026,3 @@ END FUNCTION. /* getWeekNum */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

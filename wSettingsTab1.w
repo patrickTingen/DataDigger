@@ -67,7 +67,7 @@ DEFINE INPUT  PARAMETER phRectangle AS HANDLE      NO-UNDO.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE c-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnPingBack 
@@ -675,7 +675,7 @@ ON CHOOSE OF btnClearCache IN FRAME FRAME-AB /* Clear Cache */
 DO:
   RUN clearDiskCache.
   RUN clearRegistryCache.
-  MESSAGE "Cache cleared" VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  MESSAGE "Cache cleared" VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -913,4 +913,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

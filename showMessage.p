@@ -5,9 +5,9 @@
   16-09-2012 pti Created
   ----------------------------------------------------------------------*/
 
-define input parameter pcTitle as character.
-define input parameter pcMessage as character.
-define output parameter phWindow as handle.
+define input  parameter pcTitle   as character no-undo.
+define input  parameter pcMessage as character no-undo.
+define output parameter phWindow  as handle no-undo.
 
 define variable cMessage   as character   no-undo format "x(256)".
 define variable iFont      as integer     no-undo.

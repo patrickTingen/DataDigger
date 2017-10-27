@@ -145,7 +145,7 @@ FUNCTION hasWarnings RETURNS LOGICAL
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wImport AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wImport AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnBack 
@@ -487,7 +487,7 @@ PROCEDURE btnNextChoose :
   IF CAN-FIND(FIRST ttMessage WHERE ttMessage.iType = 2) THEN 
   DO:
     MESSAGE "Some warnings were found. Are you sure you want to continue?"
-      VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE lContinue.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE lContinue.
     IF lContinue <> TRUE THEN RETURN NO-APPLY.
   END.
 
@@ -562,8 +562,8 @@ PROCEDURE checkFiles :
     /* Check all unique index fields */
     cFieldList = "".
     FOR EACH bfField 
-      WHERE bfField.lPrimary = FALSE
-        AND bfField.lUnique  = TRUE
+      WHERE bfField.lPrimary   = FALSE
+        AND bfField.lUniqueIdx = TRUE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
       cFieldList = TRIM(cFieldList + "," + bfField.cFieldName,",").
@@ -575,7 +575,7 @@ PROCEDURE checkFiles :
     cFieldList = "".
     FOR EACH bfField 
       WHERE bfField.lPrimary   = FALSE
-        AND bfField.lUnique    = FALSE 
+        AND bfField.lUniqueIdx = FALSE 
         AND bfField.lMandatory = TRUE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
@@ -588,7 +588,7 @@ PROCEDURE checkFiles :
     cFieldList = "".
     FOR EACH bfField 
       WHERE bfField.lPrimary   = FALSE
-        AND bfField.lUnique    = FALSE 
+        AND bfField.lUniqueIdx = FALSE 
         AND bfField.lMandatory = FALSE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
@@ -723,20 +723,10 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImport 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------
-  Name         : initializeObject
-  Description  : Setup
-  ----------------------------------------------------------------------*/
-  
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
-
+/*
+ * Setup
+ */
+ 
   VIEW wImport.
 
   /* Set fonts */
@@ -797,7 +787,7 @@ PROCEDURE showSummary :
 
   cSummary = "Summary of files to be loaded:".
 
-  FOR EACH ttXmlFile BY ttXmlFile.iFileNr:
+  FOR EACH ttXmlFile TABLE-SCAN BY ttXmlFile.iFileNr:
     cSummary = cSummary + "~n~n" + SUBSTITUTE("File: &1", ttXmlFile.cFilename).
 
     FOR EACH ttMessage WHERE ttMessage.iFileNr = ttXmlFile.iFileNr:

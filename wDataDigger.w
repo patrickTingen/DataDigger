@@ -186,13 +186,14 @@ END PROCEDURE. /* URLDownloadToFileA */
 cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear ~
-btnQueries btnFavourite btnClipboard ficWhere btnNextQuery btnPrevQuery ~
-btnDump btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables ~
-btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
+btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
+btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
-fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere ~
-fiFeedback 
+fiIndexNameFilter fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ~
+ficWhere fiFeedback 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -228,6 +229,14 @@ FUNCTION createMenuItem RETURNS HANDLE
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD FilterModified C-Win 
+FUNCTION FilterModified RETURNS LOGICAL
+  ( phFilterField AS HANDLE 
+  , plModified    AS LOGICAL )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getActiveQueryEditor C-Win 
 FUNCTION getActiveQueryEditor RETURNS HANDLE
   ( /* parameter-definitions */ )  FORWARD.
@@ -245,6 +254,13 @@ FUNCTION getDroppedFiles RETURNS CHARACTER
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList C-Win 
 FUNCTION getFieldList RETURNS CHARACTER
   ( pcSortBy AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMatchesValue C-Win 
+FUNCTION getMatchesValue RETURNS CHARACTER
+  ( phFilterField AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -298,6 +314,13 @@ FUNCTION setDebugMode RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setFilterFieldColor C-Win 
+FUNCTION setFilterFieldColor RETURNS LOGICAL
+  ( phWidget AS HANDLE )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQuery C-Win 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER )  FORWARD.
@@ -340,7 +363,7 @@ FUNCTION trimList RETURNS CHARACTER
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
 DEFINE MENU POPUP-MENU-brTables 
@@ -531,10 +554,16 @@ DEFINE BUTTON btnWhere
 
 DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 950
-     VIEW-AS COMBO-BOX SORT INNER-LINES 10
+     VIEW-AS COMBO-BOX SORT INNER-LINES 15
      LIST-ITEMS "Item 1" 
      DROP-DOWN-LIST
      SIZE-PIXELS 59 BY 21 TOOLTIP "filter on database" NO-UNDO.
+
+DEFINE VARIABLE cbFavouriteSet AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS COMBO-BOX INNER-LINES 10
+     LIST-ITEMS "Customers","Sales","Employee stuff","------------------------------------------","Create new set","Maintain sets" 
+     DROP-DOWN-LIST
+     SIZE-PIXELS 200 BY 21 NO-UNDO.
 
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
@@ -849,7 +878,7 @@ DEFINE QUERY brTables FOR
 DEFINE BROWSE brFields
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brFields C-Win _FREEFORM
   QUERY brFields DISPLAY
-      ttField.lShow VIEW-AS TOGGLE-BOX
+      ttField.lShow VIEW-AS TOGGLE-BOX 
   ttField.iOrder
   ttField.cFieldName
   (IF ttField.iExtent > 0
@@ -872,7 +901,7 @@ DEFINE BROWSE brFields
   ttField.cViewAs
 
   ENABLE
-  ttField.lShow
+  ttField.lShow 
   ttField.cFormat
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -922,7 +951,7 @@ DEFINE FRAME frMain
      fiFlagsFilter AT Y 5 X 860 COLON-ALIGNED NO-LABEL WIDGET-ID 164
      fiFieldsFilter AT Y 5 X 915 COLON-ALIGNED NO-LABEL WIDGET-ID 166
      btnClearIndexFilter AT Y 5 X 1065 WIDGET-ID 160
-     tgDebugMode AT Y 25 X 5 WIDGET-ID 238
+     tgDebugMode AT Y 25 X 5 WIDGET-ID 238 NO-TAB-STOP 
      brTables AT Y 27 X 38 WIDGET-ID 300
      brFields AT Y 27 X 295 WIDGET-ID 100
      btnMoveTop AT Y 28 X 760 WIDGET-ID 198
@@ -931,17 +960,18 @@ DEFINE FRAME frMain
      btnReset AT Y 72 X 760 WIDGET-ID 196
      btnMoveDown AT Y 94 X 760 WIDGET-ID 194
      btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
+     cbFavouriteSet AT Y 236 X 29 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -1539,7 +1569,7 @@ ANYWHERE DO:
 
   MESSAGE
     cWidgets SKIP(0) 'Final pos:' iTargetX ',' iTargetY
-    VIEW-AS ALERT-BOX INFO BUTTONS OK TITLE ' Debug info '.
+    VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE ' Debug info '.
 
   &ENDIF
 
@@ -1679,6 +1709,7 @@ DO:
   DEFINE VARIABLE lSelected AS LOGICAL NO-UNDO.
   DEFINE VARIABLE hOldFocus AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iBlink    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cField    AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -1698,10 +1729,18 @@ DO:
 
     hOldFocus = FOCUS:HANDLE.
 
-    /* make the column temporarily updatable and set focus to
-     * the column. This will make the browse shift to the left
-     * or the right if needed. Then apply focus back to where
-     * it was, make the column readonly again.
+    /* If the column is not visible, make it visible */
+    IF NOT bField.lShow THEN 
+    DO:
+      cField = bField.cFieldName.
+      IF bField.iExtent > 0 THEN cField = cField + '*'.
+
+      RUN showField(cField, TRUE).
+    END.
+
+    /* Make the column temporarily updatable and set focus to the column. 
+     * This will make the browse shift to the left or the right if needed. 
+     * Then apply focus back to where it was, make the column readonly again.
      * Setting focus back is needed, otherwise the browse row
      * cannot be selected using "select-focused-row"
      */
@@ -1720,7 +1759,7 @@ DO:
     setWindowFreeze(NO).
 
     /* Blink the filter field */
-    DO iBlink = 1 TO 3:
+    DO iBlink = 1 TO 2:
       IF iBlink > 1 THEN RUN doNothing(400).
       bColumn.hFilter:BGCOLOR = 14.
       RUN doNothing(400).
@@ -1730,7 +1769,6 @@ DO:
     gcLastDataField = bColumn.cFullName.
 
     APPLY "entry" TO bColumn.hColumn.
-    .run dataOffHome.
   END.
 END.
 
@@ -1775,24 +1813,24 @@ END.
 ON RETURN OF brFields IN FRAME frMain
 OR " "           OF ttField.lShow IN BROWSE brFields
 OR VALUE-CHANGED OF ttField.lShow IN BROWSE brFields
+OR " "           OF BROWSE brFields
 DO:
-  DEFINE BUFFER ttField FOR ttField.
+  DEFINE BUFFER bField FOR ttField.
   DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
 
   PUBLISH "setUsage" ("hideField"). /* user behaviour */
 
-  DO WITH FRAME {&frame-name}:
+  DO WITH FRAME {&FRAME-NAME}:
 
-    FIND ttField WHERE ttField.cFullName = brFields:get-browse-column(3):screen-value NO-ERROR.
-    ttField.lShow = NOT ttField.lShow.
-    cField = ttField.cFieldName.
+    FIND bField WHERE bField.cFullName = brFields:GET-BROWSE-COLUMN(3):SCREEN-VALUE NO-ERROR.
+    bField.lShow = NOT bField.lShow.
+    brFields:GET-BROWSE-COLUMN(1):CHECKED = bField.lShow.
 
-    /* This will include all extents */
-    IF ttField.iExtent > 0 THEN cField = cField + '*'.
+    /* Adjust name for extents */
+    cField = bField.cFieldName.
+    IF bField.iExtent > 0 THEN cField = cField + '*'.
 
-    brFields:get-browse-column(1):checked = ttField.lShow.
-
-    RUN showField( INPUT cField, INPUT ttField.lShow).
+    RUN showField( INPUT cField, INPUT bField.lShow).
   END.
 END.
 
@@ -2081,6 +2119,17 @@ END.
 
 &Scoped-define BROWSE-NAME brTables
 &Scoped-define SELF-NAME brTables
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON CTRL-CURSOR-DOWN OF brTables IN FRAME frMain
+DO:
+  IF giCurrentPage = {&PAGE-FAVOURITES} THEN
+    APPLY 'ENTRY' TO cbFavouriteSet.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON MOUSE-SELECT-CLICK OF brTables IN FRAME frMain
 DO:
@@ -2423,27 +2472,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearTableFilter C-Win
 ON CHOOSE OF btnClearTableFilter IN FRAME frMain /* C */
 DO:
-  PUBLISH "setUsage" ("clearTableFilter"). /* user behaviour */
-
-  RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
-
-  fiTableFilter     :SCREEN-VALUE = fiTableFilter:PRIVATE-DATA.
-  cbDatabaseFilter  :SCREEN-VALUE = ' '.
-
-  fiTableFilter     :MODIFIED = NO.
-  cbDatabaseFilter  :MODIFIED = NO.
-
-  setFilterFieldColor(fiTableFilter   :HANDLE).
-  setFilterFieldColor(cbDatabaseFilter:HANDLE).
-
-  RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-  RUN setWindowTitle. 
-
-  /* Get table properties from the INI file */
-  RUN getTableStats(INPUT-OUTPUT TABLE ttTable).
-
-  RUN filterTables.
-
+  RUN btnClearTableFilterChoose.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3297,9 +3326,9 @@ PROCEDURE CtrlFrame.PSTimer.Tick .
   /* Find the timer that caused the event */
   DEFINE BUFFER bTimer FOR ttTimer.
 
-  /* Turn off events when we're running */
   IF NOT glUseTimer THEN RETURN.
 
+  /* Turn off events while handling events */
   chCtrlFrame:pstimer:ENABLED = FALSE.
 
   /* No timer stuff in debug mode */
@@ -3426,7 +3455,8 @@ END.
 ON ANY-PRINTABLE OF fiIndexNameFilter IN FRAME frMain
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
-  setFilterFieldColor(SELF:handle).
+  RUN filterFieldAnyPrintable(SELF).
+/*   setFilterFieldColor(SELF:handle). */
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3437,9 +3467,10 @@ END.
 ON CURSOR-DOWN OF fiIndexNameFilter IN FRAME frMain
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
-  setFilterFieldColor(SELF:HANDLE).
-  ghLastIndexFilter = SELF.
-  APPLY 'entry' TO brIndexes.
+  RUN filterFieldCursorDown(SELF,brIndexes:HANDLE).
+/*   setFilterFieldColor(SELF:HANDLE). */
+/*   ghLastIndexFilter = SELF.         */
+/*   APPLY 'entry' TO brIndexes.       */
   RETURN NO-APPLY.
 END.
 
@@ -3452,13 +3483,16 @@ ON ENTRY OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
-  /* If you enter the field and you have not put in a filter,
-   * clear out the field so you can type something yourself
-   */
-  IF SELF:screen-value = SELF:private-data THEN
-    SELF:screen-value = ''.
+  RUN filterFieldEntry(SELF).
 
-  setFilterFieldColor(SELF:handle).
+/*   /* If you enter the field and you have not put in a filter, */
+/*    * clear out the field so you can type something yourself   */
+/*    */                                                         */
+/*   IF SELF:SCREEN-VALUE = SELF:PRIVATE-DATA                    */
+/*     AND FilterModified(SELF,?) = FALSE THEN                   */
+/*     SELF:SCREEN-VALUE = ''.                                   */
+/*                                                               */
+/*   setFilterFieldColor(SELF:handle).                           */
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3470,8 +3504,16 @@ ON LEAVE OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
-  IF SELF:SCREEN-VALUE = '' THEN SELF:SCREEN-VALUE = SELF:PRIVATE-DATA.
-  setFilterFieldColor(SELF:handle).
+
+  RUN filterFieldLeave(SELF).
+
+/*   IF SELF:SCREEN-VALUE = '' THEN           */
+/*   DO:                                      */
+/*     SELF:SCREEN-VALUE = SELF:PRIVATE-DATA. */
+/*     FilterModified(SELF,NO).               */
+/*   END.                                     */
+/*                                            */
+/*   setFilterFieldColor(SELF:HANDLE).        */
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3480,7 +3522,8 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
 ON RETURN OF fiIndexNameFilter IN FRAME frMain
-, fiFlagsFilter, fiFieldsFilter
+, fiTableFilter
+, fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
   RUN reopenIndexBrowse(?,?). /* reopen, while maintaining original sort */
 END.
@@ -3493,10 +3536,23 @@ END.
 ON SHIFT-DEL OF fiIndexNameFilter IN FRAME frMain
 , fiFlagsFilter, fiFieldsFilter
 DO:
-  APPLY 'choose' TO btnClearIndexFilter.
-  SELF:screen-value = ''.
-  APPLY 'value-changed' TO SELF.
-  APPLY 'entry' TO SELF.
+  RUN filterFieldClearAll(SELF,btnClearIndexFilter).
+/*   APPLY 'choose' TO btnClearIndexFilter. */
+/* /*   SELF:SCREEN-VALUE = ''. */          */
+/*   APPLY 'value-changed' TO SELF.         */
+/*   APPLY 'entry' TO SELF.                 */
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+ON VALUE-CHANGED OF fiIndexNameFilter IN FRAME frMain
+, fiTableFilter
+, fiFlagsFilter, fiFieldsFilter
+DO:
+  RUN filterFieldValueChanged(SELF,NO).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3565,9 +3621,19 @@ END.
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME fiTableFilter
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+ON ANY-PRINTABLE OF fiTableFilter IN FRAME frMain
+DO:
+  FilterModified(SELF,YES).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
 ON CURSOR-DOWN OF fiTableFilter IN FRAME frMain
 DO:
-  setFilterFieldColor(SELF:handle).
+  setFilterFieldColor(SELF:HANDLE).
   APPLY 'entry' TO brTables.
   RETURN NO-APPLY.
 END.
@@ -4052,9 +4118,8 @@ PROCEDURE btnClearDataFilterChoose :
   FOR EACH bColumn:
     IF VALID-HANDLE(bColumn.hFilter) THEN
     DO:
-      ASSIGN
-        bColumn.hFilter:MODIFIED     = NO
-        bColumn.hFilter:SCREEN-VALUE = bColumn.hFilter:PRIVATE-DATA.
+      bColumn.hFilter:SCREEN-VALUE = bColumn.hFilter:PRIVATE-DATA.
+      FilterModified(bColumn.hFilter,NO).
 
       RUN filterFieldValueChanged(bColumn.hFilter,NO).
       setFilterFieldColor(bColumn.hFilter).
@@ -4099,6 +4164,39 @@ END PROCEDURE. /* btnClearIndexFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearTableFilterChoose C-Win 
+PROCEDURE btnClearTableFilterChoose :
+/*
+ * Clear table filters and set focus to table browse
+ */
+  DO WITH FRAME {&FRAME-NAME}:
+    PUBLISH "setUsage" ("clearTableFilter"). /* user behaviour */
+  
+    RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
+  
+    /* Reset filters */
+    fiTableFilter   :SCREEN-VALUE = fiTableFilter:PRIVATE-DATA.
+    cbDatabaseFilter:SCREEN-VALUE = ' '.
+    FilterModified(fiTableFilter:HANDLE,NO).
+    FilterModified(cbDatabaseFilter:HANDLE,NO).
+  
+    setFilterFieldColor(fiTableFilter   :HANDLE).
+    setFilterFieldColor(cbDatabaseFilter:HANDLE).
+  
+    RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+    RUN setWindowTitle. 
+  
+    /* Get table properties from the INI file */
+    RUN getTableStats(INPUT-OUTPUT TABLE ttTable).
+  
+    RUN filterTables.  
+  END.
+
+END PROCEDURE. /* btnClearTableFilterChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose C-Win 
 PROCEDURE btnCloneChoose :
 /* Copy the current record and edit it.
@@ -4113,34 +4211,35 @@ PROCEDURE btnCloneChoose :
   /* If no data then go back */
   IF ghDataBrowse:QUERY:NUM-RESULTS = 0
     OR ghDataBrowse:QUERY:NUM-RESULTS = ? 
+    OR btnClone:SENSITIVE IN FRAME {&FRAME-NAME} = FALSE 
     OR NOT CAN-FIND(FIRST ttField WHERE ttField.lShow = TRUE) THEN RETURN.
 
   /* If there is no record selected, select the focused one */
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0 THEN
     ghDataBrowse:SELECT-FOCUSED-ROW().
 
-  IF NOT ghDataBrowse:QUERY:get-buffer-handle(1):available THEN
+  IF NOT ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN
   DO:
     RUN showHelp('RecordGone', '').
     ghDataBrowse:REFRESH().
     RETURN.
   END.
 
-  RUN value(getProgramDir() + 'wEdit.w')
+  RUN VALUE(getProgramDir() + 'wEdit.w')
     ( INPUT plReadOnlyDigger
     , INPUT 'Clone'
     , INPUT ghDataBrowse
     , INPUT gcCurrentDatabase
     , INPUT gcCurrentTable
-    , INPUT table ttField  /* do not use by-reference ! */
-    , INPUT table ttColumn /* do not use by-reference ! */
+    , INPUT TABLE ttField  /* do not use by-reference ! */
+    , INPUT TABLE ttColumn /* do not use by-reference ! */
     , OUTPUT lRecordsUpdated
     , OUTPUT rNewRecord
     ).
 
   IF lRecordsUpdated = TRUE THEN
   DO:
-    ghDataBrowse:QUERY:reposition-to-rowid(rNewRecord) NO-ERROR.
+    ghDataBrowse:QUERY:REPOSITION-TO-ROWID(rNewRecord) NO-ERROR.
     ghDataBrowse:SELECT-FOCUSED-ROW().
     RUN reopenDataBrowse.
   END.
@@ -4268,12 +4367,12 @@ PROCEDURE btnDeleteChoose :
         SKIP    "DataDigger would generate a small program and compile "
         SKIP    "it but your Progress version does not allow this.     "
         SKIP(1) "So I'm sorry, but the" STRING(ghDataBrowse:NUM-SELECTED-ROWS = 1,"record/records") "could not be deleted :("
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
       DELETE OBJECT hFileBuffer.
     END.
     ELSE
-      MESSAGE 'Sorry, could not delete record.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE 'Sorry, could not delete record.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
   RUN reopenDataBrowse.
 
@@ -4646,7 +4745,7 @@ PROCEDURE btnViewChoose :
   IF SEARCH(cFileName) <> ?
     AND isFileLocked(cFileName) THEN
   DO:
-    MESSAGE 'Error opening temporary file.~nDo you have it open for editing?~n~n' cFilename VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE 'Error opening temporary file.~nDo you have it open for editing?~n~n' cFilename VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN.
   END.
 
@@ -4854,9 +4953,8 @@ PROCEDURE clearFieldFilter :
    hFilter = WIDGET-HANDLE(ENTRY(iFilter, gcFieldFilterHandles)) NO-ERROR.
    IF VALID-HANDLE(hFilter) AND hFilter:TYPE <> "Toggle-Box" THEN
    DO:
-     ASSIGN
-       hFilter:MODIFIED     = NO
-       hFilter:SCREEN-VALUE = hFilter:PRIVATE-DATA.
+     hFilter:SCREEN-VALUE = hFilter:PRIVATE-DATA.
+     FilterModified(hFilter,NO).
 
      setFilterFieldColor(hFilter).
    END.
@@ -4872,9 +4970,9 @@ PROCEDURE clearIndexFilter :
 /* Reset the index filters to the blank values
  */
   DO WITH FRAME frMain:
-    fiIndexNameFilter:screen-value = fiIndexNameFilter:private-data.
-    fiFlagsFilter    :screen-value = fiFlagsFilter    :private-data.
-    fiFieldsFilter   :screen-value = fiFieldsFilter   :private-data.
+    fiIndexNameFilter:screen-value = fiIndexNameFilter:PRIVATE-DATA.
+    fiFlagsFilter    :screen-value = fiFlagsFilter    :PRIVATE-DATA.
+    fiFieldsFilter   :screen-value = fiFieldsFilter   :PRIVATE-DATA.
 
     setFilterFieldColor(fiIndexNameFilter:handle).
     setFilterFieldColor(fiFlagsFilter    :handle).
@@ -5024,7 +5122,7 @@ PROCEDURE connectDatabase :
     cDatabasesOld = getDatabaseList().
     RUN value(cProgDir + 'wConnections.w') (INPUT 'CONNECT', INPUT pcDatabase, OUTPUT cError).
     IF cError <> '' THEN
-      MESSAGE cError VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
     /* Get all connected databases */
     cDatabases = getDatabaseList().
@@ -5084,7 +5182,7 @@ PROCEDURE connectDroppedDatabase :
   CONNECT VALUE(pcDatabase) VALUE(SUBSTITUTE('-ld &1 -1', cLdbName)) NO-ERROR.
   IF ERROR-STATUS:ERROR THEN
   DO:
-    MESSAGE ERROR-STATUS:GET-MESSAGE(1) VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE ERROR-STATUS:GET-MESSAGE(1) VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN.
   END.
 
@@ -5294,9 +5392,19 @@ PROCEDURE convertSettings :
       OS-DELETE image/default_Dock.gif.
       OS-DELETE image/default_Tab_Favorites_Active.gif.
       OS-DELETE image/default_Tab_Favorites_Inactive.gif.
-
     END. /* 22 */
-    
+
+    WHEN 23 THEN
+    DO:
+      /* Settings removed */
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRecid" VALUE ? NO-ERROR.
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "AddDataColumnForRowid" VALUE ? NO-ERROR.
+
+      /* dHint.w is not used */
+      OS-DELETE dHint.w.
+      OS-DELETE dHint.r.
+    END. /* 23 */
+
   END CASE. /* old version */
 
   SESSION:SET-WAIT-STATE("").
@@ -5799,6 +5907,13 @@ PROCEDURE dataScrollNotify :
     , INPUT phBrowse
     ).
 
+  /* If the first filter value happens to be the same as the shadow text, 
+   * progress will 'select' it, wich looks weird, so we need to normalize it 
+   */
+  FOR EACH bColumn BY bColumn.iColumnNr:
+    IF VALID-HANDLE(bColumn.hFilter) THEN RUN FilterFieldLeave(bColumn.hFilter).
+  END.
+
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   setWindowFreeze(NO).
 
@@ -6142,16 +6257,18 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   RUN control_load.
   DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
-          fiFlagsFilter fiFieldsFilter fiTableDesc ficWhere fiFeedback 
+          fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ficWhere 
+          fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE rctQuery btnTools rctEdit fiTableFilter cbDatabaseFilter 
          btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom fiTableDesc btnWhere btnClear btnQueries 
-         btnFavourite btnClipboard ficWhere btnNextQuery btnPrevQuery btnDump 
-         btnLoad btnTabFavourites btnTabFields btnTabIndexes btnTabTables 
-         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+         btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
+         btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
+         btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
@@ -6256,9 +6373,16 @@ PROCEDURE endResize :
       fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS
       fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS
 
+      cbFavouriteSet:X = fiTableDesc:X
+      cbFavouriteSet:Y = fiTableDesc:Y
+      cbFavouriteSet:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS
+
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
       btnFavourite:Y = fiTableDesc:Y
       NO-ERROR.
+    cbFavouriteSet:MOVE-TO-TOP().
+    cbFavouriteSet:SENSITIVE = YES.
+
 
     /* Data */
     DO WITH FRAME frData:
@@ -6447,6 +6571,19 @@ END PROCEDURE. /* filterDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldAnyPrintable C-Win 
+PROCEDURE filterFieldAnyPrintable :
+/* Set modified flag if character is typed
+ */
+  DEFINE INPUT PARAMETER phFilterField AS HANDLE NO-UNDO.
+
+  FilterModified(phFilterField,TRUE).
+
+END PROCEDURE. /* filterFieldAnyPrintable */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldClearAll C-Win 
 PROCEDURE filterFieldClearAll :
 /* Wipe contents of all filter fields in the same group
@@ -6456,10 +6593,9 @@ PROCEDURE filterFieldClearAll :
 
   setWindowFreeze(YES).
 
-  APPLY "choose" TO phClearButton.
-  phFilterField:SCREEN-VALUE = "".
-  APPLY "value-changed" TO phFilterField.
-  APPLY "entry" TO phFilterField.
+  APPLY "choose"        TO phClearButton. /* clear them all */
+/*   APPLY "value-changed" TO phFilterField. /* force recolor of current filterfield */ */
+  APPLY "entry"         TO phFilterField. /* set focus */
 
   setWindowFreeze(NO).
 
@@ -6500,7 +6636,7 @@ PROCEDURE filterFieldEntry :
   /* If you enter the field and you have not put in a filter,
    * clear out the field so you can type something yourself
    */
-  IF phFilterField:SCREEN-VALUE = phFilterField:PRIVATE-DATA THEN
+  IF FilterModified(phFilterField,?) = FALSE THEN
     phFilterField:SCREEN-VALUE = ''.
 
   setFilterFieldColor(phFilterField).
@@ -6519,11 +6655,16 @@ END PROCEDURE. /* filterFieldEntry */
 PROCEDURE filterFieldLeave :
 /* Set the color for the text in the filter to gray
  */
-  DEFINE INPUT PARAMETER phFilterField AS HANDLE      NO-UNDO.
+  DEFINE INPUT PARAMETER phFilterField AS HANDLE NO-UNDO.
 
   /* If nothing in the filter, restore the shadow text */
-  IF   phFilterField:SCREEN-VALUE = ''
-    OR phFilterField:SCREEN-VALUE = ? THEN phFilterField:SCREEN-VALUE = phFilterField:PRIVATE-DATA.
+  IF FilterModified(phFilterField,?) = FALSE 
+    OR phFilterField:SCREEN-VALUE = '' 
+    OR phFilterField:SCREEN-VALUE = ? THEN 
+  DO:
+    FilterModified(phFilterField,FALSE).
+    phFilterField:SCREEN-VALUE = phFilterField:PRIVATE-DATA.
+  END.
 
   setFilterFieldColor(phFilterField).
 
@@ -6615,9 +6756,14 @@ END PROCEDURE. /* filterFieldShow */
 PROCEDURE filterFieldValueChanged :
 /* Save current filter value
  */
-  DEFINE INPUT PARAMETER phFilterField   AS HANDLE NO-UNDO.
-  DEFINE INPUT PARAMETER plRefreshBrowse AS LOGICAL     NO-UNDO.
+  DEFINE INPUT PARAMETER phFilterField   AS HANDLE  NO-UNDO.
+  DEFINE INPUT PARAMETER plRefreshBrowse AS LOGICAL NO-UNDO.
 
+  IF phFilterField:SCREEN-VALUE = '' THEN
+    FilterModified(phFilterField,FALSE).
+  ELSE 
+    FilterModified(phFilterField,TRUE).
+  
   setFilterFieldColor(phFilterField).
 
   IF plRefreshBrowse THEN
@@ -6790,7 +6936,7 @@ PROCEDURE getFilterQuery :
        AND VALID-HANDLE(bColumn.hColumn):
 
     /* Skip fields with shadowtext or empty value */
-    IF   bColumn.hFilter:SCREEN-VALUE = bColumn.cFullName
+    IF   FilterModified(bColumn.hFilter,?) = FALSE
       OR bColumn.hFilter:SCREEN-VALUE = ""
       OR bColumn.hFilter:SCREEN-VALUE = ? THEN NEXT.
 
@@ -7009,11 +7155,11 @@ PROCEDURE getSortFromQuery :
   END.
 
   /* Split query on the word ' BY ' */
-  pcQuery = REPLACE(pcQuery,' BY ', '|').
+  pcQuery = REPLACE(pcQuery,' BY ', CHR(1)).
 
   IndexLoop:
-  DO iPart = 2 TO NUM-ENTRIES(pcQuery,'|'):
-    cPart = TRIM(ENTRY(iPart,pcQuery,'|')).
+  DO iPart = 2 TO NUM-ENTRIES(pcQuery,CHR(1)):
+    cPart = TRIM(ENTRY(iPart,pcQuery,CHR(1))).
 
     CREATE bfQuerySort.
     ASSIGN
@@ -7207,6 +7353,7 @@ PROCEDURE initializeFilters :
       ON "entry"         PERSISTENT RUN filterFieldEntry        IN THIS-PROCEDURE (hFilterField).
       ON "leave"         PERSISTENT RUN filterFieldLeave        IN THIS-PROCEDURE (hFilterField).
       ON "value-changed" PERSISTENT RUN filterFieldValueChanged IN THIS-PROCEDURE (hFilterField,YES).
+      ON "any-printable" PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField).
       ON "shift-del"     PERSISTENT RUN filterFieldClearAll     IN THIS-PROCEDURE (hFilterField, phClearButton:HANDLE).
       ON "return"        PERSISTENT RUN reopenFieldBrowse       IN THIS-PROCEDURE (?,?).
       ON "F2"            PERSISTENT RUN reopenFieldBrowse       IN THIS-PROCEDURE (?,?).
@@ -7222,6 +7369,7 @@ PROCEDURE initializeFilters :
       bFilter.hFilter    = hFilterField
       bFilter.hColumn    = hColumn
       bFilter.hBrowse    = phParentBrowse
+      bFilter.lModified  = FALSE
       .
 
     /* Create menu item for context menu */
@@ -7453,6 +7601,9 @@ PROCEDURE initializeObjects :
       , INPUT btnClearFieldFilter:HANDLE
       ).
 
+    /* Register filters for table and index browse */
+    RUN registerFilters.
+
     /* Set filters for table browse */
     RUN resizeFilters (INPUT 0).
 
@@ -7502,6 +7653,8 @@ PROCEDURE initializeObjects :
     cSetting = getRegistry("DataDigger","ColumnSortFields").
     IF cSetting <> ? THEN
       brFields:SET-SORT-ARROW(INTEGER(ENTRY(1,cSetting)), LOGICAL(ENTRY(2,cSetting)) ).
+    ELSE 
+      brFields:SET-SORT-ARROW(2, TRUE ). /* default sort on nr */
 
     /* Get sort for indexes */
     cSetting = getRegistry("DataDigger","ColumnSortIndexes").
@@ -7724,8 +7877,8 @@ PROCEDURE initializeSettingsFile :
   END.
 
   /* Turn backups on by default */
-  setRegistry("DataDigger:Backup","BackupOnUpdate", "YES").
-  setRegistry("DataDigger:Backup","BackupOnDelete", "YES").
+  IF getRegistry("DataDigger:Backup","BackupOnUpdate") = ? THEN setRegistry("DataDigger:Backup","BackupOnUpdate", "YES").
+  IF getRegistry("DataDigger:Backup","BackupOnDelete") = ? THEN setRegistry("DataDigger:Backup","BackupOnDelete", "YES").
 
   IF   getRegistry("DumpAndLoad", "DumpDir") = ?
     OR getRegistry("DumpAndLoad", "DumpDir") = '' THEN setRegistry("DumpAndLoad", "DumpDir", "<PROGDIR>\Dump\").
@@ -7798,6 +7951,7 @@ PROCEDURE initializeUi :
     btnDump btnView btnAdd btnEdit fiFeedback
 
     WITH FRAME frMain IN WINDOW C-Win.
+
 
   /* FRAME frHint */
   DISPLAY
@@ -8492,6 +8646,44 @@ END PROCEDURE. /* processQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilterField C-Win 
+PROCEDURE registerFilterField :
+/**/
+  DEFINE INPUT PARAMETER phFilterField  AS HANDLE NO-UNDO.
+  DEFINE INPUT PARAMETER phParentBrowse AS HANDLE NO-UNDO.
+
+  DEFINE BUFFER bFilter FOR ttFilter.
+
+  CREATE bFilter.
+  ASSIGN
+    bFilter.cFieldName = phFilterField:NAME
+    bFilter.hFilter    = phFilterField
+    bFilter.hColumn    = ?
+    bFilter.hBrowse    = phParentBrowse
+    bFilter.lModified  = FALSE
+    .
+
+END PROCEDURE. /* registerFilterField */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilters C-Win 
+PROCEDURE registerFilters :
+/* Register filter fields for table and index browse
+  */
+  DO WITH FRAME {&FRAME-NAME}:
+    RUN registerFilterField(fiTableFilter    :HANDLE, brTables:HANDLE).
+    RUN registerFilterField(fiIndexNameFilter:HANDLE, brIndexes:HANDLE).
+    RUN registerFilterField(fiFlagsFilter    :HANDLE, brIndexes:HANDLE).
+    RUN registerFilterField(fiFieldsFilter   :HANDLE, brIndexes:HANDLE).
+  END.
+
+END PROCEDURE. /* registerFilters */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse C-Win 
 PROCEDURE reopenDataBrowse :
 /* Build the query, based on where-box and filter fields
@@ -8948,6 +9140,7 @@ PROCEDURE reopenDataBrowse-create :
             FORMAT        = "x(40)"
             PRIVATE-DATA  = bColumn.cFullName
             SCREEN-VALUE  = bColumn.cFullName
+            MODIFIED      = NO /*170901*/
           .
       ELSE
       DO:
@@ -8966,6 +9159,7 @@ PROCEDURE reopenDataBrowse-create :
             SCREEN-VALUE  = bColumn.cFullName
             INNER-LINES   = MINIMUM(10,giMaxFilterHistory)
             DELIMITER     = CHR(1)
+            MODIFIED      = NO /*170901*/
             .
 
         /* Place search history in the combo */
@@ -9016,13 +9210,14 @@ PROCEDURE reopenDataBrowse-create :
       ON "CTRL-D"           OF hFilterField PERSISTENT RUN dataSelectNone          IN THIS-PROCEDURE (ghDataBrowse).
       ON "ENTRY"            OF hFilterField PERSISTENT RUN filterFieldEntry        IN THIS-PROCEDURE (hFilterField).
       ON "LEAVE"            OF hFilterField PERSISTENT RUN filterFieldLeave        IN THIS-PROCEDURE (hFilterField).
+      ON "ANY-PRINTABLE"    OF hFilterField PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField).
       ON "VALUE-CHANGED"    OF hFilterField PERSISTENT RUN filterFieldValueChanged IN THIS-PROCEDURE (hFilterField,NO).
       ON "SHIFT-DEL"        OF hFilterField PERSISTENT RUN filterFieldClearAll     IN THIS-PROCEDURE (hFilterField, btnClearDataFilter:HANDLE).
       ON "RETURN"           OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F2"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F5"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "CTRL-CURSOR-DOWN" OF hFilterField PERSISTENT RUN filterFieldCursorDown   IN THIS-PROCEDURE (hFilterField, bColumn.hColumn).
-
+      
       /* Keep track of filters */
       CREATE bFilter.
       ASSIGN
@@ -9030,17 +9225,23 @@ PROCEDURE reopenDataBrowse-create :
         bFilter.hFilter    = hFilterField
         bFilter.hColumn    = bColumn.hColumn
         bFilter.hBrowse    = ghDataBrowse
+        bFilter.lModified  = FALSE 
         .
-
-      cCustomValue = hFilterField:SCREEN-VALUE.
-      PUBLISH "CustomGetFilterValue" (pcDatabase, pcTable, bField.cFieldName, INPUT-OUTPUT cCustomValue).
-      IF cCustomValue <> ? THEN hFilterField:SCREEN-VALUE = cCustomValue.
-
+      
       /* Connect filter to field and set color */
       bColumn.hFilter = hFilterField.
+
+      /* Set default value for filter field */
+      cCustomValue = hFilterField:SCREEN-VALUE.
+      PUBLISH "CustomGetFilterValue" (pcDatabase, pcTable, bField.cFieldName, INPUT-OUTPUT cCustomValue).
+      IF cCustomValue <> ? AND cCustomValue <> '' AND cCustomValue <> hFilterField:SCREEN-VALUE THEN 
+      DO:
+        ASSIGN hFilterField:SCREEN-VALUE = cCustomValue.
+        FilterModified(hFilterField,YES).
+      END.
+
       setFilterFieldColor(hFilterField).
     END. /* f/e bColumn */
-
   END. /* addColumnLoop */
 
   gcDataBrowseColumns     = TRIM(gcDataBrowseColumns,",").
@@ -9144,8 +9345,8 @@ PROCEDURE reopenFieldBrowse :
     IF pcSortField = '' THEN pcSortField = ?.
 
     /* Remember record we're on */
-    IF brFields:num-selected-rows > 0 THEN
-      rCurrentRecord = brFields:query:get-buffer-handle(1):rowid.
+    IF brFields:NUM-SELECTED-ROWS > 0 THEN
+      rCurrentRecord = brFields:QUERY:GET-BUFFER-HANDLE(1):ROWID.
 
     /* Find out what the current sort is */
     RUN getColumnSort(INPUT brFields:handle, OUTPUT cOldSort, OUTPUT lAscending).
@@ -9172,16 +9373,16 @@ PROCEDURE reopenFieldBrowse :
     IF plAscending <> ? THEN lAscending = plAscending.
 
     /* Wich column should have what arrow? */
-    RUN setSortArrow(brFields:handle, cNewSort, lAscending).
+    RUN setSortArrow(brFields:HANDLE, cNewSort, lAscending).
 
     /* If - and only if - the sort is on 'Order', the buttons for moving are enabled */
-    btnMoveUp:sensitive     = (cNewSort = "iOrder").
-    btnMoveDown:sensitive   = (cNewSort = "iOrder").
-    btnMoveTop:sensitive    = (cNewSort = "iOrder").
-    btnMoveBottom:sensitive = (cNewSort = "iOrder").
+    btnMoveUp:SENSITIVE     = (cNewSort = "iOrder").
+    btnMoveDown:SENSITIVE   = (cNewSort = "iOrder").
+    btnMoveTop:SENSITIVE    = (cNewSort = "iOrder").
+    btnMoveBottom:SENSITIVE = (cNewSort = "iOrder").
 
     /* Close open query */
-    IF VALID-HANDLE(brFields:query) THEN brFields:query:query-close().
+    IF VALID-HANDLE(brFields:QUERY) THEN brFields:QUERY:QUERY-CLOSE().
 
     /* Build the query */
     CREATE QUERY hQuery.
@@ -9192,10 +9393,14 @@ PROCEDURE reopenFieldBrowse :
     rcFieldFilter:visible = FALSE.
 
     cQuery = 'for each ttField where true'.
+
+    #FilterField:
     FOR EACH bFilter
       WHERE bFilter.hBrowse = brFields:handle:
 
-      IF bFilter.hColumn:data-type = "CHARACTER" THEN
+      IF FilterModified(bFilter.hFilter:HANDLE,?) = FALSE THEN NEXT #FilterField. 
+
+      IF bFilter.hColumn:DATA-TYPE = "CHARACTER" THEN
         ASSIGN
           cFilterValue = getMatchesValue(bFilter.hFilter)
           cOperator    = "MATCHES".
@@ -9205,21 +9410,21 @@ PROCEDURE reopenFieldBrowse :
           cOperator    = "=".
 
       /* Only add to the query if it has a real value */
-      IF    cFilterValue <> ""
-        AND cFilterValue <> "*"
-        AND cFilterValue <> ?
-        AND cFilterValue <> bFilter.hFilter:private-data THEN
+      IF  cFilterValue <> ""
+          AND cFilterValue <> "*"
+          AND cFilterValue <> ? THEN 
+/*           AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA THEN */
       DO:
         cQuery = SUBSTITUTE("&1 and substitute('&6',ttField.&2) &3 &4 /* &5 */"
                            , cQuery
                            , bFilter.cFieldName
                            , cOperator
                            , QUOTER(cFilterValue)
-                           , IF VALID-HANDLE(bFilter.hColumn) THEN bFilter.hColumn:data-type ELSE "?"
+                           , IF VALID-HANDLE(bFilter.hColumn) THEN bFilter.hColumn:DATA-TYPE ELSE "?"
                            , "&1"
                            ).
         /* Show red line */
-        rcFieldFilter:visible = TRUE.
+        rcFieldFilter:VISIBLE = TRUE.
       END.
     END.
 
@@ -9966,13 +10171,18 @@ PROCEDURE setDataFilter :
        * value. Otherwise see if we need to blank other fields.
        */
       IF bColumn.cFullName = cColumnName THEN
+      DO:
         bColumn.hFilter:SCREEN-VALUE = cColumnValue.
+        FilterModified(bColumn.hFilter,TRUE).
+      END.
       ELSE
       IF plClearOtherFilters THEN
+      DO:
         bColumn.hFilter:SCREEN-VALUE = bColumn.hFilter:PRIVATE-DATA.
+        FilterModified(bColumn.hFilter,FALSE).
+      END. 
 
       setFilterFieldColor(bColumn.hFilter).
-      RUN filterFieldValueChanged(bColumn.hFilter,NO).
     END.
 
     RUN reopenDataBrowse.
@@ -9994,14 +10204,7 @@ PROCEDURE setFilterFieldTabOrder :
 
   /* Set the TAB order of the filter to after the previous filter field */
   FOR EACH bColumn BY bColumn.iColumnNr:
-    IF NOT bColumn.hColumn:VISIBLE THEN NEXT.
-
-    PUBLISH 'debugMessage' (1, SUBSTITUTE('&1 &2 &3 (&4)'
-      , bColumn.iColumnNr
-      , bColumn.cFullName
-      , bColumn.hColumn:VISIBLE
-      , (IF VALID-HANDLE(hPrevFilter) THEN hPrevFilter:NAME ELSE '')
-      )).
+    IF NOT VALID-HANDLE(bColumn.hColumn) OR NOT bColumn.hColumn:VISIBLE THEN NEXT.
 
     IF VALID-HANDLE(hPrevFilter) THEN bColumn.hFilter:MOVE-AFTER-TAB-ITEM(hPrevFilter).
     hPrevFilter = bColumn.hFilter.
@@ -10067,6 +10270,8 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_active.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_inactive.gif' )).
         btnTableFilter:SENSITIVE = TRUE.
+        cbFavouriteSet:SENSITIVE = FALSE.
+        cbFavouriteSet:VISIBLE = FALSE.
         RUN setTableView(NO,NO).
       END.
 
@@ -10075,6 +10280,8 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_active.gif' )).
         btnTableFilter:SENSITIVE = FALSE.
+        cbFavouriteSet:SENSITIVE = TRUE.
+        cbFavouriteSet:VISIBLE = TRUE.
         RUN setTableView(YES,NO).
       END.
     END CASE. /* piPage */
@@ -10136,7 +10343,8 @@ PROCEDURE setRedLines :
           IF    cFilterValue <> ""
             AND cFilterValue <> "*"
             AND cFilterValue <> ?
-            AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA THEN
+            AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA 
+            AND FilterModified(bFilter.hFilter:HANDLE,?) = TRUE THEN /*170901*/
           DO:
             /* Show red line */
             rcFieldFilter:VISIBLE = TRUE.
@@ -10267,8 +10475,11 @@ PROCEDURE setTable :
         fiTableFilter:SCREEN-VALUE = cTable.
         RUN reopenTableBrowse(?).
 
-        brTables:QUERY:REPOSITION-TO-ROWID( ROWID(ttTable)).
-        brTables:REFRESH().
+        IF brTables:QUERY:NUM-RESULTS <> 0 THEN
+        DO:
+          brTables:QUERY:REPOSITION-TO-ROWID( ROWID(ttTable)) NO-ERROR. 
+          brTables:REFRESH().
+        END.
       END.
                  
       APPLY 'value-changed' TO brTables.
@@ -11220,10 +11431,10 @@ PROCEDURE showValue :
     MESSAGE
       'Total of' ghDataBrowse:NUM-SELECTED-ROWS 'rows~t:' dColumnTotal SKIP
       'Min / Max / Avg~t:' dMinValue ' / ' dMaxValue ' / ' dAvgValue
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
   ELSE
   IF cColumnValue <> '' AND cColumnValue <> ? THEN
-    MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    MESSAGE TRIM(cColumnValue) VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
 END PROCEDURE. /* showValue */
 
@@ -11297,8 +11508,11 @@ PROCEDURE startDiggerLib :
     SUBSCRIBE PROCEDURE hDiggerLib TO "customFormat" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "CustomGetFilterValue" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "customGetFilterValue" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
+
 
   END.
 END PROCEDURE. /* startDiggerLib */
@@ -11412,7 +11626,8 @@ PROCEDURE startSession :
 
     /* Check for new versions on GitHub */
     iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
-    RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
+    IF iChannel <> {&CHECK-MANUAL} THEN
+      RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
 
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
   END.
@@ -11721,6 +11936,28 @@ END FUNCTION. /* createMenuItem */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION FilterModified C-Win 
+FUNCTION FilterModified RETURNS LOGICAL
+  ( phFilterField AS HANDLE 
+  , plModified    AS LOGICAL ) :
+  /* Set modified-flag for a filter field
+   */
+  DEFINE BUFFER bFilter FOR ttFilter.
+  
+  FIND bFilter WHERE bFilter.hFilter = phFilterField NO-ERROR.
+  IF AVAILABLE bFilter THEN 
+  DO:
+    IF plModified <> ? THEN bFilter.lModified = plModified.
+    RETURN bFilter.lModified.
+  END.
+  ELSE 
+    RETURN ?.
+
+END FUNCTION. /* FilterModified */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getActiveQueryEditor C-Win 
 FUNCTION getActiveQueryEditor RETURNS HANDLE
   ( /* parameter-definitions */ ) :
@@ -11795,6 +12032,30 @@ END FUNCTION. /* getFieldList */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMatchesValue C-Win 
+FUNCTION getMatchesValue RETURNS CHARACTER
+  ( phFilterField AS HANDLE ) :
+
+  /* Convert fillin value to something we can use with MATCHES 
+   */
+  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO. 
+
+  IF FilterModified(phFilterField,?) = TRUE THEN
+    cValue = phFilterField:SCREEN-VALUE. 
+
+  IF cValue = ? OR cValue = '' THEN cValue = '*'.
+  ELSE 
+  IF    INDEX(cValue,'*') = 0 
+    AND INDEX(cValue,'.') = 0 THEN 
+    cValue = '*' + cValue + '*'.
+
+  RETURN cValue.   /* Function return value. */
+
+END FUNCTION. /* getMatchesValue */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQueryFromFields C-Win 
 FUNCTION getQueryFromFields RETURNS CHARACTER
   ( INPUT pcFieldList AS CHARACTER ):
@@ -11838,11 +12099,11 @@ FUNCTION getSelectedFields RETURNS CHARACTER
 /* Return all selected fields.
  */
   DEFINE VARIABLE cSelectedFields AS CHARACTER  NO-UNDO.
-  DEFINE BUFFER ttField FOR ttField.
+  DEFINE BUFFER bField FOR ttField.
 
   /* All selected fields */
-  FOR EACH ttField WHERE ttField.lShow = TRUE BY ttField.iOrder:
-    cSelectedFields = cSelectedFields + ',' + ttField.cFullName.
+  FOR EACH bField WHERE bField.lShow = TRUE BY bField.iOrder:
+    cSelectedFields = cSelectedFields + ',' + bField.cFullName.
     IF LENGTH(cSelectedFields) > 20000 THEN LEAVE.
   END.
 
@@ -11974,6 +12235,27 @@ END FUNCTION. /* setDebugMode */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setFilterFieldColor C-Win 
+FUNCTION setFilterFieldColor RETURNS LOGICAL
+  ( phWidget AS HANDLE ) :
+
+  /* Set color to gray if not entered a text manually 
+  */
+  IF NOT VALID-HANDLE(phWidget) THEN MESSAGE "DEBUG ALARM" VIEW-AS ALERT-BOX.
+  
+  IF phWidget:SCREEN-VALUE = phWidget:PRIVATE-DATA 
+    AND FilterModified(phWidget,?) = FALSE THEN 
+    phWidget:FGCOLOR = 7.
+  ELSE 
+    phWidget:FGCOLOR = ?.
+    
+  RETURN TRUE.
+
+END FUNCTION. /* setFilterFieldColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQuery C-Win 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER ) :
@@ -12078,13 +12360,13 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
                    AND ghDataBrowse:QUERY:NUM-RESULTS > 0).
 
     ASSIGN
-      btnAdd:SENSITIVE         = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
-      btnClone:SENSITIVE       = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND NOT plReadOnlyDigger
-      btnEdit:SENSITIVE        = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
-      btnDelete:SENSITIVE      = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT plReadOnlyDigger
-      btnView:SENSITIVE        = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
-      btnDump:SENSITIVE        = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-ITERATIONS > 0
-      btnLoad:SENSITIVE        = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
+      btnAdd:SENSITIVE    = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
+      btnClone:SENSITIVE  = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS < 2 AND NOT plReadOnlyDigger
+      btnEdit:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
+      btnDelete:SENSITIVE = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT plReadOnlyDigger
+      btnView:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
+      btnDump:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-ITERATIONS > 0
+      btnLoad:SENSITIVE   = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
       .
 
     /* Hide these when no data browse */

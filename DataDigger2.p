@@ -53,6 +53,7 @@ DEFINE TEMP-TABLE ttOsFile NO-UNDO RCODE-INFORMATION
   FIELD cBaseName     AS CHARACTER FORMAT 'x(40)'
   FIELD cStatus       AS CHARACTER FORMAT 'x(20)'
   INDEX iPrim IS PRIMARY cBaseName cFileType
+  INDEX iType cFileType
   .
 
 PROCEDURE GetDriveTypeA EXTERNAL "kernel32.dll":
@@ -329,12 +330,15 @@ PROCEDURE initializeObject :
   DO:
     MESSAGE "You need at least Progress 10.1B to run DataDigger" SKIP(1)
             "The program will now quit."
-            VIEW-AS ALERT-BOX INFO.
+            VIEW-AS ALERT-BOX INFORMATION.
     QUIT.
   END.
 
   /* Where are we running from? */
   FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
+  IF FILE-INFO:FULL-PATHNAME = ? THEN
+    FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME, '.p', '.r').
+
   gcProgramDir = REPLACE(FILE-INFO:FULL-PATHNAME,"\","/").
   gcProgramDir = SUBSTRING(gcProgramDir,1,R-INDEX(gcProgramDir,'/')).
 
@@ -403,7 +407,7 @@ PROCEDURE recompileDataDigger :
     DO:
       MESSAGE "You have not specified the -s startup parameter. DataDigger will not compile without this." SKIP(1)
               "Please set it to at least 128 and then try again."
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       STOP.
     END.
 
@@ -528,7 +532,7 @@ PROCEDURE recompileSelf :
   PUT UNFORMATTED SKIP(0) "  V6Display          : " SESSION:V6display.
 
   PUT UNFORMATTED SKIP(1) "CURRENT FILES".
-  FOR EACH bOsFile:
+  FOR EACH bOsFile TABLE-SCAN:
     cExpectedDateTime = getRegistry("DataDigger:files", bOsFile.cFileName).
 
     DISPLAY 
@@ -580,7 +584,7 @@ PROCEDURE recompileSelf :
   RUN getSourceFiles(INPUT gcProgramDir, OUTPUT TABLE bOsFile).
 
   /* Save date/time of all files in INI-file */
-  FOR EACH bOsFile: 
+  FOR EACH bOsFile TABLE-SCAN:
     USE "DataDigger".
     PUT-KEY-VALUE SECTION "DataDigger:files" KEY bOsFile.cFileName VALUE STRING(bOsFile.cModified).
     USE "".
@@ -624,7 +628,7 @@ PROCEDURE recompileSelf :
   IF lCompileError THEN 
   DO:
     MESSAGE "An error occurred while recompiling. ~n~nPlease check 'DataDigger.log' in the DataDigger directory."
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     OS-COMMAND NO-WAIT START "datadigger.log".
   END.
 
@@ -857,7 +861,11 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
   RUN getSourceFiles(INPUT gcProgramDir, OUTPUT TABLE ttOsFile).
 
   /* Has any of the source files changed since the last run? */
-  FOR EACH bOsFile WHERE CAN-DO('i,p,w,cls', bOsFile.cFileType):
+  FOR EACH bOsFile
+    WHERE bOsFile.cFileType = "i"
+       OR bOsFile.cFileType = "p"
+       OR bOsFile.cFileType = "w"
+       OR bOsFile.cFileType = "cls":
     cRegistryValue = getRegistry('DataDigger:files', bOsFile.cFileName).
 
     IF cRegistryValue = ? THEN bOsFile.cStatus = 'Status unknown'.
@@ -866,7 +874,10 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
   END.
 
   /* Does every source has an object? */
-  FOR EACH bOsFile WHERE CAN-DO('p,w,cls', bOsFile.cFileType):
+  FOR EACH bOsFile
+    WHERE bOsFile.cFileType = "p"
+       OR bOsFile.cFileType = "w"
+       OR bOsFile.cFileType = "cls":
 
     IF NOT CAN-FIND(ttOsFile WHERE ttOsFile.cBaseName = bOsFile.cBaseName
                                AND ttOsFile.cFileType = 'R') THEN 

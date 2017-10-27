@@ -273,11 +273,8 @@ END.
 ON CHOOSE OF btnDelete IN FRAME Dialog-Frame /* del */
 OR 'DELETE-CHARACTER' OF sList
 DO:
-
   DEFINE VARIABLE iThis  AS INTEGER   NO-UNDO. 
-  DEFINE VARIABLE iOther AS INTEGER   NO-UNDO. 
   DEFINE VARIABLE cThis  AS CHARACTER NO-UNDO. 
-  DEFINE VARIABLE cOther AS CHARACTER NO-UNDO. 
   DEFINE VARIABLE cList  AS CHARACTER NO-UNDO. 
   DEFINE VARIABLE cSep   AS CHARACTER NO-UNDO. 
   
@@ -293,7 +290,6 @@ DO:
   sList:list-items = cList.
   IF cList > "" THEN
     sList:screen-value = ENTRY( MINIMUM(iThis,NUM-ENTRIES(cList,cSep)),cList,cSep).
-
 
 END.
 
@@ -698,13 +694,13 @@ PROCEDURE sortList :
     END.
     
     /* Get ascending list */
-    FOR EACH ttSort BY ttSort.cItem: 
+    FOR EACH ttSort TABLE-SCAN BY ttSort.cItem:
       cListAsc = cListAsc + cSep + ttSort.cItem.
     END.
     cListAsc = SUBSTRING(cListAsc,2).
   
     /* Get ascending list */
-    FOR EACH ttSort BY ttSort.cItem DESCENDING: 
+    FOR EACH ttSort TABLE-SCAN BY ttSort.cItem DESCENDING:
       cListDesc = cListDesc + cSep + ttSort.cItem.
     END.
     cListDesc = SUBSTRING(cListDesc,2).

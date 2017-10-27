@@ -24,7 +24,7 @@
 
 /* ***************************  Definitions  ************************** */
 
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 
@@ -233,7 +233,7 @@ DO:
     or not can-find(ttQuery 
               where ttQuery.cDatabase = pcDatabase
                 and ttQuery.cTable    = pcTable
-                and ttQuery.iQuery    = piQueryNr ) then piQueryNr = ?.
+                and ttQuery.iQueryNr  = piQueryNr ) then piQueryNr = ?.
 
 END.
 
@@ -570,19 +570,16 @@ RUN disable_UI.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteQuery Dialog-Frame 
 PROCEDURE deleteQuery :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  define input  parameter piQueryNr as integer     no-undo.
-  define variable iQuery as integer     no-undo.
+/*
+ * Delete query from list
+ */
+  define input  parameter piQueryNum as integer     no-undo.
   define buffer bQuery for ttQuery.
 
   find bQuery 
     where bQuery.cDatabase = pcDatabase
       and bQuery.cTable    = pcTable
-      and bQuery.iQueryNr  = piQueryNr no-error.
+      and bQuery.iQueryNr  = piQueryNum no-error.
 
   if available bQuery then 
   do:
@@ -591,7 +588,6 @@ PROCEDURE deleteQuery :
     run renumberQueries.
     run showQueries.
   end.
-
 
 end procedure. /* deleteQuery */
 
@@ -699,7 +695,7 @@ PROCEDURE initializeObject :
     find first bQuery 
       where bQuery.cDatabase = pcDatabase
         and bQuery.cTable    = pcTable 
-        and bQuery.cQuery    = pcCurrentQuery
+        and bQuery.cQueryTxt = pcCurrentQuery
             no-error.
 
     if available bQuery then
@@ -757,40 +753,38 @@ end procedure. /* renumberQueries */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQuery Dialog-Frame 
 PROCEDURE saveQuery :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  define input  parameter piQueryNr  as integer     no-undo.
-  define input  parameter pcQueryTxt as character   no-undo.
+/* 
+ * Save the query
+ */
+  define input parameter piQueryNum as integer     no-undo.
+  define input parameter pcQueryTxt as character   no-undo.
 
   define buffer bQuery for ttQuery.
 
   /* New query? */
-  if piQueryNr = 0 then
+  if piQueryNum = 0 then
   do:
     find last bQuery 
       where bQuery.cDatabase = pcDatabase
         and bQuery.cTable    = pcTable no-error.
 
     if available bQuery then 
-      piQueryNr = bQuery.iQueryNr.
+      piQueryNum = bQuery.iQueryNr.
     else 
-      piQueryNr = 1.
+      piQueryNum = 1.
 
     create bQuery. 
     assign bQuery.cDatabase = pcDatabase
            bQuery.cTable    = pcTable
-           bQuery.iQueryNr  = piQueryNr
-           bQuery.cQuery    = pcQueryTxt.
+           bQuery.iQueryNr  = piQueryNum
+           bQuery.cQueryTxt = pcQueryTxt.
   end.
   else 
   do:
     find bQuery 
       where bQuery.cDatabase = pcDatabase
         and bQuery.cTable    = pcTable
-        and bQuery.iQueryNr  = piQueryNr no-error.
+        and bQuery.iQueryNr  = piQueryNum no-error.
 
     bQuery.cQuery = pcQueryTxt.
   end.
@@ -798,7 +792,7 @@ PROCEDURE saveQuery :
   run renumberQueries.
   run showQueries.
 
-end procedure. /* deleteQuery */
+end procedure. /* saveQuery */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -887,3 +881,4 @@ END PROCEDURE. /* startDiggerLib */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

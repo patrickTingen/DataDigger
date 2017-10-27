@@ -24,7 +24,7 @@ Purpose      : Debugger for DataDigger
 
 CREATE WIDGET-POOL.
 
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Local Variable Definitions */
 define variable giPrevTime as integer     no-undo. /* remember last TIME */.
@@ -103,7 +103,7 @@ FUNCTION setRegistry returns character
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnClear 
@@ -868,7 +868,7 @@ PROCEDURE timerCommand :
                                              , integer(ttTimer.tTotalTime / ttTimer.iNumStarts)
                                              )).
     end. /* stop */
-  end. /* case picCommand: */
+  end case. /* case picCommand: */
 
 END PROCEDURE.
 
@@ -917,4 +917,3 @@ end function. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

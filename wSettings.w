@@ -50,6 +50,7 @@ define variable gcPageButtons    as character no-undo.
 define variable giLastActivePage as integer   no-undo. 
 define variable giWinX           as integer   no-undo. 
 define variable giWinY           as integer   no-undo. 
+DEFINE VARIABLE giCurrentPage    AS INTEGER   NO-UNDO.
 
 define temp-table ttFrame no-undo rcode-info
   field cFrame   as character
@@ -81,7 +82,7 @@ end procedure.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rcSettings btnSettings ficSettingsFile ~
+&Scoped-Define ENABLED-OBJECTS btnSettings rcSettings ficSettingsFile ~
 btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK 
 &Scoped-Define DISPLAYED-OBJECTS ficSettingsFile fiSearch 
 
@@ -96,7 +97,7 @@ btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wSettings AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wSettings AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON BtnCancel-2 AUTO-END-KEY DEFAULT 
@@ -169,7 +170,7 @@ DEFINE FRAME DEFAULT-FRAME
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 154 Y 65
+         AT X 155 Y 64
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
          TITLE "" WIDGET-ID 200.
 
@@ -244,6 +245,48 @@ THEN wSettings:HIDDEN = yes.
 /* ************************  Control Triggers  ************************ */
 
 &Scoped-define SELF-NAME wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-DOWN OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+  
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'fiSearch' THEN
+      APPLY 'entry' TO btPage1.
+    ELSE 
+    CASE giCurrentPage:
+      WHEN 1 THEN APPLY 'entry' TO btPage2.
+      WHEN 2 THEN APPLY 'entry' TO btPage3.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-UP OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+  
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'btPage1' THEN
+      APPLY 'entry' TO fiSearch.
+    ELSE 
+    CASE giCurrentPage:
+      WHEN 2 THEN APPLY 'entry' TO btPage1.
+      WHEN 3 THEN APPLY 'entry' TO btPage2.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
 ON END-ERROR OF wSettings /* DataDigger Settings */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
@@ -320,7 +363,7 @@ END.
 ON CURSOR-DOWN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
 , fiSearch ,btPage2
 DO:
-
+  
   case self:name:
     when 'fiSearch' then apply 'entry' to btPage1.
     when 'btPage1'  then apply 'entry' to btPage2.
@@ -386,19 +429,6 @@ PROCEDURE PostMessageA EXTERNAL "USER32.DLL":
   DEFINE INPUT  PARAMETER pWparam  AS LONG NO-UNDO.
   DEFINE INPUT  PARAMETER pLparam  AS LONG NO-UNDO.
 END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btPage1 wSettings
-ON RETURN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
-,btPage2, btPage3
-DO:
-
-  .apply 'entry' to frame frSettings.
-  
-END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -560,7 +590,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY ficSettingsFile fiSearch 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
-  ENABLE rcSettings btnSettings ficSettingsFile btnRawEdit fiSearch btPage1 
+  ENABLE btnSettings rcSettings ficSettingsFile btnRawEdit fiSearch btPage1 
          btPage2 btPage3 BtnCancel-2 BtnOK 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
@@ -578,11 +608,10 @@ PROCEDURE initializeObject :
   Description  : Do initialisation
   ----------------------------------------------------------------------*/
   
-  define variable hWidget    as handle      no-undo.
-  define variable cValue     as character   no-undo.
-  define variable iMaxHeight as integer     no-undo.
-  define variable iScreen    as integer     no-undo. 
-  define variable hProg      as handle      no-undo extent 3.
+  define variable hWidget    as handle  no-undo.
+  define variable iMaxHeight as integer no-undo.
+  define variable iScreen    as integer no-undo. 
+  define variable hProg      as handle  no-undo extent 3.
 
   /* Load decoration stuff */
   do with frame {&frame-name}:
@@ -753,10 +782,8 @@ PROCEDURE saveSettings :
   ----------------------------------------------------------------------*/
 
   DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iColor   AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cSection AS CHARACTER NO-UNDO. 
   DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
 
   FOR EACH ttFrame:
 
@@ -817,7 +844,9 @@ PROCEDURE setPage :
   define variable iPage   as integer no-undo. 
 
   /* Remember the last active page */
-  if piPageNr <> 0 then giLastActivePage = piPageNr.
+  if piPageNr <> 0 then 
+    ASSIGN giLastActivePage = piPageNr
+           giCurrentPage = piPageNr.
 
   do iPage = 1 to num-entries(gcPageButtons):
     hButton = widget-handle( entry(iPage,gcPageButtons) ).
@@ -873,7 +902,7 @@ PROCEDURE showFrames :
   frame frSettings:height-pixels = 390.
 
   /* Make frames visible based on whether the tags match */
-  for each ttFrame by ttFrame.iOrder:
+  for each ttFrame TABLE-SCAN by ttFrame.iOrder:
 
     ttFrame.hFrame:visible = ( ttFrame.cTags matches '*' + pcTag + '*' ).
 
@@ -935,4 +964,3 @@ END PROCEDURE. /* ShowScrollbars */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

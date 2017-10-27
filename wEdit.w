@@ -5,20 +5,8 @@
 &Scoped-define WINDOW-NAME wEdit
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wEdit 
 /*------------------------------------------------------------------------
-
   File: 
-
   Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
@@ -126,7 +114,7 @@ FUNCTION increaseCharValue RETURNS CHARACTER
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wEdit AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wEdit AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnClose AUTO-END-KEY 
@@ -983,7 +971,7 @@ PROCEDURE btnGoChoose :
   Description  : Apply changes to all selected records
   ----------------------------------------------------------------------*/
   
-  DEFINE OUTPUT PARAMETER polSuccess AS LOGICAL NO-UNDO. 
+  DEFINE OUTPUT PARAMETER plSuccess AS LOGICAL NO-UNDO. 
 
   DEFINE VARIABLE hBuffer         AS handle    NO-UNDO.
   DEFINE VARIABLE hBufferSrc      AS handle    NO-UNDO.
@@ -997,12 +985,11 @@ PROCEDURE btnGoChoose :
   /* In read-only mode, return */
   IF plReadOnlyDigger THEN 
   DO:
-    polSuccess = TRUE.
+    plSuccess = TRUE.
     RETURN. 
   END.
 
-  /* 2012-09-14 JEE Disable Triggers */
-  lDisableTrigger = tgWriteTrigger:SCREEN-VALUE IN FRAME {&FRAME-NAME} = "no".
+  lDisableTrigger = (tgWriteTrigger:SCREEN-VALUE IN FRAME {&FRAME-NAME} = "no").
 
   /* See if any fields have been set. If not, go back. */
   IF NOT CAN-FIND(FIRST bColumn WHERE bColumn.lShow = TRUE) THEN RETURN.
@@ -1070,6 +1057,7 @@ PROCEDURE btnGoChoose :
     END CASE. /* picMode */
 
     /* Process record by record */
+    #RecordLoop:
     DO iRow = 1 TO iNumRecs:
 
       /* Dump the current version of the record as a backup */
@@ -1096,10 +1084,10 @@ PROCEDURE btnGoChoose :
       IF CAN-DO("Add,Clone", picMode) THEN 
       DO:
         /* Dump the newly created record as a backup */
-        RUN dumpRecord(INPUT "Create", INPUT hBuffer, OUTPUT polSuccess).
+        RUN dumpRecord(INPUT "Create", INPUT hBuffer, OUTPUT plSuccess).
         porRepositionId = hBuffer:ROWID.
         DELETE OBJECT hBuffer.
-        IF NOT polSuccess THEN UNDO commitLoop, LEAVE commitLoop.
+        IF NOT plSuccess THEN UNDO commitLoop, LEAVE commitLoop.
       END.
       ELSE
         hBuffer:BUFFER-RELEASE.
@@ -1114,7 +1102,7 @@ PROCEDURE btnGoChoose :
 
     END. /* do iRow */
 
-    polSuccess = TRUE.
+    plSuccess = TRUE.
   END. /* transaction */
 
   /* Unfreeze the window */
@@ -1333,14 +1321,9 @@ PROCEDURE initializeObject :
   Description  : Setup
   ----------------------------------------------------------------------*/
   
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer         AS handle      NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iDefaultFont    AS INTEGER     NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn. 
@@ -1351,9 +1334,6 @@ PROCEDURE initializeObject :
   BROWSE brRecord:FONT = iDefaultFont.
   BROWSE brRecord:ROW-HEIGHT-PIXELS = font-table:GET-TEXT-HEIGHT-PIXELS(iDefaultFont).
   RUN setLabelPosition(fiNumRecords:HANDLE).
-
-  /* This program is called for both ADD and EDIT */
-  lNewRecord = (picMode = 'add').
 
   /* If we add a new record, enable all fields that are either
    * part of a unique index or are mandatory
@@ -1412,10 +1392,10 @@ PROCEDURE initializeObject :
         ttColumn.lShow     = TRUE. 
 
       /* If the data is longer than the format allows, adjust format */
-      IF ttField.cDatatype = 'character'
-        AND LENGTH(ttColumn.cNewValue) > LENGTH( STRING(ttColumn.cNewValue,ttField.cFormat)) THEN
-        ttField.cFormat = SUBSTITUTE('x(&1)', LENGTH(ttColumn.cNewValue)).
-
+      IF ttField.cDatatype = 'character' THEN 
+        ttField.cFormat = SUBSTITUTE('x(&1)', MAXIMUM( LENGTH(STRING(ttColumn.cNewValue,ttField.cFormat))
+                                                     , LENGTH(ttColumn.cNewValue)
+                                                     ) * 2).
     END.
   END.
 
@@ -1513,9 +1493,7 @@ PROCEDURE reopenFieldBrowse :
   DEFINE VARIABLE cOldSort       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer        AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hColumn        AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iColumn        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lAscending     AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
 
@@ -1666,4 +1644,3 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

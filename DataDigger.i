@@ -72,6 +72,7 @@ DEFINE TEMP-TABLE ttQuery NO-UNDO RCODE-INFORMATION
   FIELD iQueryNr  AS INTEGER
   FIELD cQueryTxt AS CHARACTER
   INDEX idxQueryPrim IS PRIMARY iQueryNr
+  INDEX idxTable cDatabase cTable
   .
 
 /* TT for the fields of a table */
@@ -147,6 +148,7 @@ DEFINE TEMP-TABLE ttColumn NO-UNDO RCODE-INFORMATION
   INDEX idxField cFieldName
   INDEX idxColNr iColumnNr
   INDEX idxSort  cTableCacheId cFieldName iColumnNr
+  INDEX idxTable cDatabase cTablename
   .
 
 /* TTs Used for preCaching */
@@ -182,12 +184,10 @@ DEFINE TEMP-TABLE ttFilter NO-UNDO RCODE-INFORMATION
   FIELD hColumn    AS HANDLE
   FIELD hBrowse    AS HANDLE
   FIELD lVisible   AS LOGICAL
+  FIELD lModified  AS LOGICAL
   INDEX idxBrowse hBrowse
   INDEX idxField  cFieldName
-/*  FIELD hColumnHandle AS HANDLE */
-/*  INDEX idxPrim IS PRIMARY cFieldName */
-/*  INDEX idxFieldHandle  hFieldHandle  */
-/*  INDEX idxColumnHandle hColumnHandle */
+  INDEX idxFilter hFilter
   .
 
 /* TT for filter on database tables */
@@ -346,14 +346,11 @@ function getIndexFields returns character
 
 function getKeyList      returns character in super.
 
-function getLinkInfo          returns character
+function getLinkInfo     returns character
   ( input pcFieldName as character
   ) in super.
 
-function getMatchesValue returns character
-  ( hFillIn AS HANDLE ) in super. 
-
-function getMaxLength    returns integer   
+function getMaxLength    returns integer
   ( pcSection as character
   ) in super.
 
@@ -378,7 +375,7 @@ function getRegistry returns character
   , pcKey     AS CHARACTER 
   ) in super.
 
-function getStackSize returns intege 
+function getStackSize returns integer
   () in super.
 
 function getTableList returns character
@@ -417,10 +414,7 @@ function removeConnection returns logical
 function resolveOsVars returns character
   ( pcString AS CHARACTER ) in super. 
 
-function setFilterFieldColor returns logical
-  ( phWidget AS HANDLE ) in super.
-
-function setLinkInfo returns logical 
+function setLinkInfo returns logical
   ( input pcFieldName as character
   , input pcValue     as character
   ) in super. 

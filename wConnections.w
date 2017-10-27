@@ -24,7 +24,7 @@
   define variable pcResult    as character no-undo initial "". 
 &ENDIF   
 
-{ datadigger.i } 
+{ DataDigger.i }
 
 define variable gcRecordState as character no-undo initial 'nodata'.
 
@@ -732,7 +732,7 @@ PROCEDURE btnConnectChoose :
                            , error-status:get-number(iError)
                            ).
       end.
-      message cError view-as alert-box info buttons ok.
+      message cError view-as ALERT-BOX INFORMATION buttons ok.
       apply "ENTRY" to brConnections.
       return no-apply.
     end.
@@ -741,7 +741,7 @@ PROCEDURE btnConnectChoose :
     /* Success, but report if db was already connected */
     if lAlreadyConnected then 
     do:
-      message 'Database already connected' view-as alert-box info buttons ok.
+      message 'Database already connected' view-as ALERT-BOX INFORMATION buttons ok.
       apply "ENTRY" to brConnections.
       return no-apply.
     end.
@@ -769,7 +769,7 @@ PROCEDURE btnDeleteChoose :
   define variable rDelete     as rowid no-undo. 
 
   DO WITH FRAME dialog-frame:
-    message 'Delete this connection?' view-as alert-box info buttons yes-no-cancel update lOk.
+    message 'Delete this connection?' view-as ALERT-BOX INFORMATION buttons yes-no-cancel update lOk.
   
     if lOk = true then
     do:
@@ -822,7 +822,7 @@ PROCEDURE btnDisconnectChoose :
   cCurrentDb = fiLogicalName:screen-value in frame dialog-frame.
 
   message substitute('Are you sure you want to disconnect database "&1"?', cCurrentDb)
-    view-as alert-box info buttons yes-no-cancel update lDisconnect.
+    view-as ALERT-BOX INFORMATION buttons yes-no-cancel update lDisconnect.
   if lDisconnect <> yes then return. 
 
   disconnect value(cCurrentDb).
@@ -930,14 +930,14 @@ PROCEDURE btnTestChoose :
                            , error-status:get-number(iError)
                            ).
       end.
-      message cError view-as alert-box info buttons ok.
+      message cError view-as ALERT-BOX INFORMATION buttons ok.
     end.
     else 
     do:
       /* Otherwise disconnect the db since it's only a test */
       if not lAlreadyConnected then
         disconnect value(ldbname(num-dbs)).
-      message 'Connection successful' view-as alert-box info buttons ok.
+      message 'Connection successful' view-as ALERT-BOX INFORMATION buttons ok.
     end.
   END.
 
@@ -1200,7 +1200,6 @@ PROCEDURE openConnectionQuery :
   define variable cQuery           as character   no-undo.
   define variable hQuery           as handle      no-undo.
   define variable cConnectionList  as character   no-undo.
-  define variable cSectionName     as character   no-undo. 
 
   do with frame {&frame-name}:
 
@@ -1400,10 +1399,10 @@ FUNCTION getNewConnectionNr RETURNS INTEGER
 
   /* No nrs avail */
   if iNewNr = 999 then 
-    message "Out of connection numbers! ~nPlease contact patrick@tingen.net" view-as alert-box info buttons ok.
+    message "Out of connection numbers! ~nPlease contact patrick@tingen.net" view-as ALERT-BOX INFORMATION buttons ok.
   else
   if iNewNr > 900 then 
-    message "Almost out of connection numbers! ~nPlease contact patrick@tingen.net" view-as alert-box info buttons ok.
+    message "Almost out of connection numbers! ~nPlease contact patrick@tingen.net" view-as ALERT-BOX INFORMATION buttons ok.
 
   return iNewNr.   /* Function return value. */
 
