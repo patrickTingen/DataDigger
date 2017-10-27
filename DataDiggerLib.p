@@ -2142,6 +2142,7 @@ PROCEDURE getTableStats :
 	DEFINE VARIABLE cLine       AS CHARACTER   NO-UNDO.
 	DEFINE VARIABLE cSection    AS CHARACTER   NO-UNDO.
 	DEFINE VARIABLE cDatabase   AS CHARACTER   NO-UNDO.
+    define variable cSettingsDir as character no-undo.
 
 	/* Read the ini file as plain text and parse the lines.
 	 *
@@ -2152,7 +2153,8 @@ PROCEDURE getTableStats :
 	 */
 	{&timerStart}
 
-	cIniFile = SUBSTITUTE('&1DataDigger-&2.ini', getProgramDir(), getUserName() ).
+    cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+    cIniFile = substitute('&1DataDigger-&2.ini', cSettingsDir, getUserName() ).
 	INPUT from value(cIniFile).
 
 	#ReadLine:
@@ -2582,49 +2584,52 @@ PROCEDURE saveConfigFileSorted :
 /*
  * Save settings file sorted
  */
-	DEFINE VARIABLE cUserConfigFile AS CHARACTER NO-UNDO.
-	DEFINE BUFFER bfConfig FOR ttConfig.
+  DEFINE VARIABLE cUserConfigFile AS CHARACTER NO-UNDO.
+  define variable cSettingsDir as character no-undo.
+  
+  DEFINE BUFFER bfConfig FOR ttConfig.
 
-	cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getProgramDir(), getUserName() ).
+  cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", cSettingsDir, getUserName() ).
 
-	/* Config table holds data from 3 .ini sources, so start fresh */
-	EMPTY TEMP-TABLE bfConfig.
-	RUN readConfigFile(cUserConfigFile).
+  /* Config table holds data from 3 .ini sources, so start fresh */
+  EMPTY TEMP-TABLE bfConfig. 
+  RUN readConfigFile(cUserConfigFile).
 
-	/* Now write back, sorted */
-	OUTPUT TO VALUE(cUserConfigFile).
+  /* Now write back, sorted */
+  OUTPUT TO VALUE(cUserConfigFile).
 
-	FOR EACH bfConfig
-		WHERE bfConfig.cSection BEGINS "DataDigger"
-			AND bfConfig.cSetting <> ''
-			AND bfConfig.cSetting <> ?
-		BREAK BY bfConfig.cSection:
+  FOR EACH bfConfig 
+    WHERE bfConfig.cSection BEGINS "DataDigger"
+      AND bfConfig.cSetting <> ''
+      AND bfConfig.cSetting <> ?
+    BREAK BY bfConfig.cSection:
+  
+    IF FIRST-OF(bfConfig.cSection) THEN
+      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
+  
+    PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
+  
+    IF LAST-OF(bfConfig.cSection) THEN
+      PUT UNFORMATTED SKIP(1).
+  END.
 
-		IF FIRST-OF(bfConfig.cSection) THEN
-			PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
+  FOR EACH bfConfig 
+    WHERE NOT bfConfig.cSection BEGINS "DataDigger"
+      AND bfConfig.cSetting <> ''
+      AND bfConfig.cSetting <> ?
+    BREAK BY bfConfig.cSection:
+  
+    IF FIRST-OF(bfConfig.cSection) THEN
+      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
+  
+    PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
+  
+    IF LAST-OF(bfConfig.cSection) THEN
+      PUT UNFORMATTED SKIP(1).
+  END.
 
-		PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-
-		IF LAST-OF(bfConfig.cSection) THEN
-			PUT UNFORMATTED SKIP(1).
-	END.
-
-	FOR EACH bfConfig
-		WHERE NOT bfConfig.cSection BEGINS "DataDigger"
-			AND bfConfig.cSetting <> ''
-			AND bfConfig.cSetting <> ?
-		BREAK BY bfConfig.cSection:
-
-		IF FIRST-OF(bfConfig.cSection) THEN
-			PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
-
-		PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-
-		IF LAST-OF(bfConfig.cSection) THEN
-			PUT UNFORMATTED SKIP(1).
-	END.
-
-	OUTPUT CLOSE.
+  OUTPUT CLOSE. 
 
 END PROCEDURE. /* saveConfigFileSorted */
 
@@ -4063,99 +4068,107 @@ END FUNCTION. /* getReadableQuery */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure
 FUNCTION getRegistry RETURNS CHARACTER
-		( pcSection AS CHARACTER
-		, pcKey     AS CHARACTER
-		) :
-/*
- * Get a value from the registry.
- */
-	DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
-	DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
+    ( pcSection AS CHARACTER
+    , pcKey     AS CHARACTER 
+    ) :
+  /*
+   * Get a value from the registry.
+   */
+  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
+  define variable cSettingsDir as character no-undo.
+  
+  {&timerStart}
+  DEFINE BUFFER bfConfig FOR ttConfig.
 
-	{&timerStart}
-	DEFINE BUFFER bfConfig FOR ttConfig.
+  /* If this is a DB-specific section then replace db name if needed */
+  if pcSection begins "DB:" then
+  do:
+    FIND ttDatabase WHERE ttDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
+    IF AVAILABLE ttDatabase THEN pcSection = "DB:" + ttDatabase.cSection.
+  END.
 
-	/* If this is a DB-specific section then replace db name if needed */
-	IF pcSection BEGINS "DB:" THEN
-	DO:
-		FIND ttDatabase WHERE ttDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
-		IF AVAILABLE ttDatabase THEN pcSection = "DB:" + ttDatabase.cSection.
-	END.
 
-	IF glCacheSettings THEN
-	DO:
-		/* Load settings if there is nothing in the config table */
-		IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
-		DO:
-			/* Help file is least important */
-			RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini", getProgramDir())).
+  IF glCacheSettings THEN
+  DO:
+    /* Load settings if there is nothing in the config table */
+    IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
+    DO:
+      /* Help file is least important */
+      RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini"
+                                    , getProgramDir()
+                                    )).
+      /* General DD settings */
+      cSettingsDir = replace(search('DataDigger.ini'),'DataDigger.ini','').
+      RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini"
+                                    , cSettingsDir
+                                    )).
+      /* Per-user settings */
+      RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini"
+                                    , cSettingsDir
+                                    , getUserName()
+                                    )).
+  
+      /* When all ini-files have been read, we can determine whether 
+       * caching needs to be enabled
+       */
+      lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
+      IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
 
-			/* General DD settings */
-			RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini", getProgramDir())).
+      lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
+      IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
 
-			/* Per-user settings */
-			RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini", getProgramDir(), getUserName())).
+      /* If we do not want to cache the registry, empty it now */
+      IF NOT glCacheSettings THEN RUN clearRegistryCache.
+    END.
 
-			/* When all ini-files have been read, we can determine whether
-			 * caching needs to be enabled
-			 */
-			lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
-			IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
+    /* Search in settings tt */
+    FIND bfConfig
+      WHERE bfConfig.cSection = pcSection
+        AND bfConfig.cSetting = pcKey
+            NO-ERROR.
+            
+    {&timerStop}
+    RETURN ( IF AVAILABLE bfConfig THEN bfConfig.cValue ELSE ? ).
+  END.
 
-			lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
-			IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
-
-			/* If we do not want to cache the registry, empty it now */
-			IF NOT glCacheSettings THEN RUN clearRegistryCache.
-		END.
-
-		/* Search in settings tt */
-		FIND bfConfig
-			WHERE bfConfig.cSection = pcSection
-				AND bfConfig.cSetting = pcKey
-						NO-ERROR.
-
-		{&timerStop}
-		RETURN ( IF AVAILABLE bfConfig THEN bfConfig.cValue ELSE ? ).
-	END.
-
-	ELSE
-	DO:
-		USE SUBSTITUTE('DataDigger-&1', getUserName() ).
-		GET-KEY-VALUE
-			SECTION pcSection
-			KEY     pcKey
-			VALUE   cValue.
-
-		/* If setting is not in the personal INI file
-		 * then check the default DataDigger.ini
-		 */
-		IF cValue = ? THEN
-		DO:
-			USE 'DataDigger'.
-			GET-KEY-VALUE
-				SECTION pcSection
-				KEY     pcKey
-				VALUE   cValue.
-		END.
-
-		/* And if it is still not found, look in
-		 * the DataDiggerHelp ini file
-		 */
-		IF cValue = ? THEN
-		DO:
-			USE 'DataDiggerHelp'.
-			GET-KEY-VALUE
-				SECTION pcSection
-				KEY     pcKey
-				VALUE   cValue.
-		END.
-
-		/* Clean up and return */
-		USE "".
-		{&timerStop}
-		RETURN cValue.
-	END.
+  ELSE 
+  DO:  
+    USE SUBSTITUTE('DataDigger-&1', getUserName() ).
+    GET-KEY-VALUE 
+      SECTION pcSection
+      KEY     pcKey
+      VALUE   cValue.
+  
+    /* If setting is not in the personal INI file
+     * then check the default DataDigger.ini
+     */
+    IF cValue = ? THEN
+    DO:
+      USE 'DataDigger'.
+      GET-KEY-VALUE 
+        SECTION pcSection
+        KEY     pcKey
+        VALUE   cValue.
+    END.
+  
+    /* And if it is still not found, look in 
+     * the DataDiggerHelp ini file 
+     */
+    IF cValue = ? THEN
+    DO:
+      USE 'DataDiggerHelp'.
+      GET-KEY-VALUE 
+        SECTION pcSection
+        KEY     pcKey
+        VALUE   cValue.
+    END. 
+  
+    /* Clean up and return */
+    USE "".
+    {&timerStop}
+    return cValue.
+  END.
 
 END FUNCTION. /* getRegistry */
 
@@ -4874,4 +4887,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-
