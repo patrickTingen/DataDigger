@@ -130,7 +130,7 @@ IF iDiffWidth <> 0 THEN ASSIGN
  hs_fil_Flds:WIDTH-PIXELS = hs_lst_Flds:WIDTH-PIXELS
 
  hs_lst_Idxs:X            = hs_lst_Flds:X
- hs_lst_Idxs:WIDTH-PIXEL  = hs_lst_Tbls:WIDTH-PIXELS
+ hs_lst_Idxs:WIDTH-PIXELS = hs_lst_Tbls:WIDTH-PIXELS
  hs_fil_Idxs:X            = hs_lst_Flds:X
  hs_fil_Idxs:WIDTH-PIXELS = hs_lst_Tbls:WIDTH-PIXELS
 

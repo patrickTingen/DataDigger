@@ -474,7 +474,7 @@ PROCEDURE initializeObject :
     end.
 
     fiDir = getRegistry("DataDigger","CloneDB:dir").
-    if fiDir = ? then fiDir = session:temp-dir.
+    if fiDir = ? then fiDir = SESSION:TEMP-DIRECTORY.
 
     cSetting = getRegistry("DataDigger","CloneDB:connect").
     if cSetting = ? then cSetting = "yes".

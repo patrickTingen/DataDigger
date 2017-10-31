@@ -311,7 +311,7 @@ PROCEDURE initializeObject :
     rsDump:RADIO-BUTTONS = REPLACE(rsDump:RADIO-BUTTONS,'[db]',pcDatabase).
 
     fiDir = getRegistry("DataDigger","DumpDF:dir").
-    if fiDir = ? then fiDir = session:temp-dir.
+    if fiDir = ? then fiDir = SESSION:TEMP-DIRECTORY.
 
     cSetting = getRegistry("DataDigger","DumpDF:open").
     if cSetting = ? then cSetting = "yes".

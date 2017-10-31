@@ -39,7 +39,7 @@ FUNCTION getRemoteFile RETURNS CHARACTER (pcRemoteFile AS CHARACTER):
   DEFINE VARIABLE cContents  AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE iResult    AS INTEGER   NO-UNDO.
 
-  cLocalFile = SESSION:TEMP-DIR + 'VersionInfo.txt'.
+  cLocalFile = SESSION:TEMP-DIRECTORY + 'VersionInfo.txt'.
   OS-DELETE cLocalFile.
 
   RUN DeleteURLCacheEntry (INPUT pcRemoteFile).

@@ -36,12 +36,12 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */
-define input-output parameter table for ttTestQuery.
+DEFINE INPUT-OUTPUT PARAMETER table FOR ttTestQuery.
 
 /* Local Variable Definitions ---                                       */
 
 DEFINE TEMP-TABLE ttBuffer NO-UNDO
-  FIELD hBuffer    AS handle    
+  FIELD hBuffer    AS HANDLE    
   FIELD cDatabase  AS CHARACTER
   FIELD cTableName AS CHARACTER
   INDEX iPrimary cDatabase cTableName.
@@ -96,13 +96,13 @@ DEFINE TEMP-TABLE ttVstIndexInfo NO-UNDO
    this temp-table so that subsequent resize operations can be
    based on more exact co-ordinates */ 
 
-define temp-table temp-widget no-undo
-       field whand as widget-handle    
-       field hx as decimal decimals 10     /* calculated x-position in pixels */
-       field hy as decimal decimals 10     /* calculated y-position in pixels */
-       field hwidt as decimal decimals 10  /* calculated width in pixels */
-       field hheig as decimal decimals 10  /* calculated height in pixels */
-       index whand is primary unique whand.
+DEFINE TEMP-TABLE temp-widget NO-UNDO
+       FIELD whand AS WIDGET-HANDLE    
+       FIELD hx AS DECIMAL DECIMALS 10     /* calculated x-position in pixels */
+       FIELD hy AS DECIMAL DECIMALS 10     /* calculated y-position in pixels */
+       FIELD hwidt AS DECIMAL DECIMALS 10  /* calculated width in pixels */
+       FIELD hheig AS DECIMAL DECIMALS 10  /* calculated height in pixels */
+       INDEX whand IS PRIMARY UNIQUE whand.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -175,7 +175,7 @@ DEFINE FRAME DEFAULT-FRAME
      btn-test-qry-2 AT Y 170 X 505
      resultset AT Y 250 X 0 NO-LABEL
      btn-test-qry-3 AT Y 250 X 505 WIDGET-ID 2
-     RECT-1 AT ROW 1 COL 1 WIDGET-ID 4
+     RECT-1 AT ROW 1 COLUMN 1 WIDGET-ID 4
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -199,21 +199,21 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "MCF's Query Tester"
-         HEIGHT-P           = 360
-         WIDTH-P            = 563
-         MAX-HEIGHT-P       = 817
-         MAX-WIDTH-P        = 1152
-         VIRTUAL-HEIGHT-P   = 817
-         VIRTUAL-WIDTH-P    = 1152
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         HEIGHT-P      = 360
+         WIDTH-P       = 563
+         MAX-HEIGHT-P  = 817
+         MAX-WIDTH-P   = 1152
+         VIRTUAL-HEIGHT-P = 817
+         VIRTUAL-WIDTH-P = 1152
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -234,7 +234,7 @@ ASSIGN
        resultset:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = no.
+THEN C-Win:HIDDEN = NO.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
@@ -276,7 +276,7 @@ END.
 ON WINDOW-RESIZED OF C-Win /* MCF's Query Tester */
 DO:
 
-  run resizeFrame in this-procedure (input frame {&FRAME-NAME}:handle).
+  RUN resizeFrame IN this-procedure (INPUT FRAME {&FRAME-NAME}:handle).
 
 END.
 
@@ -337,7 +337,7 @@ END.
 ON CHOOSE OF btn-test-qry-3 IN FRAME DEFAULT-FRAME /* Pop out */
 DO:
   SESSION:SET-WAIT-STATE("GENERAL":U).
-  RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT
+  RUN value(REPLACE(THIS-PROCEDURE:FILE-NAME,"query-tester","query-data")) PERSISTENT
     (INPUT ed-qry,
      INPUT resultset:SCREEN-VALUE).
   SESSION:SET-WAIT-STATE("":U).  
@@ -384,8 +384,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
   /* Datadigger */
-  c-win:font = getFont("Default").
-  frame {&frame-name}:font = getFont("Default").
+  c-win:FONT = getFont("Default").
+  FRAME {&frame-name}:font = getFont("Default").
   ed-qry:font = getFont("Fixed").
 
   RUN enable_UI.
@@ -396,33 +396,33 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   /* query browser */
   CREATE BROWSE h-browser
-    assign FRAME            = lhFrameHdl
-           QUERY            = query q1:handle 
+    ASSIGN FRAME            = lhFrameHdl
+           QUERY            = QUERY q1:HANDLE 
            Y                = RECT-1:x
            X                = RECT-1:y
-           width-pixels     = RECT-1:width-pixels
-           height-pixels    = RECT-1:height-pixels
-           SEPARATORS       = true 
-           ROW-MARKERS      = false 
-           EXPANDABLE       = true 
-           COLUMN-RESIZABLE = true
-           COLUMN-MOVABLE   = false 
-           VISIBLE          = false 
-           READ-ONLY        = true 
+           WIDTH-PIXELS     = RECT-1:width-pixels
+           HEIGHT-PIXELS    = RECT-1:height-pixels
+           SEPARATORS       = TRUE 
+           ROW-MARKERS      = FALSE 
+           EXPANDABLE       = TRUE 
+           COLUMN-RESIZABLE = TRUE
+           COLUMN-MOVABLE   = FALSE 
+           VISIBLE          = FALSE 
+           READ-ONLY        = TRUE 
     TRIGGERS:
       ON "value-changed":U ANYWHERE DO:
-        ASSIGN ed-qry:SCREEN-VALUE IN FRAME {&FRAME-NAME} = REPLACE(ttTestQuery.cQuery,",",",~n").
+        ASSIGN ed-qry:SCREEN-VALUE IN FRAME {&FRAME-NAME} = REPLACE(ttTestQuery.cQueryTxt,",",",~n").
         RUN test-query IN THIS-PROCEDURE (INPUT FALSE,INPUT FALSE, OUTPUT lErrorDetected).
       END.
 
       ON "row-display":U ANYWHERE DO:
         IF VALID-HANDLE(h-SeqName)   THEN h-SeqName:SCREEN-VALUE   = STRING(ttTestQuery.iId).
         IF VALID-HANDLE(h-ProgName)  THEN h-ProgName:SCREEN-VALUE  = STRING(ttTestQuery.cProgName).
-        IF VALID-HANDLE(h-QueryName) THEN h-QueryName:SCREEN-VALUE = STRING(ttTestQuery.cQuery).
+        IF VALID-HANDLE(h-QueryName) THEN h-QueryName:SCREEN-VALUE = STRING(ttTestQuery.cQueryTxt).
       END.
     END TRIGGERS.
 
-    RECT-1:visible = true.
+    RECT-1:visible = TRUE.
     h-SeqName   = h-Browser:ADD-CALC-COLUMN("INTEGER",">,>>9","","Seq").
     h-ProgName  = h-Browser:ADD-CALC-COLUMN("CHARACTER","x(30)","","Table").
     h-QueryName = h-Browser:ADD-CALC-COLUMN("CHARACTER","x(105)","","Query").
@@ -432,17 +432,17 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
     h-browser:SENSITIVE = TRUE
     h-browser:VISIBLE = TRUE.
 
-  run enableButtons IN THIS-PROCEDURE.
-  run resizeFrame in this-procedure (input frame {&FRAME-NAME}:handle).
+  RUN enableButtons IN THIS-PROCEDURE.
+  RUN resizeFrame IN this-procedure (INPUT FRAME {&FRAME-NAME}:handle).
 
-  if temp-table ttTestQuery:has-records then
-  do:
-    apply "value-changed" to h-browser.
-    h-browser:select-focused-row().
-  end.
+  IF TEMP-TABLE ttTestQuery:HAS-RECORDS THEN
+  DO:
+    APPLY "value-changed" TO h-browser.
+    h-browser:SELECT-FOCUSED-ROW().
+  END.
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
-    WAIT-FOR CLOSE OF this-procedure focus h-browser.
+    WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS h-browser.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -611,7 +611,7 @@ PROCEDURE processQuery :
   /* queries. The default is FALSE. When TRUE, you cannot use the GET PREV, GET LAST,    */
   /* REPOSITION, or BROWSE methods or statements with these queries. If you do, the AVM  */
   /* generates an error.                                                                 */
-  ipcQueryString = replace(ipcQueryString,"INDEXED-REPOSITION","").
+  ipcQueryString = REPLACE(ipcQueryString,"INDEXED-REPOSITION","").
   /* </BEU> */
   
   DO WITH FRAME {&FRAME-NAME}:
@@ -628,7 +628,7 @@ PROCEDURE processQuery :
   
     IF NOT lErrorDetected THEN 
     DO:
-      find first bf-ttTestQuery no-error.
+      FIND FIRST bf-ttTestQuery NO-ERROR.
   
   
       /* The query is now added to the tt by DataDigger itself */
@@ -641,27 +641,27 @@ PROCEDURE processQuery :
       ASSIGN 
         bf-ttTestQuery.iId       = iLastQuery
         bf-ttTestQuery.cProgName = "" /* PROGRAM-NAME(2) */
-        bf-ttTestQuery.cQuery    = SUBSTRING(ipcQueryString,INDEX(ipcQueryString,"FOR EACH":U))
+        bf-ttTestQuery.cQueryTxt    = SUBSTRING(ipcQueryString,INDEX(ipcQueryString,"FOR EACH":U))
         .
   
       /* Find table name */
       define variable iWord as integer no-undo.
       findTable:
-      do iWord = 1 to num-entries(bf-ttTestQuery.cQuery," "):
-        if can-do("EACH,LAST,FIRST", entry(iWord,bf-ttTestQuery.cQuery," ")) then 
+      do iWord = 1 to num-entries(bf-ttTestQuery.cQueryTxt," "):
+        if can-do("EACH,LAST,FIRST", entry(iWord,bf-ttTestQuery.cQueryTxt," ")) then 
         do:
-          bf-ttTestQuery.cProgName = entry(iWord + 1,bf-ttTestQuery.cQuery," ").
+          bf-ttTestQuery.cProgName = entry(iWord + 1,bf-ttTestQuery.cQueryTxt," ").
           leave findTable.
         end.
       end. 
       */
 
-      find first bf-ttTestQuery no-error.
+      FIND FIRST bf-ttTestQuery NO-ERROR.
   
       CLOSE QUERY q1.
       OPEN QUERY q1 FOR EACH ttTestQuery NO-LOCK.
   
-      if available bf-ttTestQuery then
+      IF AVAILABLE bf-ttTestQuery THEN
         REPOSITION q1 TO ROWID ROWID(bf-ttTestQuery) NO-ERROR.
     END.
     ELSE 
@@ -679,71 +679,71 @@ END PROCEDURE.
 PROCEDURE resizeFrame :
 /* Resize the frame and all the widget it contains to the new window size */
 
-  define input parameter wfram# as widget-handle no-undo.
+  DEFINE INPUT PARAMETER wfram# AS WIDGET-HANDLE NO-UNDO.
 
-  DEFINE VARIABLE whand# as widget-handle no-undo. /* general purpose widget handle */
-  DEFINE VARIABLE afacthori# as decimal decimals 10 no-undo.
-  DEFINE VARIABLE afactvert# as decimal decimals 10 no-undo.
+  DEFINE VARIABLE whand# AS WIDGET-HANDLE NO-UNDO. /* general purpose widget handle */
+  DEFINE VARIABLE afacthori# AS DECIMAL DECIMALS 10 NO-UNDO.
+  DEFINE VARIABLE afactvert# AS DECIMAL DECIMALS 10 NO-UNDO.
 
-  assign wfram#:scrollable = true
-         afacthori# = {&WINDOW-NAME}:width-pixels / wfram#:width-pixels
-         afactvert# = {&WINDOW-NAME}:height-pixels / wfram#:height-pixels.
+  ASSIGN wfram#:SCROLLABLE = TRUE
+         afacthori# = {&WINDOW-NAME}:WIDTH-PIXELS / wfram#:WIDTH-PIXELS
+         afactvert# = {&WINDOW-NAME}:HEIGHT-PIXELS / wfram#:HEIGHT-PIXELS.
 
   /* prevent multiple calls of this procedure on window-maximized event */
     
-  if afacthori# = 1 and afactvert# = 1 then
-    return.
+  IF afacthori# = 1 AND afactvert# = 1 THEN
+    RETURN.
 
-  if afacthori# > 1 then
-    assign wfram#:width-pixels = {&window-name}:width-pixels.
+  IF afacthori# > 1 THEN
+    ASSIGN wfram#:WIDTH-PIXELS = {&window-name}:WIDTH-PIXELS.
 
-  if afactvert# > 1 then
-    assign wfram#:height-pixels = {&window-name}:height-pixels.
+  IF afactvert# > 1 THEN
+    ASSIGN wfram#:HEIGHT-PIXELS = {&window-name}:HEIGHT-PIXELS.
            
   ASSIGN whand# = wfram#:FIRST-CHILD  /* first field group */
          whand# = whand#:FIRST-CHILD. /* first field-level widget */
 
-  do while valid-handle(whand#):
+  DO WHILE VALID-HANDLE(whand#):
         
     /* find the last calculated positions */
 
-    find temp-widget where temp-widget.whand = whand# no-error.
+    FIND temp-widget WHERE temp-widget.whand = whand# NO-ERROR.
 
-    if not available temp-widget then do:
-      create temp-widget.
-      assign temp-widget.whand = whand#
-             temp-widget.hx    = whand#:x
-             temp-widget.hy    = whand#:y
-             temp-widget.hwidt = whand#:width-pixels
-             temp-widget.hheig = whand#:height-pixels.
-    end.
+    IF NOT AVAILABLE temp-widget THEN DO:
+      CREATE temp-widget.
+      ASSIGN temp-widget.whand = whand#
+             temp-widget.hx    = whand#:X
+             temp-widget.hy    = whand#:Y
+             temp-widget.hwidt = whand#:WIDTH-PIXELS
+             temp-widget.hheig = whand#:HEIGHT-PIXELS.
+    END.
 
-    assign temp-widget.hwidt = temp-widget.hwidt * afacthori#
+    ASSIGN temp-widget.hwidt = temp-widget.hwidt * afacthori#
            temp-widget.hx    = temp-widget.hx * afacthori#
            temp-widget.hy    = temp-widget.hy * afactvert#.
 
-    if lookup(whand#:type,"fill-in,text,literal,button") = 0 then
-      assign temp-widget.hheig = temp-widget.hheig * afactvert#.   
+    IF LOOKUP(whand#:TYPE,"fill-in,text,literal,button") = 0 THEN
+      ASSIGN temp-widget.hheig = temp-widget.hheig * afactvert#.   
 
-    assign whand#:x = temp-widget.hx
-           whand#:y = temp-widget.hy                          
-           whand#:width-pixels  = temp-widget.hwidt
-           whand#:height-pixels = temp-widget.hheig.
+    ASSIGN whand#:X = temp-widget.hx
+           whand#:Y = temp-widget.hy                          
+           whand#:WIDTH-PIXELS  = temp-widget.hwidt
+           whand#:HEIGHT-PIXELS = temp-widget.hheig.
 
 /*     IF whand#:TYPE = "BROWSE":U THEN     */
 /*       ASSIGN whand#:DOWN = whand#:DOWN.  */
 
     ASSIGN whand# = whand#:NEXT-SIBLING.
 
-  end.
+  END.
 
-  if afacthori# < 1 then
-    assign wfram#:width-pixels = {&window-name}:width-pixels
-           wfram#:virtual-width-pixels = wfram#:width-pixels.
+  IF afacthori# < 1 THEN
+    ASSIGN wfram#:WIDTH-PIXELS = {&window-name}:WIDTH-PIXELS
+           wfram#:VIRTUAL-WIDTH-PIXELS = wfram#:WIDTH-PIXELS.
 
-  if afactvert# < 1 then
-    assign wfram#:height-pixels = {&window-name}:height-pixels
-           wfram#:virtual-height-pixels = wfram#:height-pixels.
+  IF afactvert# < 1 THEN
+    ASSIGN wfram#:HEIGHT-PIXELS = {&window-name}:HEIGHT-PIXELS
+           wfram#:VIRTUAL-HEIGHT-PIXELS = wfram#:HEIGHT-PIXELS.
 
 END PROCEDURE.
 
@@ -1114,7 +1114,7 @@ PROCEDURE test-query PRIVATE :
   
     /* <BEU> */
     IF iplShowQuery THEN
-      RUN value(replace(this-procedure:file-name,"query-tester","query-data")) PERSISTENT
+      RUN value(REPLACE(THIS-PROCEDURE:FILE-NAME,"query-tester","query-data")) PERSISTENT
         ( INPUT ed-qry
         , INPUT resultset:SCREEN-VALUE
         ).

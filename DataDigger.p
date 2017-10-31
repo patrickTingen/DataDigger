@@ -15,3 +15,4 @@ gcProgramDir = SUBSTRING(gcProgramDir,1,R-INDEX(gcProgramDir,'/')).
 
 /* Start the actual DataDigger program */
 RUN VALUE(gcProgramDir + "DataDigger2.p") (INPUT FALSE).
+

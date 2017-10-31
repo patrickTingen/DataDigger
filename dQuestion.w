@@ -386,7 +386,7 @@ PROCEDURE initializeObject :
       FRAME {&FRAME-NAME}:TITLE  = IF pcTitle > '' THEN pcTitle ELSE FRAME {&FRAME-NAME}:TITLE  
       edMessage:SCREEN-VALUE     = RIGHT-TRIM(pcMessage,CHR(10))
       edMessage:INNER-LINES      = edMessage:NUM-LINES
-      dMargin                    = imgQuestion:COL /* Use the editor Y as margin template */
+      dMargin                    = imgQuestion:COLUMN /* Use the editor Y as margin template */
       iVertMargin                = edMessage:Y 
       btnYes:Y                   = edMessage:Y + edMessage:HEIGHT-PIXELS + iVertMargin
       btnNo:Y                    = btnYes:Y 
@@ -412,9 +412,9 @@ PROCEDURE initializeObject :
       tgDontShowAgain:sensitive = plCanHide. 
       tgDontShowAgain:y = 1.
 
-      FRAME {&FRAME-NAME}:HEIGHT-P = btnYes:Y + btnYes:height-pixels
-                                   + FRAME {&FRAME-NAME}:BORDER-TOP-P 
-                                   + FRAME {&FRAME-NAME}:BORDER-BOTTOM-P
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = btnYes:Y + btnYes:height-pixels
+                                        + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS 
+                                        + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
                                    + INTEGER(iVertMargin / 2) NO-ERROR.
 
     end.
@@ -436,13 +436,13 @@ PROCEDURE initializeObject :
       btnYes:width           = MAX(btnYes:width,FONT-TABLE:GET-TEXT-width(btnYes:LABEL) + 1.5) 
       btnNo:width            = MAX(btnNo:width,FONT-TABLE:GET-TEXT-width(btnNo:LABEL) + 1.5) 
       btnCancel:width        = MAX(btnCancel:width,FONT-TABLE:get-text-width(btnCancel:LABEL) + 1.5) 
-      btnCancel:COL          = FRAME {&FRAME-NAME}:width - (btnCancel:width + dMargin)
-      btnNo:COL              = IF btnCancel:HIDDEN  
+      btnCancel:COLUMN       = FRAME {&FRAME-NAME}:WIDTH - (btnCancel:width + dMargin)
+      btnNo:COLUMN           = IF btnCancel:HIDDEN  
                                  THEN FRAME {&FRAME-NAME}:width - (btnNo:width + dMargin) 
-                                 ELSE btnCancel:COL - (btnNo:width + (dMargin / 2))
-      btnYes:COL             = MAX(1, IF btnNo:HIDDEN  
+                                 ELSE btnCancel:COLUMN - (btnNo:width + (dMargin / 2))
+      btnYes:COLUMN          = MAX(1, IF btnNo:HIDDEN  
                                  THEN FRAME {&FRAME-NAME}:width - (btnYes:width + dMargin) 
-                                 ELSE btnNo:COL - (btnYes:width + (dMargin / 2)) ).
+                                 ELSE btnNo:COLUMN - (btnYes:width + (dMargin / 2)) ).
       
     /* For some reasons, these #*$&# scrollbars keep coming back */
     run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */

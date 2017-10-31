@@ -15,8 +15,8 @@ define variable iWidth     as integer     no-undo.
 define variable winMessage as handle      no-undo.
 
 define frame infoFrame
-cMessage view-as fill-in size 1 by 1 at row 1.5 col 1.5 no-label
-with 1 down no-box overlay side-labels three-d at col 1 row 1 size-pixels 50 by 40.
+cMessage VIEW-AS FILL-IN SIZE 1 BY 1 AT ROW 1.5 COLUMN 1.5 NO-LABEL
+WITH 1 DOWN NO-BOX OVERLAY SIDE-LABELS THREE-D AT COLUMN 1 ROW 1 SIZE-PIXELS 50 BY 40.
 
 /* *************************  Create Window  ************************** */
 create window winMessage assign
