@@ -1,8 +1,9 @@
 /*------------------------------------------------------------------------
-    File        : DataReader.p
-    Purpose     : Launcher for DataDigger in ReadOnly mode
-  ----------------------------------------------------------------------*/
 
+  Name: DataReader.p
+  Desc: Launcher for DataDigger in ReadOnly mode
+
+  ----------------------------------------------------------------------*/
 DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
 
 /* Where are we running from? */

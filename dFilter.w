@@ -2,22 +2,12 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
 /*------------------------------------------------------------------------
 
-  File: 
+  Name: dFilter.w
+  Desc: Let user select what files to show
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
@@ -32,7 +22,7 @@ DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -46,10 +36,10 @@ DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 &Scoped-Define ENABLED-OBJECTS btnReset cbTableNameShow cbTableNameHide ~
 tgShowSchema tgShowVst tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow ~
 cbTableFieldHide Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 ~
-RECT-2 RECT-3 
+RECT-2 RECT-3
 &Scoped-Define DISPLAYED-OBJECTS cbTableNameShow cbTableNameHide ~
 tgShowSchema tgShowVst tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow ~
-cbTableFieldHide tgShowOther tgShowNormalTables 
+cbTableFieldHide tgShowOther tgShowNormalTables
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -64,84 +54,84 @@ cbTableFieldHide tgShowOther tgShowNormalTables
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnReset 
-     LABEL "&Reset" 
+DEFINE BUTTON btnReset
+     LABEL "&Reset"
      SIZE-PIXELS 75 BY 24 TOOLTIP "reset all filters to the default value".
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
-     LABEL "Cancel" 
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY
+     LABEL "Cancel"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO 
-     LABEL "&OK" 
+DEFINE BUTTON Btn_OK AUTO-GO
+     LABEL "&OK"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE cbTableFieldHide AS CHARACTER 
+DEFINE VARIABLE cbTableFieldHide AS CHARACTER
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
      SIZE-PIXELS 430 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableFieldShow AS CHARACTER 
+DEFINE VARIABLE cbTableFieldShow AS CHARACTER
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
      SIZE-PIXELS 430 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableNameHide AS CHARACTER 
+DEFINE VARIABLE cbTableNameHide AS CHARACTER
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
      SIZE-PIXELS 425 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableNameShow AS CHARACTER 
+DEFINE VARIABLE cbTableNameShow AS CHARACTER
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
      SIZE-PIXELS 425 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 450 BY 115.
 
 DEFINE RECTANGLE RECT-2
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 450 BY 115.
 
 DEFINE RECTANGLE RECT-3
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 445 BY 118.
 
-DEFINE VARIABLE tgShowFrozen AS LOGICAL INITIAL no 
-     LABEL "Show &Frozen Application Tables" 
+DEFINE VARIABLE tgShowFrozen AS LOGICAL INITIAL NO
+     LABEL "Show &Frozen Application Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 246 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowHidden AS LOGICAL INITIAL no 
-     LABEL "Show &Hidden Application Tables" 
+DEFINE VARIABLE tgShowHidden AS LOGICAL INITIAL NO
+     LABEL "Show &Hidden Application Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 246 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowNormalTables AS LOGICAL INITIAL no 
-     LABEL "Show &Normal Tables" 
+DEFINE VARIABLE tgShowNormalTables AS LOGICAL INITIAL NO
+     LABEL "Show &Normal Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 160 BY 17 TOOLTIP "show or hide normal application tables" NO-UNDO.
 
-DEFINE VARIABLE tgShowOther AS LOGICAL INITIAL no 
-     LABEL "Show Other &MetaTables" 
+DEFINE VARIABLE tgShowOther AS LOGICAL INITIAL NO
+     LABEL "Show Other &MetaTables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 246 BY 17 TOOLTIP "show or hide tables in other categories" NO-UNDO.
 
-DEFINE VARIABLE tgShowSchema AS LOGICAL INITIAL no 
-     LABEL "Show &Schema Tables" 
+DEFINE VARIABLE tgShowSchema AS LOGICAL INITIAL NO
+     LABEL "Show &Schema Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 160 BY 17 TOOLTIP "show or hide tables like _file / _field / _index etc" NO-UNDO.
 
-DEFINE VARIABLE tgShowSql AS LOGICAL INITIAL no 
-     LABEL "Show S&QL Tables" 
+DEFINE VARIABLE tgShowSql AS LOGICAL INITIAL NO
+     LABEL "Show S&QL Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 145 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL no 
-     LABEL "Show &VST Tables" 
+DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL NO
+     LABEL "Show &VST Tables"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 160 BY 17 NO-UNDO.
 
@@ -180,8 +170,8 @@ DEFINE FRAME Dialog-Frame
      RECT-1 AT Y 15 X 10 WIDGET-ID 4
      RECT-2 AT Y 288 X 10 WIDGET-ID 22
      RECT-3 AT Y 155 X 15 WIDGET-ID 32
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+         SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 480 BY 487
          TITLE "Edit table filter"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
@@ -204,14 +194,14 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME Custom                                                    */
-ASSIGN 
+ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -250,12 +240,12 @@ OR 'go' OF FRAME {&FRAME-NAME}
 DO:
 
   /* Save settings to ttTableFilter */
-  ASSIGN 
+  ASSIGN
     ttTableFilter.lShowNormal     = tgShowNormalTables:CHECKED
     ttTableFilter.lShowSchema     = tgShowSchema:CHECKED
-    ttTableFilter.lShowVst        = tgShowVst:CHECKED   
-    ttTableFilter.lShowSql        = tgShowSql:CHECKED   
-    ttTableFilter.lShowOther      = tgShowOther:CHECKED 
+    ttTableFilter.lShowVst        = tgShowVst:CHECKED
+    ttTableFilter.lShowSql        = tgShowSql:CHECKED
+    ttTableFilter.lShowOther      = tgShowOther:CHECKED
     ttTableFilter.lShowHidden     = tgShowHidden:CHECKED
     ttTableFilter.lShowFrozen     = tgShowFrozen:CHECKED
     ttTableFilter.cTableNameShow  = cbTableNameShow :SCREEN-VALUE
@@ -278,7 +268,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
 
 
 /* ***************************  Main Block  *************************** */
@@ -314,7 +304,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -333,16 +323,16 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY cbTableNameShow cbTableNameHide tgShowSchema tgShowVst tgShowSql 
-          tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide 
-          tgShowOther tgShowNormalTables 
+  DISPLAY cbTableNameShow cbTableNameHide tgShowSchema tgShowVst tgShowSql
+          tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide
+          tgShowOther tgShowNormalTables
       WITH FRAME Dialog-Frame.
-  ENABLE btnReset cbTableNameShow cbTableNameHide tgShowSchema tgShowVst 
-         tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide 
-         Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 RECT-2 RECT-3 
+  ENABLE btnReset cbTableNameShow cbTableNameHide tgShowSchema tgShowVst
+         tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide
+         Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 RECT-2 RECT-3
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -351,18 +341,17 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
 PROCEDURE initializeObject :
-/*
- * Prepare window: set fonts and load values from registry for combo's
- */
+  /* Prepare window: set fonts and load values from registry for combo's
+  */
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Prepare frame */
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
-    
+
     /* Should have exactly 1 record */
-    FIND ttTableFilter. 
+    FIND ttTableFilter.
 
     /* Load settings from registry */
     tgShowNormalTables:CHECKED = ttTableFilter.lShowNormal.
@@ -372,7 +361,7 @@ PROCEDURE initializeObject :
     tgShowOther:CHECKED        = ttTableFilter.lShowOther.
     tgShowHidden:CHECKED       = ttTableFilter.lShowHidden.
     tgShowFrozen:CHECKED       = ttTableFilter.lShowFrozen.
-    APPLY 'VALUE-CHANGED' TO tgShowSchema. 
+    APPLY 'VALUE-CHANGED' TO tgShowSchema.
 
     /* Fill the combo boxes from the registry */
     RUN populateCombo(cbTableNameShow:HANDLE , 'TableNameShow' ).
@@ -392,12 +381,10 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE populateCombo Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE populateCombo Dialog-Frame
 PROCEDURE populateCombo :
-/*------------------------------------------------------------------------------
-  Purpose: Set items in a combo box
-------------------------------------------------------------------------------*/
-
+  /* Set items in a combo box
+  */
   DEFINE INPUT PARAMETER phCombo   AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcSetting AS CHARACTER   NO-UNDO.
 
@@ -409,47 +396,45 @@ PROCEDURE populateCombo :
 
   /* Place search history in the combo */
   phCombo:DELIMITER = CHR(1).
-  
+
   /* How many to remember? */
   iMaxFilterHistory = INTEGER(getRegistry('DataDigger', 'MaxFilterHistory')).
   IF iMaxFilterHistory = ? THEN iMaxFilterHistory = 10.
-  
+
   /* Populate combo */
   cFilterList = getRegistry('DataDigger:Tables',pcSetting).
 
   IF cFilterList = ? THEN cFilterList = ''.
-  
+
   /* Add old entries to the list */
   DO iPos = 1 TO NUM-ENTRIES(cFilterList,CHR(1)).
     cThisValue = ENTRY(iPos,cFilterList,CHR(1)).
-  
+
     /* Skip empty */
-    IF cThisValue = '' THEN NEXT. 
-  
+    IF cThisValue = '' THEN NEXT.
+
     /* If it is already in the list, ignore */
-    IF LOOKUP(cThisValue,cComboList,CHR(1)) > 0 THEN NEXT. 
-  
+    IF LOOKUP(cThisValue,cComboList,CHR(1)) > 0 THEN NEXT.
+
     /* Add to list */
     cComboList = cComboList + CHR(1) + cThisValue.
-  
+
     /* Stop if there are too much in the list */
-    IF NUM-ENTRIES(cComboList,CHR(1)) >= iMaxFilterHistory THEN LEAVE. 
+    IF NUM-ENTRIES(cComboList,CHR(1)) >= iMaxFilterHistory THEN LEAVE.
   END.
-  
+
   cComboList = TRIM(cComboList,CHR(1)).
   IF NUM-ENTRIES(cComboList,CHR(1)) > 0 THEN phCombo:LIST-ITEMS = cComboList.
-  
+
 END PROCEDURE. /* populateCombo */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveComboValue Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveComboValue Dialog-Frame
 PROCEDURE saveComboValue :
-/*------------------------------------------------------------------------------
-  Purpose: Save filter items from combo box
-------------------------------------------------------------------------------*/
-
+  /* Save filter items from combo box
+  */
   DEFINE INPUT  PARAMETER phCombo   AS HANDLE      NO-UNDO.
   DEFINE INPUT  PARAMETER pcSetting AS CHARACTER   NO-UNDO.
 
@@ -467,22 +452,22 @@ PROCEDURE saveComboValue :
   cValue = phCombo:SCREEN-VALUE.
   IF cValue = ? THEN cValue = ''.
 
-  cDelim = phCombo:DELIMITER. 
-  
+  cDelim = phCombo:DELIMITER.
+
   /* Set current screen value in front of list */
   cNewList = cValue.
 
   /* Add all old entries to it */
   DO iEntry = 1 TO NUM-ENTRIES(cList,cDelim):
     /* If same as new entry then leave it out */
-    IF ENTRY(iEntry,cList,cDelim) = cValue THEN NEXT. 
+    IF ENTRY(iEntry,cList,cDelim) = cValue THEN NEXT.
 
     /* add to list */
     cNewList = SUBSTITUTE('&1&2&3', cNewList, cDelim, ENTRY(iEntry,cList,cDelim)).
     cNewList = TRIM(cNewList,cDelim).
 
     /* if list is at max length, step out */
-    IF NUM-ENTRIES(cNewList,cDelim) = iMaxEntries THEN LEAVE. 
+    IF NUM-ENTRIES(cNewList,cDelim) = iMaxEntries THEN LEAVE.
   END.
 
   /* and finally, save it */

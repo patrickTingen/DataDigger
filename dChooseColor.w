@@ -2,22 +2,12 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
 /*------------------------------------------------------------------------
 
-  File: 
+  Name: dChooseColor.w
+  Desc: Let user choose from a palette of colors
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
@@ -28,13 +18,13 @@
 { DataDigger.i }
 
 /* Local Variable Definitions ---                                       */
-define {&invar}  piColorOld as integer no-undo.
-define {&outvar} piColorNew as integer no-undo initial -1.
+DEFINE {&invar}  piColorOld AS INTEGER NO-UNDO.
+DEFINE {&outvar} piColorNew AS INTEGER NO-UNDO INITIAL -1.
 
-define temp-table ttButton no-undo
-  field x as integer
-  field y as integer
-  field h as handle
+DEFINE TEMP-TABLE ttButton NO-UNDO RCODE-INFORMATION
+  FIELD x AS INTEGER
+  FIELD y AS INTEGER
+  FIELD h AS HANDLE
   INDEX idxPrim IS PRIMARY x y
   .
 
@@ -42,7 +32,7 @@ define temp-table ttButton no-undo
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -55,10 +45,10 @@ define temp-table ttButton no-undo
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 ~
 btn-7 btn-8 btn-9 btn-10 btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 ~
-btn-18 btn-19 btn-20 btn-21 btn-22 btn-23 BtnCancel Btn_OK RECT-6 rcFocus 
+btn-18 btn-19 btn-20 btn-21 btn-22 btn-23 BtnCancel Btn_OK RECT-6 rcFocus
 &Scoped-Define DISPLAYED-OBJECTS btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 ~
 btn-7 btn-8 btn-9 btn-10 btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 ~
-btn-18 btn-19 btn-20 btn-21 btn-22 btn-23 
+btn-18 btn-19 btn-20 btn-21 btn-22 btn-23
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -73,169 +63,169 @@ btn-18 btn-19 btn-20 btn-21 btn-22 btn-23
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON BtnCancel AUTO-END-KEY DEFAULT 
-     LABEL "Cancel" 
-     SIZE-PIXELS 75 BY 24
-     BGCOLOR 8 .
+DEFINE BUTTON BtnCancel AUTO-END-KEY DEFAULT
+    LABEL "Cancel"
+    SIZE-PIXELS 75 BY 24
+    BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO 
-     LABEL "OK" 
-     SIZE-PIXELS 75 BY 24
-     BGCOLOR 8 .
+DEFINE BUTTON Btn_OK AUTO-GO
+    LABEL "OK"
+    SIZE-PIXELS 75 BY 24
+    BGCOLOR 8 .
 
-DEFINE VARIABLE btn-0 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-0 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-1 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-1 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-10 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-10 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-11 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-11 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-12 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-12 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-13 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-13 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-14 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-14 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-15 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-15 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-16 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-16 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-17 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-17 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-18 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-18 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-19 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-19 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-2 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-2 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-20 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-20 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-21 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-21 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-22 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-22 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-23 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-23 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-3 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-3 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-4 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-4 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-5 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-5 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-6 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-6 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-7 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-7 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-8 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-8 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
-DEFINE VARIABLE btn-9 AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 60 BY 42 NO-UNDO.
+DEFINE VARIABLE btn-9 AS CHARACTER FORMAT "X(256)":U
+    VIEW-AS FILL-IN
+    SIZE-PIXELS 60 BY 42 NO-UNDO.
 
 DEFINE RECTANGLE rcFocus
-     EDGE-PIXELS 2 GRAPHIC-EDGE    
-     SIZE-PIXELS 30 BY 20
-     BGCOLOR 9 .
+    EDGE-PIXELS 2 GRAPHIC-EDGE
+    SIZE-PIXELS 30 BY 20
+    BGCOLOR 9 .
 
 DEFINE RECTANGLE RECT-6
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 525 BY 155.
+    EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+    SIZE-PIXELS 525 BY 155.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btn-0 AT Y 10 X 5 NO-LABEL WIDGET-ID 108
-     btn-1 AT Y 10 X 70 NO-LABEL WIDGET-ID 70
-     btn-2 AT Y 10 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 112
-     btn-3 AT Y 10 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 66
-     btn-4 AT Y 10 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 68
-     btn-5 AT Y 10 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 72
-     btn-6 AT Y 10 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 74
-     btn-7 AT Y 10 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-     btn-8 AT Y 60 X 5 NO-LABEL WIDGET-ID 78
-     btn-9 AT Y 60 X 70 NO-LABEL WIDGET-ID 80
-     btn-10 AT Y 60 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 114
-     btn-11 AT Y 60 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 84
-     btn-12 AT Y 60 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 86
-     btn-13 AT Y 60 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 88
-     btn-14 AT Y 60 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 90
-     btn-15 AT Y 60 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 92
-     btn-16 AT Y 110 X 5 NO-LABEL WIDGET-ID 94
-     btn-17 AT Y 110 X 70 NO-LABEL WIDGET-ID 110
-     btn-18 AT Y 110 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 116
-     btn-19 AT Y 110 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 98
-     btn-20 AT Y 110 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 100
-     btn-21 AT Y 110 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 102
-     btn-22 AT Y 110 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 104
-     btn-23 AT Y 110 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 106
-     BtnCancel AT Y 170 X 365 WIDGET-ID 54
-     Btn_OK AT Y 170 X 445
-     "Double click color to edit" VIEW-AS TEXT
+    btn-0 AT Y 10 X 5 NO-LABEL WIDGET-ID 108
+    btn-1 AT Y 10 X 70 NO-LABEL WIDGET-ID 70
+    btn-2 AT Y 10 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 112
+    btn-3 AT Y 10 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 66
+    btn-4 AT Y 10 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 68
+    btn-5 AT Y 10 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 72
+    btn-6 AT Y 10 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 74
+    btn-7 AT Y 10 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 76
+    btn-8 AT Y 60 X 5 NO-LABEL WIDGET-ID 78
+    btn-9 AT Y 60 X 70 NO-LABEL WIDGET-ID 80
+    btn-10 AT Y 60 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 114
+    btn-11 AT Y 60 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 84
+    btn-12 AT Y 60 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 86
+    btn-13 AT Y 60 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 88
+    btn-14 AT Y 60 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 90
+    btn-15 AT Y 60 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 92
+    btn-16 AT Y 110 X 5 NO-LABEL WIDGET-ID 94
+    btn-17 AT Y 110 X 70 NO-LABEL WIDGET-ID 110
+    btn-18 AT Y 110 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 116
+    btn-19 AT Y 110 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 98
+    btn-20 AT Y 110 X 255 COLON-ALIGNED NO-LABEL WIDGET-ID 100
+    btn-21 AT Y 110 X 320 COLON-ALIGNED NO-LABEL WIDGET-ID 102
+    btn-22 AT Y 110 X 385 COLON-ALIGNED NO-LABEL WIDGET-ID 104
+    btn-23 AT Y 110 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 106
+    BtnCancel AT Y 170 X 365 WIDGET-ID 54
+    Btn_OK AT Y 170 X 445
+    "Double click color to edit" VIEW-AS TEXT
           SIZE-PIXELS 175 BY 13 AT Y 180 X 5 WIDGET-ID 56
-     RECT-6 AT Y 5 X 0 WIDGET-ID 50
-     rcFocus AT Y 165 X 195 WIDGET-ID 52
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 538 BY 231
-         TITLE "Choose Color"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
+    RECT-6 AT Y 5 X 0 WIDGET-ID 50
+    rcFocus AT Y 165 X 195 WIDGET-ID 52
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+        SIDE-LABELS NO-UNDERLINE THREE-D
+        SIZE-PIXELS 538 BY 231
+        TITLE "Choose Color"
+        DEFAULT-BUTTON Btn_OK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
 
 &ANALYZE-SUSPEND _PROCEDURE-SETTINGS
 /* Settings for THIS-PROCEDURE
-   Type: Dialog-Box
-   Allow: Basic,Browse,DB-Fields,Query
-   Other Settings: COMPILE
+  Type: Dialog-Box
+  Allow: Basic,Browse,DB-Fields,Query
+  Other Settings: COMPILE
  */
 &ANALYZE-RESUME _END-PROCEDURE-SETTINGS
 
@@ -245,102 +235,102 @@ DEFINE FRAME Dialog-Frame
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
-   FRAME-NAME Custom                                                    */
-ASSIGN 
-       FRAME Dialog-Frame:SCROLLABLE       = FALSE
-       FRAME Dialog-Frame:HIDDEN           = TRUE.
+  FRAME-NAME Custom                                                    */
+ASSIGN
+      FRAME Dialog-Frame:SCROLLABLE       = FALSE
+      FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-0 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-0:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-0:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-1 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-1:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-1:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-10:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-10:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-11:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-11:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-12:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-12:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-13:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-13:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-14:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-14:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-15:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-15:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-16 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-16:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-16:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-17 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-17:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-17:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-18:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-18:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-19:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-19:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-2:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-2:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-20:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-20:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-21:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-21:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-22:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-22:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-23:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-23:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-3:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-3:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-4:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-4:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-5:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-5:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-6:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-6:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       btn-7:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+ASSIGN
+      btn-7:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-8 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-8:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-8:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN btn-9 IN FRAME Dialog-Frame
-   ALIGN-L                                                              */
-ASSIGN 
-       btn-9:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
+  ALIGN-L                                                              */
+ASSIGN
+      btn-9:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
-       rcFocus:HIDDEN IN FRAME Dialog-Frame           = TRUE.
+ASSIGN
+      rcFocus:HIDDEN IN FRAME Dialog-Frame           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -365,22 +355,22 @@ ON CURSOR-DOWN OF btn-0 IN FRAME Dialog-Frame
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
 
-  define variable hTarget as handle no-undo. 
-  define buffer bButton for ttButton.
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
   #Button:
-  for each bButton 
-    where bButton.x = self:x 
-      and bButton.y > self:y 
-       by bButton.y:
+  FOR EACH bButton
+    WHERE bButton.x = SELF:x
+      AND bButton.y > SELF:y
+      BY bButton.y:
     hTarget = bButton.h.
-    leave #Button.
-  end. 
+    LEAVE #Button.
+  END.
 
-  if valid-handle(hTarget) then
-    apply 'entry' to hTarget.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-  return no-apply.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -393,22 +383,22 @@ ON CURSOR-LEFT OF btn-0 IN FRAME Dialog-Frame
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
 
-  define variable hTarget as handle no-undo. 
-  define buffer bButton for ttButton.
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
   #Button:
-  for each bButton 
-    where bButton.y = self:y 
-      and bButton.x < self:x 
-       by bButton.x descending:
+  FOR EACH bButton
+    WHERE bButton.y = SELF:y
+      AND bButton.x < SELF:x
+      BY bButton.x DESCENDING:
     hTarget = bButton.h.
-    leave #Button.
-  end. 
+    LEAVE #Button.
+  END.
 
-  if valid-handle(hTarget) then
-    apply 'entry' to hTarget.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-  return no-apply.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -421,21 +411,21 @@ ON CURSOR-RIGHT OF btn-0 IN FRAME Dialog-Frame
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
 
-  define variable hTarget as handle no-undo. 
-  define buffer bButton for ttButton.
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-  for each bButton 
-    where bButton.y = self:y 
-      and bButton.x > self:x 
-       by bButton.x:
+  FOR EACH bButton
+    WHERE bButton.y = SELF:y
+      AND bButton.x > SELF:x
+      BY bButton.x:
     hTarget = bButton.h.
-    leave.
-  end. 
+    LEAVE.
+  END.
 
-  if valid-handle(hTarget) then
-    apply 'entry' to hTarget.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-  return no-apply.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -448,21 +438,21 @@ ON CURSOR-UP OF btn-0 IN FRAME Dialog-Frame
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
 
-  define variable hTarget as handle no-undo. 
-  define buffer bButton for ttButton.
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-  for each bButton 
-    where bButton.x = self:x 
-      and bButton.y < self:y 
-       by bButton.y descending:
+  FOR EACH bButton
+    WHERE bButton.x = SELF:x
+      AND bButton.y < SELF:y
+      BY bButton.y DESCENDING:
     hTarget = bButton.h.
-    leave.
-  end. 
+    LEAVE.
+  END.
 
-  if valid-handle(hTarget) then
-    apply 'entry' to hTarget.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-  return no-apply.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -475,13 +465,13 @@ ON ENTRY OF btn-0 IN FRAME Dialog-Frame
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
 
-  rcFocus:x = self:x - 3.
-  rcFocus:y = self:y - 3.
-  rcFocus:width-pixels = self:width-pixels + 6.
-  rcFocus:height-pixels = self:height-pixels + 6.
-  rcFocus:hidden = no.
+  rcFocus:x = SELF:x - 3.
+  rcFocus:y = SELF:y - 3.
+  rcFocus:width-pixels = SELF:width-pixels + 6.
+  rcFocus:height-pixels = SELF:height-pixels + 6.
+  rcFocus:hidden = NO.
 
-  piColorNew = integer(entry(2,self:name,'-')).
+  piColorNew = INTEGER(ENTRY(2,SELF:name,'-')).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -493,7 +483,7 @@ ON LEAVE OF btn-0 IN FRAME Dialog-Frame
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
-  rcFocus:hidden = yes.
+  rcFocus:hidden = YES.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -505,24 +495,24 @@ ON MOUSE-SELECT-DBLCLICK OF btn-0 IN FRAME Dialog-Frame
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 
-or 'RETURN' of btn-0, btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
+OR 'RETURN' OF btn-0, btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
-  define variable iColorNr as integer no-undo. 
+  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
 
-  iColorNr = integer(entry(2,self:name,'-')).
+  iColorNr = INTEGER(ENTRY(2,SELF:name,'-')).
 
-  if not color-table:get-dynamic(iColorNr) 
-    and not color-table:set-dynamic(iColorNr,true)
-  then 
-    message "Color must be DYNAMIC to edit.".
+  IF NOT COLOR-TABLE:GET-DYNAMIC(iColorNr)
+    AND NOT COLOR-TABLE:SET-DYNAMIC(iColorNr,TRUE)
+  THEN
+    MESSAGE "Color must be DYNAMIC to edit.".
 
-  else 
-  do:
-    system-dialog color iColorNr.
-    self:fgcolor = iColorNr. /* Font is same as name of button */
-    self:bgcolor = iColorNr. /* Font is same as name of button */
-  end.
+  ELSE
+  DO:
+    SYSTEM-DIALOG COLOR iColorNr.
+    SELF:fgcolor = iColorNr. /* Font is same as name of button */
+    SELF:bgcolor = iColorNr. /* Font is same as name of button */
+  END.
 
 END.
 
@@ -543,13 +533,13 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
-IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ?
+IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT EQ ?
 THEN FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
 
 
@@ -557,10 +547,10 @@ THEN FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
 /* (NOTE: handle ERROR and END-KEY so cleanup code will always fire.    */
 MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
-   ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
+  ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  run enable_UI.
-  run initializeObjects.
+  RUN enable_UI.
+  RUN initializeObjects.
 
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
 END.
@@ -578,9 +568,9 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
-               frames.  This procedure is usually called when
-               we are ready to "clean-up" after running.
+              dynamic widgets we have created and/or hide
+              frames.  This procedure is usually called when
+              we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
   /* Hide all frames. */
   HIDE FRAME Dialog-Frame.
@@ -595,18 +585,18 @@ PROCEDURE enable_UI :
   Purpose:     ENABLE the User Interface
   Parameters:  <none>
   Notes:       Here we display/view/enable the widgets in the
-               user-interface.  In addition, OPEN all queries
-               associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
-               Settings" section of the widget Property Sheets.
+              user-interface.  In addition, OPEN all queries
+              associated with each FRAME and BROWSE.
+              These statements here are based on the "Other
+              Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 btn-7 btn-8 btn-9 btn-10 
-          btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 btn-18 btn-19 btn-20 
-          btn-21 btn-22 btn-23 
+  DISPLAY btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 btn-7 btn-8 btn-9 btn-10
+          btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 btn-18 btn-19 btn-20
+          btn-21 btn-22 btn-23
       WITH FRAME Dialog-Frame.
-  ENABLE btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 btn-7 btn-8 btn-9 btn-10 
-         btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 btn-18 btn-19 btn-20 
-         btn-21 btn-22 btn-23 BtnCancel Btn_OK RECT-6 rcFocus 
+  ENABLE btn-0 btn-1 btn-2 btn-3 btn-4 btn-5 btn-6 btn-7 btn-8 btn-9 btn-10
+        btn-11 btn-12 btn-13 btn-14 btn-15 btn-16 btn-17 btn-18 btn-19 btn-20
+        btn-21 btn-22 btn-23 BtnCancel Btn_OK RECT-6 rcFocus
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -615,51 +605,49 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObjects Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObjects Dialog-Frame
 PROCEDURE initializeObjects :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  define variable iButtonNr as integer no-undo. 
-  define variable hButton   as handle  no-undo.
+  /* Set global vars
+  */
+  DEFINE VARIABLE iButtonNr AS INTEGER NO-UNDO.
+  DEFINE VARIABLE hButton   AS HANDLE  NO-UNDO.
 
   /* Get fonts */
-  frame {&frame-name}:font = getFont('Default').
+  FRAME {&frame-name}:font = getFont('Default').
 
-  hButton = frame {&frame-name}:first-child:first-child. /* rectangle */
-  
+  hButton = FRAME {&frame-name}:first-child:first-child. /* rectangle */
+
   #Button:
-  repeat:
-    hButton = hButton:next-sibling.
-    if not valid-handle(hButton) then leave #Button.
-    if not hButton:name matches 'btn-*' then next #Button.
+  REPEAT:
+    hButton = hButton:NEXT-SIBLING.
+    IF NOT VALID-HANDLE(hButton) THEN LEAVE #Button.
+    IF NOT hButton:NAME MATCHES 'btn-*' THEN NEXT #Button.
 
-    iButtonNr = integer(entry(2,hButton:name,'-')).
+    iButtonNr = INTEGER(ENTRY(2,hButton:NAME,'-')).
 
-    hButton:fgcolor = iButtonNr. /* Color is same as name of button */
-    hButton:bgcolor = iButtonNr. /* Color is same as name of button */
-    hButton:tooltip = 'Double click color to edit'.
+    hButton:FGCOLOR = iButtonNr. /* Color is same as name of button */
+    hButton:BGCOLOR = iButtonNr. /* Color is same as name of button */
+    hButton:TOOLTIP = 'Double click color to edit'.
 
     /* If this is the one that is specified in the input param
      * then set focus on this one by applying ENTRY.
      */
-    if hButton:name = substitute('btn-&1', piColorOld) then
-      apply 'entry' to hButton.
+    IF hButton:NAME = substitute('btn-&1', piColorOld) THEN
+      APPLY 'entry' TO hButton.
 
     /* Save button props */
-    create ttButton.
-    assign ttButton.x = hButton:x
-           ttButton.y = hButton:y
-           ttButton.h = hButton
-           .
-  end.
+    CREATE ttButton.
+    ASSIGN
+      ttButton.x = hButton:X
+      ttButton.y = hButton:Y
+      ttButton.h = hButton
+      .
+  END.
 
   /* For some reasons, these #*$&# scrollbars keep coming back */
-  run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */
+  RUN showScrollBars(FRAME {&frame-name}:handle, NO, NO). /* KILL KILL KILL */
 
-end procedure. /* initializeObjects */
+END PROCEDURE. /* initializeObjects */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

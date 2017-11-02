@@ -2,22 +2,12 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
 /*------------------------------------------------------------------------
 
-  File: 
+  Name: dDumpDf.w
+  Desc: Dump definitions of table or complete database
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
@@ -34,7 +24,7 @@ DEFINE INPUT  PARAMETER pcOptions  AS CHARACTER   NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -46,8 +36,8 @@ DEFINE INPUT  PARAMETER pcOptions  AS CHARACTER   NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile ~
-btnChooseDumpFile rsDump 
-&Scoped-Define DISPLAYED-OBJECTS fiDir tgOpenFile rsDump 
+btnChooseDumpFile rsDump
+&Scoped-Define DISPLAYED-OBJECTS fiDir tgOpenFile rsDump
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -62,38 +52,38 @@ btnChooseDumpFile rsDump
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnChooseDumpFile 
-     LABEL "..." 
+DEFINE BUTTON btnChooseDumpFile
+     LABEL "..."
      SIZE-PIXELS 20 BY 21.
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
-     LABEL "Cancel" 
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY
+     LABEL "Cancel"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO 
-     LABEL "OK" 
+DEFINE BUTTON Btn_OK AUTO-GO
+     LABEL "OK"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U 
-     LABEL "&Folder" 
-     VIEW-AS FILL-IN 
+DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U
+     LABEL "&Folder"
+     VIEW-AS FILL-IN
      SIZE-PIXELS 330 BY 21 TOOLTIP "the dir where you want to dump the .df file to" NO-UNDO.
 
-DEFINE VARIABLE rsDump AS CHARACTER 
+DEFINE VARIABLE rsDump AS CHARACTER
      VIEW-AS RADIO-SET VERTICAL
-     RADIO-BUTTONS 
+     RADIO-BUTTONS
           "[table]", "[table]",
 "&All Tables from [db]", "All"
      SIZE-PIXELS 315 BY 50 TOOLTIP "what should be dumped" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX  
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX
      SIZE-PIXELS 410 BY 180.
 
-DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL no 
-     LABEL "&Open DF after dump" 
+DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL NO
+     LABEL "&Open DF after dump"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 130 BY 17 TOOLTIP "open the DF file right after dumping" NO-UNDO.
 
@@ -110,8 +100,8 @@ DEFINE FRAME Dialog-Frame
      "Dump:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 13 AT Y 15 X 13 WIDGET-ID 16
      RECT-1 AT Y 0 X 0 WIDGET-ID 4
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+         SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 423 BY 213
          TITLE "Dump Definitions"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
@@ -134,14 +124,14 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN 
+ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -161,18 +151,18 @@ END.
 &Scoped-define SELF-NAME btnChooseDumpFile
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnChooseDumpFile Dialog-Frame
 ON CHOOSE OF btnChooseDumpFile IN FRAME Dialog-Frame /* ... */
-do:
-  define variable cDir  as character  no-undo.
+DO:
+  DEFINE VARIABLE cDir  AS CHARACTER  NO-UNDO.
 
   cDir = fiDir:screen-value.
 
-  system-dialog get-dir cDir
-    initial-dir cDir
-    return-to-start-dir.
-  
-  do with frame {&frame-name}:
+  SYSTEM-DIALOG GET-DIR cDir
+    INITIAL-DIR cDir
+    RETURN-TO-START-DIR.
+
+  DO WITH FRAME {&frame-name}:
     fiDir:screen-value = cDir.
-  end.
+  END.
 
 END.
 
@@ -187,7 +177,7 @@ DO:
   DEFINE VARIABLE cDumpFile AS CHARACTER NO-UNDO.
 
   /* Create full folder structure */
-  RUN createFolder(fiDir:SCREEN-VALUE). 
+  RUN createFolder(fiDir:SCREEN-VALUE).
 
   cDumpFile = SUBSTITUTE('&1\&2.df'
                         , RIGHT-TRIM(fiDir:SCREEN-VALUE,"\")
@@ -196,7 +186,7 @@ DO:
 
   /* Do the dump, using built in procedure */
   RUN prodict/dump_df.p(rsDump:SCREEN-VALUE, cDumpFile, "").
-  
+
   /* Save settings */
   setRegistry("DataDigger","DumpDF:dir" ,fiDir:SCREEN-VALUE).
   setRegistry("DataDigger","DumpDF:open",STRING(tgOpenFile:CHECKED)).
@@ -211,13 +201,13 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
-IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ?
+IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT EQ ?
 THEN FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
 
 /* Now enable the interface and wait for the exit condition.            */
@@ -244,7 +234,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -263,12 +253,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiDir tgOpenFile rsDump 
+  DISPLAY fiDir tgOpenFile rsDump
       WITH FRAME Dialog-Frame.
-  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile btnChooseDumpFile rsDump 
+  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile btnChooseDumpFile rsDump
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -277,50 +267,46 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+  /* initialize global vars
+  */
+  DEFINE VARIABLE iOption  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cOption  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
 
-  define variable iOption  as integer   no-undo.
-  define variable cOption  as character no-undo.
-  define variable cSetting as character no-undo.
-  define variable cValue   as character no-undo.
+  DO WITH FRAME {&FRAME-NAME}:
 
-  do with frame {&FRAME-NAME}:
-    
     /* Set default font */
-    frame {&frame-name}:font = getFont('Default').
+    FRAME {&frame-name}:font = getFont('Default').
 
-    do iOption = 1 to num-entries(pcOptions):
-      cOption  = entry(iOption,pcOptions).
-      cSetting = entry(1,cOption,"=").
-      cValue   = entry(2,cOption,"=").
-      
-      case cSetting:
-        when "x" then frame {&FRAME-NAME}:x = integer(cValue).
-        when "y" then frame {&FRAME-NAME}:y = integer(cValue).
-      end case.
-    end.
+    DO iOption = 1 TO NUM-ENTRIES(pcOptions):
+      cOption  = ENTRY(iOption,pcOptions).
+      cSetting = ENTRY(1,cOption,"=").
+      cValue   = ENTRY(2,cOption,"=").
+
+      CASE cSetting:
+        WHEN "x" THEN FRAME {&FRAME-NAME}:x = INTEGER(cValue).
+        WHEN "y" THEN FRAME {&FRAME-NAME}:y = INTEGER(cValue).
+      END CASE.
+    END.
 
     /* Set name in radioset */
     rsDump:RADIO-BUTTONS = REPLACE(rsDump:RADIO-BUTTONS,'[table]',pcTable).
     rsDump:RADIO-BUTTONS = REPLACE(rsDump:RADIO-BUTTONS,'[db]',pcDatabase).
 
     fiDir = getRegistry("DataDigger","DumpDF:dir").
-    if fiDir = ? then fiDir = SESSION:TEMP-DIRECTORY.
+    IF fiDir = ? THEN fiDir = SESSION:TEMP-DIRECTORY.
 
     cSetting = getRegistry("DataDigger","DumpDF:open").
-    if cSetting = ? then cSetting = "yes".
-    tgOpenFile = logical(cSetting).
-  end.
+    IF cSetting = ? THEN cSetting = "yes".
+    tgOpenFile = LOGICAL(cSetting).
+  END.
 
   RUN enable_UI.
 
-END PROCEDURE.
+END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

@@ -5,18 +5,13 @@
 &Scoped-define WINDOW-NAME wEdit
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wEdit
 /*------------------------------------------------------------------------
-  File:
-  Description:
 
-------------------------------------------------------------------------*/
+  Name : wEdit.i
+  Desc : Edit one or more records
+
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -966,14 +961,14 @@ PROCEDURE btnGoChoose :
  */
   DEFINE OUTPUT PARAMETER plSuccess AS LOGICAL NO-UNDO.
 
-	DEFINE VARIABLE hBuffer         AS HANDLE  NO-UNDO.
-	DEFINE VARIABLE hBufferDB       AS HANDLE  NO-UNDO.
-	DEFINE VARIABLE hBufferOrg      AS HANDLE  NO-UNDO.
-	DEFINE VARIABLE iNumRecs        AS INTEGER NO-UNDO.
-	DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
-	DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
-	DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
-	DEFINE VARIABLE lOverwrite      AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE hBuffer         AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE hBufferDB       AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE hBufferOrg      AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iNumRecs        AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE lOverwrite      AS LOGICAL NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
 

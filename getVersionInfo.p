@@ -1,12 +1,15 @@
 /*------------------------------------------------------------------------
-  File : getVersionInfo.p
-  Desc : Give back latest versions from DataDigger on GitHub
-    
+
+  Name: getVersionInfo.p
+  Desc: Give back latest versions from DataDigger on GitHub
+
   Notes:
     The version nr is increased when it is ready for production, the
     build nr is increaded when something is ready for beta testing.
-  ----------------------------------------------------------------------*/
-  
+------------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
+/*----------------------------------------------------------------------*/
+
 DEFINE OUTPUT PARAMETER pcVersion AS CHARACTER NO-UNDO.
 DEFINE OUTPUT PARAMETER pcBuildNr AS CHARACTER NO-UNDO.
 
@@ -20,17 +23,17 @@ pcBuildNr = TRIM(pcBuildNr).
 
 /* ---------- implementation ---------- */
 PROCEDURE URLDownloadToFileA EXTERNAL "URLMON.DLL" :
-   DEFINE INPUT PARAMETER pCaller    AS LONG.
-   DEFINE INPUT PARAMETER szURL      AS CHARACTER.
-   DEFINE INPUT PARAMETER szFilename AS CHARACTER.
-   DEFINE INPUT PARAMETER dwReserved AS LONG.
-   DEFINE INPUT PARAMETER lpfnCB     AS LONG.
-   DEFINE RETURN PARAMETER ReturnValue AS LONG.
+  DEFINE INPUT PARAMETER pCaller    AS LONG.
+  DEFINE INPUT PARAMETER szURL      AS CHARACTER.
+  DEFINE INPUT PARAMETER szFilename AS CHARACTER.
+  DEFINE INPUT PARAMETER dwReserved AS LONG.
+  DEFINE INPUT PARAMETER lpfnCB     AS LONG.
+  DEFINE RETURN PARAMETER ReturnValue AS LONG.
 END PROCEDURE. /* URLDownloadToFileA */
 
 
 PROCEDURE DeleteUrlCacheEntry EXTERNAL "WININET.DLL" :
-   DEFINE INPUT PARAMETER lbszUrlName AS CHARACTER.
+  DEFINE INPUT PARAMETER lbszUrlName AS CHARACTER.
 END PROCEDURE. /* DeleteUrlCacheEntry */
 
 
@@ -47,6 +50,6 @@ FUNCTION getRemoteFile RETURNS CHARACTER (pcRemoteFile AS CHARACTER):
 
   IF SEARCH(cLocalFile) <> ? THEN
     COPY-LOB FILE cLocalFile TO cContents.
-    
+
   RETURN STRING(cContents).
 END FUNCTION. /* getRemoteFile */

@@ -1,32 +1,15 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win
 /*------------------------------------------------------------------------
 
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+  Name: wSettingsTab3.w
+  Desc: Settings tab for Backup
 
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
+/*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -45,7 +28,7 @@ DEFINE INPUT  PARAMETER phRectangle AS HANDLE      NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -59,7 +42,7 @@ DEFINE INPUT  PARAMETER phRectangle AS HANDLE      NO-UNDO.
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
 &Scoped-define List-1 btnSeq btnAction btnDb btnDumpName btnExt btnLastDir ~
 btnProgDir btnTable btnUserid btnWeekday btnDate btnDay btnDayName btnHH ~
-btnMM btnMonth btnSS btnTime btnTimestamp btnYear 
+btnMM btnMonth btnSS btnTime btnTimestamp btnYear
 
 /* _UIB-PREPROCESSOR-BLOCK-END */
 &ANALYZE-RESUME
@@ -73,146 +56,146 @@ DEFINE VARIABLE c-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE RECTANGLE RECT-17
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 560 BY 30.
 
-DEFINE VARIABLE tgBackupOnCreate AS LOGICAL INITIAL no 
-     LABEL "Backup on &Create" 
+DEFINE VARIABLE tgBackupOnCreate AS LOGICAL INITIAL NO
+     LABEL "Backup on &Create"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 174 BY 17 TOOLTIP "save a copy of the record as xml on creation" NO-UNDO.
 
-DEFINE VARIABLE tgBackupOnDelete AS LOGICAL INITIAL no 
-     LABEL "Backup on &Delete" 
+DEFINE VARIABLE tgBackupOnDelete AS LOGICAL INITIAL NO
+     LABEL "Backup on &Delete"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 160 BY 17 TOOLTIP "save a copy of the record as xml on deletion" NO-UNDO.
 
-DEFINE VARIABLE tgBackupOnUpdate AS LOGICAL INITIAL no 
-     LABEL "Backup on &Update" 
+DEFINE VARIABLE tgBackupOnUpdate AS LOGICAL INITIAL NO
+     LABEL "Backup on &Update"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 175 BY 17 TOOLTIP "save a copy of the record as xml on change" NO-UNDO.
 
 DEFINE BUTTON btnAction  NO-FOCUS
-     LABEL "<ACTION>" 
+     LABEL "<ACTION>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnDate  NO-FOCUS
-     LABEL "<DATE>" 
+     LABEL "<DATE>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnDay  NO-FOCUS
-     LABEL "<DAY>" 
+     LABEL "<DAY>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnDayName  NO-FOCUS
-     LABEL "<DAYNAME>" 
+     LABEL "<DAYNAME>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnDb  NO-FOCUS
-     LABEL "<DB>" 
+     LABEL "<DB>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnDumpName  NO-FOCUS
-     LABEL "<DUMPNAME>" 
+     LABEL "<DUMPNAME>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnExt  NO-FOCUS
-     LABEL "<EXT>" 
+     LABEL "<EXT>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnHH  NO-FOCUS
-     LABEL "<HH>" 
+     LABEL "<HH>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnLastDir  NO-FOCUS
-     LABEL "<LASTDIR>" 
+     LABEL "<LASTDIR>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnMM  NO-FOCUS
-     LABEL "<MM>" 
+     LABEL "<MM>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnMonth  NO-FOCUS
-     LABEL "<MONTH>" 
+     LABEL "<MONTH>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnProgDir  NO-FOCUS
-     LABEL "<PROGDIR>" 
+     LABEL "<PROGDIR>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnSeq  NO-FOCUS
-     LABEL "<#>" 
+     LABEL "<#>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnSS  NO-FOCUS
-     LABEL "<SS>" 
+     LABEL "<SS>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnTable  NO-FOCUS
-     LABEL "<TABLE>" 
+     LABEL "<TABLE>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnTime  NO-FOCUS
-     LABEL "<TIME>" 
+     LABEL "<TIME>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnTimestamp  NO-FOCUS
-     LABEL "<TIMESTAMP>" 
+     LABEL "<TIMESTAMP>"
      SIZE-PIXELS 100 BY 19 TOOLTIP "show current date/time".
 
 DEFINE BUTTON btnUserid  NO-FOCUS
-     LABEL "<USERID>" 
+     LABEL "<USERID>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnWeekday  NO-FOCUS
-     LABEL "<WEEKDAY>" 
+     LABEL "<WEEKDAY>"
      SIZE-PIXELS 100 BY 19.
 
 DEFINE BUTTON btnYear  NO-FOCUS
-     LABEL "<YEAR>" 
+     LABEL "<YEAR>"
      SIZE-PIXELS 100 BY 19.
 
-DEFINE VARIABLE fiDirTemplate AS CHARACTER 
+DEFINE VARIABLE fiDirTemplate AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 21 TOOLTIP "template for the backup directory" NO-UNDO.
 
-DEFINE VARIABLE fiDumpDirTemplate AS CHARACTER 
+DEFINE VARIABLE fiDumpDirTemplate AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 21 TOOLTIP "template for the dump directory" NO-UNDO.
 
-DEFINE VARIABLE fiDumpFileExample AS CHARACTER 
+DEFINE VARIABLE fiDumpFileExample AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 20 TOOLTIP "example of the dumpfile name" NO-UNDO.
 
-DEFINE VARIABLE fiDumpFileTemplate AS CHARACTER 
+DEFINE VARIABLE fiDumpFileTemplate AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 21 TOOLTIP "template for the dump file" NO-UNDO.
 
-DEFINE VARIABLE fiFileExample AS CHARACTER 
+DEFINE VARIABLE fiFileExample AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 20 TOOLTIP "example of the backup filename" NO-UNDO.
 
-DEFINE VARIABLE fiFileTemplate AS CHARACTER 
+DEFINE VARIABLE fiFileTemplate AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP
      SIZE-PIXELS 520 BY 21 TOOLTIP "template for the backup file" NO-UNDO.
 
 DEFINE RECTANGLE RECT-14
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 560 BY 315.
 
 DEFINE RECTANGLE RECT-15
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 560 BY 208.
 
 DEFINE RECTANGLE RECT-16
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
      SIZE-PIXELS 560 BY 107.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT X 0 Y 0
          SIZE-PIXELS 586 BY 556 WIDGET-ID 100.
 
@@ -260,8 +243,8 @@ DEFINE FRAME FRAME-O
      RECT-14 AT Y 10 X 0 WIDGET-ID 170
      RECT-15 AT Y 117 X 0 WIDGET-ID 188
      RECT-16 AT Y 218 X 0 WIDGET-ID 192
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT X 5 Y 59
          SIZE-PIXELS 565 BY 368
          TITLE "3" WIDGET-ID 1600.
@@ -271,8 +254,8 @@ DEFINE FRAME FRAME-K
      tgBackupOnUpdate AT Y 5 X 215 WIDGET-ID 130
      tgBackupOnDelete AT Y 5 X 395 WIDGET-ID 132
      RECT-17 AT Y 0 X 0 WIDGET-ID 134
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT X 5 Y 0
          SIZE-PIXELS 565 BY 60
          TITLE "3" WIDGET-ID 1300.
@@ -301,15 +284,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 963
          VIRTUAL-HEIGHT-P   = 696
          VIRTUAL-WIDTH-P    = 963
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -333,29 +316,29 @@ DEFINE VARIABLE XXTABVALXX AS LOGICAL NO-UNDO.
 ASSIGN XXTABVALXX = FRAME FRAME-K:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-O:HANDLE)
 /* END-ASSIGN-TABS */.
 
-ASSIGN 
+ASSIGN
        FRAME DEFAULT-FRAME:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FRAME FRAME-K
    NOT-VISIBLE                                                          */
-ASSIGN 
+ASSIGN
        FRAME FRAME-K:HIDDEN           = TRUE.
 
-ASSIGN 
-       tgBackupOnCreate:PRIVATE-DATA IN FRAME FRAME-K     = 
+ASSIGN
+       tgBackupOnCreate:PRIVATE-DATA IN FRAME FRAME-K     =
                 "DataDigger:backup,BackupOnCreate".
 
-ASSIGN 
-       tgBackupOnDelete:PRIVATE-DATA IN FRAME FRAME-K     = 
+ASSIGN
+       tgBackupOnDelete:PRIVATE-DATA IN FRAME FRAME-K     =
                 "DataDigger:backup,BackupOnDelete".
 
-ASSIGN 
-       tgBackupOnUpdate:PRIVATE-DATA IN FRAME FRAME-K     = 
+ASSIGN
+       tgBackupOnUpdate:PRIVATE-DATA IN FRAME FRAME-K     =
                 "DataDigger:backup,BackupOnUpdate".
 
 /* SETTINGS FOR FRAME FRAME-O
    NOT-VISIBLE                                                          */
-ASSIGN 
+ASSIGN
        FRAME FRAME-O:HIDDEN           = TRUE.
 
 /* SETTINGS FOR BUTTON btnAction IN FRAME FRAME-O
@@ -398,35 +381,35 @@ ASSIGN
    NO-ENABLE 1                                                          */
 /* SETTINGS FOR BUTTON btnYear IN FRAME FRAME-O
    NO-ENABLE 1                                                          */
-ASSIGN 
-       fiDirTemplate:PRIVATE-DATA IN FRAME FRAME-O     = 
+ASSIGN
+       fiDirTemplate:PRIVATE-DATA IN FRAME FRAME-O     =
                 "DataDigger:Backup,BackupDir".
 
-ASSIGN 
-       fiDumpDirTemplate:PRIVATE-DATA IN FRAME FRAME-O     = 
+ASSIGN
+       fiDumpDirTemplate:PRIVATE-DATA IN FRAME FRAME-O     =
                 "DumpAndLoad,DumpDir".
 
-ASSIGN 
+ASSIGN
        fiDumpFileExample:READ-ONLY IN FRAME FRAME-O        = TRUE.
 
-ASSIGN 
-       fiDumpFileTemplate:PRIVATE-DATA IN FRAME FRAME-O     = 
+ASSIGN
+       fiDumpFileTemplate:PRIVATE-DATA IN FRAME FRAME-O     =
                 "DumpAndLoad,DumpFileTemplate".
 
-ASSIGN 
+ASSIGN
        fiFileExample:READ-ONLY IN FRAME FRAME-O        = TRUE.
 
-ASSIGN 
-       fiFileTemplate:PRIVATE-DATA IN FRAME FRAME-O     = 
+ASSIGN
+       fiFileTemplate:PRIVATE-DATA IN FRAME FRAME-O     =
                 "DataDigger:Backup,BackupFileTemplate".
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = yes.
+THEN C-Win:HIDDEN = YES.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -467,23 +450,23 @@ ON CHOOSE OF btnTimestamp IN FRAME FRAME-O /* <TIMESTAMP> */
 , btnDay, btnDayName, btnHH, btnMM, btnMonth, btnSS
 , btnTime, btnTimestamp, btnYear, btnSeq
 
-do:
+DO:
 
-  if   focus:name = 'fiDirTemplate' 
-    or focus:name = 'fiFileTemplate' 
-    or focus:name = 'fiDumpDirTemplate' 
-    or focus:name = 'fiDumpFileTemplate' then 
-  do:
+  IF   FOCUS:NAME = 'fiDirTemplate'
+    OR FOCUS:NAME = 'fiFileTemplate'
+    OR FOCUS:NAME = 'fiDumpDirTemplate'
+    OR FOCUS:NAME = 'fiDumpFileTemplate' THEN
+  DO:
 
-    if focus:selection-text <> '' then
-      focus:replace-selection-text( self:label ).
-    else
-      focus:insert-string(self:label).
+    IF FOCUS:SELECTION-TEXT <> '' THEN
+      FOCUS:REPLACE-SELECTION-TEXT( SELF:label ).
+    ELSE
+      FOCUS:INSERT-STRING(SELF:label).
 
-    apply "value-changed" to focus.
-  end.
+    APPLY "value-changed" TO FOCUS.
+  END.
 
-end.
+END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -492,10 +475,10 @@ end.
 &Scoped-define SELF-NAME fiFileTemplate
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFileTemplate C-Win
 ON ENTRY OF fiFileTemplate IN FRAME FRAME-O
-, fiFileTemplate, fiDirTemplate 
+, fiFileTemplate, fiDirTemplate
 , fiDumpFileTemplate, fiDumpDirTemplate
 DO:
-  enable {&list-1} with frame frame-o.
+  ENABLE {&list-1} WITH FRAME frame-o.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -504,10 +487,10 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFileTemplate C-Win
 ON LEAVE OF fiFileTemplate IN FRAME FRAME-O
-, fiFileTemplate, fiDirTemplate 
+, fiFileTemplate, fiDirTemplate
 , fiDumpFileTemplate, fiDumpDirTemplate
 DO:
-  disable {&list-1} with frame frame-o.
+  DISABLE {&list-1} WITH FRAME frame-o.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -516,37 +499,37 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFileTemplate C-Win
 ON VALUE-CHANGED OF fiFileTemplate IN FRAME FRAME-O
-, fiFileTemplate, fiDirTemplate 
+, fiFileTemplate, fiDirTemplate
 , fiDumpFileTemplate, fiDumpDirTemplate
-do:
-  define variable cDummyName as character no-undo. 
-  define variable cTemplate   as character no-undo. 
+DO:
+  DEFINE VARIABLE cDummyName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cTemplate   AS CHARACTER NO-UNDO.
 
-  if   self:name = "fiDirTemplate" 
-    or self:name = "fiFileTemplate" then 
+  IF   SELF:name = "fiDirTemplate"
+    OR SELF:name = "fiFileTemplate" THEN
     cTemplate = fiDirTemplate:screen-value + fiFileTemplate:screen-value.
-  else
-  if   self:name = "fiDumpDirTemplate" 
-    or self:name = "fiDumpFileTemplate" then 
+  ELSE
+  IF   SELF:name = "fiDumpDirTemplate"
+    OR SELF:name = "fiDumpFileTemplate" THEN
     cTemplate = fiDumpDirTemplate:screen-value + fiDumpFileTemplate:screen-value.
 
-  run getDumpFileName 
-    ( input "Update"
-    , input "sports"
-    , input "customer"
-    , input "d"
-    , input cTemplate
-    , output cDummyName
+  RUN getDumpFileName
+    ( INPUT "Update"
+    , INPUT "sports"
+    , INPUT "customer"
+    , INPUT "d"
+    , INPUT cTemplate
+    , OUTPUT cDummyName
     ).
 
-  if   self:name = "fiDirTemplate" 
-    or self:name = "fiFileTemplate" then fiFileExample:screen-value = cDummyName.
+  IF   SELF:name = "fiDirTemplate"
+    OR SELF:name = "fiFileTemplate" THEN fiFileExample:screen-value = cDummyName.
 
-  else 
-  if   self:name = "fiDumpDirTemplate" 
-    or self:name = "fiDumpFileTemplate" then fiDumpFileExample:screen-value = cDummyName.
-  
-end.
+  ELSE
+  IF   SELF:name = "fiDumpDirTemplate"
+    OR SELF:name = "fiDumpFileTemplate" THEN fiDumpFileExample:screen-value = cDummyName.
+
+END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -556,22 +539,22 @@ end.
 &Scoped-define SELF-NAME tgBackupOnCreate
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgBackupOnCreate C-Win
 ON VALUE-CHANGED OF tgBackupOnCreate IN FRAME FRAME-K /* Backup on Create */
-or 'value-changed' of tgBackupOnUpdate 
-or 'value-changed' of tgBackupOnDelete 
+OR 'value-changed' OF tgBackupOnUpdate
+OR 'value-changed' OF tgBackupOnDelete
 DO:
 
-  if    not tgBackupOnCreate:checked  
-    and not tgBackupOnUpdate:checked
-    and not tgBackupOnDelete:checked then 
-  do with frame frame-q:
-    fiDirTemplate:sensitive       in frame FRAME-O = no.
-    fiFileTemplate:sensitive      in frame FRAME-O = no.
-  end.
-  else
-  do:
-    fiDirTemplate:sensitive   = yes.
-    fiFileTemplate:sensitive  = yes.
-  end.
+  IF    NOT tgBackupOnCreate:checked
+    AND NOT tgBackupOnUpdate:checked
+    AND NOT tgBackupOnDelete:checked THEN
+  DO WITH FRAME frame-q:
+    fiDirTemplate:sensitive       IN FRAME FRAME-O = NO.
+    fiFileTemplate:sensitive      IN FRAME FRAME-O = NO.
+  END.
+  ELSE
+  DO:
+    fiDirTemplate:sensitive   = YES.
+    fiFileTemplate:sensitive  = YES.
+  END.
 
 END.
 
@@ -582,14 +565,14 @@ END.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win
 
 
 /* ***************************  Main Block  *************************** */
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
@@ -605,8 +588,8 @@ PAUSE 0 BEFORE-HIDE.
 MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
-  
-  run initializeObject.
+
+  RUN initializeObject.
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
     WAIT-FOR CLOSE OF THIS-PROCEDURE.
@@ -624,7 +607,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -645,21 +628,21 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   VIEW FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
-  DISPLAY tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete 
+  DISPLAY tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete
       WITH FRAME FRAME-K IN WINDOW C-Win.
-  ENABLE RECT-17 tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete 
+  ENABLE RECT-17 tgBackupOnCreate tgBackupOnUpdate tgBackupOnDelete
       WITH FRAME FRAME-K IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-K}
-  DISPLAY fiDirTemplate fiFileTemplate fiFileExample fiDumpDirTemplate 
-          fiDumpFileTemplate fiDumpFileExample 
+  DISPLAY fiDirTemplate fiFileTemplate fiFileExample fiDumpDirTemplate
+          fiDumpFileTemplate fiDumpFileExample
       WITH FRAME FRAME-O IN WINDOW C-Win.
-  ENABLE RECT-14 RECT-15 RECT-16 fiDirTemplate fiFileTemplate fiFileExample 
-         fiDumpDirTemplate fiDumpFileTemplate fiDumpFileExample 
+  ENABLE RECT-14 RECT-15 RECT-16 fiDirTemplate fiFileTemplate fiFileExample
+         fiDumpDirTemplate fiDumpFileTemplate fiDumpFileExample
       WITH FRAME FRAME-O IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-O}
 END PROCEDURE.
@@ -667,59 +650,42 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject C-Win
 PROCEDURE initializeObject :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
-  define variable hWidget as handle no-undo. 
-  define variable cTooltip as character no-undo. 
+  DEFINE VARIABLE hWidget AS HANDLE NO-UNDO.
+  DEFINE VARIABLE cTooltip AS CHARACTER NO-UNDO.
 
   /* Attach tooltips to the template buttons */
-  hWidget = frame frame-o:handle:first-child:first-child. 
+  hWidget = FRAME frame-o:handle:first-child:first-child.
 
-  do while valid-handle(hWidget):
-    if hWidget:type = "BUTTON" then
-    do:
-      run getDumpFileName 
-        ( input "Update"
-        , input "sports"
-        , input "customer"
-        , input "d"
-        , input hWidget:label
-        , output cTooltip
+  DO WHILE VALID-HANDLE(hWidget):
+    IF hWidget:type = "BUTTON" THEN
+    DO:
+      RUN getDumpFileName
+        ( INPUT "Update"
+        , INPUT "sports"
+        , INPUT "customer"
+        , INPUT "d"
+        , INPUT hWidget:label
+        , OUTPUT cTooltip
         ).
       hWidget:tooltip = cTooltip.
-    end.
+    END.
 
     hWidget = hWidget:next-sibling.
-  end.
+  END.
 
-  apply "VALUE-CHANGED" to fiFileTemplate in frame frame-o.
-  apply "VALUE-CHANGED" to fiDumpFileTemplate in frame frame-o.
-  apply "VALUE-CHANGED" to tgBackupOnCreate in frame frame-k.
+  APPLY "VALUE-CHANGED" TO fiFileTemplate IN FRAME frame-o.
+  APPLY "VALUE-CHANGED" TO fiDumpFileTemplate IN FRAME frame-o.
+  APPLY "VALUE-CHANGED" TO tgBackupOnCreate IN FRAME frame-k.
 
-end procedure. /* initializeObject */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE xxxxlocalInitialize C-Win 
-PROCEDURE xxxxlocalInitialize :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
-  apply "VALUE-CHANGED" to fiFileTemplate     in frame frame-o.
-  apply "VALUE-CHANGED" to fiDumpFileTemplate in frame frame-o.
-  apply "VALUE-CHANGED" to tgBackupOnCreate   in frame frame-k.
-
-end procedure. /* localInitialize */
+END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

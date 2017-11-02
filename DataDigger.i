@@ -1,17 +1,11 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12
 &ANALYZE-RESUME
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Include 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Include
 /*------------------------------------------------------------------------
-    File        : 
-    Purpose     :
 
-    Syntax      :
+  Name : DataDigger.i
+  Desc : Definitions / forward defs for DataDigger programs
 
-    Description :
-
-    Author(s)   :
-    Created     :
-    Notes       :
   ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
@@ -50,7 +44,7 @@ DEFINE TEMP-TABLE ttTable NO-UNDO RCODE-INFORMATION
   FIELD cCrc          AS CHARACTER LABEL "CRC"
   FIELD cCacheId      AS CHARACTER LABEL "CacheId"
   FIELD lShowInList   AS LOGICAL   LABEL "" /* for getTablesWithField */
-  FIELD cTableDesc    AS CHARACTER LABEL "Desc"      
+  FIELD cTableDesc    AS CHARACTER LABEL "Desc"
   FIELD cFields       AS CHARACTER LABEL "Fields"
   FIELD lHidden       AS LOGICAL   LABEL ""
   FIELD lFrozen       AS LOGICAL   LABEL ""
@@ -81,7 +75,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO RCODE-INFORMATION
   FIELD cDatabase     AS CHARACTER
   FIELD cTableName    AS CHARACTER
   FIELD cFieldName    AS CHARACTER                   LABEL "Name"      FORMAT "X(40)"
-                     
+
   FIELD cFullName     AS CHARACTER                   LABEL "Name"      FORMAT "X(40)"    /* fieldname incl extent     */
   FIELD cXmlNodeName  AS CHARACTER                   LABEL "Xml Name"  FORMAT "X(40)"    /* name for usage in XML     */
   FIELD iOrder        AS DECIMAL                     LABEL "Order"     FORMAT ">>>>>9"   /* user defined order        */
@@ -96,7 +90,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO RCODE-INFORMATION
   FIELD lPrimary      AS LOGICAL                     LABEL "Prim"                        /* part of prim index?       */
   FIELD lMandatory    AS LOGICAL                     LABEL "Man"                         /* mandatory?                */
   FIELD lUniqueIdx    AS LOGICAL                     LABEL "Uni"                         /* part of unique index?     */
-  
+
   /* New fields as per v19 */
   FIELD cColLabel     AS CHARACTER                   LABEL "Column Label" FORMAT "x(24)"
   FIELD iDecimals     AS INTEGER                     LABEL "Decimals"     FORMAT ">>9"
@@ -157,7 +151,7 @@ DEFINE TEMP-TABLE ttFieldCache NO-UNDO LIKE ttField RCODE-INFORMATION
   .
 DEFINE TEMP-TABLE ttColumnCache NO-UNDO LIKE ttColumn RCODE-INFORMATION
   .
-  
+
 DEFINE DATASET dsFields FOR ttField, ttColumn.
 DEFINE DATASET dsFieldCache FOR ttFieldCache, ttColumnCache.
 
@@ -167,19 +161,19 @@ DEFINE TEMP-TABLE ttIndex NO-UNDO RCODE-INFORMATION
   FIELD cIndexFlags  AS CHARACTER          LABEL "Flags"       FORMAT "x(14)"
   FIELD cIndexFields AS CHARACTER          LABEL "Fields"      FORMAT "x(160)"
   FIELD cFieldList   AS CHARACTER          LABEL "Field List"  FORMAT "x(80)"
-  FIELD lIndexActive AS LOGICAL            
+  FIELD lIndexActive AS LOGICAL
   .
 
 /* TT for counting windowLocks  (WindowsUpdateLock) */
 DEFINE TEMP-TABLE ttWindowLock NO-UNDO RCODE-INFORMATION
-  FIELD hWindow      AS HANDLE 
-  FIELD iLockCounter AS INTEGER 
+  FIELD hWindow      AS HANDLE
+  FIELD iLockCounter AS INTEGER
   INDEX idxPrim IS PRIMARY hWindow
   .
 
 /* TT for filters on top of data browse */
 DEFINE TEMP-TABLE ttFilter NO-UNDO RCODE-INFORMATION
-  FIELD cFieldName as character
+  FIELD cFieldName AS CHARACTER
   FIELD hFilter    AS HANDLE
   FIELD hColumn    AS HANDLE
   FIELD hBrowse    AS HANDLE
@@ -207,28 +201,28 @@ DEFINE TEMP-TABLE ttTableFilter NO-UNDO RCODE-INFORMATION
 
 /* TT For currently connected databases */
 DEFINE TEMP-TABLE ttDatabase NO-UNDO RCODE-INFORMATION
-  FIELD cLogicalName  AS CHARACTER column-label "Logical Name" FORMAT "x(20)"
-  FIELD cSection      AS CHARACTER column-label "Section"      FORMAT "x(20)"
-  FIELD cCacheStamp   AS CHARACTER column-label "CacheStamp"   FORMAT "x(24)"
-  INDEX idxPrim IS PRIMARY unique cLogicalName
+  FIELD cLogicalName  AS CHARACTER COLUMN-LABEL "Logical Name" FORMAT "x(20)"
+  FIELD cSection      AS CHARACTER COLUMN-LABEL "Section"      FORMAT "x(20)"
+  FIELD cCacheStamp   AS CHARACTER COLUMN-LABEL "CacheStamp"   FORMAT "x(24)"
+  INDEX idxPrim IS PRIMARY UNIQUE cLogicalName
   .
 
 /* TT for favourites */
 DEFINE TEMP-TABLE ttConnection NO-UNDO RCODE-INFORMATION
-  FIELD iConnectionNr as integer
-  FIELD cLogicalName  AS CHARACTER column-label "Logical Name" FORMAT "x(20)"
-  FIELD cDescription  AS CHARACTER column-label "Description"  FORMAT "x(28)"
-  FIELD cDatabaseName AS CHARACTER column-label "Database"     FORMAT "x(20)"
-  FIELD cParameters   as character
-  FIELD lConnected    AS LOGICAL   column-label "Con"
-  FIELD cSection      AS CHARACTER column-label "Section"      FORMAT "x(20)"
-  INDEX idxPrim IS PRIMARY unique iConnectionNr
+  FIELD iConnectionNr AS INTEGER
+  FIELD cLogicalName  AS CHARACTER COLUMN-LABEL "Logical Name" FORMAT "x(20)"
+  FIELD cDescription  AS CHARACTER COLUMN-LABEL "Description"  FORMAT "x(28)"
+  FIELD cDatabaseName AS CHARACTER COLUMN-LABEL "Database"     FORMAT "x(20)"
+  FIELD cParameters   AS CHARACTER
+  FIELD lConnected    AS LOGICAL   COLUMN-LABEL "Con"
+  FIELD cSection      AS CHARACTER COLUMN-LABEL "Section"      FORMAT "x(20)"
+  INDEX idxPrim IS PRIMARY UNIQUE iConnectionNr
   .
 
 /* TT for Query Tester */
 DEFINE TEMP-TABLE ttTestQuery NO-UNDO RCODE-INFORMATION
   FIELD iId        AS INTEGER LABEL "Seq" COLUMN-LABEL "Seq" FORMAT ">,>>9"
-  FIELD cProgName  AS character
+  FIELD cProgName  AS CHARACTER
   FIELD cQueryTxt  AS CHARACTER
   FIELD cIndexInfo AS CHARACTER
   INDEX idxId IS PRIMARY UNIQUE iId DESCENDING
@@ -236,9 +230,9 @@ DEFINE TEMP-TABLE ttTestQuery NO-UNDO RCODE-INFORMATION
 
 /* TT for ini-file settings */
 DEFINE TEMP-TABLE ttConfig NO-UNDO RCODE-INFORMATION
-  FIELD cSection as character
-  FIELD cSetting as character
-  FIELD cValue   as character
+  FIELD cSection AS CHARACTER
+  FIELD cSetting AS CHARACTER
+  FIELD cValue   AS CHARACTER
   INDEX idxPrim IS PRIMARY cSection cSetting.
 
 
@@ -256,7 +250,7 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -272,7 +266,7 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
 &ANALYZE-SUSPEND _PROCEDURE-SETTINGS
 /* Settings for THIS-PROCEDURE
    Type: Include
-   Allow: 
+   Allow:
    Frames: 0
    Add Fields to: Neither
    Other Settings: INCLUDE-ONLY
@@ -282,7 +276,7 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
 /* *************************  Create Window  ************************** */
 
 &ANALYZE-SUSPEND _CREATE-WINDOW
-/* DESIGN Window definition (used by the UIB) 
+/* DESIGN Window definition (used by the UIB)
   CREATE WINDOW Include ASSIGN
          HEIGHT             = 6
          WIDTH              = 35.8.
@@ -290,10 +284,10 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
                                                                         */
 &ANALYZE-RESUME
 
- 
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Include 
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Include
 
 
 /* ***************************  Main Block  *************************** */
@@ -312,121 +306,121 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
 &endif
 
 /* Forward defs */
-function addConnection returns logical
-  ( pcDatabase as character
-  , pcSection  AS CHARACTER ) in super.
+FUNCTION addConnection RETURNS LOGICAL
+  ( pcDatabase AS CHARACTER
+  , pcSection  AS CHARACTER ) IN SUPER.
 
-function formatQueryString returns character
-  ( input pcQueryString as character
-  , input plExpanded    AS LOGICAL ) in super.
+FUNCTION formatQueryString RETURNS CHARACTER
+  ( INPUT pcQueryString AS CHARACTER
+  , INPUT plExpanded    AS LOGICAL ) IN SUPER.
 
-function getDatabaseList returns character in super.
+FUNCTION getDatabaseList RETURNS CHARACTER IN SUPER.
 
-function getEscapedData returns character
-  ( input pcTarget as character
-  , input pcString AS CHARACTER ) in super.
+FUNCTION getEscapedData RETURNS CHARACTER
+  ( INPUT pcTarget AS CHARACTER
+  , INPUT pcString AS CHARACTER ) IN SUPER.
 
-function getColor returns integer
-  ( input pcName AS CHARACTER ) in super.
+FUNCTION getColor RETURNS INTEGER
+  ( INPUT pcName AS CHARACTER ) IN SUPER.
 
-function getColumnLabel returns character
-  ( input phFieldBuffer AS HANDLE ) in super.
-  
-function getFont returns integer
-  ( pcFontName AS CHARACTER ) in super.
+FUNCTION getColumnLabel RETURNS CHARACTER
+  ( INPUT phFieldBuffer AS HANDLE ) IN SUPER.
 
-function getImagePath returns character 
-  ( pcImage AS CHARACTER ) in super.
+FUNCTION getFont RETURNS INTEGER
+  ( pcFontName AS CHARACTER ) IN SUPER.
 
-function getIndexFields returns character
-  ( input pcDatabaseName as character
-  , input pcTableName    as character
-  , input pcFlags        as character
-  ) in super.
+FUNCTION getImagePath RETURNS CHARACTER
+  ( pcImage AS CHARACTER ) IN SUPER.
 
-function getKeyList      returns character in super.
+FUNCTION getIndexFields RETURNS CHARACTER
+  ( INPUT pcDatabaseName AS CHARACTER
+  , INPUT pcTableName    AS CHARACTER
+  , INPUT pcFlags        AS CHARACTER
+  ) IN SUPER.
 
-function getLinkInfo     returns character
-  ( input pcFieldName as character
-  ) in super.
+FUNCTION getKeyList      RETURNS CHARACTER IN SUPER.
 
-function getMaxLength    returns integer
-  ( pcSection as character
-  ) in super.
+FUNCTION getLinkInfo     RETURNS CHARACTER
+  ( INPUT pcFieldName AS CHARACTER
+  ) IN SUPER.
 
-function getOsErrorDesc returns character
-  ( input piOsError as integer
-  ) in super.
+FUNCTION getMaxLength    RETURNS INTEGER
+  ( pcSection AS CHARACTER
+  ) IN SUPER.
 
-function getProgramDir returns character in super.
+FUNCTION getOsErrorDesc RETURNS CHARACTER
+  ( INPUT piOsError AS INTEGER
+  ) IN SUPER.
 
-function getQuery returns character
-  ( input pcDatabase as character
-  , input pcTable    as character
-  , input piQuery    as integer
-  ) in super.
+FUNCTION getProgramDir RETURNS CHARACTER IN SUPER.
 
-function getReadableQuery returns character
-  ( input pcQuery AS CHARACTER 
-  ) in super. 
+FUNCTION getQuery RETURNS CHARACTER
+  ( INPUT pcDatabase AS CHARACTER
+  , INPUT pcTable    AS CHARACTER
+  , INPUT piQuery    AS INTEGER
+  ) IN SUPER.
 
-function getRegistry returns character 
-  ( pcSection as character
-  , pcKey     AS CHARACTER 
-  ) in super.
+FUNCTION getReadableQuery RETURNS CHARACTER
+  ( INPUT pcQuery AS CHARACTER
+  ) IN SUPER.
 
-function getStackSize returns integer
-  () in super.
+FUNCTION getRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  ) IN SUPER.
 
-function getTableList returns character
-  ( input  pcDatabaseFilter   as character
-  , input  pcTableFilter      as character
-  ) in super.
+FUNCTION getStackSize RETURNS INTEGER
+  () IN SUPER.
 
-function getUsername returns character in super.
+FUNCTION getTableList RETURNS CHARACTER
+  ( INPUT  pcDatabaseFilter   AS CHARACTER
+  , INPUT  pcTableFilter      AS CHARACTER
+  ) IN SUPER.
 
-function getWidgetUnderMouse returns handle
-  ( input phWidget AS HANDLE ) in super.
-  
-function isDefaultFontsChanged returns logical in super. 
+FUNCTION getUsername RETURNS CHARACTER IN SUPER.
 
-function isFileLocked returns logical 
-  ( pcFileName AS CHARACTER ) in super. 
+FUNCTION getWidgetUnderMouse RETURNS HANDLE
+  ( INPUT phWidget AS HANDLE ) IN SUPER.
 
-function isBrowseChanged returns logical
-  ( input phWidget AS HANDLE ) in super.
+FUNCTION isDefaultFontsChanged RETURNS LOGICAL IN SUPER.
 
-function isMouseOver returns logical
-  ( input phWidget AS HANDLE ) in super.
+FUNCTION isFileLocked RETURNS LOGICAL
+  ( pcFileName AS CHARACTER ) IN SUPER.
+
+FUNCTION isBrowseChanged RETURNS LOGICAL
+  ( INPUT phWidget AS HANDLE ) IN SUPER.
+
+FUNCTION isMouseOver RETURNS LOGICAL
+  ( INPUT phWidget AS HANDLE ) IN SUPER.
 
 FUNCTION isTableFilterUsed RETURNS LOGICAL
-  ( INPUT TABLE ttTableFilter )  in super.
-  
-function isWidgetChanged returns logical
-  ( input phWidget AS HANDLE ) in super.
-  
+  ( INPUT TABLE ttTableFilter )  IN SUPER.
+
+FUNCTION isWidgetChanged RETURNS LOGICAL
+  ( INPUT phWidget AS HANDLE ) IN SUPER.
+
 FUNCTION readFile RETURNS LONGCHAR
   ( INPUT pcFilename AS CHARACTER) IN SUPER.
-  
-function removeConnection returns logical
-  ( pcDatabase AS CHARACTER ) in super.
 
-function resolveOsVars returns character
-  ( pcString AS CHARACTER ) in super. 
+FUNCTION removeConnection RETURNS LOGICAL
+  ( pcDatabase AS CHARACTER ) IN SUPER.
 
-function setLinkInfo returns logical
-  ( input pcFieldName as character
-  , input pcValue     as character
-  ) in super. 
+FUNCTION resolveOsVars RETURNS CHARACTER
+  ( pcString AS CHARACTER ) IN SUPER.
 
-function setRegistry returns character 
-    ( pcSection as character
-    , pcKey     as character
-    , pcValue   as character
-    ) in super.
+FUNCTION setLinkInfo RETURNS LOGICAL
+  ( INPUT pcFieldName AS CHARACTER
+  , INPUT pcValue     AS CHARACTER
+  ) IN SUPER.
+
+FUNCTION setRegistry RETURNS CHARACTER
+    ( pcSection AS CHARACTER
+    , pcKey     AS CHARACTER
+    , pcValue   AS CHARACTER
+    ) IN SUPER.
 
 FUNCTION isValidCodePage RETURNS LOGICAL
-  (pcCodepage AS CHARACTER) in super.
+  (pcCodepage AS CHARACTER) IN SUPER.
 
 /* Initialize */
 gcThisProcedure = THIS-PROCEDURE:FILE-NAME.
@@ -441,14 +435,14 @@ SUBSCRIBE TO gcThisProcedure ANYWHERE RUN-PROCEDURE "getProcHandle".
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getProcHandle Include 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getProcHandle Include
 PROCEDURE getProcHandle :
 /*
  * Name : getProcHandle
  * Desc : Return the handle of the procedure this include is in
  */
- DEFINE OUTPUT PARAMETER phHandle AS HANDLE NO-UNDO.
- phHandle = THIS-PROCEDURE:HANDLE.
+DEFINE OUTPUT PARAMETER phHandle AS HANDLE NO-UNDO.
+phHandle = THIS-PROCEDURE:HANDLE.
 
 END PROCEDURE. /* getProcHandle */
 

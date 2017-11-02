@@ -2,22 +2,12 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
 /*------------------------------------------------------------------------
 
-  File: 
+  Name: dQueries.w
+  Desc: Let user maintain previously used queries
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
@@ -30,22 +20,22 @@
 
 DEFINE INPUT PARAMETER  pcDatabase     AS CHARACTER NO-UNDO.
 DEFINE INPUT PARAMETER  pcTable        AS CHARACTER NO-UNDO.
-DEFINE INPUT PARAMETER  pcCurrentQuery AS CHARACTER NO-UNDO. 
-DEFINE OUTPUT PARAMETER piQueryNr      AS INTEGER NO-UNDO INITIAL ?. 
+DEFINE INPUT PARAMETER  pcCurrentQuery AS CHARACTER NO-UNDO.
+DEFINE OUTPUT PARAMETER piQueryNr      AS INTEGER NO-UNDO INITIAL ?.
 
 /* Local Variable Definitions ---                                       */
 
 DEFINE VARIABLE giQueryOffset  AS INTEGER NO-UNDO.
-DEFINE VARIABLE ghEditor       AS HANDLE  EXTENT 5 NO-UNDO. 
-DEFINE VARIABLE ghDelButton    AS HANDLE  EXTENT 5 NO-UNDO. 
-DEFINE VARIABLE giQuery        AS INTEGER EXTENT 5 NO-UNDO. 
+DEFINE VARIABLE ghEditor       AS HANDLE  EXTENT 5 NO-UNDO.
+DEFINE VARIABLE ghDelButton    AS HANDLE  EXTENT 5 NO-UNDO.
+DEFINE VARIABLE giQuery        AS INTEGER EXTENT 5 NO-UNDO.
 DEFINE VARIABLE ghActiveEditor AS HANDLE NO-UNDO.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -58,9 +48,9 @@ DEFINE VARIABLE ghActiveEditor AS HANDLE NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btDelQuery-1 EdQuery-1 btUp EdQuery-2 btDown ~
 EdQuery-3 EdQuery-4 EdQuery-5 BtnOK BtnCancel btDelQuery-2 btDelQuery-3 ~
-btDelQuery-4 btDelQuery-5 
+btDelQuery-4 btDelQuery-5
 &Scoped-Define DISPLAYED-OBJECTS EdQuery-1 EdQuery-2 EdQuery-3 EdQuery-4 ~
-EdQuery-5 
+EdQuery-5
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -75,71 +65,71 @@ EdQuery-5
 /* Define a dialog box                                                  */
 
 /* Menu Definitions                                                     */
-DEFINE MENU POPUP-MENU-EdQuery-1 
-       MENU-ITEM m_Edit         LABEL "Edit"          
+DEFINE MENU POPUP-MENU-EdQuery-1
+       MENU-ITEM m_Edit         LABEL "Edit"
        MENU-ITEM m_Delete       LABEL "Delete"        .
 
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btDelQuery-1  NO-FOCUS FLAT-BUTTON
-     LABEL "Del" 
+     LABEL "Del"
      SIZE-PIXELS 23 BY 23 TOOLTIP "delete this query".
 
 DEFINE BUTTON btDelQuery-2  NO-FOCUS FLAT-BUTTON
-     LABEL "Del" 
+     LABEL "Del"
      SIZE-PIXELS 23 BY 23 TOOLTIP "delete this query".
 
 DEFINE BUTTON btDelQuery-3  NO-FOCUS FLAT-BUTTON
-     LABEL "Del" 
+     LABEL "Del"
      SIZE-PIXELS 23 BY 23 TOOLTIP "delete this query".
 
 DEFINE BUTTON btDelQuery-4  NO-FOCUS FLAT-BUTTON
-     LABEL "Del" 
+     LABEL "Del"
      SIZE-PIXELS 23 BY 23 TOOLTIP "delete this query".
 
 DEFINE BUTTON btDelQuery-5  NO-FOCUS FLAT-BUTTON
-     LABEL "Del" 
+     LABEL "Del"
      SIZE-PIXELS 23 BY 23 TOOLTIP "delete this query".
 
-DEFINE BUTTON btDown 
-     LABEL "Down" 
+DEFINE BUTTON btDown
+     LABEL "Down"
      SIZE-PIXELS 30 BY 24 TOOLTIP "go down".
 
-DEFINE BUTTON BtnCancel AUTO-END-KEY 
-     LABEL "&Cancel" 
+DEFINE BUTTON BtnCancel AUTO-END-KEY
+     LABEL "&Cancel"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
-     LABEL "OK" 
+DEFINE BUTTON BtnOK AUTO-GO DEFAULT
+     LABEL "OK"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON btUp 
-     LABEL "Up" 
+DEFINE BUTTON btUp
+     LABEL "Up"
      SIZE-PIXELS 30 BY 24 TOOLTIP "go up".
 
-DEFINE VARIABLE EdQuery-1 AS CHARACTER 
+DEFINE VARIABLE EdQuery-1 AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 415 BY 75
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE EdQuery-2 AS CHARACTER 
+DEFINE VARIABLE EdQuery-2 AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 415 BY 75
      BGCOLOR 8 FONT 0 NO-UNDO.
 
-DEFINE VARIABLE EdQuery-3 AS CHARACTER 
+DEFINE VARIABLE EdQuery-3 AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 415 BY 75
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE EdQuery-4 AS CHARACTER 
+DEFINE VARIABLE EdQuery-4 AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 415 BY 75
      BGCOLOR 8 FONT 0 NO-UNDO.
 
-DEFINE VARIABLE EdQuery-5 AS CHARACTER 
+DEFINE VARIABLE EdQuery-5 AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 415 BY 75
      FONT 0 NO-UNDO.
@@ -162,8 +152,8 @@ DEFINE FRAME Dialog-Frame
      btDelQuery-3 AT Y 155 X 420 WIDGET-ID 60
      btDelQuery-4 AT Y 230 X 420 WIDGET-ID 62
      btDelQuery-5 AT Y 305 X 420 WIDGET-ID 64
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+         SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 560 BY 420
          TITLE "Select query"
          DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
@@ -186,30 +176,30 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN 
+ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
-ASSIGN 
+ASSIGN
        EdQuery-1:POPUP-MENU IN FRAME Dialog-Frame       = MENU POPUP-MENU-EdQuery-1:HANDLE
        EdQuery-1:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
+ASSIGN
        EdQuery-2:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
+ASSIGN
        EdQuery-3:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
+ASSIGN
        EdQuery-4:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
-ASSIGN 
+ASSIGN
        EdQuery-5:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -219,7 +209,6 @@ ASSIGN
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
 ON GO OF FRAME Dialog-Frame /* Select query */
 DO:
-  
   RUN saveQuery( ghActiveEditor:PRIVATE-DATA
                , ghActiveEditor:SCREEN-VALUE ).
 
@@ -229,8 +218,8 @@ DO:
                     ).
 
   piQueryNr = INTEGER(ghActiveEditor:PRIVATE-DATA) NO-ERROR.
-  IF ERROR-STATUS:ERROR 
-    OR NOT CAN-FIND(ttQuery 
+  IF ERROR-STATUS:ERROR
+    OR NOT CAN-FIND(ttQuery
               WHERE ttQuery.cDatabase = pcDatabase
                 AND ttQuery.cTable    = pcTable
                 AND ttQuery.iQueryNr  = piQueryNr ) THEN piQueryNr = ?.
@@ -266,9 +255,7 @@ END.
 ON CHOOSE OF btDelQuery-1 IN FRAME Dialog-Frame /* Del */
 OR 'shift-del' OF EdQuery-1
 DO:
-
   RUN deleteQuery( ghEditor[1]:PRIVATE-DATA ).
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -280,9 +267,7 @@ END.
 ON CHOOSE OF btDelQuery-2 IN FRAME Dialog-Frame /* Del */
 OR 'shift-del' OF EdQuery-2
 DO:
-
   RUN deleteQuery(giQueryOffset + 1).
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -294,9 +279,7 @@ END.
 ON CHOOSE OF btDelQuery-3 IN FRAME Dialog-Frame /* Del */
 OR 'shift-del' OF EdQuery-3
 DO:
-
   RUN deleteQuery(giQueryOffset + 2).
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -308,9 +291,7 @@ END.
 ON CHOOSE OF btDelQuery-4 IN FRAME Dialog-Frame /* Del */
 OR 'shift-del' OF EdQuery-4
 DO:
-
   RUN deleteQuery(giQueryOffset + 3).
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -322,9 +303,7 @@ END.
 ON CHOOSE OF btDelQuery-5 IN FRAME Dialog-Frame /* Del */
 OR 'shift-del' OF EdQuery-5
 DO:
-
   RUN deleteQuery(giQueryOffset + 4).
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -382,7 +361,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL EdQuery-1 Dialog-Frame
 ON ENTRY OF EdQuery-1 IN FRAME Dialog-Frame
 , edQuery-2, edQuery-3, edQuery-4, edQuery-5 DO:
-  
+
   SELF:read-only = NO.
   SELF:bgcolor = 14.
 
@@ -395,9 +374,9 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL EdQuery-1 Dialog-Frame
 ON LEAVE OF EdQuery-1 IN FRAME Dialog-Frame
-, edQuery-3, edQuery-5 
+, edQuery-3, edQuery-5
 DO:
-  IF SELF:modified THEN 
+  IF SELF:modified THEN
     RUN saveQuery( SELF:private-data, SELF:screen-value ).
 
   SELF:read-only = YES.
@@ -411,11 +390,11 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL EdQuery-1 Dialog-Frame
 ON MOUSE-SELECT-DBLCLICK OF EdQuery-1 IN FRAME Dialog-Frame
-, edQuery-2, edQuery-3, edQuery-4, edQuery-5 
-OR 'return' OF edQuery-1, edQuery-2, edQuery-3, edQuery-4, edQuery-5 
+, edQuery-2, edQuery-3, edQuery-4, edQuery-5
+OR 'return' OF edQuery-1, edQuery-2, edQuery-3, edQuery-4, edQuery-5
 
 DO:
-  APPLY 'GO' TO FRAME {&frame-name}. 
+  APPLY 'GO' TO FRAME {&frame-name}.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -445,9 +424,9 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL EdQuery-2 Dialog-Frame
 ON LEAVE OF EdQuery-2 IN FRAME Dialog-Frame
-, edQuery-4 
+, edQuery-4
 DO:
-  IF SELF:modified THEN 
+  IF SELF:modified THEN
     RUN saveQuery( SELF:private-data, SELF:screen-value ).
 
   SELF:read-only = YES.
@@ -506,13 +485,6 @@ END.
 ON CURSOR-DOWN OF EdQuery-5 IN FRAME Dialog-Frame
 DO:
 
-  /* Only proceed if there is more to show */
-  .if not can-find(first ttQuery 
-            where ttQuery.cDatabase = pcDatabase
-              and ttQuery.cTable    = pcTable
-              and ttQuery.iQueryNr  > giQueryOffset + 5) then 
-    return.
-
   RUN saveQuery( ghActiveEditor:PRIVATE-DATA
                , ghActiveEditor:SCREEN-VALUE ).
 
@@ -538,7 +510,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
 
 
 /* ***************************  Main Block  *************************** */
@@ -568,7 +540,7 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteQuery Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteQuery Dialog-Frame
 PROCEDURE deleteQuery :
 /*
  * Delete query from list
@@ -576,12 +548,12 @@ PROCEDURE deleteQuery :
   DEFINE INPUT  PARAMETER piQueryNum AS INTEGER     NO-UNDO.
   DEFINE BUFFER bQuery FOR ttQuery.
 
-  FIND bQuery 
+  FIND bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
       AND bQuery.iQueryNr  = piQueryNum NO-ERROR.
 
-  IF AVAILABLE bQuery THEN 
+  IF AVAILABLE bQuery THEN
   DO:
     DELETE bQuery.
 
@@ -600,7 +572,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -619,14 +591,14 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY EdQuery-1 EdQuery-2 EdQuery-3 EdQuery-4 EdQuery-5 
+  DISPLAY EdQuery-1 EdQuery-2 EdQuery-3 EdQuery-4 EdQuery-5
       WITH FRAME Dialog-Frame.
-  ENABLE btDelQuery-1 EdQuery-1 btUp EdQuery-2 btDown EdQuery-3 EdQuery-4 
-         EdQuery-5 BtnOK BtnCancel btDelQuery-2 btDelQuery-3 btDelQuery-4 
-         btDelQuery-5 
+  ENABLE btDelQuery-1 EdQuery-1 btUp EdQuery-2 btDown EdQuery-3 EdQuery-4
+         EdQuery-5 BtnOK BtnCancel btDelQuery-2 btDelQuery-3 btDelQuery-4
+         btDelQuery-5
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -635,34 +607,28 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  DEFINE VARIABLE iBox AS INTEGER NO-UNDO. 
+  /* Set global vars and prepare widgets
+  */
+  DEFINE VARIABLE iBox AS INTEGER NO-UNDO.
 
   DEFINE BUFFER bQuery FOR ttQuery.
 
   DO WITH FRAME {&frame-name}:
-    
-    /* Make sure the lib is running */
-    RUN startDiggerLib.
 
     /* Set default font */
     FRAME {&frame-name}:font = getFont('Default').
 
     /* Get all queries */
     RUN getQueryTable( OUTPUT table ttQuery ).
-    
+
     /* Init handles */
-    ghEditor[1] = edQuery-1:handle. 
-    ghEditor[2] = edQuery-2:handle. 
-    ghEditor[3] = edQuery-3:handle. 
-    ghEditor[4] = edQuery-4:handle. 
-    ghEditor[5] = edQuery-5:handle. 
+    ghEditor[1] = edQuery-1:handle.
+    ghEditor[2] = edQuery-2:handle.
+    ghEditor[3] = edQuery-3:handle.
+    ghEditor[4] = edQuery-4:handle.
+    ghEditor[5] = edQuery-5:handle.
 
     ghDelButton[1] = btDelQuery-1:handle.
     ghDelButton[2] = btDelQuery-2:handle.
@@ -685,28 +651,28 @@ PROCEDURE initializeObject :
 
     FRAME {&frame-name}:title = SUBSTITUTE('Select query for &1.&2'
                                           , pcDatabase
-                                          , pcTable   
+                                          , pcTable
                                           ).
     RUN showQueries.
     giQueryOffset = 1.
     ghActiveEditor = ghEditor[1].
 
     /* Point to current query */
-    FIND FIRST bQuery 
+    FIND FIRST bQuery
       WHERE bQuery.cDatabase = pcDatabase
-        AND bQuery.cTable    = pcTable 
+        AND bQuery.cTable    = pcTable
         AND bQuery.cQueryTxt = pcCurrentQuery
             NO-ERROR.
 
     IF AVAILABLE bQuery THEN
     DO:
-      IF bQuery.iQueryNr > 5 THEN 
+      IF bQuery.iQueryNr > 5 THEN
       DO:
         giQueryOffset = bQuery.iQueryNr - 4.
         ghActiveEditor = ghEditor[5].
         RUN showQueries.
       END.
-      ELSE 
+      ELSE
       DO:
         ghActiveEditor = ghEditor[bQuery.iQueryNr].
       END.
@@ -721,27 +687,23 @@ END PROCEDURE. /* initializeObject. */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE renumberQueries Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE renumberQueries Dialog-Frame
 PROCEDURE renumberQueries :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+  /* Renumber all queries to avoid gaps
+  */
   DEFINE VARIABLE iQuery AS INTEGER     NO-UNDO.
   DEFINE BUFFER bQuery FOR ttQuery.
 
   /* Renumber ttQuery temp-table */
   iQuery = 0.
 
-  REPEAT PRESELECT EACH bQuery 
+  REPEAT PRESELECT EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
-      AND bQuery.cTable    = pcTable 
+      AND bQuery.cTable    = pcTable
        BY bQuery.iQueryNr:
 
     FIND NEXT bQuery.
-    ASSIGN 
+    ASSIGN
       iQuery          = iQuery + 1
       bQuery.iQueryNr = iQuery.
   END.
@@ -751,11 +713,10 @@ END PROCEDURE. /* renumberQueries */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQuery Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQuery Dialog-Frame
 PROCEDURE saveQuery :
-/* 
- * Save the query
- */
+  /* Save the query to INI
+  */
   DEFINE INPUT PARAMETER piQueryNum AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcQueryTxt AS CHARACTER   NO-UNDO.
 
@@ -764,24 +725,24 @@ PROCEDURE saveQuery :
   /* New query? */
   IF piQueryNum = 0 THEN
   DO:
-    FIND LAST bQuery 
+    FIND LAST bQuery
       WHERE bQuery.cDatabase = pcDatabase
         AND bQuery.cTable    = pcTable NO-ERROR.
 
-    IF AVAILABLE bQuery THEN 
+    IF AVAILABLE bQuery THEN
       piQueryNum = bQuery.iQueryNr.
-    ELSE 
+    ELSE
       piQueryNum = 1.
 
-    CREATE bQuery. 
+    CREATE bQuery.
     ASSIGN bQuery.cDatabase = pcDatabase
            bQuery.cTable    = pcTable
            bQuery.iQueryNr  = piQueryNum
            bQuery.cQueryTxt = pcQueryTxt.
   END.
-  ELSE 
+  ELSE
   DO:
-    FIND bQuery 
+    FIND bQuery
       WHERE bQuery.cDatabase = pcDatabase
         AND bQuery.cTable    = pcTable
         AND bQuery.iQueryNr  = piQueryNum NO-ERROR.
@@ -797,13 +758,10 @@ END PROCEDURE. /* saveQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setButtons Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setButtons Dialog-Frame
 PROCEDURE setButtons :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+  /* Set sensitivity of the buttons
+  */
   DEFINE VARIABLE iQuery AS INTEGER NO-UNDO.
 
   DO iQuery = 1 TO 5:
@@ -815,21 +773,17 @@ END PROCEDURE. /* setButtons */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showQueries Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showQueries Dialog-Frame
 PROCEDURE showQueries :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+  /* Show the queries in their editor box
+  */
   DEFINE VARIABLE iQuery AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iLoop  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cQuery AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bQuery FOR ttQuery.
-  
-  FOR EACH bQuery 
+
+  FOR EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
       AND bQuery.iQueryNr  >= giQueryOffset:
@@ -851,33 +805,6 @@ PROCEDURE showQueries :
   RUN setButtons.
 
 END PROCEDURE. /* showQueries */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib Dialog-Frame 
-PROCEDURE startDiggerLib :
-/*
- * Start DiggerLib if it has not already been started
- */
-  DEFINE VARIABLE hDiggerLib AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE cProgDir   AS CHARACTER NO-UNDO.
-
-  /* Call out to see if the lib has been started */
-  PUBLISH 'DataDiggerLib' (OUTPUT hDiggerLib).
-
-  IF NOT VALID-HANDLE(hDiggerLib) THEN
-  DO:
-    /* gcProgramDir = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,R-INDEX(THIS-PROCEDURE:FILE-NAME,'\')). */
-    cProgDir = THIS-PROCEDURE:FILE-NAME.
-    cProgDir = REPLACE(cProgDir,"\","/").
-    cProgDir = SUBSTRING(cProgDir,1,R-INDEX(cProgDir,'/')).
-    
-    RUN VALUE(cProgDir + 'DataDiggerLib.p') PERSISTENT SET hDiggerLib.
-    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
-  END.
-
-END PROCEDURE. /* startDiggerLib */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

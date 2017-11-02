@@ -1,32 +1,15 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wAbout
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wAbout
 /*------------------------------------------------------------------------
 
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+  File : wAbout.p
+  Desc : Shows the 'About' info of DD
 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -35,8 +18,8 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 
 DEFINE TEMP-TABLE ttBrick NO-UNDO
-  FIELD cBlockId AS CHARACTER 
-  FIELD hBrick   AS HANDLE 
+  FIELD cBlockId AS CHARACTER
+  FIELD hBrick   AS HANDLE
   FIELD iLine    AS INTEGER
   FIELD x1       AS INTEGER
   FIELD x2       AS INTEGER
@@ -98,7 +81,7 @@ DEFINE VARIABLE glUseTimer    AS LOGICAL   NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -109,9 +92,9 @@ DEFINE VARIABLE glUseTimer    AS LOGICAL   NO-UNDO.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog fiWebsite 
+&Scoped-Define ENABLED-OBJECTS btnDataDigger BtnOK edChangelog fiWebsite
 &Scoped-Define DISPLAYED-OBJECTS edChangelog fiDataDigger-1 fiDataDigger-2 ~
-fiWebsite 
+fiWebsite
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -132,36 +115,36 @@ DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnDataDigger  NO-FOCUS
-     LABEL "D" 
+     LABEL "D"
      SIZE-PIXELS 30 BY 30.
 
-DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
-     LABEL "OK" 
+DEFINE BUTTON BtnOK AUTO-GO DEFAULT
+     LABEL "OK"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE edChangelog AS CHARACTER 
+DEFINE VARIABLE edChangelog AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-VERTICAL LARGE
      SIZE-PIXELS 625 BY 335
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE fiDataDigger-1 AS CHARACTER FORMAT "X(256)":U INITIAL "DataDigger ~{&&version} - ~{&&edition}" 
-      VIEW-AS TEXT 
+DEFINE VARIABLE fiDataDigger-1 AS CHARACTER FORMAT "X(256)":U INITIAL "DataDigger ~{&&version} - ~{&&edition}"
+      VIEW-AS TEXT
      SIZE-PIXELS 275 BY 13
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&&build}" 
-      VIEW-AS TEXT 
+DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&&build}"
+      VIEW-AS TEXT
      SIZE-PIXELS 155 BY 13
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE fiMsg AS CHARACTER FORMAT "X(256)":U INITIAL "(Click to close window)" 
-      VIEW-AS TEXT 
+DEFINE VARIABLE fiMsg AS CHARACTER FORMAT "X(256)":U INITIAL "(Click to close window)"
+      VIEW-AS TEXT
      SIZE-PIXELS 170 BY 20
      BGCOLOR 14 FGCOLOR 9  NO-UNDO.
 
-DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadigger.wordpress.com/" 
-      VIEW-AS TEXT 
+DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadigger.wordpress.com/"
+      VIEW-AS TEXT
      SIZE-PIXELS 210 BY 20
      FGCOLOR 9  NO-UNDO.
 
@@ -210,8 +193,8 @@ DEFINE FRAME DEFAULT-FRAME
      imgPaddle-3 AT Y 35 X 350 WIDGET-ID 310
      imgTitle AT Y 45 X 101 WIDGET-ID 314
      imgPaddle-4 AT Y 35 X 375 WIDGET-ID 312
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT COL 1 ROW 1
          SIZE 126.6 BY 21.71 WIDGET-ID 100.
 
@@ -239,17 +222,17 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH          = 384
          VIRTUAL-HEIGHT     = 54
          VIRTUAL-WIDTH      = 384
-         MIN-BUTTON         = no
-         MAX-BUTTON         = no
-         RESIZE             = no
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         MIN-BUTTON         = NO
+         MAX-BUTTON         = NO
+         RESIZE             = NO
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -263,10 +246,10 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
-ASSIGN 
+ASSIGN
        FRAME DEFAULT-FRAME:HIDDEN           = TRUE.
 
-ASSIGN 
+ASSIGN
        edChangelog:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDataDigger-1 IN FRAME DEFAULT-FRAME
@@ -275,47 +258,47 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FILL-IN fiMsg IN FRAME DEFAULT-FRAME
    NO-DISPLAY NO-ENABLE                                                 */
-ASSIGN 
+ASSIGN
        fiMsg:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE
        fiMsg:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 /* SETTINGS FOR IMAGE imgBall IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgBall:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR IMAGE imgPaddle IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgPaddle:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR IMAGE imgPaddle-2 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgPaddle-2:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR IMAGE imgPaddle-3 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgPaddle-3:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR IMAGE imgPaddle-4 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgPaddle-4:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 /* SETTINGS FOR IMAGE imgTitle IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-ASSIGN 
+ASSIGN
        imgTitle:HIDDEN IN FRAME DEFAULT-FRAME           = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
-THEN wAbout:HIDDEN = yes.
+THEN wAbout:HIDDEN = YES.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 /* **********************  Create OCX Containers  ********************** */
@@ -331,8 +314,8 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        HEIGHT          = 1.43
        WIDTH           = 6
        WIDGET-ID       = 292
-       HIDDEN          = yes
-       SENSITIVE       = yes.
+       HIDDEN          = YES
+       SENSITIVE       = YES.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: BallTimer */
       CtrlFrame:MOVE-AFTER(BtnOK:HANDLE IN FRAME DEFAULT-FRAME).
 
@@ -361,7 +344,7 @@ ON WINDOW-CLOSE OF wAbout /* About the DataDigger */
 DO:
   /* This event will close the window and terminate the procedure.  */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -374,7 +357,7 @@ ON F12 OF FRAME DEFAULT-FRAME
 ANYWHERE DO:
 
   RUN gameOver(YES).
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -416,7 +399,7 @@ PROCEDURE CtrlFrame.BallTimer.Tick .
   giNumTicks = giNumTicks + 1.
 
   RUN moveBall.
-  
+
 END PROCEDURE. /* OCX.Tick */
 
 /* _UIB-CODE-BLOCK-END */
@@ -427,7 +410,7 @@ END PROCEDURE. /* OCX.Tick */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiWebsite wAbout
 ON MOUSE-SELECT-CLICK OF fiWebsite IN FRAME DEFAULT-FRAME
 DO:
-  
+
   OS-COMMAND NO-WAIT START VALUE(SELF:SCREEN-VALUE).
 
 END.
@@ -438,18 +421,18 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wAbout
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
@@ -466,8 +449,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   RUN initializeObject.
   FRAME {&FRAME-NAME}:HIDDEN = NO.
-  RUN blinkLogo. 
-  
+  RUN blinkLogo.
+
   WAIT-FOR CLOSE OF THIS-PROCEDURE FOCUS edChangelog.
 END.
 
@@ -477,7 +460,7 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE blinkLogo wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE blinkLogo wAbout
 PROCEDURE blinkLogo :
 /* Blink the DD logo
 */
@@ -493,8 +476,8 @@ PROCEDURE blinkLogo :
   DO WITH FRAME {&FRAME-NAME}:
     btnDataDigger:X = 5.
     btnDataDigger:Y = 5.
-    RETURN. 
-  END. 
+    RETURN.
+  END.
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -515,29 +498,29 @@ PROCEDURE blinkLogo :
     dy = dy + grav.
     xx = xx + dx.
     yy = yy + dy.
-    
+
     /* Bounce at bottom of frame */
     IF yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - btnDataDigger:HEIGHT-PIXELS) THEN
     DO:
       yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - btnDataDigger:HEIGHT-PIXELS.
       dy = -1 * dy.
     END.
-    IF xx <= 5 THEN LEAVE. 
+    IF xx <= 5 THEN LEAVE.
 
     btnDataDigger:X = xx.
     btnDataDigger:Y = yy.
 
-    RUN justWait(10). 
-  END. 
+    RUN justWait(10).
+  END.
 
   btnDataDigger:X = 5.
   btnDataDigger:Y = 5.
 
   DO ii = 1 TO 3:
     btnDataDigger:SENSITIVE = NO.
-    RUN justWait(300). 
+    RUN justWait(300).
     btnDataDigger:SENSITIVE = YES.
-    RUN justWait(300). 
+    RUN justWait(300).
   END.
 
 
@@ -549,10 +532,10 @@ END PROCEDURE. /* blinkLogo */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load wAbout  _CONTROL-LOAD
 PROCEDURE control_load :
 /*------------------------------------------------------------------------------
-  Purpose:     Load the OCXs    
+  Purpose:     Load the OCXs
   Parameters:  <none>
-  Notes:       Here we load, initialize and make visible the 
-               OCXs in the interface.                        
+  Notes:       Here we load, initialize and make visible the
+               OCXs in the interface.
 ------------------------------------------------------------------------------*/
 
 &IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
@@ -584,13 +567,13 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createBricks wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createBricks wAbout
 PROCEDURE createBricks :
 /* Build blocks on the screen via button widgets
  */
- DEFINE BUFFER bfBrick FOR ttBrick.
- 
- FOR EACH bfBrick:
+DEFINE BUFFER bfBrick FOR ttBrick.
+
+FOR EACH bfBrick:
 
    CREATE FILL-IN bfBrick.hBrick
      ASSIGN
@@ -605,7 +588,7 @@ PROCEDURE createBricks :
        FORMAT        = 'X(100)'
        .
 
- END.
+END.
 
 END PROCEDURE. /* createBricks */
 
@@ -618,7 +601,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -631,22 +614,22 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE gameOver wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE gameOver wAbout
 PROCEDURE gameOver :
 /* Game over
  **/
- DEFINE INPUT PARAMETER plPlayerLost AS LOGICAL NO-UNDO.
+DEFINE INPUT PARAMETER plPlayerLost AS LOGICAL NO-UNDO.
 
- DO WITH FRAME {&FRAME-NAME}:
+DO WITH FRAME {&FRAME-NAME}:
    gcGameStatus = 'Game Over'.
-   
+
    /* Disable ball mover */
-   chCtrlFrame:BallTimer:ENABLED = FALSE.  
+   chCtrlFrame:BallTimer:ENABLED = FALSE.
 
    /* Load proper image: 'Game Over' or 'Good Job' */
    IF plPlayerLost THEN
      imgTitle:LOAD-IMAGE(getImagePath('AboutTitle2.gif')).
-   ELSE 
+   ELSE
      imgTitle:LOAD-IMAGE(getImagePath('AboutTitle3.gif')).
 
    imgTitle:WIDTH-PIXELS = 600.
@@ -657,7 +640,7 @@ PROCEDURE gameOver :
 
    /* Show 'Click to close' message */
    RUN justWait(1000).
-   ASSIGN 
+   ASSIGN
      fiMsg:FONT          = getFont('fixed')
      fiMsg:SCREEN-VALUE  = '(Click to close window)'
      fiMsg:WIDTH-PIXELS  = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiMsg:SCREEN-VALUE, getFont('fixed')) + 10
@@ -668,19 +651,19 @@ PROCEDURE gameOver :
      fiMsg:SENSITIVE     = YES
      .
 
- END.
+END.
 
 END PROCEDURE. /* gameOver */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hitBottom wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hitBottom wAbout
 PROCEDURE hitBottom :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
   DEFINE VARIABLE ii AS INTEGER     NO-UNDO.
@@ -693,11 +676,11 @@ PROCEDURE hitBottom :
   END.
 
   giNumLives = giNumLives - 1.
-  IF giNumLives = 0 THEN 
+  IF giNumLives = 0 THEN
   DO:
     RUN gameOver(YES).
   END.
-  ELSE 
+  ELSE
   DO:
     RUN setBall(NO).
   END.
@@ -707,7 +690,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wAbout
 PROCEDURE initializeObject :
 /* Init frame
 */
@@ -715,7 +698,7 @@ PROCEDURE initializeObject :
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    wAbout:VISIBLE = FALSE. 
+    wAbout:VISIBLE = FALSE.
 
     /* Position frame relative to main window */
     wAbout:X = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
@@ -738,10 +721,10 @@ PROCEDURE initializeObject :
     /* DiggerNoid title */
     imgTitle:LOAD-IMAGE(getImagePath('AboutTitle.gif')).
     imgTitle:VISIBLE = FALSE.
-    
+
     /* Disable ball mover */
     IF glUseTimer THEN
-      chCtrlFrame:BallTimer:ENABLED = TRUE.  
+      chCtrlFrame:BallTimer:ENABLED = TRUE.
 
     /* Set version name */
     fiDataDigger-1:SCREEN-VALUE = "DataDigger {&version} - {&edition}".
@@ -752,11 +735,11 @@ PROCEDURE initializeObject :
     edChangeLog:CURSOR-OFFSET = 1.
 
     RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
-    
+
     /* For some reasons, these #*$&# scrollbars keep coming back */
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
 
-    wAbout:VISIBLE = TRUE. 
+    wAbout:VISIBLE = TRUE.
   END.
 
 END PROCEDURE. /* initializeObject. */
@@ -764,7 +747,7 @@ END PROCEDURE. /* initializeObject. */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeUi wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeUi wAbout
 PROCEDURE initializeUi :
 /* Enable the user interface
  */
@@ -788,20 +771,20 @@ PROCEDURE initializeUi :
     /* Check for message 6087:
      * Specified ActiveX control is not registered or the .ocx file was moved from where it was registered.
      * Error occurred in procedure: <procedure name> (6087)
-     * This error occurred while trying to load an ActiveX control.  
+     * This error occurred while trying to load an ActiveX control.
      * It is possible that the control was not properly installed or that the .ocx file was moved or deleted.
      */
-    IF ERROR-STATUS:GET-NUMBER(1) = 6087 THEN 
+    IF ERROR-STATUS:GET-NUMBER(1) = 6087 THEN
       glUseTimer = NO.
     ELSE
       glUseTimer = YES.
   END.
 
   /* From enable_ui */
-  DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 fiWebsite 
+  DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 fiWebsite
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
 
-  ENABLE btnDataDigger BtnOK edChangelog fiWebsite 
+  ENABLE btnDataDigger BtnOK edChangelog fiWebsite
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
 
   VIEW FRAME DEFAULT-FRAME IN WINDOW wAbout.
@@ -812,24 +795,24 @@ END PROCEDURE. /* initializeUi */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE justWait wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE justWait wAbout
 PROCEDURE justWait :
-/* Wait a few miliseconds 
+/* Wait a few miliseconds
  */
   DEFINE INPUT  PARAMETER piWait AS INTEGER NO-UNDO.
   DEFINE VARIABLE iStart    AS INTEGER NO-UNDO.
   DEFINE VARIABLE lUseTimer AS LOGICAL NO-UNDO.
-   
+
   iStart = ETIME.
-  
-  /* For the duration of the wait, switch off 
+
+  /* For the duration of the wait, switch off
    * the timer to avoid deep loops */
   lUseTimer = chCtrlFrame:BallTimer:ENABLED.
   chCtrlFrame:BallTimer:ENABLED = FALSE.
 
-  DO WHILE ETIME < iStart + piWait: 
+  DO WHILE ETIME < iStart + piWait:
     PROCESS EVENTS.
-  END. 
+  END.
 
   chCtrlFrame:BallTimer:ENABLED = lUseTimer.
 
@@ -838,9 +821,9 @@ END PROCEDURE. /* justWait */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBall wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveBall wAbout
 PROCEDURE moveBall :
-/* Move the ball and detect collisions 
+/* Move the ball and detect collisions
   */
   DEFINE VARIABLE iNewX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iNewY    AS INTEGER NO-UNDO.
@@ -867,12 +850,12 @@ PROCEDURE moveBall :
     iNewX = iNewX + giBallX.
 
     /* Gonna hit the wall? */
-    IF iNewX <= iMinX OR iNewX >= iMaxX THEN 
+    IF iNewX <= iMinX OR iNewX >= iMaxX THEN
     DO:
       giBallX = giBallX * -1.
       RETURN.
     END.
-    ELSE 
+    ELSE
     DO:
       FIND FIRST bfBrick
         WHERE iNewX > bfBrick.x1 AND iNewX < bfBrick.x2
@@ -892,19 +875,19 @@ PROCEDURE moveBall :
     iNewY = iNewY + giBallY.
 
     /* Hit top or bottom? */
-    IF iNewY <= iMinY OR iNewY >= iMaxY THEN 
+    IF iNewY <= iMinY OR iNewY >= iMaxY THEN
     DO:
       /* flash when bottom is hit */
       IF iNewY >= iMaxY THEN RUN hitBottom.
       giBallY = giBallY * -1.
       RETURN.
     END.
-    ELSE 
+    ELSE
     DO:
       FIND FIRST bfBrick
-        WHERE iNewX > bfBrick.x1 AND iNewX < bfBrick.x2 
+        WHERE iNewX > bfBrick.x1 AND iNewX < bfBrick.x2
           AND iNewY > bfBrick.y1 AND iNewY < bfBrick.y2 NO-ERROR.
-  
+
       IF AVAILABLE bfBrick THEN
       DO:
         giBallY = giBallY * -1.
@@ -916,35 +899,35 @@ PROCEDURE moveBall :
     END.
 
     /* hit the paddle? */
-    ASSIGN 
-      iPaddleX = imgPaddle:X 
+    ASSIGN
+      iPaddleX = imgPaddle:X
       iPaddleY = imgPaddle:Y.
 
     IF    iNewY >= iPaddleY - 10
-      AND iNewY <= iPaddleY + imgBall:HEIGHT-PIXELS 
-      AND iNewX >= iPaddleX 
+      AND iNewY <= iPaddleY + imgBall:HEIGHT-PIXELS
+      AND iNewX >= iPaddleX
       AND iNewX <= iPaddleX + 70 THEN
     DO:
 
       /* Right side ball hits left side of paddle */
-      IF    iNewX >= iPaddleX 
-        AND iNewX <= iPaddleX + 20 THEN 
-        ASSIGN 
+      IF    iNewX >= iPaddleX
+        AND iNewX <= iPaddleX + 20 THEN
+        ASSIGN
           giBallY = giBallY * -1
           giBallX = -3 - (RANDOM(1,3) * 2).
 
       ELSE
       /* Ball hits center of paddle */
       IF    iNewX >= iPaddleX + 20
-        AND iNewX <= iPaddleX + 50 THEN 
-        ASSIGN 
+        AND iNewX <= iPaddleX + 50 THEN
+        ASSIGN
           giBallY = giBallY * -1.
 
       ELSE
       /* Left side of ball hits right side of paddle */
       IF    iNewX >= iPaddleX + 50
-        AND iNewX <= iPaddleX + 70 THEN 
-        ASSIGN 
+        AND iNewX <= iPaddleX + 70 THEN
+        ASSIGN
           giBallY = giBallY * -1
           giBallX = 3 + (RANDOM(1,3) * 2).
 
@@ -959,17 +942,17 @@ END PROCEDURE. /* moveBall */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE movePaddle wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE movePaddle wAbout
 PROCEDURE movePaddle :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
   DEFINE INPUT PARAMETER piMove AS INTEGER NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
-    IF    imgPaddle:X + piMove > 0 
+    IF    imgPaddle:X + piMove > 0
       AND imgPaddle:X + piMove < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - imgPaddle:WIDTH-PIXELS - 10) THEN
       imgPaddle:X = imgPaddle:X + piMove.
   END.
@@ -979,7 +962,7 @@ END PROCEDURE. /* movePaddle */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE prepareWindow wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE prepareWindow wAbout
 PROCEDURE prepareWindow :
 /* Grow window to desired size and position
   */
@@ -999,13 +982,13 @@ PROCEDURE prepareWindow :
   DEFINE VARIABLE iNumSteps AS INTEGER     NO-UNDO INITIAL 50.
 
   /* debug */
-  IF glDebugRun THEN iNumSteps = 1. 
+  IF glDebugRun THEN iNumSteps = 1.
 
   DO WITH FRAME {&FRAME-NAME}:
     BtnOK:VISIBLE     = NO.
     fiWebsite:VISIBLE = FALSE.
 
-    ASSIGN 
+    ASSIGN
       iStartH = wAbout:HEIGHT-PIXELS
       iStartW = wAbout:WIDTH-PIXELS
       iStartX = wAbout:X
@@ -1048,9 +1031,9 @@ END PROCEDURE. /* prepareWindow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE readAboutFile wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE readAboutFile wAbout
 PROCEDURE readAboutFile :
-/* Build blocks with names of all contributors 
+/* Build blocks with names of all contributors
  **/
   DEFINE VARIABLE cLine  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cName  AS CHARACTER   NO-UNDO.
@@ -1060,9 +1043,9 @@ PROCEDURE readAboutFile :
   INPUT FROM 'DataDigger.txt'.
   REPEAT:
     IMPORT UNFORMATTED cLine.
-    IF cLine BEGINS '====' THEN LEAVE. 
+    IF cLine BEGINS '====' THEN LEAVE.
   END.
-  
+
   REPEAT:
     IMPORT UNFORMATTED cLine.
     IF cLine BEGINS 'DataDigger' THEN NEXT. /* lines with version name */
@@ -1075,36 +1058,36 @@ PROCEDURE readAboutFile :
       IF NOT AVAILABLE bfBrick THEN
       DO:
         CREATE bfBrick.
-        ASSIGN bfBrick.cBlockId = ENTRY(ii,cName). 
+        ASSIGN bfBrick.cBlockId = ENTRY(ii,cName).
       END.
     END.
   END.
-  
-  INPUT CLOSE. 
+
+  INPUT CLOSE.
 
 END PROCEDURE. /* readAboutFile */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resumeGame wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resumeGame wAbout
 PROCEDURE resumeGame :
-/* Game is waiting for the user to click so it can resume */                                                
+/* Game is waiting for the user to click so it can resume */
   IF gcGameStatus = 'waiting' THEN gcGameStatus = 'running'.
   imgTitle:VISIBLE IN FRAME DEFAULT-FRAME = FALSE.
 
   /* After the game has ended, close the screen */
-  IF gcGameStatus = "Game Over" THEN APPLY "close" TO THIS-PROCEDURE. 
-  
+  IF gcGameStatus = "Game Over" THEN APPLY "close" TO THIS-PROCEDURE.
+
 END PROCEDURE. /* resumeGame */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBall wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBall wAbout
 PROCEDURE setBall :
-/* Set the ball to its place with a nice bounce 
-*/  
+/* Set the ball to its place with a nice bounce
+*/
   DEFINE INPUT PARAMETER plBounceBall AS LOGICAL NO-UNDO.
 
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
@@ -1135,14 +1118,14 @@ PROCEDURE setBall :
     dy = dy + grav.
     xx = xx + dx.
     yy = yy + dy.
-    
+
     /* Bounce at bottom of frame */
     IF xx < 280 AND yy > (FRAME {&FRAME-NAME}:HEIGHT-PIXELS - imgBall:HEIGHT-PIXELS) THEN
     DO:
       yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - imgBall:HEIGHT-PIXELS.
       dy = -1 * dy.
       dy = dy * elas.
-      IF xx > 305 THEN LEAVE. 
+      IF xx > 305 THEN LEAVE.
     END.
 
     /* Bounce at the bat */
@@ -1152,7 +1135,7 @@ PROCEDURE setBall :
       dy = -1 * dy.
       dy = dy * elas * elas * elas.
       dx = dx * elas.
-      IF xx > 305 THEN LEAVE. 
+      IF xx > 305 THEN LEAVE.
     END.
 
     imgBall:X = xx.
@@ -1191,46 +1174,46 @@ PROCEDURE setBall :
   ON 'cursor-right' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN movePaddle(+20).
   ON 'cursor-left' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN movePaddle(-20).
   ON 'MOUSE-SELECT-CLICK' OF FRAME {&FRAME-NAME} ANYWHERE PERSISTENT RUN resumeGame.
-  
+
   /* Start timer */
   IF plBounceBall THEN giGameStarted = MTIME.
-  
+
 END PROCEDURE. /* setBall */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBricks wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setBricks wAbout
 PROCEDURE setBricks :
 /* Build blocks on the screen via button widgets
  */
- DEFINE BUFFER bfBrick FOR ttBrick.
- 
- &GLOBAL-DEFINE Border      30
- &GLOBAL-DEFINE RowMargin   10
- &GLOBAL-DEFINE BlockMargin 20
- 
- DEFINE VARIABLE xx AS INTEGER NO-UNDO.
- DEFINE VARIABLE yy AS INTEGER NO-UNDO.
- DEFINE VARIABLE ii AS INTEGER NO-UNDO.
- DEFINE VARIABLE iBgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [10,11,12,13,14,2,9].
- DEFINE VARIABLE iFgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [0,0,0,0,0,15,15].
- DEFINE VARIABLE iColor   AS INTEGER NO-UNDO.
+DEFINE BUFFER bfBrick FOR ttBrick.
 
- DEFINE VARIABLE iBlockLine  AS INTEGER NO-UNDO.
- DEFINE VARIABLE iNumLines   AS INTEGER NO-UNDO.
- DEFINE VARIABLE iNumBricks  AS INTEGER NO-UNDO.
- DEFINE VARIABLE iTotalWidth AS INTEGER NO-UNDO.
- DEFINE VARIABLE iFreeSpace  AS INTEGER NO-UNDO.
- DEFINE VARIABLE iRestWidth  AS INTEGER NO-UNDO.
- DEFINE VARIABLE iSpaces     AS INTEGER NO-UNDO.
- DEFINE VARIABLE iExtraWidth AS INTEGER NO-UNDO.
+&GLOBAL-DEFINE Border      30
+&GLOBAL-DEFINE RowMargin   10
+&GLOBAL-DEFINE BlockMargin 20
 
- xx = {&border}.
- yy = 90.
- iBlockLine = 1.
+DEFINE VARIABLE xx AS INTEGER NO-UNDO.
+DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+DEFINE VARIABLE ii AS INTEGER NO-UNDO.
+DEFINE VARIABLE iBgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [10,11,12,13,14,2,9].
+DEFINE VARIABLE iFgColor AS INTEGER NO-UNDO EXTENT 7 INITIAL [0,0,0,0,0,15,15].
+DEFINE VARIABLE iColor   AS INTEGER NO-UNDO.
 
- FOR EACH bfBrick:
+DEFINE VARIABLE iBlockLine  AS INTEGER NO-UNDO.
+DEFINE VARIABLE iNumLines   AS INTEGER NO-UNDO.
+DEFINE VARIABLE iNumBricks  AS INTEGER NO-UNDO.
+DEFINE VARIABLE iTotalWidth AS INTEGER NO-UNDO.
+DEFINE VARIABLE iFreeSpace  AS INTEGER NO-UNDO.
+DEFINE VARIABLE iRestWidth  AS INTEGER NO-UNDO.
+DEFINE VARIABLE iSpaces     AS INTEGER NO-UNDO.
+DEFINE VARIABLE iExtraWidth AS INTEGER NO-UNDO.
+
+xx = {&border}.
+yy = 90.
+iBlockLine = 1.
+
+FOR EACH bfBrick:
 
    /* Set brick to a safe position so we can resize it */
    bfBrick.hBrick:X = 1.
@@ -1256,11 +1239,11 @@ PROCEDURE setBricks :
    bfBrick.hBrick:Y = yy.
    bfBrick.iLine = iBlockLine.
    xx = xx + bfBrick.hBrick:WIDTH-PIXELS + {&BlockMargin}.
- END.
+END.
 
 
- /* Justify blocks */
- DO ii = 1 TO iNumLines:
+/* Justify blocks */
+DO ii = 1 TO iNumLines:
 
    /* How much bricks per row */
    iTotalWidth = 0.
@@ -1269,21 +1252,21 @@ PROCEDURE setBricks :
      iTotalWidth = iTotalWidth + bfBrick.hBrick:WIDTH-PIXELS.
      iNumBricks = iNumBricks + 1.
    END.
-   
+
    /* Extra space */
    iFreeSpace = FRAME {&FRAME-NAME}:WIDTH-PIXELS    /* max available space */
               - (2 * {&border})                     /* left and right border */
               - iTotalWidth                         /* width of all bricks */
               - ((iNumBricks - 1) * {&BlockMargin}) /* margin between bricks */
               .
-   iExtraWidth = TRUNCATE(iFreeSpace / iNumBricks,0). 
+   iExtraWidth = TRUNCATE(iFreeSpace / iNumBricks,0).
    iRestWidth  = FRAME {&FRAME-NAME}:WIDTH-PIXELS    /* max available space */
               - (2 * {&border})                     /* left and right border */
               - iTotalWidth                         /* width of all bricks */
               - ((iNumBricks - 1) * {&BlockMargin}) /* margin between bricks */
               - (iNumBricks * iExtraWidth)          /* extra width per brick */
               .
-      
+
    /* Redraw buttons */
    xx = {&border}.
    FOR EACH bfBrick WHERE bfBrick.iLine = ii:
@@ -1291,7 +1274,7 @@ PROCEDURE setBricks :
      bfBrick.hBrick:X = 1. /* to avoid errors while resizing */
      bfBrick.hBrick:WIDTH-PIXELS = bfBrick.hBrick:WIDTH-PIXELS + iExtraWidth + iRestWidth.
      iRestWidth = 0.
-     
+
      bfBrick.hBrick:X = xx.
      xx = xx + bfBrick.hBrick:WIDTH-PIXELS + {&BlockMargin}.
      bfBrick.hBrick:SENSITIVE = NO.
@@ -1303,21 +1286,21 @@ PROCEDURE setBricks :
      bfBrick.hBrick:SCREEN-VALUE = FILL(' ', iSpaces) + bfBrick.cBlockId.
 
      /* Register exact position */
-     ASSIGN 
+     ASSIGN
        bfBrick.x1 = bfBrick.hBrick:X
-       bfBrick.y1 = bfBrick.hBrick:Y 
+       bfBrick.y1 = bfBrick.hBrick:Y
        bfBrick.x2 = bfBrick.hBrick:X + bfBrick.hBrick:WIDTH-PIXELS
        bfBrick.y2 = bfBrick.hBrick:Y + bfBrick.hBrick:HEIGHT-PIXELS
        .
    END.
- END.
+END.
 
 END PROCEDURE. /* setBricks */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPaddle wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPaddle wAbout
 PROCEDURE setPaddle :
 /* Adjust paddle position to mouse
   */
@@ -1325,21 +1308,21 @@ PROCEDURE setPaddle :
   DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
 
   /* Don't move paddle while bouncing */
-  IF gcGameStatus = 'intro' THEN RETURN. 
+  IF gcGameStatus = 'intro' THEN RETURN.
 
   DO WITH FRAME {&FRAME-NAME}:
-    
+
     RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
 
     IF giOldMouseX <> iMouseX
-      AND iMouseX > (imgPaddle:WIDTH-PIXELS / 2) 
-      AND iMouseX < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (imgPaddle:WIDTH-PIXELS / 2)) THEN 
+      AND iMouseX > (imgPaddle:WIDTH-PIXELS / 2)
+      AND iMouseX < (FRAME {&FRAME-NAME}:WIDTH-PIXELS - (imgPaddle:WIDTH-PIXELS / 2)) THEN
     DO:
       imgPaddle:X = iMouseX - (imgPaddle:WIDTH-PIXELS / 2).
       giOldMouseX = iMouseX.
-      
+
       /* During wait phase, let ball stick to paddle */
-      IF gcGameStatus = 'waiting' THEN 
+      IF gcGameStatus = 'waiting' THEN
         ASSIGN imgBall:X = imgPaddle:X + 25.
     END.
   END.
@@ -1349,7 +1332,7 @@ END PROCEDURE. /* setPaddle */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showBricks wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showBricks wAbout
 PROCEDURE showBricks :
 /* Make bricks visible */
   DEFINE BUFFER bfBrick FOR ttBrick.
@@ -1363,11 +1346,11 @@ END PROCEDURE. /* showBricks */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showLog wAbout
 PROCEDURE showLog :
-/* Play arkanoid-like game 
- */ 
- 
+/* Play arkanoid-like game
+ */
+
   gcGameStatus = 'waiting'.
 
   RUN prepareWindow.
@@ -1379,18 +1362,18 @@ PROCEDURE showLog :
   RUN setBall(YES).
 
   OS-COMMAND NO-WAIT START 'https://datadigger.wordpress.com/easter-egg'.
-  
+
 END PROCEDURE. /* showLog */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTitle wAbout 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTitle wAbout
 PROCEDURE showTitle :
 /* Show DiggerNoid title */
   DEFINE VARIABLE ii AS INTEGER NO-UNDO.
   &GLOBAL-DEFINE step 5
-  
+
   DO WITH FRAME {&FRAME-NAME}:
     imgTitle:LOAD-IMAGE(getImagePath('AboutTitle.gif')).
     imgTitle:WIDTH-PIXELS = 600.
@@ -1398,22 +1381,22 @@ PROCEDURE showTitle :
     imgTitle:X = 250.
     imgTitle:Y = 1.
     imgTitle:VISIBLE = FALSE.
-    
+
     DO ii = 1 TO 300 BY {&step}:
       imgTitle:Y = ii.
       imgTitle:VISIBLE = TRUE.
       IF ii <= 250 THEN imgTitle:HEIGHT-PIXELS = ii.
       RUN justWait(2).
-    END. 
+    END.
 
     DO ii = 1 TO 100 BY {&step}:
       imgTitle:Y = imgTitle:Y + {&step}.
       imgTitle:VISIBLE = TRUE.
       imgTitle:HEIGHT-PIXELS = imgTitle:HEIGHT-PIXELS - {&step}.
       RUN justWait(2).
-    END. 
-  END. 
-  
+    END.
+  END.
+
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
