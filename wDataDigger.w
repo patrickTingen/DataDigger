@@ -12381,7 +12381,8 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
 
   /* Kill scrollbars */
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
-
+  RETURN TRUE.
+  
   {&timerStop}
 END FUNCTION. /* setUpdatePanel */
 
@@ -12423,4 +12424,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
