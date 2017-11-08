@@ -5293,10 +5293,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE convertSettings C-Win
 PROCEDURE convertSettings :
-/* Do one-time conversions for new versions
- */
+  /* Do one-time conversions for new versions
+  */
   DEFINE INPUT PARAMETER piOldVersion AS INTEGER   NO-UNDO.
-  DEFINE INPUT PARAMETER pcOldBuild   AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE cFile      AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cIniFile   AS CHARACTER NO-UNDO.
@@ -5688,11 +5687,8 @@ END PROCEDURE. /* DataDiggerClose */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataDoubleClick C-Win
 PROCEDURE dataDoubleClick :
-/* Double click on databrowse might result in EDIT / VIEW / DUMP
- */
-  DEFINE INPUT PARAMETER hBrowseBuffer AS HANDLE NO-UNDO.
-
-  /* What to do on double click? */
+  /* Double click on databrowse might result in EDIT / VIEW / DUMP
+  */
   CASE getRegistry('DataDigger','DataDoubleClick'):
     WHEN 'VIEW' THEN RUN btnViewChoose.
     WHEN 'EDIT' THEN RUN btnEditChoose.
@@ -5824,43 +5820,30 @@ END PROCEDURE. /* dataRowDisplay */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowJumpToEnd C-Win
-PROCEDURE dataRowJumpToEnd :
-/* End on datarow
- */
-  DEFINE INPUT  PARAMETER hBrowseBuffer AS HANDLE      NO-UNDO.
-
-END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowValueChanged C-Win
 PROCEDURE dataRowValueChanged :
-/* Save the content of the fields in linkinfo
- */
-  DEFINE INPUT  PARAMETER hBrowseBuffer AS HANDLE      NO-UNDO.
-
+  /* Save the content of the fields in linkinfo
+  */
   DEFINE VARIABLE iColumn    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cFieldName AS CHARACTER   NO-UNDO.
+  DEFINE BUFFER bColumn FOR ttColumn.
+  {&timerStart}
 
   PUBLISH "debugInfo" (3, SUBSTITUTE("Browse columns: &1", gcDataBrowseColumns)).
   PUBLISH "debugInfo" (3, SUBSTITUTE("Column names  : &1", gcDataBrowseColumnNames)).
 
-  DO iColumn = 1 TO NUM-ENTRIES(gcDataBrowseColumns):
-
-    hColumn    = WIDGET-HANDLE( ENTRY(iColumn,gcDataBrowseColumns) ).
-    cFieldName = ENTRY(iColumn,gcDataBrowseColumnNames).
-
-    RUN showNumSelected.
-
-    IF hColumn:SCREEN-VALUE <> "" AND hColumn:SCREEN-VALUE <> ? THEN
-      setLinkInfo(cFieldName, hColumn:SCREEN-VALUE).
+  FOR EACH bColumn:
+    IF VALID-HANDLE(bColumn.hColumn)
+      AND bColumn.hColumn:SCREEN-VALUE <> ""
+      AND bColumn.hColumn:SCREEN-VALUE <> ? THEN
+      setLinkInfo(bColumn.hColumn:NAME, bColumn.hColumn:SCREEN-VALUE).
   END.
 
+  RUN showNumSelected.
   setUpdatePanel(?). /* Refresh sensitivity of buttons if needed */
 
+  {&timerStop}
 END PROCEDURE. /* dataRowValueChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -5927,9 +5910,10 @@ END PROCEDURE.  /* dataScrollNotify */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectAll C-Win
 PROCEDURE dataSelectAll :
-/* Select all records in the browse
- */
+  /* Select all records in the browse
+  */
   DEFINE INPUT PARAMETER phBrowse AS HANDLE     NO-UNDO.
+  {&timerStart}
 
   setWindowFreeze(YES).
   SESSION:SET-WAIT-STATE('general').
@@ -5939,6 +5923,7 @@ PROCEDURE dataSelectAll :
   setWindowFreeze(NO).
   SESSION:SET-WAIT-STATE('').
 
+  {&timerStop}
 END PROCEDURE. /* dataSelectAll */
 
 /* _UIB-CODE-BLOCK-END */
@@ -5946,9 +5931,10 @@ END PROCEDURE. /* dataSelectAll */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectNone C-Win
 PROCEDURE dataSelectNone :
-/* Deselect all records in the browse
- */
+  /* Deselect all records in the browse
+  */
   DEFINE INPUT  PARAMETER phBrowse AS HANDLE     NO-UNDO.
+  {&timerStart}
 
   setWindowFreeze(YES).
   phBrowse:DESELECT-ROWS().
@@ -5956,6 +5942,7 @@ PROCEDURE dataSelectNone :
   setUpdatePanel('display'). /* Activate buttons */
   setWindowFreeze(NO).
 
+  {&timerStop}
 END PROCEDURE. /* dataSelectNone */
 
 /* _UIB-CODE-BLOCK-END */
@@ -6734,11 +6721,10 @@ END PROCEDURE.  /* filterScrollNotify */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldShow C-Win
-PROCEDURE filterFieldShow :
-/* Show or hide a filter field
- */
+PROCEDURE filterFieldShow:
+  /* Show or hide a filter field
+  */
   DEFINE INPUT PARAMETER phColumn AS HANDLE NO-UNDO.
-  DEFINE INPUT PARAMETER phFilter AS HANDLE NO-UNDO.
   DEFINE INPUT PARAMETER phMenu   AS HANDLE NO-UNDO.
 
   phColumn:VISIBLE = phMenu:CHECKED.
@@ -7375,7 +7361,7 @@ PROCEDURE initializeFilters :
     /* Create menu item for context menu */
     hMenuItem = createMenuItem(ghFieldMenu,"TOGGLE-BOX",bFilter.hColumn:LABEL,"").
     ON "VALUE-CHANGED" OF hMenuItem PERSISTENT
-      RUN filterFieldShow IN THIS-PROCEDURE(bFilter.hColumn, hFilterField, hMenuItem).
+      RUN filterFieldShow IN THIS-PROCEDURE(bFilter.hColumn, hMenuItem).
 
     /* Column visible? */
     lVisible = LOGICAL(getRegistry("DataDigger:Fields", SUBSTITUTE("&1:Visible", hColumn:NAME))) NO-ERROR.
@@ -8966,10 +8952,9 @@ PROCEDURE reopenDataBrowse-create :
       ON "ALT-O"            PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
       ON "ALT-E"            PERSISTENT RUN btnEditChoose           IN THIS-PROCEDURE.
       ON "DELETE-CHARACTER" PERSISTENT RUN btnDeleteChoose         IN THIS-PROCEDURE.
-      ON "VALUE-CHANGED"    PERSISTENT RUN dataRowValueChanged     IN THIS-PROCEDURE (ghDataBuffer).
-      ON "END"              PERSISTENT RUN dataRowJumpToEnd        IN THIS-PROCEDURE (ghDataBuffer).
+      ON "VALUE-CHANGED"    PERSISTENT RUN dataRowValueChanged     IN THIS-PROCEDURE.
       ON "SCROLL-NOTIFY"    PERSISTENT RUN dataScrollNotify        IN THIS-PROCEDURE (ghDataBrowse).
-      ON "DEFAULT-ACTION"   PERSISTENT RUN dataDoubleClick         IN THIS-PROCEDURE (ghDataBrowse).
+      ON "DEFAULT-ACTION"   PERSISTENT RUN dataDoubleClick         IN THIS-PROCEDURE.
       ON "OFF-HOME"         PERSISTENT RUN dataOffHome             IN THIS-PROCEDURE.
       ON "CTRL-CURSOR-UP"   PERSISTENT RUN dataGotoFilter          IN THIS-PROCEDURE.
       ON "F5"               PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
@@ -10918,10 +10903,11 @@ END PROCEDURE. /* showFavourite */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showField C-Win
 PROCEDURE showField :
-/* Toggle the selected status of a field.
- */
+  /* Toggle the selected status of a field.
+  */
   DEFINE INPUT PARAMETER pcFieldList AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER plSelected  AS LOGICAL   NO-UNDO.
+  {&timerStart}
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
@@ -10970,7 +10956,7 @@ PROCEDURE showField :
   END.
 
   setWindowFreeze(NO).
-
+  {&timerStop}
 END PROCEDURE. /* showField */
 
 /* _UIB-CODE-BLOCK-END */
@@ -11221,9 +11207,9 @@ END PROCEDURE. /* showNewFeatures */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumRecords C-Win
 PROCEDURE showNumRecords :
-/*
- * Show nr of total and selected records
- */
+  /* Show nr of total and selected records
+  */
+  {&timerStart}
   DEFINE INPUT PARAMETER piNumRecords    AS INTEGER NO-UNDO.
   DEFINE INPUT PARAMETER plQueryComplete AS LOGICAL NO-UNDO.
 
@@ -11250,9 +11236,9 @@ PROCEDURE showNumRecords :
     fiNumRecords:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(fiNumRecords:SCREEN-VALUE,FRAME frMain:FONT) + 5.
     fiNumRecords:X = rctData:X + rctData:WIDTH-PIXELS - fiNumRecords:WIDTH-PIXELS - 40.
     fiNumRecords:Y = rctData:Y + rctData:HEIGHT-PIXELS - 6.
-
   END.
 
+  {&timerStop}
 END PROCEDURE. /* showNumRecords */
 
 /* _UIB-CODE-BLOCK-END */
@@ -11260,9 +11246,9 @@ END PROCEDURE. /* showNumRecords */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumSelected C-Win
 PROCEDURE showNumSelected :
-/*
- * Show nr of selected records
- */
+  /* Show nr of selected records
+  */
+  {&timerStart}
   IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
 
   DO WITH FRAME frData:
@@ -11278,6 +11264,7 @@ PROCEDURE showNumSelected :
 
   END.
 
+  {&timerStop}
 END PROCEDURE. /* showNumSelected */
 
 /* _UIB-CODE-BLOCK-END */
@@ -11562,7 +11549,7 @@ PROCEDURE startSession :
       SESSION:SET-WAIT-STATE("general").
       convLoop:
       REPEAT:
-        RUN convertSettings(iVersion,cBuild).
+        RUN convertSettings(iVersion).
         iVersion = iVersion + 1.
         IF iVersion >= {&VERSION} THEN LEAVE convLoop.
       END.
@@ -11580,7 +11567,7 @@ PROCEDURE startSession :
   DO:
     lNewBuild = TRUE.
     RUN clearDiskCache.
-    RUN convertSettings(iVersion, cBuild).
+    RUN convertSettings(iVersion).
     setRegistry('DataDigger', 'Build', '{&build}').
   END.
 
@@ -12382,7 +12369,7 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
   /* Kill scrollbars */
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   RETURN TRUE.
-  
+
   {&timerStop}
 END FUNCTION. /* setUpdatePanel */
 
