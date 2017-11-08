@@ -269,23 +269,22 @@ ON CURSOR-DOWN OF btn-0 IN FRAME Dialog-Frame /* Font 0 */
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-        DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
-        DEFINE BUFFER bButton FOR ttButton.
+  #Button:
+  FOR EACH bButton
+    WHERE bButton.x = SELF:x
+      AND bButton.y > SELF:y
+       BY bButton.y:
+    hTarget = bButton.h.
+    LEAVE #Button.
+  END.
 
-        #Button:
-        FOR EACH bButton
-                WHERE bButton.x = SELF:x
-                        AND bButton.y > SELF:y
-                         BY bButton.y:
-                hTarget = bButton.h.
-                LEAVE #Button.
-        END.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-        IF VALID-HANDLE(hTarget) THEN
-                APPLY 'entry' TO hTarget.
-
-        RETURN NO-APPLY.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -297,23 +296,22 @@ ON CURSOR-LEFT OF btn-0 IN FRAME Dialog-Frame /* Font 0 */
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-        DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
-        DEFINE BUFFER bButton FOR ttButton.
+  #Button:
+  FOR EACH bButton
+    WHERE bButton.y = SELF:y
+      AND bButton.x < SELF:x
+       BY bButton.x DESCENDING:
+    hTarget = bButton.h.
+    LEAVE #Button.
+  END.
 
-        #Button:
-        FOR EACH bButton
-                WHERE bButton.y = SELF:y
-                        AND bButton.x < SELF:x
-                         BY bButton.x DESCENDING:
-                hTarget = bButton.h.
-                LEAVE #Button.
-        END.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-        IF VALID-HANDLE(hTarget) THEN
-                APPLY 'entry' TO hTarget.
-
-        RETURN NO-APPLY.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -325,22 +323,22 @@ ON CURSOR-RIGHT OF btn-0 IN FRAME Dialog-Frame /* Font 0 */
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-        DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
-        DEFINE BUFFER bButton FOR ttButton.
+  #Button:
+  FOR EACH bButton
+    WHERE bButton.y = SELF:y
+      AND bButton.x > SELF:x
+       BY bButton.x:
+    hTarget = bButton.h.
+    LEAVE #Button.
+  END.
 
-        FOR EACH bButton
-                WHERE bButton.y = SELF:y
-                        AND bButton.x > SELF:x
-                         BY bButton.x:
-                hTarget = bButton.h.
-                LEAVE.
-        END.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-        IF VALID-HANDLE(hTarget) THEN
-                APPLY 'entry' TO hTarget.
-
-        RETURN NO-APPLY.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -352,22 +350,22 @@ ON CURSOR-UP OF btn-0 IN FRAME Dialog-Frame /* Font 0 */
 , btn-1, btn-2, btn-3, btn-4, btn-5, btn-6, btn-7, btn-8, btn-9, btn-10, btn-11, btn-12
 , btn-13, btn-14, btn-15, btn-16, btn-17, btn-18, btn-19, btn-20, btn-21, btn-22, btn-23
 DO:
+  DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bButton FOR ttButton.
 
-        DEFINE VARIABLE hTarget AS HANDLE NO-UNDO.
-        DEFINE BUFFER bButton FOR ttButton.
+  #Button:
+  FOR EACH bButton
+    WHERE bButton.x = SELF:x
+      AND bButton.y < SELF:y
+       BY bButton.y DESCENDING:
+    hTarget = bButton.h.
+    LEAVE #Button.
+  END.
 
-        FOR EACH bButton
-                WHERE bButton.x = SELF:x
-                        AND bButton.y < SELF:y
-                         BY bButton.y DESCENDING:
-                hTarget = bButton.h.
-                LEAVE.
-        END.
+  IF VALID-HANDLE(hTarget) THEN
+    APPLY 'entry' TO hTarget.
 
-        IF VALID-HANDLE(hTarget) THEN
-                APPLY 'entry' TO hTarget.
-
-        RETURN NO-APPLY.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */

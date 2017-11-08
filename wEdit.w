@@ -420,7 +420,8 @@ ON ROW-DISPLAY OF brRecord IN FRAME frMain
 DO:
 
   /* Get field definition */
-  FIND ttField WHERE ttField.cFieldName = ttColumn.cFieldName.
+  FIND ttField WHERE ttField.cFieldName = ttColumn.cFieldName NO-ERROR.
+  IF NOT AVAILABLE ttField THEN RETURN.
 
   /* Change color when it has been changed */
   IF ttColumn.cNewValue <> ttColumn.cOldValue THEN
@@ -486,7 +487,8 @@ DO:
   IF FOCUS:NAME = 'cNewValue' THEN
   DO WITH FRAME {&frame-name}:
 
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:get-browse-column( {&field-cFullName} ):screen-value.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:get-browse-column( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN.
 
     /* See if there is only ONE ttData for this field.
      * The find will only succeed if there is exactly ONE record
@@ -562,11 +564,12 @@ DO:
 
   DO WITH FRAME frMain:
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN.
+
     cValue = ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord.
 
-    RUN VALUE(getProgramDir() + 'wViewAsEditor.w')
-     ( INPUT-OUTPUT cValue).
+    RUN VALUE(getProgramDir() + 'wViewAsEditor.w')(INPUT-OUTPUT cValue).
 
     ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord = cValue.
     APPLY 'value-changed' TO ttColumn.cNewValue IN BROWSE brRecord.
@@ -626,7 +629,8 @@ DO:
 
   DO WITH FRAME frMain:
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN.
     cValue = ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord.
 
     RUN VALUE( getProgramDir() + 'wLister.w')
@@ -968,7 +972,6 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
   DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
-  DEFINE VARIABLE lOverwrite      AS LOGICAL NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
 
@@ -1064,7 +1067,7 @@ PROCEDURE btnGoChoose :
 
         /* Get mapping record */
         FIND ttRecordMapping WHERE ttRecordMapping.dbRowid = hBufferDB:ROWID NO-ERROR.
-        IF NOT AVAILABLE ttRecordMapping THEN NEXT.
+        IF NOT AVAILABLE ttRecordMapping THEN NEXT #RecordLoop.
 
         /* Get original record in TT */
         hBufferOrg:FIND-BY-ROWID(ttRecordMapping.ttRowid).
@@ -1250,6 +1253,7 @@ PROCEDURE getDataValues :
  */
   DEFINE INPUT PARAMETER phBrowse AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcColumn AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER piExtent AS INTEGER     NO-UNDO.
 
   DEFINE VARIABLE cRowValue AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer   AS HANDLE      NO-UNDO.
@@ -1262,7 +1266,7 @@ PROCEDURE getDataValues :
   addValue:
   DO iRow = 1 TO phBrowse:NUM-SELECTED-ROWS:
     phBrowse:FETCH-SELECTED-ROW(iRow).
-    cRowValue = hBuffer:BUFFER-FIELD(ttColumn.cFieldName):BUFFER-VALUE(ttColumn.iExtent).
+    cRowValue = hBuffer:BUFFER-FIELD(pcColumn):BUFFER-VALUE(piExtent).
 
     /* Already in the set or not? */
     FIND bData
@@ -1343,8 +1347,11 @@ PROCEDURE increaseValue :
   DO WITH FRAME frMain:
 
     /* Make sure we are looking at the right field. It might have changed due to a sort */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN({&field-cFullName}):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN({&field-cFullName}):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN.
+
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN.
 
     /* Get current value on the screen */
     cScreenValue = ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord.
@@ -1382,14 +1389,14 @@ END PROCEDURE. /* increaseValue */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wEdit
 PROCEDURE initializeObject :
-/*
- * Setup
- */
+  /* Setup
+  */
   DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iDefaultFont    AS INTEGER     NO-UNDO.
 
+  DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
 
   /* Get fonts */
@@ -1403,14 +1410,14 @@ PROCEDURE initializeObject :
    * part of a unique index or are mandatory
    */
   IF CAN-DO('Add,Clone',picMode) THEN
-  FOR EACH ttField
-    WHERE ttField.lMandatory = TRUE
-       OR ttField.lUniqueIdx = TRUE
-   , EACH ttColumn
-    WHERE ttColumn.cFieldName = ttField.cFieldname:
+  FOR EACH bField
+    WHERE bField.lMandatory = TRUE
+       OR bField.lUniqueIdx = TRUE
+   , EACH bColumn
+    WHERE bColumn.cFieldName = bField.cFieldname:
 
-    ttColumn.lShow = TRUE.
-    gcUniqueFields = gcUniqueFields + "," + ttColumn.cFieldName.
+    bColumn.lShow = TRUE.
+    gcUniqueFields = gcUniqueFields + "," + bColumn.cFieldName.
   END.
   gcUniqueFields = TRIM(gcUniqueFields,",").
 
@@ -1418,47 +1425,49 @@ PROCEDURE initializeObject :
    * in the main window we can safely delete them. While we're at
    * it, get rid of other trash as well
    */
-  FOR EACH ttField
-    WHERE ttField.lShow      = FALSE   /* Hidden by user     */
-       OR ttField.cFieldName = "RECID"
-       OR ttField.cFieldName = "ROWID"
-       OR ttField.cDataType  = "CLOB"
-       OR ttField.cDataType  = "BLOB"
-       OR ttField.cDataType  BEGINS "RAW"
-    , EACH ttColumn
-     WHERE ttColumn.cFieldName = ttField.cFieldname:
+  FOR EACH bField
+    WHERE bField.lShow      = FALSE   /* Hidden by user     */
+       OR bField.cFieldName = "RECID"
+       OR bField.cFieldName = "ROWID"
+       OR bField.cDataType  = "CLOB"
+       OR bField.cDataType  = "BLOB"
+       OR bField.cDataType  BEGINS "RAW"
+    , EACH bColumn
+     WHERE bColumn.cFieldName = bField.cFieldname:
 
-    DELETE ttColumn.
+    DELETE bColumn.
   END.
 
   /* Find out max fieldname length */
-  FOR EACH ttColumn:
-    ttColumn.cFilterValue = ''.    /* cFilterValue is now the list of currently used values */
-    ttColumn.lShow        = FALSE. /* lShow now means: "Change this field" */
-    iMaxFieldLength      = MAXIMUM(iMaxFieldLength,LENGTH(ttColumn.cFullName)).
+  FOR EACH bColumn:
+    bColumn.cFilterValue = ''.    /* cFilterValue is now the list of currently used values */
+    bColumn.lShow        = FALSE. /* lShow now means: "Change this field" */
+    iMaxFieldLength      = MAXIMUM(iMaxFieldLength,LENGTH(bColumn.cFullName)).
   END.
 
   /* Collect data for all fields
    * And if we only have 1 value for all selected records, let's show that
    */
-  FOR EACH ttColumn:
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+  #Column:
+  FOR EACH bColumn:
+    FIND bField WHERE bField.cFieldname = bColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE bField THEN NEXT #Column.
 
     IF CAN-DO('Clone,Edit',picMode) THEN
-      RUN getDataValues(pihBrowse,ttColumn.cFullName).
+      RUN getDataValues(pihBrowse,bColumn.cFullName, bColumn.iExtent).
 
-    FIND ttData WHERE ttData.cFieldName = ttColumn.cFullName NO-ERROR.
+    FIND ttData WHERE ttData.cFieldName = bColumn.cFullName NO-ERROR.
     IF AVAILABLE ttData THEN
     DO:
       ASSIGN
-        ttColumn.cOldValue = ttData.cValue /* so we can revert to the old value */
-        ttColumn.cNewValue = ttData.cValue
-        ttColumn.lShow     = TRUE.
+        bColumn.cOldValue = ttData.cValue /* so we can revert to the old value */
+        bColumn.cNewValue = ttData.cValue
+        bColumn.lShow     = TRUE.
 
       /* If the data is longer than the format allows, adjust format */
-      IF ttField.cDatatype = 'character' THEN
-        ttField.cFormat = SUBSTITUTE('x(&1)', MAXIMUM( LENGTH(STRING(ttColumn.cNewValue,ttField.cFormat))
-                                                     , LENGTH(ttColumn.cNewValue)
+      IF bField.cDatatype = 'character' THEN
+        bField.cFormat = SUBSTITUTE('x(&1)', MAXIMUM( LENGTH(STRING(bColumn.cNewValue,bField.cFormat))
+                                                     , LENGTH(bColumn.cNewValue)
                                                      ) * 2).
     END.
   END.
@@ -1678,9 +1687,9 @@ FUNCTION increaseCharValue RETURNS CHARACTER
   END.
 
   /* Otherwise look for the first number in the string.
-   * Extract it and remember what is at the left and
-   * at the right of the number
+   * Extract it and remember what is at the left and right of the number
    */
+  #CharLoop:
   DO iChar = 1 TO LENGTH(pcCharValue):
     cChar = SUBSTRING(pcCharValue,iChar,1).
     IF LOOKUP(cChar,"0,1,2,3,4,5,6,7,8,9") > 0 THEN
@@ -1690,7 +1699,7 @@ FUNCTION increaseCharValue RETURNS CHARACTER
       IF cNumber <> "" THEN
       DO:
         cRight = SUBSTRING(pcCharValue,iChar).
-        LEAVE.
+        LEAVE #CharLoop.
       END.
 
       /* Collect all that is left of the nr */

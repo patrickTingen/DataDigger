@@ -452,7 +452,6 @@ PROCEDURE recompileSelf :
                      OR bOsFile.cFileType = "w") THEN
   DO:
     MESSAGE "No source files found. Compiling aborted.".
-
     OUTPUT CLOSE.
     EMPTY TEMP-TABLE bOsFile.
     DELETE WIDGET hWindow.
@@ -497,7 +496,7 @@ PROCEDURE recompileSelf :
   PUT UNFORMATTED SKIP(0) "  V6Display          : " SESSION:V6DISPLAY.
 
   PUT UNFORMATTED SKIP(1) "CURRENT FILES".
-  FOR EACH bOsFile TABLE-SCAN:
+  FOR EACH bOsFile {&TABLE-SCAN}:
     cExpectedDateTime = getRegistry("DataDigger:files", bOsFile.cFileName).
 
     DISPLAY
@@ -549,7 +548,7 @@ PROCEDURE recompileSelf :
   RUN getSourceFiles(INPUT gcProgramDir, OUTPUT TABLE bOsFile).
 
   /* Save date/time of all files in INI-file */
-  FOR EACH bOsFile TABLE-SCAN:
+  FOR EACH bOsFile {&TABLE-SCAN}:
     USE "DataDigger".
     PUT-KEY-VALUE SECTION "DataDigger:files" KEY bOsFile.cFileName VALUE STRING(bOsFile.cModified).
     USE "".
@@ -792,8 +791,7 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
   ( /* parameter-definitions */ ) :
   /* Check if any of the files of DataDigger has changed and recompile is needed
   */
-  DEFINE VARIABLE lRecompileNeeded AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE cRegistryValue   AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cRegistryValue AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
@@ -812,11 +810,12 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
        OR bOsFile.cFileType = "p"
        OR bOsFile.cFileType = "w"
        OR bOsFile.cFileType = "cls":
+
     cRegistryValue = getRegistry('DataDigger:files', bOsFile.cFileName).
 
-    IF cRegistryValue = ? THEN bOsFile.cStatus = 'Status unknown'.
+    IF cRegistryValue = ? THEN bOsFile.cStatus  = 'Status unknown'.
     ELSE
-    IF cRegistryValue <> bOsFile.cModified THEN bOsFile.cStatus = 'File modified'.
+    IF cRegistryValue <> bOsFile.cModified THEN bOsFile.cStatus  = 'File modified'.
   END.
 
   /* Does every source has an object? */
@@ -826,12 +825,12 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
        OR bOsFile.cFileType = "cls":
 
     IF NOT CAN-FIND(ttOsFile WHERE ttOsFile.cBaseName = bOsFile.cBaseName
-                               AND ttOsFile.cFileType = 'R') THEN
-      bOsFile.cStatus = 'File has no .r'.
+                               AND ttOsFile.cFileType = 'R') THEN bOsFile.cStatus = 'File has no .r'.
   END.
 
   /* Need to recompile? */
   RETURN CAN-FIND(FIRST bOsFile WHERE bOsFile.cStatus <> '').
+
 END FUNCTION. /* isRecompileNeeded */
 
 /* _UIB-CODE-BLOCK-END */

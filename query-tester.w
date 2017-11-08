@@ -1000,10 +1000,9 @@ PROCEDURE test-query PRIVATE :
                                                , bf-ttVstTableInfo.iTableRead
                                                ) NO-ERROR.
 
+          {&_proparse_ prolint-nowarn(oflink)}
           FOR EACH bf-ttVstIndexInfo OF bf-ttVstTableInfo:
-            ASSIGN
-              resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("-  index &1 has &2 reads~n",bf-ttVstIndexInfo.cIndexName,bf-ttVstIndexInfo.iIndexRead) NO-ERROR.
-
+            ASSIGN resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("-  index &1 has &2 reads~n",bf-ttVstIndexInfo.cIndexName,bf-ttVstIndexInfo.iIndexRead) NO-ERROR.
             DELETE bf-ttVstIndexInfo.
           END.
 

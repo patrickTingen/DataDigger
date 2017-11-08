@@ -536,8 +536,9 @@ PROCEDURE dataRowDisplay :
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
 
+  #Column:
   FOR EACH bColumn, bField WHERE bField.cFieldName = bColumn.cFieldName:
-    IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT.
+    IF NOT VALID-HANDLE(bColumn.hColumn) THEN NEXT #Column.
 
     /* Alternate FG and BGcolor */
     IF phBrowseBuffer:QUERY:CURRENT-RESULT-ROW MODULO 2 = 1 THEN
@@ -617,6 +618,7 @@ PROCEDURE hideNonExistingFields :
   /* Go thru the tt one by one and check whether the field
    * is in the XML buffer. If not, hide the field from the user
    */
+  #Column:
   FOR EACH bfField, EACH bfColumn WHERE bfColumn.cFieldName = bfField.cFieldName:
 
     IF LOOKUP(bfField.cDataType, 'clob,blob,raw') > 0
@@ -624,7 +626,7 @@ PROCEDURE hideNonExistingFields :
     DO:
       bfColumn.lShow = FALSE.
       bfColumn.hFilter = ?.
-      NEXT.
+      NEXT #Column.
     END.
 
     /* Save handle to the buffer in the tt */
@@ -733,12 +735,11 @@ PROCEDURE loadData :
   DEFINE VARIABLE hXmlQuery       AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hXmlBuffer      AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hDbBuffer       AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iRow            AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iField          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE cKeyFields      AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cQuery          AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE lOk             AS LOGICAL   NO-UNDO.
 
   /* Disable Triggers? */
   lDisableTrigger = tgWriteTrigger:SCREEN-VALUE IN FRAME {&FRAME-NAME} = "no".

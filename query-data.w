@@ -29,7 +29,7 @@ CREATE WIDGET-POOL.
 &ENDIF
 
 /* DataDigger */
-{ Datadigger.i }
+{ DataDigger.i }
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -46,8 +46,8 @@ CREATE WIDGET-POOL.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS EDITOR-1
-&Scoped-Define DISPLAYED-OBJECTS EDITOR-1
+&Scoped-Define ENABLED-OBJECTS edQuery
+&Scoped-Define DISPLAYED-OBJECTS edQuery
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -60,15 +60,15 @@ CREATE WIDGET-POOL.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
 DEFINE MENU MENU-BAR-C-Win MENUBAR
-       MENU-ITEM m_Print LABEL "Print":U .
+       MENU-ITEM m_Print        LABEL "Print":U         .
 
 
 /* Definitions of the field level widgets                               */
-DEFINE VARIABLE EDITOR-1 AS CHARACTER
+DEFINE VARIABLE edQuery AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE 94 BY 20.71
      BGCOLOR 15  NO-UNDO.
@@ -77,7 +77,7 @@ DEFINE VARIABLE EDITOR-1 AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     EDITOR-1 AT ROW 1 COL 1 NO-LABEL
+     edQuery AT ROW 1 COL 1 NO-LABEL
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
          SIDE-LABELS NO-UNDERLINE THREE-D
          AT COL 1 ROW 1
@@ -132,7 +132,7 @@ ASSIGN {&WINDOW-NAME}:MENUBAR    = MENU MENU-BAR-C-Win:HANDLE.
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 ASSIGN
-       EDITOR-1:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+       edQuery:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
 THEN C-Win:HIDDEN = NO.
@@ -191,10 +191,10 @@ DO:
 
     ASSIGN
 
-      EDITOR-1:X                = 1
-      EDITOR-1:Y                = 1
-      EDITOR-1:WIDTH-PIXELS     = iNewFrameWidth  - EDITOR-1:X - 2
-      EDITOR-1:HEIGHT-PIXELS    = iNewFrameHeight - 2
+      edQuery:X                = 1
+      edQuery:Y                = 1
+      edQuery:WIDTH-PIXELS     = iNewFrameWidth  - edQuery:X - 2
+      edQuery:HEIGHT-PIXELS    = iNewFrameHeight - 2
       .
   END.
 
@@ -243,7 +243,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   /* Datadigger */
   FRAME {&frame-name}:font = getFont("Default").
-  EDITOR-1:font = getFont("Fixed").
+  edQuery:font = getFont("Fixed").
 
   RUN initialize-window.
 
@@ -289,9 +289,9 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY EDITOR-1
+  DISPLAY edQuery
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE EDITOR-1
+  ENABLE edQuery
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -310,7 +310,7 @@ PROCEDURE initialize-window :
 
 ASSIGN
   {&WINDOW-NAME}:TITLE = pcTitle
-   EDITOR-1:SCREEN-VALUE IN FRAME {&FRAME-NAME} = pcDataString.
+   edQuery:SCREEN-VALUE IN FRAME {&FRAME-NAME} = pcDataString.
 
 END PROCEDURE.
 
@@ -319,7 +319,7 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE killquerywindow C-Win
 PROCEDURE killquerywindow :
-  /* Close it
+/* Close it
   */
   APPLY "close":U TO THIS-PROCEDURE.
 END PROCEDURE.
@@ -329,7 +329,7 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE print-editor C-Win
 PROCEDURE print-editor :
-  /* Output to printer
+/* Output to printer
   */
   DEFINE VARIABLE liLine AS INTEGER NO-UNDO.
   DEFINE VARIABLE liNumLines AS INTEGER NO-UNDO.
@@ -347,3 +347,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

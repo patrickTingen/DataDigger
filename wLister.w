@@ -684,13 +684,13 @@ PROCEDURE sortList :
     END.
 
     /* Get ascending list */
-    FOR EACH ttSort TABLE-SCAN BY ttSort.cItem:
+    FOR EACH ttSort {&TABLE-SCAN} BY ttSort.cItem:
       cListAsc = cListAsc + cSep + ttSort.cItem.
     END.
     cListAsc = SUBSTRING(cListAsc,2).
 
     /* Get ascending list */
-    FOR EACH ttSort TABLE-SCAN BY ttSort.cItem DESCENDING:
+    FOR EACH ttSort {&TABLE-SCAN} BY ttSort.cItem DESCENDING:
       cListDesc = cListDesc + cSep + ttSort.cItem.
     END.
     cListDesc = SUBSTRING(cListDesc,2).

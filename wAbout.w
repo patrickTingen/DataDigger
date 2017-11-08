@@ -462,8 +462,8 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE blinkLogo wAbout
 PROCEDURE blinkLogo :
-/* Blink the DD logo
-*/
+  /* Blink the DD logo
+  */
   DEFINE VARIABLE ii   AS INTEGER NO-UNDO.
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
@@ -480,7 +480,6 @@ PROCEDURE blinkLogo :
   END.
 
   DO WITH FRAME {&FRAME-NAME}:
-
     btnDataDigger:MOVE-TO-TOP().
     btnDataDigger:X = 600.
     btnDataDigger:Y = 0.
@@ -493,6 +492,7 @@ PROCEDURE blinkLogo :
     btnDataDigger:VISIBLE = TRUE.
   END.
 
+  #Bounce:
   REPEAT:
     /* Normal flow */
     dy = dy + grav.
@@ -505,7 +505,7 @@ PROCEDURE blinkLogo :
       yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - btnDataDigger:HEIGHT-PIXELS.
       dy = -1 * dy.
     END.
-    IF xx <= 5 THEN LEAVE.
+    IF xx <= 5 THEN LEAVE #Bounce.
 
     btnDataDigger:X = xx.
     btnDataDigger:Y = yy.
@@ -692,12 +692,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wAbout
 PROCEDURE initializeObject :
-/* Init frame
-*/
-  DEFINE BUFFER bQuery FOR ttQuery.
-
+  /* Init frame
+  */
   DO WITH FRAME {&FRAME-NAME}:
-
     wAbout:VISIBLE = FALSE.
 
     /* Position frame relative to main window */
@@ -1041,17 +1038,19 @@ PROCEDURE readAboutFile :
   DEFINE BUFFER bfBrick FOR ttBrick.
 
   INPUT FROM 'DataDigger.txt'.
+  #ReadHeader:
   REPEAT:
     IMPORT UNFORMATTED cLine.
-    IF cLine BEGINS '====' THEN LEAVE.
-  END.
+    IF cLine BEGINS '====' THEN LEAVE #ReadHeader.
+  END. /* #ReadLine */
 
+  #ReadLine:
   REPEAT:
     IMPORT UNFORMATTED cLine.
-    IF cLine BEGINS 'DataDigger' THEN NEXT. /* lines with version name */
-    IF NOT cLine MATCHES '*(*)' THEN NEXT. /* does not end with brackets */
+    IF cLine BEGINS 'DataDigger' THEN NEXT #ReadLine. /* lines with version name */
+    IF NOT cLine MATCHES '*(*)' THEN NEXT #ReadLine. /* does not end with brackets */
     cName = TRIM( ENTRY(NUM-ENTRIES(cLine,'('),cLine,'(' ), ')').
-    IF cName = '' THEN NEXT.  /* blank name */
+    IF cName = '' THEN NEXT #ReadLine.  /* blank name */
 
     DO ii = 1 TO NUM-ENTRIES(cName):
       FIND bfBrick WHERE bfBrick.cBlockId = ENTRY(ii,cName) NO-ERROR.
@@ -1061,7 +1060,7 @@ PROCEDURE readAboutFile :
         ASSIGN bfBrick.cBlockId = ENTRY(ii,cName).
       END.
     END.
-  END.
+  END. /* #ReadLine */
 
   INPUT CLOSE.
 
@@ -1111,6 +1110,7 @@ PROCEDURE setBall :
   END.
 
   IF plBounceBall THEN
+  #SetBall:
   REPEAT:
     gcGameStatus = 'intro'.
 
@@ -1125,7 +1125,7 @@ PROCEDURE setBall :
       yy = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - imgBall:HEIGHT-PIXELS.
       dy = -1 * dy.
       dy = dy * elas.
-      IF xx > 305 THEN LEAVE.
+      IF xx > 305 THEN LEAVE #SetBall.
     END.
 
     /* Bounce at the bat */
@@ -1135,7 +1135,7 @@ PROCEDURE setBall :
       dy = -1 * dy.
       dy = dy * elas * elas * elas.
       dx = dx * elas.
-      IF xx > 305 THEN LEAVE.
+      IF xx > 305 THEN LEAVE #SetBall.
     END.
 
     imgBall:X = xx.

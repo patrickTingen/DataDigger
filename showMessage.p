@@ -35,12 +35,13 @@ ASSIGN
   default-window = winMessage.
 
 /* Find a decent font */
+#FindFont:
 DO iFont = 0 TO FONT-TABLE:NUM-ENTRIES - 1:
   IF    FONT-TABLE:GET-TEXT-WIDTH-PIXELS('DataDigger',iFont) = 54
     AND FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(iFont) = 13 THEN
   DO:
     FRAME infoFrame:font = iFont.
-    LEAVE.
+    LEAVE #FindFont.
   END.
 END.
 

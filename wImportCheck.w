@@ -744,7 +744,7 @@ PROCEDURE showSummary :
 
   cSummary = "Summary of files to be loaded:".
 
-  FOR EACH ttXmlFile TABLE-SCAN BY ttXmlFile.iFileNr:
+  FOR EACH ttXmlFile {&TABLE-SCAN} BY ttXmlFile.iFileNr:
     cSummary = cSummary + "~n~n" + SUBSTITUTE("File: &1", ttXmlFile.cFilename).
 
     FOR EACH ttMessage WHERE ttMessage.iFileNr = ttXmlFile.iFileNr:

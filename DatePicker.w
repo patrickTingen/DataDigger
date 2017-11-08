@@ -595,10 +595,11 @@ PROCEDURE changeYear :
   IF YEAR(ptBaseDate) + piChangeYear = 0 THEN piChangeYear = piChangeYear * 2.
 
   /* Correct day nr in february for non-leap years */
+  #DayCorrection:
   DO iDayCorrection = 0 TO 1:
     ASSIGN
       tNewDate = DATE(MONTH(ptBaseDate), DAY(ptBaseDate) - iDayCorrection, YEAR(ptBaseDate) + pichangeYear) NO-ERROR.
-    IF NOT ERROR-STATUS:ERROR THEN LEAVE.
+    IF NOT ERROR-STATUS:ERROR THEN LEAVE #DayCorrection.
   END.
 
   RUN setDate(INPUT tNewDate).

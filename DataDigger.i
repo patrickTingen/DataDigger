@@ -28,6 +28,11 @@
 /* Constant for collecting statistics */
 &GLOBAL-DEFINE PINGBACKURL https://goo.gl/24deK3
 
+/* Table scan is not available for pre-v11 */
+&IF PROVERSION >= '11' &THEN
+  &GLOBAL-DEFINE TABLE-SCAN TABLE-SCAN
+&ENDIF
+
 DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
 
 /* TT for field data to link DataDiggers to each other */

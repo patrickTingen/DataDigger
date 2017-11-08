@@ -859,7 +859,7 @@ PROCEDURE showFrames :
   FRAME frSettings:height-pixels = 390.
 
   /* Make frames visible based on whether the tags match */
-  FOR EACH ttFrame TABLE-SCAN BY ttFrame.iOrder:
+  FOR EACH ttFrame {&TABLE-SCAN} BY ttFrame.iOrder:
 
     ttFrame.hFrame:visible = ( ttFrame.cTags MATCHES '*' + pcTag + '*' ).
 

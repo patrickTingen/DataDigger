@@ -697,12 +697,15 @@ PROCEDURE renumberQueries :
   /* Renumber ttQuery temp-table */
   iQuery = 0.
 
+  #QueryLoop:
   REPEAT PRESELECT EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
        BY bQuery.iQueryNr:
 
-    FIND NEXT bQuery.
+    FIND NEXT bQuery NO-ERROR.
+    IF NOT AVAILABLE bQuery THEN LEAVE #QueryLoop.
+
     ASSIGN
       iQuery          = iQuery + 1
       bQuery.iQueryNr = iQuery.
@@ -783,6 +786,7 @@ PROCEDURE showQueries :
 
   DEFINE BUFFER bQuery FOR ttQuery.
 
+  #Query:
   FOR EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
@@ -794,8 +798,8 @@ PROCEDURE showQueries :
     ghEditor[iQuery]:SCREEN-VALUE = cQuery.
     ghEditor[iQuery]:PRIVATE-DATA = STRING(bQuery.iQueryNr).
 
-    IF iQuery = 5 THEN LEAVE.
-  END.
+    IF iQuery = 5 THEN LEAVE #Query.
+  END. /* #Query */
 
   DO iLoop = iQuery + 1 TO 5:
     ghEditor[iLoop]:SCREEN-VALUE = ''.

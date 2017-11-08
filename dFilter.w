@@ -351,7 +351,8 @@ PROCEDURE initializeObject :
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
 
     /* Should have exactly 1 record */
-    FIND ttTableFilter.
+    FIND ttTableFilter NO-ERROR.
+    IF NOT AVAILABLE ttTableFilter THEN RETURN.
 
     /* Load settings from registry */
     tgShowNormalTables:CHECKED = ttTableFilter.lShowNormal.
@@ -407,21 +408,20 @@ PROCEDURE populateCombo :
   IF cFilterList = ? THEN cFilterList = ''.
 
   /* Add old entries to the list */
+  #AddEntry:
   DO iPos = 1 TO NUM-ENTRIES(cFilterList,CHR(1)).
     cThisValue = ENTRY(iPos,cFilterList,CHR(1)).
-
-    /* Skip empty */
-    IF cThisValue = '' THEN NEXT.
+    IF cThisValue = '' THEN NEXT #AddEntry.
 
     /* If it is already in the list, ignore */
-    IF LOOKUP(cThisValue,cComboList,CHR(1)) > 0 THEN NEXT.
+    IF LOOKUP(cThisValue,cComboList,CHR(1)) > 0 THEN NEXT #AddEntry.
 
     /* Add to list */
     cComboList = cComboList + CHR(1) + cThisValue.
 
     /* Stop if there are too much in the list */
-    IF NUM-ENTRIES(cComboList,CHR(1)) >= iMaxFilterHistory THEN LEAVE.
-  END.
+    IF NUM-ENTRIES(cComboList,CHR(1)) >= iMaxFilterHistory THEN LEAVE #AddEntry.
+  END. /* #AddEntry */
 
   cComboList = TRIM(cComboList,CHR(1)).
   IF NUM-ENTRIES(cComboList,CHR(1)) > 0 THEN phCombo:LIST-ITEMS = cComboList.
@@ -458,17 +458,18 @@ PROCEDURE saveComboValue :
   cNewList = cValue.
 
   /* Add all old entries to it */
+  #AddEntry:
   DO iEntry = 1 TO NUM-ENTRIES(cList,cDelim):
     /* If same as new entry then leave it out */
-    IF ENTRY(iEntry,cList,cDelim) = cValue THEN NEXT.
+    IF ENTRY(iEntry,cList,cDelim) = cValue THEN NEXT #AddEntry.
 
     /* add to list */
     cNewList = SUBSTITUTE('&1&2&3', cNewList, cDelim, ENTRY(iEntry,cList,cDelim)).
     cNewList = TRIM(cNewList,cDelim).
 
     /* if list is at max length, step out */
-    IF NUM-ENTRIES(cNewList,cDelim) = iMaxEntries THEN LEAVE.
-  END.
+    IF NUM-ENTRIES(cNewList,cDelim) = iMaxEntries THEN LEAVE #AddEntry.
+  END. /* #AddEntry */
 
   /* and finally, save it */
   setRegistry('DataDigger:Tables',pcSetting,cNewList).

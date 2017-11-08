@@ -19,8 +19,23 @@ PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
   DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
 END PROCEDURE.
 
+/* This procedure causes problems:
+ * using datatype LONG causes problems on 64 bit systems
+ * using datatype INT64 causes problems on 32 bit systems
+ */
+&IF PROVERSION BEGINS '10' &THEN
+  /* 32 bit */
+  &GLOBAL-DEFINE return-type LONG
+&ELSEIF PROCESS-ARCHITECTURE = 32 &THEN
+  /* 32 bit */
+  &GLOBAL-DEFINE return-type LONG
+&ELSE
+  /* 64 bit */
+  &GLOBAL-DEFINE return-type INT64
+&ENDIF
+
 PROCEDURE GetKeyboardState EXTERNAL "user32.dll":
-  DEFINE INPUT  PARAMETER KBState AS INT64. /* memptr */
+  DEFINE INPUT  PARAMETER KBState AS {&return-type}. /* memptr */
   DEFINE RETURN PARAMETER RetVal  AS LONG. /* bool   */
 END PROCEDURE.
 
@@ -1507,7 +1522,8 @@ PROCEDURE getFields :
   IF glCacheFieldDefs THEN
   DO:
     /* Find the table. Should exist. */
-    FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
+    FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+    IF NOT AVAILABLE bTable THEN RETURN.
 
     /* Verify whether the CRC is still the same. If not, kill the cache */
     CREATE BUFFER hBufferFile FOR TABLE cSDBName + "._File".
@@ -1530,7 +1546,8 @@ PROCEDURE getFields :
       RUN getTables(INPUT TABLE bTableFilter, OUTPUT TABLE bTable).
 
       /* Find the table back. Should exist. */
-      FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
+      FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+      IF NOT AVAILABLE bTable THEN RETURN.
     END.
 
     /* First look in the memory-cache */
@@ -1566,11 +1583,11 @@ PROCEDURE getFields :
       IF TEMP-TABLE bField:HAS-RECORDS THEN
       DO:
         PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache")).
-        FOR EACH bField TABLE-SCAN:
+        FOR EACH bField {&TABLE-SCAN}:
           CREATE bFieldCache.
           BUFFER-COPY bField TO bFieldCache.
         END.
-        FOR EACH bColumn TABLE-SCAN:
+        FOR EACH bColumn {&TABLE-SCAN}:
           CREATE bColumnCache.
           BUFFER-COPY bColumn TO bColumnCache.
         END.
@@ -1589,7 +1606,8 @@ PROCEDURE getFields :
    * If we get here, the table either cannot be found in the cache
    * or caching is disabled. Either way, fill the tt with fields
    */
-  FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
+  FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+  IF NOT AVAILABLE bTable THEN RETURN.
 
   CREATE BUFFER hBufferFile  FOR TABLE cSDBName + "._File".
   CREATE BUFFER hBufferField FOR TABLE cSDBName + "._Field".
@@ -1744,12 +1762,12 @@ PROCEDURE getFields :
 
     /* Add to memory cache */
     PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache.")).
-    FOR EACH bField TABLE-SCAN:
+    FOR EACH bField {&TABLE-SCAN}:
       CREATE bFieldCache.
       BUFFER-COPY bField TO bFieldCache.
     END.
 
-    FOR EACH bColumn TABLE-SCAN:
+    FOR EACH bColumn {&TABLE-SCAN}:
       CREATE bColumnCache.
       BUFFER-COPY bColumn TO bColumnCache.
     END.
@@ -2019,7 +2037,7 @@ PROCEDURE getTablesFiltered :
   RUN correctFilterList(INPUT-OUTPUT cFieldShow, INPUT-OUTPUT cFieldHide).
 
   #Table:
-  FOR EACH ttTable TABLE-SCAN:
+  FOR EACH ttTable {&TABLE-SCAN}:
     /* Init table to false until proven otherwise */
     ASSIGN ttTable.lShowInList = FALSE.
 
@@ -2084,21 +2102,22 @@ PROCEDURE getTablesFiltered :
       ELSE
       DO:
         lRejected = FALSE.
+        #Field:
         DO iField = 1 TO NUM-ENTRIES(ttTable.cFields):
           cThisField = ENTRY(iField,ttTable.cFields).
           IF CAN-DO(cSearchFld,cThisField) THEN
           DO:
             lRejected = TRUE.
-            LEAVE.
+            LEAVE #Field.
           END.
-        END.
+        END. /* do iField */
         IF lRejected THEN NEXT #Table.
-      END.
-    END.
+      END. /* else */
+    END. /* do iSearch */
 
     /* If we get here, we should add the table */
     ASSIGN ttTable.lShowInList = TRUE.
-  END.
+  END. /* for each ttTable */
 
   {&timerStop}
 END PROCEDURE. /* getTablesWithFields */
@@ -2620,7 +2639,7 @@ PROCEDURE saveQuery :
   DEFINE INPUT  PARAMETER pcQuery        AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cQuery AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iQuery AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iNewNr AS INTEGER   NO-UNDO.
 
   DEFINE BUFFER bQuery FOR ttQuery.
 
@@ -2659,16 +2678,17 @@ PROCEDURE saveQuery :
   END.
 
   /* The ttQuery temp-table is already filled, renumber it */
-  iQuery = 0.
+  #QueryLoop:
   REPEAT PRESELECT EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
       BY bQuery.iQueryNr:
 
-    FIND NEXT bQuery.
+    FIND NEXT bQuery NO-ERROR.
+    IF NOT AVAILABLE bQuery THEN LEAVE #QueryLoop.
     ASSIGN
-      iQuery          = iQuery + 1
-      bQuery.iQueryNr = iQuery.
+      iNewNr          = iNewNr + 1
+      bQuery.iQueryNr = iNewNr.
   END.
 
   /* And save it to the INI-file */
@@ -3193,7 +3213,7 @@ PROCEDURE updateFields :
     PUBLISH "debugInfo" (3, SUBSTITUTE("Rowid/recid at the end for table &1: &2", pcTableName, lRecRowAtEnd)).
   END.
 
-  FOR EACH bField TABLE-SCAN:
+  FOR EACH bField {&TABLE-SCAN}:
 
     /* Due to a bug the nr of decimals may be set on non-decimal fields
      * See PKB P185263 (article 18087) for more information
@@ -3253,8 +3273,10 @@ PROCEDURE updateFields :
 
   /* Reorder fields to get rid of gaps */
   iFieldOrder = 0.
+  #FieldLoop:
   REPEAT PRESELECT EACH bField BY bField.iOrder:
-    FIND NEXT bField.
+    FIND NEXT bField NO-ERROR.
+    IF NOT AVAILABLE bField THEN LEAVE #FieldLoop.
     ASSIGN
       iFieldOrder   = iFieldOrder + 1
       bField.iOrder = iFieldOrder.
@@ -3311,12 +3333,12 @@ PROCEDURE updateMemoryCache :
   END.
 
   /* Create new */
-  FOR EACH bField TABLE-SCAN:
+  FOR EACH bField {&TABLE-SCAN}:
     CREATE bFieldCache.
     BUFFER-COPY bField TO bFieldCache.
   END.
 
-  FOR EACH bColumn TABLE-SCAN:
+  FOR EACH bColumn {&TABLE-SCAN}:
     CREATE bColumnCache.
     BUFFER-COPY bColumn TO bColumnCache.
   END.
@@ -3743,6 +3765,7 @@ FUNCTION getIndexFields RETURNS CHARACTER
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hFileBuffer,hIndexBuffer,hIndexFieldBuffer,hFieldBuffer).
 
+  {&_proparse_ prolint-nowarn(longstrings)}
   cWhere = SUBSTITUTE("FOR EACH &1._file WHERE &1._file._file-name = &2 AND _File._File-Number < 32768, ~
                           EACH &1._index       OF &1._file WHERE TRUE &3 &4,  ~
                           EACH &1._index-field OF &1._index,            ~
