@@ -21,6 +21,7 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Clone button active when more than one record is selected #16
 - Solved: Character fields limited to current width on editing #17
 - Solved: Debug Messages from DataDigger interfere with DWP (Jeroen Beugels)
+- Solved: Right click in field browse gives DLL error #22
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
