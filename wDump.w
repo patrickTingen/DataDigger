@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wDump
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wDump 
 /*------------------------------------------------------------------------
 
   Name : wDump.w
@@ -40,7 +40,7 @@ DEFINE STREAM strDump.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -53,14 +53,14 @@ DEFINE STREAM strDump.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-2 RECT-3 RECT-4 ficFileName ~
 btnChooseDumpFile cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator ~
-cbNumericFormat cbiRecordSelection cbDateFormat cbiFieldSelection btnDump ~
-btnClose tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView ~
-tbDumpReadyClipboard
+cbNumericFormat cbiRecordSelection cbDateFormat cbiFieldSelection ~
+ficMessageNow ficMessage btnDump btnClose tbDumpReadyClose ~
+tbDumpReadyExplore tbDumpReadyView tbDumpReadyClipboard 
 &Scoped-Define DISPLAYED-OBJECTS ficFileName cbDumpType cbCodePage ~
 tbUseCustomizedFormats cbSeparator cbNumericFormat tbExportSchema ~
 cbiRecordSelection cbDateFormat tbMinimalSchema cbiFieldSelection ~
 ficMessageNow ficMessage tbDumpReadyClose tbDumpReadyExplore ~
-tbDumpReadyView tbDumpReadyClipboard
+tbDumpReadyView tbDumpReadyClipboard 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -71,22 +71,23 @@ tbDumpReadyView tbDumpReadyClipboard
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getEscapedData wDump
-FUNCTION getEscapedData RETURNS CHARACTER
-  ( pcTarget AS CHARACTER
-  , pcString AS CHARACTER )  FORWARD.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD allFieldsInList wDump 
+FUNCTION allFieldsInList RETURNS LOGICAL
+  ( INPUT pcFields AS CHARACTER
+  , INPUT pcList   AS CHARACTER
+  )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getExcelCol wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getExcelCol wDump 
 FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldListFromIndexInformation wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldListFromIndexInformation wDump 
 FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   ( INPUT picIndexInformation AS CHARACTER
   )  FORWARD.
@@ -94,19 +95,10 @@ FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldValue wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldValue wDump 
 FUNCTION getFieldValue RETURNS CHARACTER
   ( phField AS HANDLE
   , piExtent AS INTEGER
-  )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD allFieldsInList wDump
-FUNCTION allFieldsInList RETURNS LOGICAL
-  ( INPUT pcFields AS CHARACTER
-  , INPUT pcList   AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -119,40 +111,40 @@ FUNCTION allFieldsInList RETURNS LOGICAL
 DEFINE VAR wDump AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnChooseDumpFile
-     LABEL "..."
+DEFINE BUTTON btnChooseDumpFile 
+     LABEL "..." 
      SIZE-PIXELS 20 BY 21.
 
-DEFINE BUTTON btnClose AUTO-END-KEY
-     LABEL "&Close"
+DEFINE BUTTON btnClose AUTO-END-KEY 
+     LABEL "&Close" 
      SIZE-PIXELS 74 BY 24.
 
-DEFINE BUTTON btnDump
-     LABEL "&Dump"
+DEFINE BUTTON btnDump 
+     LABEL "&Dump" 
      SIZE-PIXELS 74 BY 24 TOOLTIP "start the dump".
 
-DEFINE BUTTON btnOpenLastDumpDir
-     LABEL "&Open"
+DEFINE BUTTON btnOpenLastDumpDir 
+     LABEL "&Open" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "open directory of last dump".
 
-DEFINE BUTTON btnViewLastDump
-     LABEL "&View"
+DEFINE BUTTON btnViewLastDump 
+     LABEL "&View" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "view the last exported file".
 
-DEFINE VARIABLE cbCodePage AS CHARACTER INITIAL "0"
-     LABEL "Code &page"
+DEFINE VARIABLE cbCodePage AS CHARACTER INITIAL "0" 
+     LABEL "Code &page" 
      VIEW-AS COMBO-BOX INNER-LINES 5
      SIMPLE
      SIZE-PIXELS 150 BY 23 TOOLTIP "the code page used for dumping" NO-UNDO.
 
-DEFINE VARIABLE cbDateFormat AS CHARACTER FORMAT "X(256)":U
-     LABEL "D&ate Format"
+DEFINE VARIABLE cbDateFormat AS CHARACTER FORMAT "X(256)":U 
+     LABEL "D&ate Format" 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "the date format used for the dump" NO-UNDO.
 
-DEFINE VARIABLE cbDumpType AS CHARACTER FORMAT "X(32)":U
-     LABEL "&Export as"
+DEFINE VARIABLE cbDumpType AS CHARACTER FORMAT "X(32)":U 
+     LABEL "&Export as" 
      VIEW-AS COMBO-BOX INNER-LINES 8
      LIST-ITEM-PAIRS "Comma Separated","CSV",
                      "Excel","XLS",
@@ -164,16 +156,16 @@ DEFINE VARIABLE cbDumpType AS CHARACTER FORMAT "X(32)":U
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "type of format of the file" NO-UNDO.
 
-DEFINE VARIABLE cbiFieldSelection AS INTEGER FORMAT "9":U INITIAL 0
-     LABEL "&Fields"
+DEFINE VARIABLE cbiFieldSelection AS INTEGER FORMAT "9":U INITIAL 0 
+     LABEL "&Fields" 
      VIEW-AS COMBO-BOX INNER-LINES 3
      LIST-ITEM-PAIRS "All",1,
                      "Selected",2
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "the fieldset that will be exported" NO-UNDO.
 
-DEFINE VARIABLE cbiRecordSelection AS INTEGER FORMAT "9":U INITIAL 0
-     LABEL "&Records"
+DEFINE VARIABLE cbiRecordSelection AS INTEGER FORMAT "9":U INITIAL 0 
+     LABEL "&Records" 
      VIEW-AS COMBO-BOX INNER-LINES 4
      LIST-ITEM-PAIRS "Table",1,
                      "Browse",2,
@@ -181,14 +173,14 @@ DEFINE VARIABLE cbiRecordSelection AS INTEGER FORMAT "9":U INITIAL 0
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "the recordset that will be exported" NO-UNDO.
 
-DEFINE VARIABLE cbNumericFormat AS CHARACTER FORMAT "X(256)":U INITIAL "0"
-     LABEL "&Numeric Format"
+DEFINE VARIABLE cbNumericFormat AS CHARACTER FORMAT "X(256)":U INITIAL "0" 
+     LABEL "&Numeric Format" 
      VIEW-AS COMBO-BOX INNER-LINES 6
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "the numeric format used for dumping" NO-UNDO.
 
-DEFINE VARIABLE cbSeparator AS INTEGER FORMAT "9":U INITIAL 1
-     LABEL "&Separator"
+DEFINE VARIABLE cbSeparator AS INTEGER FORMAT "9":U INITIAL 1 
+     LABEL "&Separator" 
      VIEW-AS COMBO-BOX INNER-LINES 4
      LIST-ITEM-PAIRS "Comma",1,
                      "Pipe",2,
@@ -196,81 +188,81 @@ DEFINE VARIABLE cbSeparator AS INTEGER FORMAT "9":U INITIAL 1
      DROP-DOWN-LIST
      SIZE-PIXELS 150 BY 21 TOOLTIP "character used to separate fields in a record" NO-UNDO.
 
-DEFINE VARIABLE ficFileName AS CHARACTER FORMAT "X(256)":U
-     LABEL "&Dumpfile"
-     VIEW-AS FILL-IN NATIVE
+DEFINE VARIABLE ficFileName AS CHARACTER FORMAT "X(256)":U 
+     LABEL "&Dumpfile" 
+     VIEW-AS FILL-IN NATIVE 
      SIZE-PIXELS 570 BY 21 TOOLTIP "the name and path of the resulting dumpfile" NO-UNDO.
 
-DEFINE VARIABLE ficMessage AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE ficMessage AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 735 BY 22 NO-UNDO.
 
-DEFINE VARIABLE ficMessageNow AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE ficMessageNow AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 130 BY 21 NO-UNDO.
 
 DEFINE RECTANGLE RECT-2
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 795 BY 145.
 
 DEFINE RECTANGLE RECT-3
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 800 BY 65.
 
 DEFINE RECTANGLE RECT-4
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 580 BY 40.
 
-DEFINE VARIABLE tbDumpReadyClipboard AS LOGICAL INITIAL NO
-     LABEL "Data to Clip&board"
+DEFINE VARIABLE tbDumpReadyClipboard AS LOGICAL INITIAL no 
+     LABEL "Data to Clip&board" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 137 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tbDumpReadyClose AS LOGICAL INITIAL NO
-     LABEL "C&lose window"
+DEFINE VARIABLE tbDumpReadyClose AS LOGICAL INITIAL no 
+     LABEL "C&lose window" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 115 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tbDumpReadyExplore AS LOGICAL INITIAL NO
-     LABEL "E&xplore dump dir"
+DEFINE VARIABLE tbDumpReadyExplore AS LOGICAL INITIAL no 
+     LABEL "E&xplore dump dir" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 121 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tbDumpReadyView AS LOGICAL INITIAL NO
-     LABEL "&View dump file"
+DEFINE VARIABLE tbDumpReadyView AS LOGICAL INITIAL no 
+     LABEL "&View dump file" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 113 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tbExportSchema AS LOGICAL INITIAL NO
-     LABEL "Export &XML schema"
+DEFINE VARIABLE tbExportSchema AS LOGICAL INITIAL no 
+     LABEL "Export &XML schema" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 205 BY 17 TOOLTIP "also export the schema to the XML file" NO-UNDO.
 
-DEFINE VARIABLE tbMinimalSchema AS LOGICAL INITIAL NO
-     LABEL "&Minimal Schema"
+DEFINE VARIABLE tbMinimalSchema AS LOGICAL INITIAL no 
+     LABEL "&Minimal Schema" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 205 BY 17 TOOLTIP "use a minimal schema export" NO-UNDO.
 
-DEFINE VARIABLE tbUseCustomizedFormats AS LOGICAL INITIAL NO
-     LABEL "&Use Customized Field Formats"
+DEFINE VARIABLE tbUseCustomizedFormats AS LOGICAL INITIAL no 
+     LABEL "&Use Customized Field Formats" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 205 BY 17 TOOLTIP "export with the customized field formats instead of dictionary formats" NO-UNDO.
 
-DEFINE BUTTON btAbort
-     LABEL "Abort"
+DEFINE BUTTON btAbort 
+     LABEL "Abort" 
      SIZE-PIXELS 75 BY 24 TOOLTIP "abort the dumping process".
 
-DEFINE VARIABLE fcInfoLine AS CHARACTER FORMAT "X(256)":U
-      VIEW-AS TEXT
+DEFINE VARIABLE fcInfoLine AS CHARACTER FORMAT "X(256)":U 
+      VIEW-AS TEXT 
      SIZE-PIXELS 165 BY 13 NO-UNDO.
 
 DEFINE RECTANGLE rcBody
-     EDGE-PIXELS 2 GRAPHIC-EDGE
+     EDGE-PIXELS 2 GRAPHIC-EDGE    
      SIZE-PIXELS 50 BY 20
      BGCOLOR 9 .
 
 DEFINE RECTANGLE rcBorder
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 165 BY 20.
 
 
@@ -289,10 +281,10 @@ DEFINE FRAME DEFAULT-FRAME
      cbDateFormat AT Y 95 X 384 COLON-ALIGNED WIDGET-ID 50
      tbMinimalSchema AT Y 104 X 576 WIDGET-ID 22
      cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED WIDGET-ID 30
-     ficMessageNow AT Y 184 X 10 NO-LABEL WIDGET-ID 18
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
      btnViewLastDump AT Y 200 X 750 WIDGET-ID 28
      btnOpenLastDumpDir AT Y 200 X 773 WIDGET-ID 32
-     ficMessage AT Y 203 X 10 NO-LABEL WIDGET-ID 16
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      btnDump AT Y 265 X 649 WIDGET-ID 62
      btnClose AT Y 265 X 729 WIDGET-ID 60
      tbDumpReadyClose AT Y 270 X 15 WIDGET-ID 36
@@ -306,8 +298,8 @@ DEFINE FRAME DEFAULT-FRAME
      RECT-2 AT Y 5 X 10 WIDGET-ID 14
      RECT-3 AT Y 169 X 5 WIDGET-ID 24
      RECT-4 AT Y 254 X 5 WIDGET-ID 34
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 810 BY 301
          DEFAULT-BUTTON btnDump WIDGET-ID 100.
@@ -317,8 +309,8 @@ DEFINE FRAME infoFrame
      fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 46
      rcBorder AT Y 30 X 10 WIDGET-ID 2
      rcBody AT Y 29 X 10 WIDGET-ID 6
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 280 Y 84
          SIZE-PIXELS 188 BY 103 WIDGET-ID 200.
 
@@ -346,17 +338,17 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 958
          VIRTUAL-HEIGHT-P   = 608
          VIRTUAL-WIDTH-P    = 958
-         MIN-BUTTON         = NO
-         MAX-BUTTON         = NO
-         RESIZE             = NO
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         MIN-BUTTON         = no
+         MAX-BUTTON         = no
+         RESIZE             = no
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -377,8 +369,12 @@ ASSIGN FRAME infoFrame:FRAME = FRAME DEFAULT-FRAME:HANDLE.
    NO-ENABLE                                                            */
 /* SETTINGS FOR BUTTON btnViewLastDump IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-/* SETTINGS FOR FILL-IN ficMessage IN F ficMessageNow IN FRAME DEFAULT-FRAME
-   NO-ENABLE ALIGN-L                                                    */
+ASSIGN 
+       ficMessage:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+
+ASSIGN 
+       ficMessageNow:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+
 /* SETTINGS FOR TOGGLE-BOX tbExportSchema IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
 /* SETTINGS FOR TOGGLE-BOX tbMinimalSchema IN FRAME DEFAULT-FRAME
@@ -386,12 +382,12 @@ ASSIGN FRAME infoFrame:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 /* SETTINGS FOR FRAME infoFrame
                                                                         */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wDump)
-THEN wDump:HIDDEN = NO.
+THEN wDump:HIDDEN = no.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -669,7 +665,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wDump 
 
 
 /* ***************************  Main Block  *************************** */
@@ -708,7 +704,7 @@ SESSION:NUMERIC-FORMAT = gcSessionNumericFormat.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose wDump 
 PROCEDURE btnDumpChoose :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -763,7 +759,7 @@ END PROCEDURE. /* btnDumpChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOpenLastDumpDirChoose wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOpenLastDumpDirChoose wDump 
 PROCEDURE btnOpenLastDumpDirChoose :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -795,7 +791,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpChoose wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpChoose wDump 
 PROCEDURE btnViewLastDumpChoose :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -822,7 +818,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpEnable wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpEnable wDump 
 PROCEDURE btnViewLastDumpEnable :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -852,7 +848,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbCodePageValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbCodePageValueChanged wDump 
 PROCEDURE cbCodePageValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -872,7 +868,7 @@ END PROCEDURE. /* cbCodePageValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDateFormatValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDateFormatValueChanged wDump 
 PROCEDURE cbDateFormatValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -892,7 +888,7 @@ END PROCEDURE. /* cbDateFormatValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDumpTypeValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDumpTypeValueChanged wDump 
 PROCEDURE cbDumpTypeValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -987,7 +983,7 @@ END PROCEDURE. /* cbDumpTypeValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiFieldSelectionValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiFieldSelectionValueChanged wDump 
 PROCEDURE cbiFieldSelectionValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -1004,7 +1000,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiRecordSelectionValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiRecordSelectionValueChanged wDump 
 PROCEDURE cbiRecordSelectionValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -1031,7 +1027,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbNumericFormatValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbNumericFormatValueChanged wDump 
 PROCEDURE cbNumericFormatValueChanged :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -1057,7 +1053,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -1070,9 +1066,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpData wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpData wDump 
 PROCEDURE dumpData :
-  /* Actual dump of the data
+/* Actual dump of the data
   */
   DEFINE INPUT PARAMETER pihDdBrowse         AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER picFormat           AS CHARACTER   NO-UNDO.
@@ -1279,7 +1275,7 @@ END PROCEDURE. /* dumpData */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpData4GL wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpData4GL wDump 
 PROCEDURE DumpData4GL :
 /*------------------------------------------------------------------------------
   Purpose:     Dump Data as 4GL code
@@ -1435,9 +1431,9 @@ END PROCEDURE. /* DumpData4GL */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataCSV wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataCSV wDump 
 PROCEDURE DumpDataCSV :
-  /* Dump data as csv file
+/* Dump data as csv file
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
@@ -1563,7 +1559,7 @@ END PROCEDURE. /* DumpDataCSV */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataExcel wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataExcel wDump 
 PROCEDURE DumpDataExcel :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -1620,9 +1616,9 @@ END PROCEDURE. /* DumpDataExcel */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataHtml wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataHtml wDump 
 PROCEDURE DumpDataHtml :
-  /* Dump data as HTML
+/* Dump data as HTML
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
@@ -1704,29 +1700,34 @@ PROCEDURE DumpDataHtml :
       FIND ttField WHERE ttField.cFullName = hField:NAME NO-ERROR.
       IF NOT AVAILABLE ttField THEN NEXT #FieldLoop.
 
-      IF hField:EXTENT > 1 THEN
-      DO iExtent = 1 TO hField:EXTENT:
+/*       IF hField:EXTENT > 1 THEN */
+      DO iExtent = (IF hField:EXTENT = 0 THEN 0 ELSE 1) TO MAXIMUM(0,hField:EXTENT):
 
-        cData = IF tbUseCustomizedFormats
-                  THEN TRIM(STRING(hField:BUFFER-VALUE(iExtent),ttField.cFormat))
-                  ELSE hField:BUFFER-VALUE(iExtent).
-
-        cData = getEscapedData("HTML", cData).
-
-        PUT STREAM strDump UNFORMATTED
-          SKIP SUBSTITUTE('<td>&1</td>', cData).
-      END.
-      ELSE
-      DO:
-        cData = IF tbUseCustomizedFormats
-                  THEN TRIM(STRING(hField:BUFFER-VALUE,ttField.cFormat))
-                  ELSE hField:BUFFER-VALUE.
+        ASSIGN 
+          cData = IF tbUseCustomizedFormats
+                    THEN TRIM(STRING(hField:BUFFER-VALUE(iExtent),ttField.cFormat))
+                    ELSE hField:BUFFER-VALUE(iExtent) NO-ERROR.
+        
+        /* "** Value X cannot be displayed using Y. (74) " */
+        IF ERROR-STATUS:GET-NUMBER(1) = 74 THEN 
+          ASSIGN cData = TRIM(STRING(hField:BUFFER-VALUE(iExtent)))
 
         cData = getEscapedData("HTML", cData).
 
         PUT STREAM strDump UNFORMATTED
           SKIP SUBSTITUTE('<td>&1</td>', cData).
       END.
+/*       ELSE                                                               */
+/*       DO:                                                                */
+/*         cData = IF tbUseCustomizedFormats                                */
+/*                   THEN TRIM(STRING(hField:BUFFER-VALUE,ttField.cFormat)) */
+/*                   ELSE hField:BUFFER-VALUE.                              */
+/*                                                                          */
+/*         cData = getEscapedData("HTML", cData).                           */
+/*                                                                          */
+/*         PUT STREAM strDump UNFORMATTED                                   */
+/*           SKIP SUBSTITUTE('<td>&1</td>', cData).                         */
+/*       END.                                                               */
     END.
     PUT STREAM strDump UNFORMATTED '</tr>'.
 
@@ -1745,9 +1746,9 @@ END PROCEDURE. /* DumpDataExcel */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataProgressD wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataProgressD wDump 
 PROCEDURE DumpDataProgressD :
-  /* Dump as Progress .d file
+/* Dump as Progress .d file
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
@@ -1874,9 +1875,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataTxt wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataTxt wDump 
 PROCEDURE DumpDataTxt :
-  /* Dump data as plain txt
+/* Dump data as plain txt
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
@@ -2036,7 +2037,7 @@ END PROCEDURE. /* DumpDataText */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataXml wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataXml wDump 
 PROCEDURE DumpDataXml :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -2099,25 +2100,25 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY ficFileName cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator
-          cbNumericFormat tbExportSchema cbiRecordSelection cbDateFormat
-          tbMinimalSchema cbiFieldSelection ficMessageNow ficMessage
-          tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView
-          tbDumpReadyClipboard
+  DISPLAY ficFileName cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator 
+          cbNumericFormat tbExportSchema cbiRecordSelection cbDateFormat 
+          tbMinimalSchema cbiFieldSelection ficMessageNow ficMessage 
+          tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView 
+          tbDumpReadyClipboard 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
-  ENABLE RECT-2 RECT-3 RECT-4 ficFileName btnChooseDumpFile cbDumpType
-         cbCodePage tbUseCustomizedFormats cbSeparator cbNumericFormat
-         cbiRecordSelection cbDateFormat cbiFieldSelection btnDump btnClose
-         tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView
-         tbDumpReadyClipboard
+  ENABLE RECT-2 RECT-3 RECT-4 ficFileName btnChooseDumpFile cbDumpType 
+         cbCodePage tbUseCustomizedFormats cbSeparator cbNumericFormat 
+         cbiRecordSelection cbDateFormat cbiFieldSelection ficMessageNow 
+         ficMessage btnDump btnClose tbDumpReadyClose tbDumpReadyExplore 
+         tbDumpReadyView tbDumpReadyClipboard 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
-  DISPLAY fcInfoLine
+  DISPLAY fcInfoLine 
       WITH FRAME infoFrame IN WINDOW wDump.
-  ENABLE rcBorder rcBody btAbort fcInfoLine
+  ENABLE rcBorder rcBody btAbort fcInfoLine 
       WITH FRAME infoFrame IN WINDOW wDump.
   {&OPEN-BROWSERS-IN-QUERY-infoFrame}
   VIEW wDump.
@@ -2126,7 +2127,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wDump 
 PROCEDURE initializeObject :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -2248,7 +2249,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDumpFileName wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDumpFileName wDump 
 PROCEDURE setDumpFileName :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -2282,7 +2283,7 @@ END PROCEDURE. /* setDumpFileName */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setStatusMessage wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setStatusMessage wDump 
 PROCEDURE setStatusMessage :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -2313,7 +2314,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showProgressBar wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showProgressBar wDump 
 PROCEDURE showProgressBar :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -2351,9 +2352,9 @@ END PROCEDURE. /* showProgressBar */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbDumpReadyClipboard wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbDumpReadyClipboard wDump 
 PROCEDURE tbDumpReadyClipboard :
-  /* Put last dumpfile in clipboard
+/* Put last dumpfile in clipboard
   */
   DEFINE VARIABLE cLine    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iLength  AS INTEGER     NO-UNDO.
@@ -2387,9 +2388,9 @@ END PROCEDURE. /* tbDumpReadyClipboard */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbExportSchemaValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbExportSchemaValueChanged wDump 
 PROCEDURE tbExportSchemaValueChanged :
-  /* Value changed for Export Schema
+/* Value changed for Export Schema
   */
   DO WITH FRAME {&frame-name}:
     ASSIGN tbExportSchema.
@@ -2407,9 +2408,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbMinimalSchemaValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbMinimalSchemaValueChanged wDump 
 PROCEDURE tbMinimalSchemaValueChanged :
-  /* Value changed for Minimal Schema
+/* Value changed for Minimal Schema
   */
   DO WITH FRAME {&frame-name}:
     ASSIGN tbMinimalSchema.
@@ -2419,9 +2420,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbUseCustomizedFormatsValueChanged wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbUseCustomizedFormatsValueChanged wDump 
 PROCEDURE tbUseCustomizedFormatsValueChanged :
-  /* Value changed for Use Customized Formats
+/* Value changed for Use Customized Formats
   */
   DO WITH FRAME {&frame-name}:
     ASSIGN tbUseCustomizedFormats.
@@ -2433,7 +2434,27 @@ END PROCEDURE.
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getExcelCol wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION allFieldsInList wDump 
+FUNCTION allFieldsInList RETURNS LOGICAL
+  ( INPUT pcFields AS CHARACTER
+  , INPUT pcList   AS CHARACTER
+  ) :
+  /* Check if all fields occur in the list
+  */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
+
+  DO i = 1 TO NUM-ENTRIES(pcFields):
+    IF LOOKUP(ENTRY(i,pcFields), pcList) = 0 THEN RETURN FALSE.
+  END.
+
+  RETURN TRUE.
+
+END FUNCTION. /* allFieldsInList */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getExcelCol wDump 
 FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER ) :
   /* Transform a column nr to Excel Column name (27 -> AA)
@@ -2453,7 +2474,7 @@ END FUNCTION. /* getExcelCol */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldListFromIndexInformation wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldListFromIndexInformation wDump 
 FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   ( INPUT picIndexInformation AS CHARACTER
   ) :
@@ -2489,7 +2510,7 @@ END FUNCTION. /* getFieldListFromIndexInformation */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldValue wDump
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldValue wDump 
 FUNCTION getFieldValue RETURNS CHARACTER
   ( phField AS HANDLE
   , piExtent AS INTEGER
@@ -2529,26 +2550,6 @@ FUNCTION getFieldValue RETURNS CHARACTER
   RETURN cFieldValue.
 
 END FUNCTION. /* getFieldValue */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION allFieldsInList wDump
-FUNCTION allFieldsInList RETURNS LOGICAL
-  ( INPUT pcFields AS CHARACTER
-  , INPUT pcList   AS CHARACTER
-  ) :
-  /* Check if all fields occur in the list
-  */
-  DEFINE VARIABLE i AS INTEGER NO-UNDO.
-
-  DO i = 1 TO NUM-ENTRIES(pcFields):
-    IF LOOKUP(ENTRY(i,pcFields), pcList) = 0 THEN RETURN FALSE.
-  END.
-
-  RETURN TRUE.
-
-END FUNCTION. /* allFieldsInList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
