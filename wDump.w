@@ -53,14 +53,14 @@ DEFINE STREAM strDump.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-2 RECT-3 RECT-4 ficFileName ~
 btnChooseDumpFile cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator ~
-cbNumericFormat cbiRecordSelection cbDateFormat cbiFieldSelection ~
-ficMessageNow ficMessage btnDump btnClose tbDumpReadyClose ~
-tbDumpReadyExplore tbDumpReadyView tbDumpReadyClipboard 
+cbNumericFormat cbiRecordSelection cbDateFormat cbiFieldSelection btnDump ~
+btnClose tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView ~
+tbDumpReadyClipboard ficMessageNow ficMessage 
 &Scoped-Define DISPLAYED-OBJECTS ficFileName cbDumpType cbCodePage ~
 tbUseCustomizedFormats cbSeparator cbNumericFormat tbExportSchema ~
 cbiRecordSelection cbDateFormat tbMinimalSchema cbiFieldSelection ~
-ficMessageNow ficMessage tbDumpReadyClose tbDumpReadyExplore ~
-tbDumpReadyView tbDumpReadyClipboard 
+tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView tbDumpReadyClipboard ~
+ficMessageNow ficMessage 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -194,12 +194,12 @@ DEFINE VARIABLE ficFileName AS CHARACTER FORMAT "X(256)":U
      SIZE-PIXELS 570 BY 21 TOOLTIP "the name and path of the resulting dumpfile" NO-UNDO.
 
 DEFINE VARIABLE ficMessage AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 735 BY 22 NO-UNDO.
+      VIEW-AS TEXT 
+     SIZE-PIXELS 735 BY 13 NO-UNDO.
 
 DEFINE VARIABLE ficMessageNow AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 130 BY 21 NO-UNDO.
+      VIEW-AS TEXT 
+     SIZE-PIXELS 130 BY 13 NO-UNDO.
 
 DEFINE RECTANGLE RECT-2
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
@@ -281,16 +281,16 @@ DEFINE FRAME DEFAULT-FRAME
      cbDateFormat AT Y 95 X 384 COLON-ALIGNED WIDGET-ID 50
      tbMinimalSchema AT Y 104 X 576 WIDGET-ID 22
      cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED WIDGET-ID 30
-     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
      btnViewLastDump AT Y 200 X 750 WIDGET-ID 28
      btnOpenLastDumpDir AT Y 200 X 773 WIDGET-ID 32
-     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      btnDump AT Y 265 X 649 WIDGET-ID 62
      btnClose AT Y 265 X 729 WIDGET-ID 60
      tbDumpReadyClose AT Y 270 X 15 WIDGET-ID 36
      tbDumpReadyExplore AT Y 270 X 145 WIDGET-ID 38
      tbDumpReadyView AT Y 270 X 282 WIDGET-ID 40
      tbDumpReadyClipboard AT Y 270 X 406 WIDGET-ID 56
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      "Last dump" VIEW-AS TEXT
           SIZE-PIXELS 87 BY 13 AT Y 163 X 13 WIDGET-ID 26
      "After the dump ..." VIEW-AS TEXT
@@ -1647,7 +1647,7 @@ PROCEDURE DumpDataHtml :
   PUT STREAM strDump UNFORMATTED
     '<html><body><table border="0"><tr bgcolor="KHAKI">'.
 
-  /* Pump field names as column headers*/
+  /* Pump field names as column headers */
   #Field:
   DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
     hField = hTTBuffer:BUFFER-FIELD(iCurField).
@@ -2105,15 +2105,14 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY ficFileName cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator 
           cbNumericFormat tbExportSchema cbiRecordSelection cbDateFormat 
-          tbMinimalSchema cbiFieldSelection ficMessageNow ficMessage 
-          tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView 
-          tbDumpReadyClipboard 
+          tbMinimalSchema cbiFieldSelection tbDumpReadyClose tbDumpReadyExplore 
+          tbDumpReadyView tbDumpReadyClipboard ficMessageNow ficMessage 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
   ENABLE RECT-2 RECT-3 RECT-4 ficFileName btnChooseDumpFile cbDumpType 
          cbCodePage tbUseCustomizedFormats cbSeparator cbNumericFormat 
-         cbiRecordSelection cbDateFormat cbiFieldSelection ficMessageNow 
-         ficMessage btnDump btnClose tbDumpReadyClose tbDumpReadyExplore 
-         tbDumpReadyView tbDumpReadyClipboard 
+         cbiRecordSelection cbDateFormat cbiFieldSelection btnDump btnClose 
+         tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView 
+         tbDumpReadyClipboard ficMessageNow ficMessage 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   DISPLAY fcInfoLine 
@@ -2553,4 +2552,3 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

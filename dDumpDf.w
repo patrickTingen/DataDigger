@@ -2,7 +2,7 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
   Name: dDumpDf.w
@@ -24,7 +24,7 @@ DEFINE INPUT  PARAMETER pcOptions  AS CHARACTER   NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -36,8 +36,8 @@ DEFINE INPUT  PARAMETER pcOptions  AS CHARACTER   NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile ~
-btnChooseDumpFile rsDump
-&Scoped-Define DISPLAYED-OBJECTS fiDir tgOpenFile rsDump
+btnChooseDumpFile rsDump 
+&Scoped-Define DISPLAYED-OBJECTS fiDir tgOpenFile rsDump 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -52,38 +52,38 @@ btnChooseDumpFile rsDump
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnChooseDumpFile
-     LABEL "..."
+DEFINE BUTTON btnChooseDumpFile 
+     LABEL "..." 
      SIZE-PIXELS 20 BY 21.
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY
-     LABEL "Cancel"
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO
-     LABEL "OK"
+DEFINE BUTTON Btn_OK AUTO-GO 
+     LABEL "OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U
-     LABEL "&Folder"
-     VIEW-AS FILL-IN
-     SIZE-PIXELS 330 BY 21 TOOLTIP "the dir where you want to dump the .df file to" NO-UNDO.
+DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U 
+     LABEL "&Folder" 
+     VIEW-AS FILL-IN 
+     SIZE-PIXELS 320 BY 21 TOOLTIP "the dir where you want to dump the .df file to" NO-UNDO.
 
-DEFINE VARIABLE rsDump AS CHARACTER
+DEFINE VARIABLE rsDump AS CHARACTER 
      VIEW-AS RADIO-SET VERTICAL
-     RADIO-BUTTONS
+     RADIO-BUTTONS 
           "[table]", "[table]",
 "&All Tables from [db]", "All"
-     SIZE-PIXELS 315 BY 50 TOOLTIP "what should be dumped" NO-UNDO.
+     SIZE-PIXELS 307 BY 50 TOOLTIP "what should be dumped" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX  
      SIZE-PIXELS 410 BY 180.
 
-DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL NO
-     LABEL "&Open DF after dump"
+DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL no 
+     LABEL "&Open DF after dump" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 130 BY 17 TOOLTIP "open the DF file right after dumping" NO-UNDO.
 
@@ -91,17 +91,17 @@ DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL NO
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiDir AT Y 74 X 40 COLON-ALIGNED WIDGET-ID 2
+     fiDir AT Y 74 X 50 COLON-ALIGNED WIDGET-ID 2
      Btn_OK AT Y 145 X 245
      Btn_Cancel AT Y 145 X 325
-     tgOpenFile AT Y 99 X 50 WIDGET-ID 10
+     tgOpenFile AT Y 100 X 60 WIDGET-ID 10
      btnChooseDumpFile AT Y 74 X 380 WIDGET-ID 8
-     rsDump AT Y 10 X 52 NO-LABEL WIDGET-ID 12
+     rsDump AT Y 10 X 60 NO-LABEL WIDGET-ID 12
      "Dump:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 13 AT Y 15 X 13 WIDGET-ID 16
      RECT-1 AT Y 0 X 0 WIDGET-ID 4
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 423 BY 213
          TITLE "Dump Definitions"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
@@ -124,14 +124,14 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN
+ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -201,7 +201,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
 
 
 /* ***************************  Main Block  *************************** */
@@ -234,7 +234,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -253,12 +253,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiDir tgOpenFile rsDump
+  DISPLAY fiDir tgOpenFile rsDump 
       WITH FRAME Dialog-Frame.
-  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile btnChooseDumpFile rsDump
+  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgOpenFile btnChooseDumpFile rsDump 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -267,9 +267,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
-  /* initialize global vars
+/* initialize global vars
   */
   DEFINE VARIABLE iOption  AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cOption  AS CHARACTER NO-UNDO.

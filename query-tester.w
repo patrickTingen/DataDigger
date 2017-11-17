@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*------------------------------------------------------------------------
 
   Name: query-tester.w
@@ -81,7 +81,7 @@ DEFINE TEMP-TABLE temp-widget NO-UNDO
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -92,9 +92,9 @@ DEFINE TEMP-TABLE temp-widget NO-UNDO
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS RECT-1 btn-clear ed-qry btn-test-qry ~
-btn-test-qry-2 resultset btn-test-qry-3
-&Scoped-Define DISPLAYED-OBJECTS ed-qry resultset
+&Scoped-Define ENABLED-OBJECTS RECT-1 btnClearQuery ed-qry btnTestQuery ~
+btnRunQuery resultset btnPopOut 
+&Scoped-Define DISPLAYED-OBJECTS ed-qry resultset 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -107,50 +107,50 @@ btn-test-qry-2 resultset btn-test-qry-3
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btn-clear
-     LABEL "&Clear"
+DEFINE BUTTON btnClearQuery 
+     LABEL "&Clear" 
      SIZE-PIXELS 50 BY 21.
 
-DEFINE BUTTON btn-test-qry
-     LABEL "&Run"
+DEFINE BUTTON btnPopOut 
+     LABEL "&Pop out" 
+     SIZE-PIXELS 50 BY 21 TOOLTIP "Show text in separate window".
+
+DEFINE BUTTON btnRunQuery 
+     LABEL "&Run" 
+     SIZE-PIXELS 50 BY 21 TOOLTIP "Run the query".
+
+DEFINE BUTTON btnTestQuery 
+     LABEL "&Test" 
      SIZE-PIXELS 50 BY 21 TOOLTIP "Test the query".
 
-DEFINE BUTTON btn-test-qry-2
-     LABEL "&Test"
-     SIZE-PIXELS 50 BY 21 TOOLTIP "Test the query".
-
-DEFINE BUTTON btn-test-qry-3
-     LABEL "&Pop out"
-     SIZE-PIXELS 50 BY 21 TOOLTIP "Test the query".
-
-DEFINE VARIABLE ed-qry AS CHARACTER
+DEFINE VARIABLE ed-qry AS CHARACTER 
      VIEW-AS EDITOR MAX-CHARS 4000 SCROLLBAR-VERTICAL LARGE
      SIZE-PIXELS 500 BY 105 NO-UNDO.
 
-DEFINE VARIABLE resultset AS CHARACTER
+DEFINE VARIABLE resultset AS CHARACTER 
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE-PIXELS 500 BY 105 TOOLTIP "result previous analyze" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE 100 BY 6.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btn-clear AT Y 5 X 505
+     btnClearQuery AT Y 5 X 505
      ed-qry AT Y 135 X 0 NO-LABEL
-     btn-test-qry AT Y 135 X 505
-     btn-test-qry-2 AT Y 170 X 505
+     btnTestQuery AT Y 135 X 505
+     btnRunQuery AT Y 160 X 505
      resultset AT Y 250 X 0 NO-LABEL
-     btn-test-qry-3 AT Y 250 X 505 WIDGET-ID 2
-     RECT-1 AT ROW 1 COLUMN 1 WIDGET-ID 4
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+     btnPopOut AT Y 250 X 505 WIDGET-ID 2
+     RECT-1 AT ROW 1 COL 1 WIDGET-ID 4
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 564 BY 360.
 
@@ -172,21 +172,21 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "MCF's Query Tester"
-         HEIGHT-P      = 360
-         WIDTH-P       = 563
-         MAX-HEIGHT-P  = 817
-         MAX-WIDTH-P   = 1152
-         VIRTUAL-HEIGHT-P = 817
-         VIRTUAL-WIDTH-P = 1152
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         HEIGHT-P           = 360
+         WIDTH-P            = 563
+         MAX-HEIGHT-P       = 817
+         MAX-WIDTH-P        = 1152
+         VIRTUAL-HEIGHT-P   = 817
+         VIRTUAL-WIDTH-P    = 1152
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -200,19 +200,19 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   VISIBLE,,RUN-PERSISTENT                                               */
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
-ASSIGN
+ASSIGN 
        ed-qry:RETURN-INSERTED IN FRAME DEFAULT-FRAME  = TRUE.
 
-ASSIGN
+ASSIGN 
        resultset:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = NO.
+THEN C-Win:HIDDEN = no.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -255,9 +255,9 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btn-clear
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btn-clear C-Win
-ON CHOOSE OF btn-clear IN FRAME DEFAULT-FRAME /* Clear */
+&Scoped-define SELF-NAME btnClearQuery
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearQuery C-Win
+ON CHOOSE OF btnClearQuery IN FRAME DEFAULT-FRAME /* Clear */
 DO:
   FOR EACH ttTestQuery:
     DELETE ttTestQuery.
@@ -273,35 +273,9 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btn-test-qry
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btn-test-qry C-Win
-ON CHOOSE OF btn-test-qry IN FRAME DEFAULT-FRAME /* Run */
-DO:
-  SESSION:SET-WAIT-STATE("GENERAL":U).
-  RUN test-query IN THIS-PROCEDURE (INPUT TRUE, INPUT TRUE ,OUTPUT lErrorDetected).
-  SESSION:SET-WAIT-STATE("":U).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btn-test-qry-2
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btn-test-qry-2 C-Win
-ON CHOOSE OF btn-test-qry-2 IN FRAME DEFAULT-FRAME /* Test */
-DO:
-  SESSION:SET-WAIT-STATE("GENERAL":U).
-  RUN test-query IN THIS-PROCEDURE (INPUT FALSE, INPUT TRUE ,OUTPUT lErrorDetected).
-  SESSION:SET-WAIT-STATE("":U).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btn-test-qry-3
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btn-test-qry-3 C-Win
-ON CHOOSE OF btn-test-qry-3 IN FRAME DEFAULT-FRAME /* Pop out */
+&Scoped-define SELF-NAME btnPopOut
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnPopOut C-Win
+ON CHOOSE OF btnPopOut IN FRAME DEFAULT-FRAME /* Pop out */
 DO:
   SESSION:SET-WAIT-STATE("GENERAL":U).
   RUN value(REPLACE(THIS-PROCEDURE:FILE-NAME,"query-tester","query-data")) PERSISTENT
@@ -314,9 +288,35 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME btnRunQuery
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnRunQuery C-Win
+ON CHOOSE OF btnRunQuery IN FRAME DEFAULT-FRAME /* Run */
+DO:
+  SESSION:SET-WAIT-STATE("GENERAL":U).
+  RUN test-query IN THIS-PROCEDURE (INPUT TRUE, INPUT TRUE ,OUTPUT lErrorDetected).
+  SESSION:SET-WAIT-STATE("":U).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME btnTestQuery
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTestQuery C-Win
+ON CHOOSE OF btnTestQuery IN FRAME DEFAULT-FRAME /* Test */
+DO:
+  SESSION:SET-WAIT-STATE("GENERAL":U).
+  RUN test-query IN THIS-PROCEDURE (INPUT FALSE, INPUT TRUE ,OUTPUT lErrorDetected).
+  SESSION:SET-WAIT-STATE("":U).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
 
 
 /* ***************************  Main Block  *************************** */
@@ -418,9 +418,9 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE ask-table-from-user C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE ask-table-from-user C-Win 
 PROCEDURE ask-table-from-user PRIVATE :
-  /* Let user select a table
+/* Let user select a table
   */
   DEFINE INPUT PARAMETER ipc-current-name AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER opc-TableName AS CHARACTER NO-UNDO.
@@ -449,9 +449,9 @@ END PROCEDURE. /* ask-table-from-user */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clean-temp-table C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clean-temp-table C-Win 
 PROCEDURE clean-temp-table PRIVATE :
-  /* Clean up internal temp-tables
+/* Clean up internal temp-tables
   */
   DEFINE BUFFER bf-ttBuffer FOR ttBuffer.
   DEFINE BUFFER bf-ttVstTableInfo FOR ttVstTableInfo.
@@ -482,7 +482,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -495,15 +495,15 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enableButtons C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enableButtons C-Win 
 PROCEDURE enableButtons :
-  /* Set the sensitivity of the buttons
+/* Set the sensitivity of the buttons
   */
   DEFINE VARIABLE hTt AS HANDLE NO-UNDO.
 
   ASSIGN hTt = TEMP-TABLE ttTestQuery:HANDLE.
   DO WITH FRAME {&FRAME-NAME}:
-    ASSIGN btn-clear:SENSITIVE = hTt:HAS-RECORDS.
+    ASSIGN btnClearQuery:SENSITIVE = hTt:HAS-RECORDS.
   END.
 
 END PROCEDURE.
@@ -519,13 +519,13 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY ed-qry resultset
+  DISPLAY ed-qry resultset 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE RECT-1 btn-clear ed-qry btn-test-qry btn-test-qry-2 resultset
-         btn-test-qry-3
+  ENABLE RECT-1 btnClearQuery ed-qry btnTestQuery btnRunQuery resultset 
+         btnPopOut 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -534,9 +534,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processMessage C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processMessage C-Win 
 PROCEDURE processMessage :
-  /* Parse FOR EACH expressions out of debug messages
+/* Parse FOR EACH expressions out of debug messages
   */
   DEFINE INPUT PARAMETER ipiLevel AS INTEGER NO-UNDO.
   DEFINE INPUT PARAMETER ipcQueryString AS CHARACTER NO-UNDO.  /* will mostly contain not valid queries (running procecure etc...) */
@@ -550,9 +550,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win 
 PROCEDURE processQuery :
-  /* Analyze the query
+/* Analyze the query
   */
   DEFINE INPUT PARAMETER ipcQueryString AS CHARACTER NO-UNDO.
 
@@ -566,7 +566,7 @@ PROCEDURE processQuery :
   /* queries. The default is FALSE. When TRUE, you cannot use the GET PREV, GET LAST,    */
   /* REPOSITION, or BROWSE methods or statements with these queries. If you do, the AVM  */
   /* generates an error.                                                                 */
-  ipcQueryString = REPLACE(ipcQueryString,"INDEXED-REPOSITION","").
+/*  ipcQueryString = REPLACE(ipcQueryString,"INDEXED-REPOSITION","").*/
   /* </BEU> */
 
   DO WITH FRAME {&FRAME-NAME}:
@@ -602,9 +602,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFrame C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFrame C-Win 
 PROCEDURE resizeFrame :
-  /* Resize the frame and all the widget it contains to the new window size
+/* Resize the frame and all the widget it contains to the new window size
   */
   DEFINE INPUT PARAMETER wfram# AS WIDGET-HANDLE NO-UNDO.
 
@@ -674,9 +674,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE scanVST C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE scanVST C-Win 
 PROCEDURE scanVST PRIVATE :
-  /* Scan the VST tables
+/* Scan the VST tables
   */
   DEFINE INPUT PARAMETER iplInitialData AS LOGICAL NO-UNDO. /* get the initial data or get the number of reads from the query */
 
@@ -801,9 +801,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE test-query C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE test-query C-Win 
 PROCEDURE test-query PRIVATE :
-  /* test the query
+/* test the query
   */
   DEFINE INPUT  PARAMETER iplPerfromQuery AS LOGICAL NO-UNDO.
   DEFINE INPUT  PARAMETER iplShowQuery    AS LOGICAL NO-UNDO.
@@ -850,8 +850,13 @@ PROCEDURE test-query PRIVATE :
       lcCurrentName = "".
 
     CREATE QUERY hQry.
-    hQry:FORWARD-ONLY = TRUE. /* 240609-001 */
-
+    
+    /* If user specifies INDEXED-REPOSITION in 
+     * the query, we cannot use FORWARD-ONLY. 
+     */
+    hQry:FORWARD-ONLY = ( LOOKUP('INDEXED-REPOSITION', ed-qry,' ') = 0 ).
+    ed-qry = REPLACE(ed-qry,'INDEXED-REPOSITION','').
+    
     DO FOR bf-ttBuffer liWord = 1 TO liNumWords:
       ASSIGN
         lcPrevName    = lcCurrentName
@@ -1031,3 +1036,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
