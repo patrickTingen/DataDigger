@@ -4149,6 +4149,7 @@ PROCEDURE btnClearTableFilterChoose :
     cbDatabaseFilter:SCREEN-VALUE = ' '.
     FilterModified(fiTableFilter:HANDLE,NO).
     FilterModified(cbDatabaseFilter:HANDLE,NO).
+    gcFieldFilterList = ''.
 
     setFilterFieldColor(fiTableFilter   :HANDLE).
     setFilterFieldColor(cbDatabaseFilter:HANDLE).
@@ -4160,6 +4161,7 @@ PROCEDURE btnClearTableFilterChoose :
     RUN getTableStats(INPUT-OUTPUT TABLE ttTable).
 
     RUN filterTables.
+    RUN reopenFieldBrowse(?,?). /* reopen, while maintaining original sort */
   END.
 
 END PROCEDURE. /* btnClearTableFilterChoose */
