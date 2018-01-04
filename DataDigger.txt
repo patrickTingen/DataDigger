@@ -24,13 +24,16 @@ DataDigger version 24 - dd MMM 2017
 - Solved: Right click in field browse gives DLL error #22
 - Solved: Error when exporting data that does not fit in format #24 (Martin Verstegen)
 - Solved: When clearing filter-by-field, colors remain in field browse #25
+- Solved: Jumping to/from filter fields jumps to wrong field #27
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
-- Change: Export to csv now uses field names instead of labels (fixes #13)
-- Change: Tabs on settings page now react to CTRL+PgUp/PgDn (fixes #14)
+- Change: Export to csv now uses field names instead of labels #13
+- Change: Tabs on settings page now react to CTRL+PgUp/PgDn #14
 - Change: Query Tester can now also handle INDEXED-REPOSITION queries
 - Change: Minimum Progress version for DD changed to 10.1C #19
+
+- New   : Option to set table name as first element in window title #26 (Johan Geerts)
 
 =====================================================================================
 

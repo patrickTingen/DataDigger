@@ -10,7 +10,7 @@
            starts. In future versions of the DataDigger, myDataDigger.p
            will not be overwritten.
            
-           Using QAD? Look for [QAD] tags in this file. 
+           Using QAD? Look for #QAD tags in this file.
            
 
   HISTORY: DD18: customFilter added.
@@ -24,13 +24,12 @@
 /* All functions of DataDigger, see DataDiggerLib for a full list */
 {datadigger.i}
 
-/* [QAD]
+/* #QAD
 /* You might like to set global_domain based on (for example) database name */
 define new global shared variable global_domain as character.
-
 */
 
-/* [QAD] users might use this function to determine the 
+/* #QAD users might use this function to determine the 
  *       domain-field in a table 
  */ 
 FUNCTION getDomainFieldName RETURNS CHARACTER
@@ -64,6 +63,8 @@ FUNCTION getDomainFieldName RETURNS CHARACTER
 
 END FUNCTION. /* getDomainFieldName */
 
+
+/*
 PROCEDURE customShowField:
   /*
    * Name: customShowField
@@ -83,16 +84,22 @@ PROCEDURE customShowField:
   DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
 
-  /* Example, hide the cust-num field except on the customer table
+  /* Example 1: hide the cust-num field except on the customer table
   IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
   */
-  
-  /* [QAD] By default, do not show extra QAD fields */
+
+  /* Example 2: hide the default RECID and ROWID field
+  IF pcField = 'RECID' OR pcField = 'ROWID' THEN plShow = FALSE.
+  */
+
+  /* Example 3: By default, do not show extra #QAD fields */
   /* IF pcField MATCHES '*__*' THEN plShow = FALSE. */
 
 END PROCEDURE. /* customShowField */
+*/
 
 
+/*
 PROCEDURE customFormat:
   /*
    * Name: customFormat
@@ -122,8 +129,10 @@ PROCEDURE customFormat:
   /*  AND pcFormat MATCHES '*~~.99' THEN pcFormat = pcFormat + '9'.  */
 
 END PROCEDURE. /* customFormat */
+*/
 
 
+/*
 PROCEDURE CustomDump:
   /*
    * Name: customDump.p
@@ -197,8 +206,10 @@ PROCEDURE CustomDump:
   /*   END.                                                                                     */
 
 END PROCEDURE. /* CustomDump */
+*/
 
 
+/*
 PROCEDURE customQuery:
   /*
    * Name: customQuery.p
@@ -223,8 +234,10 @@ PROCEDURE customQuery:
   /*  pcQuery = DYNAMIC-FUNCTION("getQuery", pcDatabase, pcTable, 1).  */
 
 END PROCEDURE. /* customQuery */
+*/
 
 
+/*
 PROCEDURE DataDigger:
   /*
    * Name: DataDigger
@@ -244,14 +257,13 @@ PROCEDURE DataDigger:
   DO:
     MESSAGE 'Sorry, db is in maintenance, please try again later' VIEW-AS ALERT-BOX.
     QUIT.
-  END.
-  
-  *
+  END.  
   */
-
 END PROCEDURE. /* DataDigger */
+*/
 
 
+/*
 PROCEDURE customGetFilterValue:
   /*
    * Name: customGetFilterValue
@@ -268,8 +280,10 @@ PROCEDURE customGetFilterValue:
   /* IF pcField MATCHES "*_domain" THEN pcFilterValue = global_domain. */
 
 END PROCEDURE. /* customGetFilterValue */
+*/
 
 
+/*
 PROCEDURE customSaveFilterValue:
   /*
    * Name: customSaveFilterValue
@@ -282,14 +296,16 @@ PROCEDURE customSaveFilterValue:
   DEFINE INPUT PARAMETER pcFilterValue AS CHARACTER NO-UNDO.
 
   /* Example code: save value of a particular field 
-   * [QAD] users could use this to catch filtering on global_domain
+   * #QAD users could use this to catch filtering on global_domain
    *       and then later adding it to the query.
    */
   /* IF pcField MATCHES "*_domain" THEN global_domain = pcFilterValue. */
 
 END PROCEDURE. /* customSaveFilterValue */
+*/
 
 
+/*
 PROCEDURE queryOpen:
   /* 
    * Name: queryOpen
@@ -320,3 +336,4 @@ PROCEDURE queryOpen:
   /* END.                                                             */
   
 END PROCEDURE. /* queryOpen */
+*/

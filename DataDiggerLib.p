@@ -1847,7 +1847,6 @@ PROCEDURE getTables :
   DEFINE VARIABLE hFileBuffer     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileQuery      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hDbQuery        AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFieldQuery     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
 
   {&timerStart}

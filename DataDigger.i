@@ -145,6 +145,7 @@ DEFINE TEMP-TABLE ttColumn NO-UNDO RCODE-INFORMATION
   FIELD hFilter       AS HANDLE             /* handle to the filter on top of the databrowse */
   INDEX idxPrim IS PRIMARY cTableCacheId
   INDEX idxField cFieldName
+  INDEX idxFull  cFullName
   INDEX idxColNr iColumnNr
   INDEX idxSort  cTableCacheId cFieldName iColumnNr
   INDEX idxTable cDatabase cTablename

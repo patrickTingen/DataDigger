@@ -748,8 +748,8 @@ END PROCEDURE. /* initializeObject. */
 PROCEDURE initializeUi :
 /* Enable the user interface
  */
-  DEFINE VARIABLE UIB_S    AS LOGICAL    NO-UNDO.
-  DEFINE VARIABLE OCXFile  AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE lLoaded AS LOGICAL    NO-UNDO.
+  DEFINE VARIABLE OCXFile AS CHARACTER  NO-UNDO.
 
   /* Load wrx file if possible */
   OCXFile = SEARCH( "wAbout.wrx":U ).
@@ -762,7 +762,7 @@ PROCEDURE initializeUi :
     ASSIGN
       chCtrlFrame    = CtrlFrame:COM-HANDLE
       CtrlFrame:NAME = "CtrlFrame":U
-      UIB_S          = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U) NO-ERROR
+      lLoaded        = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U) NO-ERROR
     .
 
     /* Check for message 6087:
@@ -771,7 +771,10 @@ PROCEDURE initializeUi :
      * This error occurred while trying to load an ActiveX control.
      * It is possible that the control was not properly installed or that the .ocx file was moved or deleted.
      */
-    IF ERROR-STATUS:GET-NUMBER(1) = 6087 THEN
+    IF ERROR-STATUS:GET-NUMBER(1) = 6087
+      OR lLoaded = FALSE
+      OR chCtrlFrame:pstimer = 0
+      OR NOT VALID-HANDLE(chCtrlFrame) THEN
       glUseTimer = NO.
     ELSE
       glUseTimer = YES.
