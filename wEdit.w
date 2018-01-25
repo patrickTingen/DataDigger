@@ -1391,6 +1391,7 @@ END PROCEDURE. /* increaseValue */
 PROCEDURE initializeObject :
 /* Setup
   */
+  DEFINE VARIABLE cExtFormat      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
@@ -1444,6 +1445,15 @@ PROCEDURE initializeObject :
     bColumn.lShow        = FALSE. /* lShow now means: "Change this field" */
     iMaxFieldLength      = MAXIMUM(iMaxFieldLength,LENGTH(bColumn.cFullName)).
   END.
+
+  /* Add leading zeros to full name for extents */
+  FOR EACH bField WHERE bField.iExtent > 10:
+    /* Create a format for extents with proper nr of digits */
+    cExtFormat = FILL('9', INTEGER(LENGTH(STRING(bField.iExtent)))).
+    FOR EACH bColumn WHERE bColumn.cFieldName = bField.cFieldname:
+       bColumn.cFullName  = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
+    END.
+  END.    
 
   /* Collect data for all fields
    * And if we only have 1 value for all selected records, let's show that
