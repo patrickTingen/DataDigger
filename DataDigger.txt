@@ -5,7 +5,7 @@
       
 =====================================================================================
 
-DataDigger version 24 - dd MMM 2017 
+DataDigger version 24 - dd MMM 2018 
 
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
@@ -26,6 +26,9 @@ DataDigger version 24 - dd MMM 2017
 - Solved: When clearing filter-by-field, colors remain in field browse #25
 - Solved: Jumping to/from filter fields jumps to wrong field #27
 - Solved: Field names for extents do not sort intuitive #28 (Johan Geerts)
+- Solved: Change table + immediate RETURN did not open the query
+- Solved: Error on opening list editor #29 (Hans Kaman)
+- Solved: Error on initializing backup folder #30 (Hans Kaman)
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
@@ -33,6 +36,7 @@ DataDigger version 24 - dd MMM 2017
 - Change: Tabs on settings page now react to CTRL+PgUp/PgDn #14
 - Change: Query Tester can now also handle INDEXED-REPOSITION queries
 - Change: Minimum Progress version for DD changed to 10.1C #19
+- Change: Removed SHIFT-HOME shortcut in record editor
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 

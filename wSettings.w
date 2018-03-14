@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wSettings
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wSettings 
 /*------------------------------------------------------------------------
 
         Name: wSettings.w
@@ -46,7 +46,7 @@ DEFINE TEMP-TABLE ttFrame NO-UNDO RCODE-INFORMATION
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -58,8 +58,8 @@ DEFINE TEMP-TABLE ttFrame NO-UNDO RCODE-INFORMATION
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnSettings rcSettings ficSettingsFile ~
-btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK
-&Scoped-Define DISPLAYED-OBJECTS ficSettingsFile fiSearch
+btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK 
+&Scoped-Define DISPLAYED-OBJECTS ficSettingsFile fiSearch 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -75,48 +75,48 @@ btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK
 DEFINE VAR wSettings AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON BtnCancel-2 AUTO-END-KEY DEFAULT
-     LABEL "Cancel"
+DEFINE BUTTON BtnCancel-2 AUTO-END-KEY DEFAULT 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnOK AUTO-GO DEFAULT
-     LABEL "OK"
+DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
+     LABEL "OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON btnRawEdit
-     LABEL "&Raw Edit"
+DEFINE BUTTON btnRawEdit 
+     LABEL "&Raw Edit" 
      SIZE-PIXELS 60 BY 21 TOOLTIP "direct editing of the settings file".
 
 DEFINE BUTTON btnSettings  NO-FOCUS FLAT-BUTTON
-     LABEL ""
+     LABEL "" 
      SIZE-PIXELS 125 BY 35.
 
-DEFINE BUTTON btPage1
-     LABEL "Behavior"
+DEFINE BUTTON btPage1 
+     LABEL "Behavior" 
      SIZE-PIXELS 125 BY 35.
 
-DEFINE BUTTON btPage2
-     LABEL "Appearance"
+DEFINE BUTTON btPage2 
+     LABEL "Appearance" 
      SIZE-PIXELS 125 BY 35.
 
-DEFINE BUTTON btPage3
-     LABEL "Backup"
+DEFINE BUTTON btPage3 
+     LABEL "Backup" 
      SIZE-PIXELS 125 BY 35.
 
-DEFINE VARIABLE ficSettingsFile AS CHARACTER FORMAT "X(256)":U
-     LABEL "Settings file"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE ficSettingsFile AS CHARACTER FORMAT "X(256)":U 
+     LABEL "Settings file" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 460 BY 21 NO-UNDO.
 
-DEFINE VARIABLE fiSearch AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiSearch AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 125 BY 23
      FONT 4 NO-UNDO.
 
 DEFINE RECTANGLE rcSettings
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 610 BY 402.
 
 
@@ -124,7 +124,7 @@ DEFINE RECTANGLE rcSettings
 
 DEFINE FRAME DEFAULT-FRAME
      btnSettings AT Y 10 X 20 WIDGET-ID 24
-     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED WIDGET-ID 54 NO-TAB-STOP
+     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED WIDGET-ID 54 NO-TAB-STOP 
      btnRawEdit AT Y 15 X 690 WIDGET-ID 90
      fiSearch AT Y 64 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      btPage1 AT Y 104 X 20 WIDGET-ID 8
@@ -134,18 +134,18 @@ DEFINE FRAME DEFAULT-FRAME
      BtnOK AT Y 470 X 660 WIDGET-ID 94
      "CTRL-ALT-S also opens this window" VIEW-AS TEXT
           SIZE-PIXELS 240 BY 20 AT Y 475 X 15 WIDGET-ID 100
-          FGCOLOR 7
+          FGCOLOR 7 
      rcSettings AT Y 60 X 150 WIDGET-ID 92
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 761 BY 508
          DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel-2 WIDGET-ID 100.
 
 DEFINE FRAME frSettings
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         AT X 156 Y 64
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 155 Y 65
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
          TITLE "" WIDGET-ID 200.
 
@@ -173,15 +173,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 769
          VIRTUAL-HEIGHT-P   = 562
          VIRTUAL-WIDTH-P    = 769
-         RESIZE             = NO
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         RESIZE             = no
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -198,22 +198,22 @@ ASSIGN FRAME frSettings:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    NOT-VISIBLE FRAME-NAME                                               */
-ASSIGN
+ASSIGN 
        ficSettingsFile:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 /* SETTINGS FOR FRAME frSettings
                                                                         */
-ASSIGN
+ASSIGN 
        FRAME frSettings:HEIGHT           = 18.57
        FRAME frSettings:WIDTH            = 120.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wSettings)
-THEN wSettings:HIDDEN = YES.
+THEN wSettings:HIDDEN = yes.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -293,10 +293,15 @@ END.
 ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
 OR GO OF wSettings ANYWHERE
 DO:
+  DEFINE VARIABLE lOk AS LOGICAL NO-UNDO.
+  
   SESSION:SET-WAIT-STATE("general").
   RUN saveSettings.
   SESSION:SET-WAIT-STATE("").
 
+  RUN checkBackupFolder(OUTPUT lOk).
+  IF NOT lOk THEN RETURN NO-APPLY. 
+  
   RUN saveConfigFileSorted.
 
   plSuccess = TRUE.
@@ -445,7 +450,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wSettings 
 
 
 /* ***************************  Main Block  *************************** */
@@ -490,9 +495,9 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFrames wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFrames wSettings 
 PROCEDURE collectFrames :
-  /* Collect all frames that have been instantiated
+/* Collect all frames that have been instantiated
   */
   DEFINE INPUT PARAMETER phParent AS HANDLE NO-UNDO.
 
@@ -536,7 +541,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -557,13 +562,13 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY ficSettingsFile fiSearch
+  DISPLAY ficSettingsFile fiSearch 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
-  ENABLE btnSettings rcSettings ficSettingsFile btnRawEdit fiSearch btPage1
-         btPage2 btPage3 BtnCancel-2 BtnOK
+  ENABLE btnSettings rcSettings ficSettingsFile btnRawEdit fiSearch btPage1 
+         btPage2 btPage3 BtnCancel-2 BtnOK 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW FRAME frSettings IN WINDOW wSettings.
@@ -573,9 +578,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wSettings 
 PROCEDURE initializeObject :
-  /* Init global vars and frames
+/* Init global vars and frames
   */
   DEFINE VARIABLE hWidget    AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iMaxHeight AS INTEGER NO-UNDO.
@@ -649,9 +654,9 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadSettings wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadSettings wSettings 
 PROCEDURE loadSettings :
-  /* Walk the frames and load settings for all widgets
+/* Walk the frames and load settings for all widgets
   */
   DEFINE VARIABLE hWidget    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cValue     AS CHARACTER   NO-UNDO.
@@ -740,9 +745,9 @@ END PROCEDURE. /* loadSettings */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveSettings wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveSettings wSettings 
 PROCEDURE saveSettings :
-  /* Write settings back to the ini file
+/* Write settings back to the ini file
   */
   DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
   DEFINE VARIABLE cSection AS CHARACTER NO-UNDO.
@@ -794,9 +799,9 @@ END PROCEDURE. /* saveSettings */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wSettings 
 PROCEDURE setPage :
-  /* Show a page
+/* Show a page
   */
   DEFINE INPUT PARAMETER piPageNr AS INTEGER NO-UNDO.
 
@@ -841,9 +846,9 @@ END PROCEDURE. /* setPage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFrames wSettings
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFrames wSettings 
 PROCEDURE showFrames :
-  /* Show all subframes containing a certain tag
+/* Show all subframes containing a certain tag
   */
   DEFINE INPUT PARAMETER pcTag AS CHARACTER   NO-UNDO.
 
