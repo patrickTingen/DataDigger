@@ -27,8 +27,8 @@ DEFINE {&invar} picDatabase       AS CHARACTER  NO-UNDO.
 DEFINE {&invar} picTableName      AS CHARACTER  NO-UNDO.
 
 &IF DEFINED(UIB_is_Running) = 0 &THEN
-DEFINE {&invar} TABLE FOR ttField.
-DEFINE {&invar} TABLE FOR ttColumn.
+  DEFINE {&invar} TABLE FOR ttField.
+  DEFINE {&invar} TABLE FOR ttColumn.
 &ENDIF
 
 DEFINE {&outvar} polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
@@ -780,6 +780,7 @@ DO:
 END.
 
 ON "RETURN" OF ttColumn.lShow IN BROWSE brRecord
+OR 'default-action' OF brRecord
 DO:
   DEFINE VARIABLE hDataField AS HANDLE NO-UNDO.
   hDataField = brRecord:GET-BROWSE-COLUMN( {&field-cNewValue} ) IN FRAME {&FRAME-NAME}.
@@ -887,16 +888,6 @@ DO:
   END.
 END.
 
-/* Set field back to original value */
-ON "SHIFT-HOME" OF ttColumn.cNewValue IN BROWSE brRecord
-DO:
-  DO WITH FRAME {&FRAME-NAME}:
-    /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    SELF:SCREEN-VALUE = ttColumn.cOldValue.
-  END.
-END.
-
 /* Clean field */
 ON "SHIFT-DEL" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
@@ -968,6 +959,7 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE hBuffer         AS HANDLE  NO-UNDO.
   DEFINE VARIABLE hBufferDB       AS HANDLE  NO-UNDO.
   DEFINE VARIABLE hBufferOrg      AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE hSourceBuffer   AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iNumRecs        AS INTEGER NO-UNDO.
   DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
   DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
@@ -981,7 +973,7 @@ PROCEDURE btnGoChoose :
     plSuccess = TRUE.
     RETURN.
   END.
-
+  
   lDisableTrigger = (tgWriteTrigger:SCREEN-VALUE IN FRAME {&FRAME-NAME} = "no").
 
   /* See if any fields have been set. If not, go back. */
@@ -1075,51 +1067,54 @@ PROCEDURE btnGoChoose :
         /* Dump the original record as a backup */
         RUN dumpRecord(INPUT "Update", INPUT hBufferDB, OUTPUT plSuccess).
         IF NOT plSuccess THEN UNDO #CommitLoop, LEAVE #CommitLoop.
+      
+        /* Check for changes by other users */
+        FOR EACH bColumn WHERE bColumn.lShow = TRUE
+          ON ERROR UNDO #CommitLoop, LEAVE #CommitLoop:
+
+          IF hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) <> hBufferORG:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
+            THEN
+          DO:
+            RUN showHelp("DataChanged"
+                        , SUBSTITUTE('&1,&2,&3'
+                                    , bColumn.cFieldName
+                                    , hBufferORG:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
+                                    , hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
+                                    ) ).
+
+            CASE getRegistry('DataDigger:help', 'DataChanged:answer'):
+              WHEN '1' THEN . /* yes */
+              WHEN '2' THEN NEXT #RecordLoop. /* no */
+              WHEN '3' THEN . /* yes-all */
+              WHEN '4' THEN UNDO #CommitLoop, LEAVE #CommitLoop. /* cancel */
+            END CASE.
+          END.
+        END. /* f/e bColumn */
       END. /* edit */
 
-      /* Set values of all fields and check for changes by others */
-      FOR EACH bColumn WHERE bColumn.lShow = TRUE
-        ON ERROR UNDO #CommitLoop, LEAVE #CommitLoop:
-
-        IF hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) <> hBufferORG:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
-/*          AND getRegistry('DataDigger:help', 'DataChanged:answer') <> '3'*/
-          THEN
-        DO:
-          RUN showHelp("DataChanged"
-                      , SUBSTITUTE('&1,&2,&3'
-                                  , bColumn.cFieldName
-                                  , hBufferORG:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
-                                  , hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
-                                  ) ).
-
-/*          MESSAGE 'Field' bColumn.cFieldName 'has been changed by another user' SKIP(1)                   */
-/*            'Expected~t:' hBufferORG:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) SKIP  */
-/*            'Actual  ~t:' hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) SKIP(1)*/
-/*            'Overwrite values with yours?'                                                                */
-/*            VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lOverwrite.                           */
-
-          CASE getRegistry('DataDigger:help', 'DataChanged:answer'):
-            WHEN '1' THEN . /* yes */
-            WHEN '2' THEN NEXT #RecordLoop. /* no */
-            WHEN '3' THEN . /* yes-all */
-            WHEN '4' THEN UNDO #CommitLoop, LEAVE #CommitLoop. /* cancel */
+      /* Copy data to record */
+      IF CAN-DO("Add,Clone,Edit", picMode) THEN
+      DO:
+        /* Set values of all fields */
+        IF CAN-DO("Add,Clone", picMode) THEN
+          hSourceBuffer = hBuffer.
+        ELSE /* Edit */
+          hSourceBuffer = hBufferDB.
+          
+        FOR EACH bColumn WHERE bColumn.lShow = TRUE
+          ON ERROR UNDO #CommitLoop, LEAVE #CommitLoop:
+          /* 2016-08-08 richardk large decimal values are not correctly casted from string,
+           * last two digits of a 23 digit decimal are always zero */
+          CASE hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):DATA-TYPE:
+            WHEN "decimal" THEN hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) = DECIMAL(bColumn.cNewValue).
+            OTHERWISE hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) = bColumn.cNewValue.
           END CASE.
+        END. /* f/e bColumn */
+      END. /* Copy data to record */
 
-/*          IF lOverwrite = NO THEN NEXT #RecordLoop.                  */
-/*          IF lOverwrite = ? THEN UNDO #CommitLoop, LEAVE #CommitLoop.*/
-        END.
-
-        /* 2016-08-08 richardk large decimal values are not correctly casted from string,
-         * last two digits of a 23 digit decimal are always zero */
-        CASE hBufferDB:BUFFER-FIELD(bColumn.cFieldName):DATA-TYPE:
-          WHEN "decimal" THEN hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) = DECIMAL(bColumn.cNewValue).
-          OTHERWISE hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent) = bColumn.cNewValue.
-        END CASE.
-      END. /* f/e bColumn */
-
+      /* Dump the newly created record as a backup */
       IF CAN-DO("Add,Clone", picMode) THEN
       DO:
-        /* Dump the newly created record as a backup */
         RUN dumpRecord(INPUT "Create", INPUT hBuffer, OUTPUT plSuccess).
         porRepositionId = hBuffer:ROWID.
         DELETE OBJECT hBuffer.
@@ -1266,7 +1261,7 @@ PROCEDURE getDataValues :
   addValue:
   DO iRow = 1 TO phBrowse:NUM-SELECTED-ROWS:
     phBrowse:FETCH-SELECTED-ROW(iRow).
-    cRowValue = hBuffer:BUFFER-FIELD(pcColumn):BUFFER-VALUE(piExtent).
+    cRowValue = hBuffer:BUFFER-FIELD(ENTRY(1,pcColumn,'[')):BUFFER-VALUE(piExtent).
 
     /* Already in the set or not? */
     FIND bData
@@ -1322,8 +1317,6 @@ PROCEDURE getOriginalData :
     ttRecordMapping.ttRowid = hBufferTT:ROWID.
     ttRecordMapping.dbRowid = hBufferDB:ROWID.
   END.
-
-  TEMP-TABLE ttRecordMapping:WRITE-XML('file', 'c:\temp\tt_Table.xml',YES,'utf-8', ?).
 
 END PROCEDURE. /* getOriginalData */
 
@@ -1447,9 +1440,9 @@ PROCEDURE initializeObject :
   END.
 
   /* Add leading zeros to full name for extents */
-  FOR EACH bField WHERE bField.iExtent > 10:
+  FOR EACH bField WHERE bField.iExtent >= 10:
     /* Create a format for extents with proper nr of digits */
-    cExtFormat = FILL('9', INTEGER(LENGTH(STRING(bField.iExtent)))).
+    cExtFormat = FILL('9', LENGTH(STRING(bField.iExtent))).
     FOR EACH bColumn WHERE bColumn.cFieldName = bField.cFieldname:
        bColumn.cFullName  = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
     END.
@@ -1516,7 +1509,7 @@ PROCEDURE initializeObject :
 
     /* to avoid scrollbars on the frame */
     FRAME {&FRAME-NAME}:SCROLLABLE = FALSE.
-
+    
     iValue = INTEGER(getRegistry('DataDigger:Edit', 'Window:x' )).
     IF iValue = ? THEN iValue = INTEGER(getRegistry('DataDigger', 'Window:x' )) + 50.
     ASSIGN wEdit:X = iValue NO-ERROR.

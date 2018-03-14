@@ -773,7 +773,6 @@ PROCEDURE initializeUi :
      */
     IF ERROR-STATUS:GET-NUMBER(1) = 6087
       OR lLoaded = FALSE
-      OR chCtrlFrame:pstimer = 0
       OR NOT VALID-HANDLE(chCtrlFrame) THEN
       glUseTimer = NO.
     ELSE

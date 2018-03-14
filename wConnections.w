@@ -1,10 +1,10 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
-/* Connected Databases
+/* Connected Databases 
 */
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
   Name: wConnections.w
@@ -57,7 +57,7 @@ DEFINE VARIABLE gcRecordState AS CHARACTER NO-UNDO INITIAL 'nodata'.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -72,8 +72,8 @@ DEFINE VARIABLE gcRecordState AS CHARACTER NO-UNDO INITIAL 'nodata'.
 &Scoped-define INTERNAL-TABLES ttConnection
 
 /* Definitions for BROWSE brConnections                                 */
-&Scoped-define FIELDS-IN-QUERY-brConnections ttConnection.cLogicalName ttConnection.cDescription ttConnection.lConnected
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brConnections
+&Scoped-define FIELDS-IN-QUERY-brConnections ttConnection.cLogicalName ttConnection.cDescription ttConnection.lConnected   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brConnections   
 &Scoped-define SELF-NAME brConnections
 &Scoped-define QUERY-STRING-brConnections FOR EACH ttConnection
 &Scoped-define OPEN-QUERY-brConnections OPEN QUERY {&SELF-NAME} FOR EACH ttConnection.
@@ -88,9 +88,9 @@ DEFINE VARIABLE gcRecordState AS CHARACTER NO-UNDO INITIAL 'nodata'.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnBrowse btnDelete btnTest btnConnect ~
 btnDisconnect cbSection btnAdd brConnections btnClone btnEdit btnSave ~
-btnUndo
+btnUndo 
 &Scoped-Define DISPLAYED-OBJECTS fiLogicalName cbSection fiDescription ~
-fiDatabaseName edParameters
+fiDatabaseName edParameters 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -101,7 +101,7 @@ fiDatabaseName edParameters
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getNewConnectionNr Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getNewConnectionNr Dialog-Frame 
 FUNCTION getNewConnectionNr RETURNS INTEGER
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -115,83 +115,83 @@ FUNCTION getNewConnectionNr RETURNS INTEGER
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnAdd  NO-FOCUS FLAT-BUTTON
-     LABEL "&Add"
+     LABEL "&Add" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "add a connection".
 
-DEFINE BUTTON btnBrowse
-     LABEL "..."
+DEFINE BUTTON btnBrowse 
+     LABEL "..." 
      SIZE-PIXELS 25 BY 24 TOOLTIP "find database".
 
 DEFINE BUTTON btnClone  NO-FOCUS FLAT-BUTTON
-     LABEL "&Clone"
+     LABEL "&Clone" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "clone connection".
 
 DEFINE BUTTON btnConnect DEFAULT  NO-FOCUS FLAT-BUTTON
-     LABEL "&Con"
+     LABEL "&Con" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "connect selected database"
      BGCOLOR 8 .
 
 DEFINE BUTTON btnDelete  NO-FOCUS FLAT-BUTTON
-     LABEL "&Delete"
+     LABEL "&Delete" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "delete the currently selected connection".
 
 DEFINE BUTTON btnDisconnect  NO-FOCUS FLAT-BUTTON
-     LABEL "&Dis"
+     LABEL "&Dis" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "disconnect selected database".
 
 DEFINE BUTTON btnEdit  NO-FOCUS FLAT-BUTTON
-     LABEL "&Edit"
+     LABEL "&Edit" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "change settings of currently selected connection".
 
 DEFINE BUTTON btnSave DEFAULT  NO-FOCUS FLAT-BUTTON
-     LABEL "&Save"
+     LABEL "&Save" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "save changes"
      BGCOLOR 8 .
 
-DEFINE BUTTON btnTest DEFAULT
-     LABEL "&Test"
+DEFINE BUTTON btnTest DEFAULT 
+     LABEL "&Test" 
      SIZE-PIXELS 60 BY 24 TOOLTIP "test the currently selected connection"
      BGCOLOR 8 .
 
 DEFINE BUTTON btnUndo DEFAULT  NO-FOCUS FLAT-BUTTON
-     LABEL "&Undo"
+     LABEL "&Undo" 
      SIZE-PIXELS 25 BY 24 TOOLTIP "cancel changes"
      BGCOLOR 8 .
 
-DEFINE VARIABLE cbSection AS CHARACTER
-     LABEL "Section in INI"
+DEFINE VARIABLE cbSection AS CHARACTER 
+     LABEL "Section in INI" 
      VIEW-AS COMBO-BOX SORT INNER-LINES 10
-     LIST-ITEMS "Item 1"
+     LIST-ITEMS "Item 1" 
      DROP-DOWN
      SIZE-PIXELS 160 BY 21 TOOLTIP "the section in the INI file to save the settings to"
      FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE edParameters AS CHARACTER
+DEFINE VARIABLE edParameters AS CHARACTER 
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
-     SIZE-PIXELS 470 BY 180 TOOLTIP "the connection parameters for this database"
+     SIZE-PIXELS 540 BY 180 TOOLTIP "the connection parameters for this database"
      FGCOLOR 1 FONT 2 NO-UNDO.
 
-DEFINE VARIABLE fiDatabaseName AS CHARACTER FORMAT "X(256)":U
-     LABEL "DB/PF name"
-     VIEW-AS FILL-IN
-     SIZE-PIXELS 375 BY 21 TOOLTIP "the physical database name or PF file name to connect"
+DEFINE VARIABLE fiDatabaseName AS CHARACTER FORMAT "X(256)":U 
+     LABEL "DB/PF name" 
+     VIEW-AS FILL-IN 
+     SIZE-PIXELS 425 BY 21 TOOLTIP "the physical database name or PF file name to connect"
      FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDescription AS CHARACTER FORMAT "X(256)":U
-     LABEL "Description"
-     VIEW-AS FILL-IN
-     SIZE-PIXELS 400 BY 21 TOOLTIP "the description of this connection"
+DEFINE VARIABLE fiDescription AS CHARACTER FORMAT "X(256)":U 
+     LABEL "Description" 
+     VIEW-AS FILL-IN 
+     SIZE-PIXELS 425 BY 21 TOOLTIP "the description of this connection"
      FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiLogicalName AS CHARACTER FORMAT "X(256)":U
-     LABEL "Logical Name"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiLogicalName AS CHARACTER FORMAT "X(256)":U 
+     LABEL "Logical Name" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 160 BY 21 TOOLTIP "the logical name for this connection (no spaces)"
      FGCOLOR 1  NO-UNDO.
 
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
-DEFINE QUERY brConnections FOR
+DEFINE QUERY brConnections FOR 
       ttConnection SCROLLING.
 &ANALYZE-RESUME
 
@@ -212,27 +212,27 @@ ttConnection.lConnected
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnBrowse AT Y 90 X 760 WIDGET-ID 56
-     btnDelete AT Y 5 X 565 WIDGET-ID 14
-     btnTest AT Y 325 X 725 WIDGET-ID 42
-     btnConnect AT Y 5 X 315 WIDGET-ID 48
-     fiLogicalName AT Y 40 X 375 COLON-ALIGNED WIDGET-ID 4
-     btnDisconnect AT Y 5 X 340 WIDGET-ID 52
-     cbSection AT Y 40 X 615 COLON-ALIGNED WIDGET-ID 54
-     btnAdd AT Y 5 X 390 WIDGET-ID 2
-     fiDescription AT Y 65 X 375 COLON-ALIGNED WIDGET-ID 38
-     fiDatabaseName AT Y 92 X 375 COLON-ALIGNED WIDGET-ID 6
+     btnBrowse AT Y 90 X 825 WIDGET-ID 56
+     btnDelete AT Y 5 X 560 WIDGET-ID 14
+     btnTest AT Y 325 X 790 WIDGET-ID 42
+     btnConnect AT Y 5 X 310 WIDGET-ID 48
+     fiLogicalName AT Y 40 X 390 COLON-ALIGNED WIDGET-ID 4
+     btnDisconnect AT Y 5 X 335 WIDGET-ID 52
+     cbSection AT Y 40 X 655 COLON-ALIGNED WIDGET-ID 54
+     btnAdd AT Y 5 X 385 WIDGET-ID 2
+     fiDescription AT Y 65 X 390 COLON-ALIGNED WIDGET-ID 38
+     fiDatabaseName AT Y 92 X 390 COLON-ALIGNED WIDGET-ID 6
      brConnections AT Y 1 X 1 WIDGET-ID 200
-     btnClone AT Y 5 X 415 WIDGET-ID 46
-     edParameters AT Y 145 X 315 NO-LABEL WIDGET-ID 10
-     btnEdit AT Y 5 X 440 WIDGET-ID 12
-     btnSave AT Y 5 X 490 WIDGET-ID 22
-     btnUndo AT Y 5 X 515 WIDGET-ID 24
+     btnClone AT Y 5 X 410 WIDGET-ID 46
+     edParameters AT Y 145 X 310 NO-LABEL WIDGET-ID 10
+     btnEdit AT Y 5 X 435 WIDGET-ID 12
+     btnSave AT Y 5 X 485 WIDGET-ID 22
+     btnUndo AT Y 5 X 510 WIDGET-ID 24
      "Parameters:" VIEW-AS TEXT
-          SIZE-PIXELS 120 BY 13 AT Y 130 X 315 WIDGET-ID 18
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         SIZE-PIXELS 798 BY 382
+          SIZE-PIXELS 120 BY 13 AT Y 130 X 310 WIDGET-ID 18
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         SIZE-PIXELS 873 BY 382
          TITLE "Database Connections" DROP-TARGET WIDGET-ID 100.
 
 
@@ -254,11 +254,11 @@ DEFINE FRAME Dialog-Frame
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME Custom                                                    */
 /* BROWSE-TAB brConnections fiDatabaseName Dialog-Frame */
-ASSIGN
+ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
-ASSIGN
+ASSIGN 
        brConnections:ALLOW-COLUMN-SEARCHING IN FRAME Dialog-Frame = TRUE
        brConnections:COLUMN-RESIZABLE IN FRAME Dialog-Frame       = TRUE.
 
@@ -285,7 +285,7 @@ OPEN QUERY {&SELF-NAME} FOR EACH ttConnection.
 */  /* BROWSE brConnections */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -522,7 +522,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
 
 
 /* ***************************  Main Block  *************************** */
@@ -571,9 +571,9 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addConnections Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addConnections Dialog-Frame 
 PROCEDURE addConnections :
-  /* Add dropped files as connections
+/* Add dropped files as connections
   */
   DEFINE VARIABLE iFile       AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cFile       AS CHARACTER NO-UNDO.
@@ -639,9 +639,9 @@ END PROCEDURE. /* addConnections */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose Dialog-Frame 
 PROCEDURE btnAddChoose :
-  /* Set screen to add-mode
+/* Set screen to add-mode
   */
   gcRecordState = 'new'.
 
@@ -658,9 +658,9 @@ END PROCEDURE. /* btnAddChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose Dialog-Frame 
 PROCEDURE btnCloneChoose :
-  /* Duplicate a connection and go to update-mode
+/* Duplicate a connection and go to update-mode
   */
   DEFINE BUFFER bfOriginalConnection FOR ttConnection.
 
@@ -683,9 +683,9 @@ END PROCEDURE. /* btnCloneChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnConnectChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnConnectChoose Dialog-Frame 
 PROCEDURE btnConnectChoose :
-  /* Try to connect to the current connection
+/* Try to connect to the current connection
   */
   DEFINE VARIABLE iError AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cError AS CHARACTER   NO-UNDO INITIAL 'Errors:'.
@@ -737,9 +737,9 @@ END PROCEDURE. /* btnConnectChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose Dialog-Frame 
 PROCEDURE btnDeleteChoose :
-  /* Delete a connection
+/* Delete a connection
   */
   DEFINE VARIABLE lOk         AS LOGICAL NO-UNDO INITIAL TRUE.
   DEFINE VARIABLE iConn       AS INTEGER NO-UNDO.
@@ -785,9 +785,9 @@ END PROCEDURE. /* btnDeleteChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDisconnectChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDisconnectChoose Dialog-Frame 
 PROCEDURE btnDisconnectChoose :
-  /* Disconnect db
+/* Disconnect db
   */
   DEFINE VARIABLE cCurrentDb  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lDisconnect AS LOGICAL     NO-UNDO.
@@ -812,9 +812,9 @@ END PROCEDURE. /* btnDisconnectChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose Dialog-Frame 
 PROCEDURE btnEditChoose :
-  /* Set screen to edit-mode
+/* Set screen to edit-mode
   */
   DO WITH FRAME dialog-frame:
     gcRecordState = 'edit'.
@@ -827,9 +827,9 @@ END PROCEDURE. /* btnEditChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSaveChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSaveChoose Dialog-Frame 
 PROCEDURE btnSaveChoose :
-  /* Save the current connection
+/* Save the current connection
   */
   DO WITH FRAME dialog-frame:
 
@@ -859,9 +859,9 @@ END PROCEDURE. /* btnSaveChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnTestChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnTestChoose Dialog-Frame 
 PROCEDURE btnTestChoose :
-  /* Test the current connection
+/* Test the current connection
   */
   DEFINE VARIABLE iError AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cError AS CHARACTER   NO-UNDO INITIAL 'Errors:'.
@@ -904,9 +904,9 @@ END PROCEDURE. /* btnTestConnection */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnUndoChoose Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnUndoChoose Dialog-Frame 
 PROCEDURE btnUndoChoose :
-  /* Undo changes and go back to display-mode
+/* Undo changes and go back to display-mode
   */
   DO WITH FRAME dialog-frame:
 
@@ -930,9 +930,9 @@ END PROCEDURE. /* btnUndoChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase Dialog-Frame 
 PROCEDURE connectDatabase :
-  /* Try to connect to a given database.
+/* Try to connect to a given database.
   */
   DEFINE INPUT PARAMETER pcConnection AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER pcError AS CHARACTER NO-UNDO.
@@ -991,7 +991,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -1010,13 +1010,13 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiLogicalName cbSection fiDescription fiDatabaseName edParameters
+  DISPLAY fiLogicalName cbSection fiDescription fiDatabaseName edParameters 
       WITH FRAME Dialog-Frame.
-  ENABLE btnBrowse btnDelete btnTest btnConnect btnDisconnect cbSection btnAdd
-         brConnections btnClone btnEdit btnSave btnUndo
+  ENABLE btnBrowse btnDelete btnTest btnConnect btnDisconnect cbSection btnAdd 
+         brConnections btnClone btnEdit btnSave btnUndo 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -1025,9 +1025,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getConnections Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getConnections Dialog-Frame 
 PROCEDURE getConnections :
-  /* Return a comma separated list of all connections
+/* Return a comma separated list of all connections
   */
   DEFINE OUTPUT PARAMETER pcConnectionList AS CHARACTER NO-UNDO.
 
@@ -1044,9 +1044,9 @@ END PROCEDURE. /* getConnections */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
-  /* Prepare the program.
+/* Prepare the program.
   */
   EMPTY TEMP-TABLE ttConnection.
 
@@ -1119,9 +1119,9 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE openConnectionQuery Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE openConnectionQuery Dialog-Frame 
 PROCEDURE openConnectionQuery :
-  /* Undo changes and go back to display-mode
+/* Undo changes and go back to display-mode
   */
   DEFINE INPUT PARAMETER pcSortField  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER plAscending  AS LOGICAL     NO-UNDO.
@@ -1214,9 +1214,9 @@ END PROCEDURE. /* openConnectionQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveConnection Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveConnection Dialog-Frame 
 PROCEDURE saveConnection :
-  /* Save a connection to the INI file
+/* Save a connection to the INI file
   */
   DEFINE PARAMETER BUFFER ttConnection FOR ttConnection.
 
@@ -1235,9 +1235,9 @@ END PROCEDURE. /* saveConnection */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setToolbar Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setToolbar Dialog-Frame 
 PROCEDURE setToolbar :
-  /* Set the state of the icons on the toolbar
+/* Set the state of the icons on the toolbar
   */
   DO WITH FRAME {&frame-name}:
     DISABLE btnAdd btnClone btnEdit btnDelete btnTest btnSave btnUndo
@@ -1259,9 +1259,9 @@ END PROCEDURE. /* setToolbar */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE viewConnection Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE viewConnection Dialog-Frame 
 PROCEDURE viewConnection :
-  /* Show the details of the connection on the screen.
+/* Show the details of the connection on the screen.
   */
   DO WITH FRAME {&frame-name}:
 
@@ -1298,7 +1298,7 @@ END PROCEDURE. /* viewConnection */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getNewConnectionNr Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getNewConnectionNr Dialog-Frame 
 FUNCTION getNewConnectionNr RETURNS INTEGER
   ( /* parameter-definitions */ ) :
 

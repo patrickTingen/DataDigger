@@ -1,6 +1,6 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12
 &ANALYZE-RESUME
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Procedure 
 /*------------------------------------------------------------------------
 
   Name: DataDigger2.p
@@ -51,7 +51,7 @@ END PROCEDURE.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -68,7 +68,7 @@ END PROCEDURE.
 
 &IF DEFINED(EXCLUDE-getDriveType) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDriveType Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDriveType Procedure 
 FUNCTION getDriveType RETURNS CHARACTER ( pcDrive AS CHARACTER ) FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -78,7 +78,7 @@ FUNCTION getDriveType RETURNS CHARACTER ( pcDrive AS CHARACTER ) FORWARD.
 
 &IF DEFINED(EXCLUDE-getProcessorArchitecture) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProcessorArchitecture Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProcessorArchitecture Procedure 
 FUNCTION getProcessorArchitecture RETURNS INTEGER() FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -88,7 +88,7 @@ FUNCTION getProcessorArchitecture RETURNS INTEGER() FORWARD.
 
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry Procedure 
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -101,7 +101,7 @@ FUNCTION getRegistry RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getTimeStamp) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTimeStamp Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTimeStamp Procedure 
 FUNCTION getTimeStamp RETURNS CHARACTER
   ( INPUT pDateTime AS DATETIME )  FORWARD.
 
@@ -112,7 +112,7 @@ FUNCTION getTimeStamp RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-isFolderWritable) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isFolderWritable Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isFolderWritable Procedure 
 FUNCTION isFolderWritable RETURNS LOGICAL
   ( INPUT pcFolderName AS CHARACTER ) FORWARD.
 
@@ -123,7 +123,7 @@ FUNCTION isFolderWritable RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isRecompileNeeded) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isRecompileNeeded Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isRecompileNeeded Procedure 
 FUNCTION isRecompileNeeded RETURNS LOGICAL
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -138,7 +138,7 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
 &ANALYZE-SUSPEND _PROCEDURE-SETTINGS
 /* Settings for THIS-PROCEDURE
    Type: Procedure
-   Allow:
+   Allow: 
    Frames: 0
    Add Fields to: Neither
    Other Settings: CODE-ONLY COMPILE
@@ -148,7 +148,7 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
 /* *************************  Create Window  ************************** */
 
 &ANALYZE-SUSPEND _CREATE-WINDOW
-/* DESIGN Window definition (used by the UIB)
+/* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
          HEIGHT             = 23.29
          WIDTH              = 46.
@@ -156,10 +156,10 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
                                                                         */
 &ANALYZE-RESUME
 
+ 
 
 
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Procedure 
 
 
 /* ***************************  Main Block  *************************** */
@@ -210,9 +210,9 @@ END.
 
 &IF DEFINED(EXCLUDE-DataDigger) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDigger Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDigger Procedure 
 PROCEDURE DataDigger :
-  /* Notifications of starts and stops of DataDigger windows
+/* Notifications of starts and stops of DataDigger windows
   */
   DEFINE INPUT PARAMETER piChange AS INTEGER NO-UNDO.
 
@@ -228,9 +228,9 @@ END PROCEDURE. /* DataDigger */
 
 &IF DEFINED(EXCLUDE-getSourceFiles) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSourceFiles Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSourceFiles Procedure 
 PROCEDURE getSourceFiles :
-  /* Read all source files with date/time stamp
+/* Read all source files with date/time stamp
   */
   DEFINE INPUT  PARAMETER pcDirectory AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER TABLE FOR ttOsFile.
@@ -292,9 +292,9 @@ END PROCEDURE. /* getSourceFiles */
 
 &IF DEFINED(EXCLUDE-initializeObject) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Procedure 
 PROCEDURE initializeObject :
-  /* Initialize all kind of things.
+/* Initialize all kind of things.
   */
   DEFINE VARIABLE cDebuggerStart AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
@@ -350,11 +350,11 @@ END PROCEDURE. /* initializeObject */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE- ) = 0 &THEN
+&IF DEFINED(EXCLUDE-recompileDataDigger) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE recompileDataDigger Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE recompileDataDigger Procedure 
 PROCEDURE recompileDataDigger :
-  /* Recompile all files and restart if needed
+/* Recompile all files and restart if needed
   */
   DEFINE VARIABLE cSetting   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lRecompile AS LOGICAL     NO-UNDO.
@@ -394,9 +394,9 @@ END PROCEDURE. /* recompileDataDigger */
 
 &IF DEFINED(EXCLUDE-recompileSelf) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE recompileSelf Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE recompileSelf Procedure 
 PROCEDURE recompileSelf :
-  /* Recompile all DataDigger procedures
+/* Recompile all DataDigger procedures
   */
   DEFINE VARIABLE cDiggerDriveType   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBuildNr           AS CHARACTER   NO-UNDO.
@@ -410,7 +410,6 @@ PROCEDURE recompileSelf :
   DEFINE VARIABLE hWindow            AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cFile              AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
@@ -517,8 +516,7 @@ PROCEDURE recompileSelf :
   /* Clean up obsolete source names from the ini */
   cFileList = getRegistry("DataDigger:files", "").
   DO iFile = 1 TO NUM-ENTRIES(cFileList):
-    cFile = gcProgramDir + ENTRY(iFile,cFileList).
-    IF SEARCH(cFile) = ? THEN
+    IF SEARCH(gcProgramDir + ENTRY(iFile,cFileList)) = ? THEN
     DO:
       USE "DataDigger".
       PUT-KEY-VALUE SECTION "DataDigger:files" KEY ENTRY(iFile,cFileList) VALUE ?.
@@ -535,8 +533,19 @@ PROCEDURE recompileSelf :
        OR bOsFile.cFileType = "w":
 
     MESSAGE "  Compiling:" bOsFile.cFullPathName.
-    COMPILE VALUE(bOsFile.cFullPathName) SAVE.
-
+    
+    /* Do a strict compile for all DD sources on OpenEdge >= 11.7
+     * Exception is myDataDigger.p of the user
+     */
+    &IF PROVERSION >= '11.7' &THEN 
+      IF bOsFile.cFileName <> "myDataDigger.p" THEN
+        COMPILE VALUE(bOsFile.cFullPathName) SAVE OPTIONS "require-full-names, require-field-qualifiers".
+      ELSE 
+        COMPILE VALUE(bOsFile.cFullPathName) SAVE.
+    &ELSE
+      COMPILE VALUE(bOsFile.cFullPathName) SAVE.    
+    &ENDIF
+    
     IF COMPILER:ERROR THEN
     DO:
       ASSIGN lCompileError = TRUE.
@@ -609,9 +618,9 @@ END PROCEDURE. /* recompileSelf */
 
 &IF DEFINED(EXCLUDE-startDiggerLib) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib Procedure 
 PROCEDURE startDiggerLib :
-  /* Start DiggerLib if it has not already been started
+/* Start DiggerLib if it has not already been started
   */
   DEFINE INPUT PARAMETER plForcedRestart AS LOGICAL NO-UNDO.
   DEFINE VARIABLE hDiggerLib AS HANDLE NO-UNDO.
@@ -648,7 +657,7 @@ END PROCEDURE. /* startDiggerLib */
 
 &IF DEFINED(EXCLUDE-getDriveType) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDriveType Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDriveType Procedure 
 FUNCTION getDriveType RETURNS CHARACTER ( pcDrive AS CHARACTER ):
   /* Return the type of drive
   */
@@ -675,7 +684,7 @@ END FUNCTION.
 
 &IF DEFINED(EXCLUDE-getProcessorArchitecture) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProcessorArchitecture Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProcessorArchitecture Procedure 
 FUNCTION getProcessorArchitecture RETURNS INTEGER():
   /* Return whether the CPU is 32 or 64 bit
   */
@@ -697,7 +706,7 @@ END FUNCTION. /* getProcessorArchitecture */
 
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure 
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -720,7 +729,7 @@ END FUNCTION. /* getRegistry */
 
 &IF DEFINED(EXCLUDE-getTimeStamp) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTimeStamp Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTimeStamp Procedure 
 FUNCTION getTimeStamp RETURNS CHARACTER
   ( INPUT pDateTime AS DATETIME ) :
   /* Return a timestamp in the form "YYYY-MM-DD HH:MM:SS"
@@ -742,7 +751,7 @@ END FUNCTION. /* getTimeStamp */
 
 &IF DEFINED(EXCLUDE-isFolderWritable) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isFolderWritable Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isFolderWritable Procedure 
 FUNCTION isFolderWritable RETURNS LOGICAL
   ( INPUT pcFolderName AS CHARACTER ):
   /* Check whether a folder is writable (PKB #S000021408)
@@ -786,7 +795,7 @@ END FUNCTION. /* isFolderWritable */
 
 &IF DEFINED(EXCLUDE-isRecompileNeeded) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isRecompileNeeded Procedure
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isRecompileNeeded Procedure 
 FUNCTION isRecompileNeeded RETURNS LOGICAL
   ( /* parameter-definitions */ ) :
   /* Check if any of the files of DataDigger has changed and recompile is needed
@@ -837,3 +846,4 @@ END FUNCTION. /* isRecompileNeeded */
 &ANALYZE-RESUME
 
 &ENDIF
+

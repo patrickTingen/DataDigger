@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*
 -------------------------------------------------------------------
 Copyright (c) 2001 and later Netsetup B.V.
@@ -49,7 +49,7 @@ END PROCEDURE.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -61,9 +61,9 @@ END PROCEDURE.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS fiLevelFrom fiLevelTo fiFilterText btnFilter ~
-btnClear edMessageBox fiFindString btnTimers
+btnClear edMessageBox fiFindString btnTimers 
 &Scoped-Define DISPLAYED-OBJECTS fiLevelFrom fiLevelTo fiFilterText ~
-edMessageBox fiFindString
+edMessageBox fiFindString 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -74,7 +74,7 @@ edMessageBox fiFindString
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry C-Win 
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -83,7 +83,7 @@ FUNCTION getRegistry RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry C-Win 
 FUNCTION setRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -97,45 +97,45 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnClear
-     LABEL "&Clear All"
+DEFINE BUTTON btnClear 
+     LABEL "&Clear All" 
      SIZE-PIXELS 70 BY 21 TOOLTIP "clear all messages".
 
-DEFINE BUTTON btnFilter
-     LABEL "&Filter Now"
+DEFINE BUTTON btnFilter 
+     LABEL "&Filter Now" 
      SIZE-PIXELS 70 BY 21 TOOLTIP "(re)apply the filter".
 
-DEFINE BUTTON btnTimers
-     LABEL "&Timers"
+DEFINE BUTTON btnTimers 
+     LABEL "&Timers" 
      SIZE-PIXELS 70 BY 21 TOOLTIP "show timers".
 
-DEFINE VARIABLE edMessageBox AS CHARACTER
+DEFINE VARIABLE edMessageBox AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL LARGE
      SIZE-PIXELS 780 BY 225
      FONT 2 NO-UNDO.
 
-DEFINE VARIABLE fiFilterText AS CHARACTER FORMAT "X(256)":U
-     LABEL "Te&xt"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiFilterText AS CHARACTER FORMAT "X(256)":U 
+     LABEL "Te&xt" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 120 BY 21 TOOLTIP "filter on text" NO-UNDO.
 
-DEFINE VARIABLE fiFindString AS CHARACTER FORMAT "X(256)":U
-     LABEL "&Find"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiFindString AS CHARACTER FORMAT "X(256)":U 
+     LABEL "&Find" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 165 BY 21 TOOLTIP "Find text (CTRL-F) use F9 / SHIFT-F9 to search again" NO-UNDO.
 
-DEFINE VARIABLE fiLevelFrom AS INTEGER FORMAT ">>9":U INITIAL 0
-     LABEL "&Level from"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiLevelFrom AS INTEGER FORMAT ">>9":U INITIAL 0 
+     LABEL "&Level from" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 35 BY 21 TOOLTIP "select the lower limit of the levelfilter"
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE fiLevelTo AS INTEGER FORMAT ">>9":U INITIAL 999
-     LABEL "&to"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiLevelTo AS INTEGER FORMAT ">>9":U INITIAL 999 
+     LABEL "&to" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 35 BY 21 TOOLTIP "select the upper limit of the levelfilter"
      FONT 0 NO-UNDO.
 
@@ -151,8 +151,8 @@ DEFINE FRAME DEFAULT-FRAME
      edMessageBox AT Y 25 X 0 NO-LABEL
      fiFindString AT Y 2 X 425 COLON-ALIGNED WIDGET-ID 14
      btnTimers AT Y 2 X 620 WIDGET-ID 16
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 780 BY 250
          FONT 4.
@@ -181,15 +181,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1024
          VIRTUAL-HEIGHT-P   = 702
          VIRTUAL-WIDTH-P    = 1024
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -203,16 +203,16 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   VISIBLE,,RUN-PERSISTENT                                               */
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME Custom                                                    */
-ASSIGN
+ASSIGN 
        edMessageBox:RETURN-INSERTED IN FRAME DEFAULT-FRAME  = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = NO.
+THEN C-Win:HIDDEN = no.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -379,7 +379,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
 
 
 /* ***************************  Main Block  *************************** */
@@ -422,7 +422,7 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyFilter C-Win 
 PROCEDURE applyFilter :
 /*------------------------------------------------------------------------------
   Name: applyFilter
@@ -466,7 +466,7 @@ END PROCEDURE. /* applyFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE debugInfo C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE debugInfo C-Win 
 PROCEDURE debugInfo :
 /*------------------------------------------------------------------------------
   Name       : debugInfo
@@ -516,7 +516,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -537,13 +537,13 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiLevelFrom fiLevelTo fiFilterText edMessageBox fiFindString
+  DISPLAY fiLevelFrom fiLevelTo fiFilterText edMessageBox fiFindString 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE fiLevelFrom fiLevelTo fiFilterText btnFilter btnClear edMessageBox
-         fiFindString btnTimers
+  ENABLE fiLevelFrom fiLevelTo fiFilterText btnFilter btnClear edMessageBox 
+         fiFindString btnTimers 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -552,7 +552,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE findText C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE findText C-Win 
 PROCEDURE findText :
 /*------------------------------------------------------------------------------
   Name : findText
@@ -579,7 +579,7 @@ END PROCEDURE. /* findText */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeDebugger C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeDebugger C-Win 
 PROCEDURE initializeDebugger :
 /*------------------------------------------------------------------------------
   Name       : initializeDebugger
@@ -658,7 +658,7 @@ END PROCEDURE. /* initializeDebugger */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeWindow C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeWindow C-Win 
 PROCEDURE resizeWindow :
 /*------------------------------------------------------------------------------
   Name       : resizeWindow
@@ -690,7 +690,7 @@ END PROCEDURE. /* resizeWindow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveSettings C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveSettings C-Win 
 PROCEDURE saveSettings :
 /*------------------------------------------------------------------------
   Name         : saveSettings
@@ -720,7 +720,7 @@ END PROCEDURE. /* saveSettings */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showMessage C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showMessage C-Win 
 PROCEDURE showMessage :
 /*------------------------------------------------------------------------------
   Name       : showMessage
@@ -740,6 +740,7 @@ PROCEDURE showMessage :
   DEFINE VARIABLE cLevel      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTextStart  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iTime       AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iMilliSec   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTextPart   AS INTEGER     NO-UNDO.
 
   DEFINE VARIABLE iLevelFrom  AS INTEGER     NO-UNDO.
@@ -761,7 +762,9 @@ PROCEDURE showMessage :
   END.
 
   /* Use time representation in Seconds rather than milliseconds */
-  ASSIGN iTime = piTimeMsec / 1000.
+  ASSIGN 
+    iTime = piTimeMsec / 1000 
+    iMilliSec = piTimeMsec MOD 1000.
 
   /* Respect Capture level and text/program filter */
   IF    piLevel >= iLevelFrom
@@ -781,16 +784,16 @@ PROCEDURE showMessage :
 
     /* Insert new line when changing procedure or time difference more than 1 second */
     IF   pcProgram <> gnPrevProg OR iTime <> giPrevTime THEN
-      edMessageBox:insert-string("~n").
+      edMessageBox:INSERT-STRING("~n").
 
     ASSIGN
       cLevel = SUBSTITUTE("&1:&2: ", STRING(piLevel,"999"), pcProgram ).
 
     /* Insert time only once per second */
-    IF iTime <> giPrevTime THEN
-      edMessageBox:insert-string(SUBSTITUTE("&1 &2" ,STRING(iTime,"HH:MM:SS"), cLevel)).
+    IF iTime <> giPrevTime OR YES THEN
+      edMessageBox:INSERT-STRING(SUBSTITUTE("&1.&2 &3" ,STRING(iTime,"HH:MM:SS"), STRING(iMilliSec,'999'), cLevel)).
     ELSE
-      edMessageBox:insert-string(SUBSTITUTE("         &1", cLevel)).
+      edMessageBox:INSERT-STRING(SUBSTITUTE("             &1", cLevel)).
 
     /* Respect newlines inserted by the developer */
     DO iTextPart = 1 TO NUM-ENTRIES(cMessage,"~n"):
@@ -818,7 +821,7 @@ END PROCEDURE. /* showMessage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timerCommand C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timerCommand C-Win 
 PROCEDURE timerCommand :
 /*------------------------------------------------------------------------------
   Purpose:
@@ -871,7 +874,7 @@ END PROCEDURE.
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry C-Win 
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -892,7 +895,7 @@ END FUNCTION. /* getRegistry */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry C-Win 
 FUNCTION setRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
     , pcKey     AS CHARACTER
@@ -911,3 +914,4 @@ END FUNCTION. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

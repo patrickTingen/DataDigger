@@ -186,7 +186,7 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnWhere btnClear btnFavourite btnQueries btnClipboard ficWhere ~
 btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
@@ -363,7 +363,9 @@ DEFINE MENU POPUP-MENU-brTables
        MENU-ITEM m_Disconnect   LABEL "&Disconnect"   
        MENU-ITEM m_Manage_Connections LABEL "Manage Connections"
        MENU-ITEM m_Toggle_as_favourite LABEL "Set / Unset as &Favourite"
-       MENU-ITEM m_Dump_table_DF LABEL "&Dump definitions"
+       RULE
+       MENU-ITEM m_Dump_table_DF LABEL "&Dump Definitions"
+       MENU-ITEM m_Generate_Include LABEL "&Generate TT Include"
        MENU-ITEM m_Clone_this_Database LABEL "&Clone this Database"
        RULE.
 
@@ -565,7 +567,7 @@ DEFINE VARIABLE ficWhere AS CHARACTER
 
 DEFINE VARIABLE fiFeedback AS CHARACTER FORMAT "X(256)":U INITIAL "Got a question or feedback?" 
       VIEW-AS TEXT 
-     SIZE-PIXELS 145 BY 13 TOOLTIP "click me!"
+     SIZE-PIXELS 204 BY 13 TOOLTIP "click me!"
      FGCOLOR 7  NO-UNDO.
 
 DEFINE VARIABLE fiFieldsFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Fields" 
@@ -957,13 +959,13 @@ DEFINE FRAME frMain
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnQueries AT Y 265 X 715 WIDGET-ID 190
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
      btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
@@ -976,7 +978,7 @@ DEFINE FRAME frMain
      btnView AT Y 520 X 170 WIDGET-ID 4
      btnAdd AT Y 520 X 25
      btnEdit AT Y 520 X 75
-     fiFeedback AT Y 520 X 634 COLON-ALIGNED NO-LABEL WIDGET-ID 308
+     fiFeedback AT Y 520 X 575 COLON-ALIGNED NO-LABEL WIDGET-ID 308
      rctQuery AT Y 2 X 2
      rctEdit AT Y 515 X 20
      rcTableFilter AT Y 24 X 35 WIDGET-ID 254
@@ -986,6 +988,54 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
+
+DEFINE FRAME frSettings
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 9.48 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1023,54 +1073,6 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
 
 /* *********************** Procedure Settings ************************ */
 
@@ -1089,7 +1091,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger"
-         HEIGHT-P           = 700
+         HEIGHT-P           = 697
          WIDTH-P            = 1523
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
@@ -1186,7 +1188,9 @@ ASSIGN
 /* SETTINGS FOR BUTTON btnViewData IN FRAME frMain
    NO-ENABLE                                                            */
 ASSIGN 
-       fiFeedback:READ-ONLY IN FRAME frMain        = TRUE.
+       fiFeedback:READ-ONLY IN FRAME frMain        = TRUE
+       fiFeedback:PRIVATE-DATA IN FRAME frMain     = 
+                "https://datadigger.wordpress.com/contact/".
 
 /* SETTINGS FOR FILL-IN fiFieldsFilter IN FRAME frMain
    3                                                                    */
@@ -1473,13 +1477,25 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON F10 OF C-Win /* DataDigger */
+ANYWHERE DO:
+  plReadOnlyDigger = TRUE.
+  RUN setWindowTitle.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON F11 OF C-Win /* DataDigger */
 ANYWHERE DO:
 
+  &IF DEFINED (UIB_is_running) &THEN
   IF FRAME frMain:BGCOLOR = ? THEN
   DO:
-    FRAME frMain:BGCOLOR = 0.
-    FRAME frData:BGCOLOR = 0.
+    FRAME frMain:BGCOLOR = 12.
+    FRAME frData:BGCOLOR = 12.
 
     setRegistry('DataDigger:colors', 'DataRow:odd:fg','6').
     setRegistry('DataDigger:colors', 'DataRow:odd:bg','0').
@@ -1520,7 +1536,7 @@ ANYWHERE DO:
 /*   giDataOddRowColor[2]  = getColor("DataRow:odd:bg" ). */
 /*   giDataEvenRowColor[1] = getColor("DataRow:even:fg"). */
 /*   giDataEvenRowColor[2] = getColor("DataRow:even:bg"). */
-
+  &ENDIF
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3212,11 +3228,12 @@ DO:
    */
   APPLY "VALUE-CHANGED" TO brTables IN FRAME frMain.
 
-  /* Check whether a table change event is pending
-   * And speed it up if needed.
-   */
+  /* Check whether a table change event is pending */
   FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR.
-  IF AVAILABLE bTimer THEN RUN setTimer('timedTableChange',1).
+  IF AVAILABLE bTimer THEN DO:
+    RUN setTimer('timedTableChange',0).
+    RUN timedTableChange.
+  END.
 
   /* Open the query */
   RUN reopenDataBrowse.
@@ -3419,7 +3436,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFeedback C-Win
 ON MOUSE-SELECT-CLICK OF fiFeedback IN FRAME frMain
 DO:
-  OS-COMMAND NO-WAIT START VALUE("https://datadigger.wordpress.com/contact/").
+  OS-COMMAND NO-WAIT START VALUE(SELF:PRIVATE-DATA).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3698,6 +3715,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Disconnect C-Win
 ON CHOOSE OF MENU-ITEM m_Disconnect /* Disconnect */
 OR "-",DELETE-CHARACTER OF cbDatabaseFilter
+OR "-",DELETE-CHARACTER OF brTables
 DO:
   RUN disconnectDatabase.
 END.
@@ -3708,7 +3726,7 @@ END.
 
 &Scoped-define SELF-NAME m_Dump_table_DF
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Dump_table_DF C-Win
-ON CHOOSE OF MENU-ITEM m_Dump_table_DF /* Dump definitions */
+ON CHOOSE OF MENU-ITEM m_Dump_table_DF /* Dump Definitions */
 DO:
 
   DO WITH FRAME frMain:
@@ -3728,10 +3746,29 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME m_Generate_Include
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Generate_Include C-Win
+ON CHOOSE OF MENU-ITEM m_Generate_Include /* Generate TT Include */
+DO:
+  
+    RUN VALUE(getProgramDir() + 'generateInclude.w')
+     ( INPUT gcCurrentDatabase
+     , INPUT gcCurrentTable
+     , INPUT TABLE ttField
+     , INPUT TABLE ttIndex
+     ).
+     
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME m_Quick_Connect
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Quick_Connect C-Win
 ON CHOOSE OF MENU-ITEM m_Quick_Connect /* Quick Connect */
 OR '+', INSERT-MODE OF cbDatabaseFilter
+OR '+', INSERT-MODE OF brTables
 DO:
   DEFINE VARIABLE cPhysicalName AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cLogicalName  AS CHARACTER   NO-UNDO.
@@ -6158,7 +6195,7 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnFavourite btnQueries btnClipboard ficWhere btnNextQuery 
          btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
          btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
          btnAdd btnEdit fiFeedback 
@@ -6202,11 +6239,16 @@ PROCEDURE endResize :
   {&timerStart}
   DEFINE VARIABLE iButtonSpacingX AS INTEGER    NO-UNDO.
   DEFINE VARIABLE iButtonSpacingY AS INTEGER    NO-UNDO.
+  DEFINE BUFFER bFilter FOR ttFilter.
 
+  PUBLISH "debugInfo" (1, SUBSTITUTE("endResize start")).
+  
   /* To catch resize errors */
   DO ON ERROR UNDO, LEAVE:
     setWindowFreeze(YES).
 
+    RUN setTimer('timedScrollNotify',0).
+    
     /* Set max width */
     IF C-Win:WIDTH > 384 THEN C-Win:WIDTH = 384.
 
@@ -6218,16 +6260,7 @@ PROCEDURE endResize :
     IF btnResizeVer:Y < 150 THEN btnResizeVer:Y = 150.
     IF btnResizeVer:Y > (C-Win:HEIGHT-PIXELS - 200) THEN btnResizeVer:Y = C-Win:HEIGHT-PIXELS - 200.
 
-    /* Park widgets at a safe place, so making the window smaller will
-     * not results in errors for widgets not being placeable
-     */
-    IF VALID-HANDLE(ghDataBrowse) THEN
-    ASSIGN
-      ghDataBrowse:WIDTH-PIXELS  = 100
-      ghDataBrowse:HEIGHT-PIXELS = 100
-      ghDataBrowse:Y = 1
-      ghDataBrowse:X = 1 NO-ERROR.
-
+    /* Feedback (bottom right) */
     fiFeedback:X = 1.
     fiFeedback:Y = 1.
 
@@ -6271,21 +6304,46 @@ PROCEDURE endResize :
       btnFavourite:Y = fiTableDesc:Y
       NO-ERROR.
     cbFavouriteSet:MOVE-TO-TOP().
-    cbFavouriteSet:SENSITIVE = YES.
-
+    cbFavouriteSet:SENSITIVE = YES.  
 
     /* Data */
     DO WITH FRAME frData:
 
-      /* Prepare embedding frame. First make small to avoid errors */
+      /* Data browse */
+      IF VALID-HANDLE(ghDataBrowse) THEN
       ASSIGN
+        ghDataBrowse:WIDTH-PIXELS  = 100
+        ghDataBrowse:HEIGHT-PIXELS = 100
+        ghDataBrowse:Y = 1
+        ghDataBrowse:X = 1 NO-ERROR.
+        
+      /* Prepare embedding frame, first make small to avoid errors. */
+      ASSIGN
+        btnClearDataFilter:X = 0
+        btnDataSort:X = 0
         FRAME frData:WIDTH-PIXELS  = 100
         FRAME frData:HEIGHT-PIXELS = 100
         FRAME frData:X = 0
         FRAME frData:Y = rctQuery:Y + rctQuery:HEIGHT-PIXELS + 2
         FRAME frData:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS + 4
         FRAME frData:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34
+        FRAME frData:VIRTUAL-WIDTH-PIXELS = FRAME frData:WIDTH-PIXELS
+        FRAME frData:VIRTUAL-HEIGHT-PIXELS = FRAME frData:HEIGHT-PIXELS
         NO-ERROR.
+        
+      /* Data filters */
+      FOR EACH bFilter WHERE bFilter.hBrowse = ghDataBrowse:
+        ASSIGN
+          bFilter.hFilter:X = 1
+          bFilter.hFilter:WIDTH-PIXELS = 10.
+      END.
+      
+      /* Num records */
+      ASSIGN 
+        fiNumSelected:X = 1
+        fiNumSelected:Y = 1
+        fiNumRecords:X = 1
+        fiNumRecords:Y = 1 NO-ERROR.
 
       /* Make small to prevent errors */
       ASSIGN
@@ -6442,6 +6500,7 @@ PROCEDURE endResize :
   rctData:VISIBLE = FALSE.
 
   APPLY "entry" TO c-win. /* dkn */
+  PUBLISH "debugInfo" (1, SUBSTITUTE("endResize start")).
 
 END PROCEDURE.
 
@@ -7488,7 +7547,6 @@ PROCEDURE initializeObjects :
     /*
      * > Restore
      */
-
     /* Window position and size */
     iValue = INTEGER(getRegistry("DataDigger", "Window:X" )).
     IF iValue = ? THEN iValue = 200.
@@ -7560,9 +7618,6 @@ PROCEDURE initializeObjects :
     cSetting = gcCurrentDatabase.
     /* < Restore  */
 
-    /* timedScrollNotify */
-    /* RUN setTimer("timedScrollNotIFy", 100). */
-
     /* KeepAlive timer */
     IF LOGICAL(getRegistry("DataDigger", "KeepAlive")) THEN
       RUN setTimer("KeepAlive", 5000). /* every 5 seconds */
@@ -7599,6 +7654,7 @@ PROCEDURE initializeSettingsFile :
   DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cSettingsDir AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
 
   /* Find out where DataDigger is installed and how we"re logged on */
   cProgDir = getProgramDir().
@@ -7761,6 +7817,9 @@ PROCEDURE initializeSettingsFile :
   IF   getRegistry("DataDigger:Backup", "BackupDir") = ?
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<PROGDIR>\Backup\").
 
+  /* If backup is on, create a folder for it */  
+  RUN checkBackupFolder(OUTPUT lOk).
+  
   /* Update check, set to check on STABLE */
   IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
   IF getRegistry('DataDigger:Update','PingBack') = ? THEN setRegistry('DataDigger:Update','PingBack','YES').
@@ -8697,7 +8756,8 @@ PROCEDURE reopenDataBrowse :
   RUN showNumSelected.
 
   /* Make sure all filter fields have the correct 'modified' status */
-  APPLY 'leave' TO FOCUS.
+  IF VALID-HANDLE(FOCUS) AND FOCUS:TYPE = 'fill-in' THEN
+    APPLY 'leave' TO FOCUS.
   
   /* Show or hide red line around filters */
   rctDataFilter:VISIBLE IN FRAME frData = FALSE.
@@ -10410,10 +10470,10 @@ PROCEDURE setTableContext :
     RUN reopenIndexBrowse(?,?).
 
     /* Set toggle to de/select all fields */
-    tgSelAll:checked = TRUE.
+    tgSelAll:CHECKED = TRUE.
 
     /* Unless no field is selected */
-    IF getSelectedFields() = '' THEN tgSelAll:checked = FALSE.
+    IF getSelectedFields() = '' THEN tgSelAll:CHECKED = FALSE.
 
     /* Get a list of all fields (extents NOT expanded) */
     FOR EACH ttField BY ttField.cFieldName BY ttField.iExtent:
@@ -10422,19 +10482,19 @@ PROCEDURE setTableContext :
 
     DO WITH FRAME frWhere:
       /* Set list of fields in field combo */
-      cbFields:list-items     = cFieldList.
-      cbAndOr:screen-value    = ENTRY(1,cbAndOr:list-items).
-      cbFields:screen-value   = ENTRY(1,cbFields:list-items).
-      cbOperator:screen-value = ENTRY(1,cbOperator:list-items).
+      cbFields:LIST-ITEMS     = cFieldList.
+      cbAndOr:SCREEN-VALUE    = ENTRY(1,cbAndOr:LIST-ITEMS).
+      cbFields:SCREEN-VALUE   = ENTRY(1,cbFields:LIST-ITEMS).
+      cbOperator:SCREEN-VALUE = ENTRY(1,cbOperator:LIST-ITEMS).
     END.
 
     /* Reset query-pointer */
     ASSIGN giQueryPointer = 0.
 
-    fiWarning:visible = NO.
-    ficWhere:bgcolor = ?. /* default */
-    ficWhere:fgcolor = ?. /* default */
-    ficWhere:tooltip = ''.
+    fiWarning:VISIBLE = NO.
+    ficWhere:BGCOLOR = ?. /* default */
+    ficWhere:FGCOLOR = ?. /* default */
+    ficWhere:TOOLTIP = ''.
 
     /* Save last used table and position in browse in registry */
     setRegistry ("DB:" + gcCurrentDatabase, "table", pcTable ).
@@ -11478,9 +11538,8 @@ PROCEDURE startSession :
   /* PhoneHome / Check for new version only once a day */
   IF getRegistry('DataDigger:Update','LastUpdateCheck') <> ISO-DATE(TODAY) THEN
   DO:
-    /* Phone Home
-     * Don't be alarmed, this link refers to the build.i version on GitHub.
-     * This to track the use of DataDigger.
+    /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
+     * version on GitHub. This to track the use of DataDigger.
      * Interested yourself? Check https://goo.gl/24deK3+ to see statistics
     */
     IF getRegistry('DataDigger:Update','PingBack') <> ? THEN
@@ -11492,6 +11551,13 @@ PROCEDURE startSession :
       RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
 
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
+  END.
+  
+  IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' THEN
+  DO WITH FRAME frMain:
+    fiFeedback:SCREEN-VALUE = 'New version available'.
+    fiFeedback:PRIVATE-DATA = 'https://github.com/patrickTingen/DataDigger/releases'.
+    fiFeedback:FGCOLOR = 12.
   END.
 
 END PROCEDURE. /* startSession */
