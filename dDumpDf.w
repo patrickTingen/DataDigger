@@ -175,44 +175,50 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_OK Dialog-Frame
 ON CHOOSE OF Btn_OK IN FRAME Dialog-Frame /* OK */
 DO:
-  DEFINE VARIABLE cFolder AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE i       AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cDir  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cList AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE i     AS INTEGER   NO-UNDO.
 
   /* Create full folder structure */
   RUN createFolder(fiDir:SCREEN-VALUE).
-
-  cFolder = RIGHT-TRIM(fiDir:SCREEN-VALUE,"\").
+  cDir = RIGHT-TRIM(fiDir:SCREEN-VALUE,"\").
 
   /* Do the dump, using built in procedure */
   CASE rsDump:SCREEN-VALUE:
-    WHEN 'table' THEN RUN DumpDF(pcTable, SUBSTITUTE('&1\&2.df',cFolder,pcTable   ), tgOpenFile:CHECKED).
-    WHEN 'db'    THEN RUN DumpDF('ALL'  , SUBSTITUTE('&1\&2.df',cFolder,pcDatabase), tgOpenFile:CHECKED).
+    WHEN 'table' THEN RUN DumpDF(pcTable, SUBSTITUTE('&1\&2.df',cDir,pcTable   ), tgOpenFile:CHECKED, INPUT-OUTPUT cList).
+    WHEN 'db'    THEN RUN DumpDF('ALL'  , SUBSTITUTE('&1\&2.df',cDir,pcDatabase), tgOpenFile:CHECKED, INPUT-OUTPUT cList).
     WHEN 'all'   THEN DO i = 1 TO NUM-DBS:
                         CREATE ALIAS dictdb FOR DATABASE VALUE(LDBNAME(i)).
-                        RUN DumpDF('ALL', SUBSTITUTE('&1\&2.df',cFolder,LDBNAME(i)), tgOpenFile:CHECKED).
+                        RUN DumpDF('ALL', SUBSTITUTE('&1\&2.df',cDir,LDBNAME(i)), tgOpenFile:CHECKED, INPUT-OUTPUT cList).
                       END.
   END CASE.
   
+  IF tgOpenFile:CHECKED THEN
+  DO i = 1 TO NUM-ENTRIES(cList):
+    OS-COMMAND NO-WAIT START VALUE(ENTRY(i,cList)).
+  END.
+
   /* Save settings */
-  setRegistry("DataDigger","DumpDF:what",rsDump:SCREEN-VALUE).
-  setRegistry("DataDigger","DumpDF:dir" ,fiDir:SCREEN-VALUE).
-  setRegistry("DataDigger","DumpDF:open",STRING(tgOpenFile:CHECKED)).
+  setRegistry("DataDigger:DumpDF","WhatToDump",rsDump:SCREEN-VALUE).
+  setRegistry("DataDigger:DumpDF","DumpDir" ,fiDir:SCREEN-VALUE).
+  setRegistry("DataDigger:DumpDF","OpenFile",STRING(tgOpenFile:CHECKED)).
 
   RUN showHelp('DumpCompleted','').
 END.
 
 PROCEDURE DumpDF:
-    DEFINE INPUT  PARAMETER pcWhat  AS CHARACTER   NO-UNDO.
-    DEFINE INPUT  PARAMETER pcWhere AS CHARACTER   NO-UNDO.
-    DEFINE INPUT  PARAMETER plOpen  AS LOGICAL     NO-UNDO.
+    DEFINE INPUT PARAMETER pcWhat  AS CHARACTER   NO-UNDO.
+    DEFINE INPUT PARAMETER pcFile  AS CHARACTER   NO-UNDO.
+    DEFINE INPUT PARAMETER plOpen  AS LOGICAL     NO-UNDO.
+    DEFINE INPUT-OUTPUT PARAMETER pcList AS CHARACTER NO-UNDO.
 
     /* suppress 'Dump of definitions completed.' */
     OUTPUT TO nul.
 
-    RUN prodict/dump_df.p(pcWhat, pcWhere, '').
+    RUN prodict/dump_df.p(pcWhat, pcFile, '').
 
     OUTPUT CLOSE. 
-    IF plOpen THEN OS-COMMAND NO-WAIT START VALUE(pcWhere).
+    IF plOpen THEN pcList = TRIM(SUBSTITUTE('&1,&2',pcList,pcFile),',').
 
 END PROCEDURE. /* DumpDF */
 
@@ -317,14 +323,14 @@ PROCEDURE initObject :
     rsDump:RADIO-BUTTONS = REPLACE(rsDump:RADIO-BUTTONS,'[table]',pcTable).
     rsDump:RADIO-BUTTONS = REPLACE(rsDump:RADIO-BUTTONS,'[db]',pcDatabase).
 
-    fiDir = getRegistry("DataDigger","DumpDF:dir").
+    fiDir = getRegistry("DataDigger:DumpDF","DumpDir").
     IF fiDir = ? THEN fiDir = SESSION:TEMP-DIRECTORY.
 
-    cSetting = getRegistry("DataDigger","DumpDF:open").
+    cSetting = getRegistry("DataDigger:DumpDF","OpenFile").
     IF cSetting = ? THEN cSetting = "yes".
     tgOpenFile = LOGICAL(cSetting).
 
-    cSetting = getRegistry("DataDigger","DumpDF:what").
+    cSetting = getRegistry("DataDigger:DumpDF","WhatToDump").
     IF cSetting = ? THEN cSetting = 'table'.
     rsDump:SCREEN-VALUE = cSetting.
   END.
