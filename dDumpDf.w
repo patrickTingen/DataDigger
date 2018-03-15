@@ -74,35 +74,36 @@ DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE rsDump AS CHARACTER 
      VIEW-AS RADIO-SET VERTICAL
      RADIO-BUTTONS 
-          "[table]", "[table]",
-"&All Tables from [db]", "All"
-     SIZE-PIXELS 307 BY 50 TOOLTIP "what should be dumped" NO-UNDO.
+          "Table [table]", "table",
+"&Database [db]", "db",
+"&All connected Databases", "all"
+     SIZE-PIXELS 307 BY 75 TOOLTIP "what should be dumped" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX  
-     SIZE-PIXELS 410 BY 180.
+     SIZE-PIXELS 410 BY 205.
 
 DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL no 
      LABEL "&Open DF after dump" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 130 BY 17 TOOLTIP "open the DF file right after dumping" NO-UNDO.
+     SIZE-PIXELS 195 BY 17 TOOLTIP "open the DF file right after dumping" NO-UNDO.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiDir AT Y 74 X 50 COLON-ALIGNED WIDGET-ID 2
-     Btn_OK AT Y 145 X 245
-     Btn_Cancel AT Y 145 X 325
-     tgOpenFile AT Y 100 X 60 WIDGET-ID 10
-     btnChooseDumpFile AT Y 74 X 380 WIDGET-ID 8
+     fiDir AT Y 95 X 50 COLON-ALIGNED WIDGET-ID 2
+     Btn_OK AT Y 166 X 245
+     Btn_Cancel AT Y 166 X 325
+     tgOpenFile AT Y 121 X 60 WIDGET-ID 10
+     btnChooseDumpFile AT Y 95 X 380 WIDGET-ID 8
      rsDump AT Y 10 X 60 NO-LABEL WIDGET-ID 12
      "Dump:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 13 AT Y 15 X 13 WIDGET-ID 16
      RECT-1 AT Y 0 X 0 WIDGET-ID 4
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 423 BY 213
+         SIZE-PIXELS 425 BY 243
          TITLE "Dump Definitions"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
 
@@ -174,26 +175,46 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_OK Dialog-Frame
 ON CHOOSE OF Btn_OK IN FRAME Dialog-Frame /* OK */
 DO:
-  DEFINE VARIABLE cDumpFile AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFolder AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE i       AS INTEGER     NO-UNDO.
 
   /* Create full folder structure */
   RUN createFolder(fiDir:SCREEN-VALUE).
 
-  cDumpFile = SUBSTITUTE('&1\&2.df'
-                        , RIGHT-TRIM(fiDir:SCREEN-VALUE,"\")
-                        , (IF rsDump:SCREEN-VALUE = 'all' THEN pcDatabase ELSE pcTable)
-                        ).
+  cFolder = RIGHT-TRIM(fiDir:SCREEN-VALUE,"\").
 
   /* Do the dump, using built in procedure */
-  RUN prodict/dump_df.p(rsDump:SCREEN-VALUE, cDumpFile, "").
-
+  CASE rsDump:SCREEN-VALUE:
+    WHEN 'table' THEN RUN DumpDF(pcTable, SUBSTITUTE('&1\&2.df',cFolder,pcTable   ), tgOpenFile:CHECKED).
+    WHEN 'db'    THEN RUN DumpDF('ALL'  , SUBSTITUTE('&1\&2.df',cFolder,pcDatabase), tgOpenFile:CHECKED).
+    WHEN 'all'   THEN DO i = 1 TO NUM-DBS:
+                        CREATE ALIAS dictdb FOR DATABASE VALUE(LDBNAME(i)).
+                        RUN DumpDF('ALL', SUBSTITUTE('&1\&2.df',cFolder,LDBNAME(i)), tgOpenFile:CHECKED).
+                      END.
+  END CASE.
+  
   /* Save settings */
+  setRegistry("DataDigger","DumpDF:what",rsDump:SCREEN-VALUE).
   setRegistry("DataDigger","DumpDF:dir" ,fiDir:SCREEN-VALUE).
   setRegistry("DataDigger","DumpDF:open",STRING(tgOpenFile:CHECKED)).
 
-  IF tgOpenFile:CHECKED THEN OS-COMMAND NO-WAIT START VALUE(cDumpFile).
-
+  RUN showHelp('DumpCompleted','').
 END.
+
+PROCEDURE DumpDF:
+    DEFINE INPUT  PARAMETER pcWhat  AS CHARACTER   NO-UNDO.
+    DEFINE INPUT  PARAMETER pcWhere AS CHARACTER   NO-UNDO.
+    DEFINE INPUT  PARAMETER plOpen  AS LOGICAL     NO-UNDO.
+
+    /* suppress 'Dump of definitions completed.' */
+    OUTPUT TO nul.
+
+    RUN prodict/dump_df.p(pcWhat, pcWhere, '').
+
+    OUTPUT CLOSE. 
+    IF plOpen THEN OS-COMMAND NO-WAIT START VALUE(pcWhere).
+
+END PROCEDURE. /* DumpDF */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -216,7 +237,7 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  RUN initializeObject.
+  RUN initObject.
 
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
 END.
@@ -267,8 +288,8 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
-PROCEDURE initializeObject :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initObject Dialog-Frame 
+PROCEDURE initObject :
 /* initialize global vars
   */
   DEFINE VARIABLE iOption  AS INTEGER   NO-UNDO.
@@ -279,7 +300,7 @@ PROCEDURE initializeObject :
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Set default font */
-    FRAME {&frame-name}:font = getFont('Default').
+    FRAME {&FRAME-NAME}:FONT = getFont('Default').
 
     DO iOption = 1 TO NUM-ENTRIES(pcOptions):
       cOption  = ENTRY(iOption,pcOptions).
@@ -287,8 +308,8 @@ PROCEDURE initializeObject :
       cValue   = ENTRY(2,cOption,"=").
 
       CASE cSetting:
-        WHEN "x" THEN FRAME {&FRAME-NAME}:x = INTEGER(cValue).
-        WHEN "y" THEN FRAME {&FRAME-NAME}:y = INTEGER(cValue).
+        WHEN "x" THEN FRAME {&FRAME-NAME}:X = INTEGER(cValue).
+        WHEN "y" THEN FRAME {&FRAME-NAME}:Y = INTEGER(cValue).
       END CASE.
     END.
 
@@ -302,11 +323,15 @@ PROCEDURE initializeObject :
     cSetting = getRegistry("DataDigger","DumpDF:open").
     IF cSetting = ? THEN cSetting = "yes".
     tgOpenFile = LOGICAL(cSetting).
+
+    cSetting = getRegistry("DataDigger","DumpDF:what").
+    IF cSetting = ? THEN cSetting = 'table'.
+    rsDump:SCREEN-VALUE = cSetting.
   END.
 
   RUN enable_UI.
 
-END PROCEDURE. /* initializeObject */
+END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

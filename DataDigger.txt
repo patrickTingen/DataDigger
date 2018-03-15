@@ -29,6 +29,9 @@ DataDigger version 24 - dd MMM 2018
 - Solved: Change table + immediate RETURN did not open the query
 - Solved: Error on opening list editor #29 (Hans Kaman)
 - Solved: Error on initializing backup folder #30 (Hans Kaman)
+- Solved: Wrong layout for large font in connections screen
+- Solved: 'Value 3786382987984 does not fit in long DLL datatype. (13712)' on right-click
+- Solved: Error on about-screen when PSTimer does not work
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
@@ -37,8 +40,12 @@ DataDigger version 24 - dd MMM 2018
 - Change: Query Tester can now also handle INDEXED-REPOSITION queries
 - Change: Minimum Progress version for DD changed to 10.1C #19
 - Change: Removed SHIFT-HOME shortcut in record editor
+- Change: On v11, try to compile strict
+- Change: Detect when data is changed by other user
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
+- New   : Option to generate an include file with tt definitions
+- New   : Option to dump df of all connected databases #23
 
 =====================================================================================
 
