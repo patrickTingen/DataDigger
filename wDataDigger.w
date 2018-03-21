@@ -186,8 +186,8 @@ cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
 btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
 btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnFavourite btnNextQuery btnQueries btnPrevQuery ~
-btnClipboard ficWhere btnDump btnLoad btnTabFavourites btnTabFields ~
+btnWhere btnClear btnQueries btnClipboard ficWhere btnFavourite ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
 btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
 btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -959,17 +959,17 @@ DEFINE FRAME frMain
      btnWhere AT Y 265 X 653 WIDGET-ID 236
      btnViewData AT Y 265 X 675
      btnClear AT Y 265 X 695 WIDGET-ID 30
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
      btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnClipboard AT Y 265 X 735 WIDGET-ID 178
      ficWhere AT Y 266 X 50 NO-LABEL
+     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 239 X 238 WIDGET-ID 310
+     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
+     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
      btnDump AT Y 520 X 145
      btnLoad AT Y 520 X 195 WIDGET-ID 224
      btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
      btnTabFields AT Y 45 X 271 WIDGET-ID 156
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnTabIndexes AT Y 122 X 271 WIDGET-ID 158
      btnTabTables AT Y 45 X 13 WIDGET-ID 300
      btnDelete AT Y 520 X 250
@@ -988,54 +988,6 @@ DEFINE FRAME frMain
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1494 BY 675 DROP-TARGET.
-
-DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1072,6 +1024,54 @@ DEFINE FRAME frWhere
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 80 X 70 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1194 Y 242
+         SIZE-PIXELS 205 BY 110
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frData
+     btnDataSort AT Y 5 X 15 WIDGET-ID 300
+     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
+     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
+     btnConnections AT Y 0 X 186 WIDGET-ID 212
+     btnSettings AT Y 32 X 0 WIDGET-ID 210
+     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
+     btnDict AT Y 64 X 0 WIDGET-ID 224
+     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
+     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
+     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
+     btnHelp AT Y 128 X 0 WIDGET-ID 260
+     btnAbout AT Y 128 X 186 WIDGET-ID 196
+     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
+     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
+     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
+     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
+     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
+     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
+     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
+     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
+     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 160.6 ROW 9.48 SCROLLABLE 
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -3891,7 +3891,6 @@ SUBSCRIBE TO "dwp_stop" ANYWHERE RUN-PROCEDURE 'DataDiggerClose'.
 SUBSCRIBE TO "query" ANYWHERE RUN-PROCEDURE "processQuery".
 
 /* Avoid drawing */
-/* {&WINDOW-NAME}:Y              = -1000. /* out of sight */ */
 {&WINDOW-NAME}:VISIBLE           = YES. /* otherwise lockwindow complains */
 {&WINDOW-NAME}:HIDDEN            = YES. /* otherwise lockwindow complains */
 {&WINDOW-NAME}:MAX-WIDTH-PIXELS  = ?.
@@ -3930,9 +3929,12 @@ DO:
   /* Save size and position of the window */
   RUN saveWindow.
 
-  cSetting = cbDatabaseFilter:screen-value IN FRAME {&frame-name}.
+  cSetting = cbDatabaseFilter:SCREEN-VALUE IN FRAME {&frame-name}.
   IF cSetting = ? THEN cSetting = '<empty>'.
   setRegistry("DataDigger", "Database", cSetting ).
+
+  /* Make sure all settings are saved */
+  RUN flushRegistry.
 
   /* Notify launcher that the window closes */
   PUBLISH 'DataDigger'(-1).
@@ -4025,9 +4027,8 @@ END. /* CTRL-TAB OF C-Win anywhere */
 ON "CTRL-ALT-D" OF C-Win ANYWHERE /* Debugger */
 DO:
   PUBLISH "setUsage" ("debugger"). /* user behaviour */
-  RUN value(getProgramDir() + "wDebugger.w") PERSISTENT.
+  RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
 END.
-
 
 /* Best default for GUI applications is...                              */
 PAUSE 0 BEFORE-HIDE.
@@ -4044,19 +4045,17 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN initializeUi.
   RUN initializeObjects.
 
-  setWindowFreeze(NO).
-
   /* Clear wait-message */
   DELETE WIDGET winWait.
   {&WINDOW-NAME}:HIDDEN = NO.
 
-  PUBLISH "timerCommand" ("stop", "Startup").
   RUN startSession.
-
   APPLY 'entry' TO fiTableFilter.
 
   /* Auto-start DD on selected text */
   RUN setTable(?).
+
+  setWindowFreeze(NO). 
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
   DO:
@@ -6205,10 +6204,10 @@ PROCEDURE enable_UI :
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
          btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnFavourite btnNextQuery btnQueries btnPrevQuery btnClipboard 
-         ficWhere btnDump btnLoad btnTabFavourites btnTabFields btnTabIndexes 
-         btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd btnEdit 
-         fiFeedback 
+         btnQueries btnClipboard ficWhere btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
+         btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
+         btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
@@ -7640,6 +7639,9 @@ PROCEDURE initializeObjects :
       iSetting = INTEGER(getRegistry("DataDigger:Cache","preCacheInterval")) * 1000.
       IF iSetting > 0 THEN RUN setTimer("PreCache", iSetting).
     END.
+
+    /* Flush registry timer */
+    RUN setTimer('flushRegistry',5000).
 
     /* Set caching in library */
     RUN setCaching.
@@ -9649,7 +9651,7 @@ PROCEDURE resetFields :
 
   DEFINE VARIABLE iNewColNr AS INTEGER NO-UNDO.
 
-  setWindowFreeze(TRUE).
+  setWindowFreeze(YES).
 
   colLoop:
   FOR EACH bField, EACH bColumn WHERE bColumn.cFieldName = bField.cFieldName
@@ -9680,7 +9682,7 @@ PROCEDURE resetFields :
 
   RUN reopenFieldBrowse(?,?).
 
-  setWindowFreeze(FALSE).
+  setWindowFreeze(NO).
 
 END PROCEDURE. /* resetFields */
 
@@ -10027,7 +10029,7 @@ PROCEDURE setDataBrowseColumns :
 
   IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
 
-  setWindowFreeze(TRUE).
+  setWindowFreeze(YES).
 
   colLoop:
   FOR EACH bColumn BY bColumn.iColumnNr:
@@ -10055,7 +10057,7 @@ PROCEDURE setDataBrowseColumns :
   /* Reset the TAB order of the filter fields */
   RUN setFilterFieldTabOrder.
 
-  setWindowFreeze(FALSE).
+  setWindowFreeze(NO).
 
 END PROCEDURE. /* setDataBrowseColumns */
 
@@ -10386,7 +10388,7 @@ PROCEDURE setTable :
     DO WITH FRAME frMain:
 
       SESSION:SET-WAIT-STATE("general").
-      setWindowFreeze(TRUE).
+      setWindowFreeze(YES).
 
       /* If we have a full match on table name, for example when text "ORDER"
        * is selected, make sure table is set to "ORDER" and not "ORDERLINE"

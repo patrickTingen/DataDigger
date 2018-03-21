@@ -643,7 +643,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 38
+         HEIGHT             = 36
          WIDTH              = 45.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -1350,6 +1350,45 @@ PROCEDURE dynamicDump :
   OUTPUT CLOSE.
 
 END PROCEDURE. /* dynamicDump */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-flushRegistry) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushRegistry Procedure 
+PROCEDURE flushRegistry :
+/* Flush all dirty registry settings to disk
+*/
+  {&timerStart}
+  DEFINE BUFFER bfConfig FOR ttConfig.
+
+  /* Don't do anything if nothing is dirty */
+  IF NOT CAN-FIND(FIRST bfConfig WHERE bfConfig.lDirty = TRUE) THEN RETURN. 
+      
+  USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
+
+  IF NOT ERROR-STATUS:ERROR THEN
+  DO:
+    FOR EACH bfConfig WHERE bfConfig.lDirty = TRUE:
+        PUT-KEY-VALUE
+          SECTION bfConfig.cSection
+          KEY     bfConfig.cSetting
+          VALUE   bfConfig.cValue
+          NO-ERROR
+          .
+        bfConfig.lDirty = FALSE.
+    END. /* for each bfConfig */
+    USE "".
+  END. /* no error */
+              
+  FINALLY:
+    {&timerStop}
+  END FINALLY.
+              
+END PROCEDURE. /* flushRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -2635,6 +2674,8 @@ PROCEDURE saveConfigFileSorted :
 
   DEFINE BUFFER bfConfig FOR ttConfig.
 
+  {&timerStart}
+
   cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
   cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", cSettingsDir, getUserName() ).
 
@@ -2677,6 +2718,7 @@ PROCEDURE saveConfigFileSorted :
 
   OUTPUT CLOSE.
 
+  {&timerStop}
 END PROCEDURE. /* saveConfigFileSorted */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4282,6 +4324,8 @@ FUNCTION getUserName RETURNS CHARACTER
   DEFINE VARIABLE intSize   AS INTEGER    NO-UNDO.
   DEFINE VARIABLE mUserId   AS MEMPTR     NO-UNDO.
 
+  {&startTimer}
+
   /* Otherwise determine the value */
   SET-SIZE(mUserId) = 256.
   intSize = 255.
@@ -4296,6 +4340,9 @@ FUNCTION getUserName RETURNS CHARACTER
 
   RETURN STRING(cUserName). /* Function return value. */
 
+  FINALLY: 
+    {&stopTimer} 
+  END FINALLY.
 END FUNCTION. /* getUserName */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4833,19 +4880,8 @@ FUNCTION setRegistry RETURNS CHARACTER
   {&timerStart}
   DEFINE BUFFER bfConfig FOR ttConfig.
 
-  USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
-  IF NOT ERROR-STATUS:ERROR THEN
-  DO:
-    PUT-KEY-VALUE
-      SECTION pcSection
-      KEY     pcKey
-      VALUE   pcValue
-      NO-ERROR
-      .
-    USE "".
-  END.
-
   /* Update the local cache of the registry as well */
+  PUBLISH "timerCommand" ("start", "setRegistry:save-to-tt").
   FIND bfConfig
     WHERE bfConfig.cSection = pcSection
       AND bfConfig.cSetting = pcKey NO-ERROR.
@@ -4857,7 +4893,11 @@ FUNCTION setRegistry RETURNS CHARACTER
       bfConfig.cSection = pcSection
       bfConfig.cSetting = pcKey.
   END.
-  bfConfig.cValue = pcValue.
+  ASSIGN 
+    bfConfig.cValue = pcValue
+    bfConfig.lDirty = TRUE.
+
+  PUBLISH "timerCommand" ("stop", "setRegistry:save-to-tt").
 
   {&timerStop}
   RETURN "". /* Function return value. */

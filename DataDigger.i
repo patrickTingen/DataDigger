@@ -239,7 +239,9 @@ DEFINE TEMP-TABLE ttConfig NO-UNDO RCODE-INFORMATION
   FIELD cSection AS CHARACTER
   FIELD cSetting AS CHARACTER
   FIELD cValue   AS CHARACTER
-  INDEX idxPrim IS PRIMARY cSection cSetting.
+  FIELD lDirty   AS LOGICAL
+  INDEX idxPrim IS PRIMARY cSection cSetting
+  INDEX idxDirty lDirty.
 
 
 /* TT for sorting options in user query */
