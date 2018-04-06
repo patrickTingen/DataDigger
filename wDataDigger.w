@@ -222,7 +222,6 @@ FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
   , pcLabel   AS CHARACTER
-  , pcName    AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -358,17 +357,6 @@ FUNCTION trimList RETURNS CHARACTER
 DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
-DEFINE MENU POPUP-MENU-brTables 
-       MENU-ITEM m_Quick_Connect LABEL "Quick Connect" 
-       MENU-ITEM m_Disconnect   LABEL "&Disconnect"   
-       MENU-ITEM m_Manage_Connections LABEL "Manage Connections"
-       MENU-ITEM m_Toggle_as_favourite LABEL "Set / Unset as &Favourite"
-       RULE
-       MENU-ITEM m_Dump_table_DF LABEL "&Dump Definitions"
-       MENU-ITEM m_Generate_Include LABEL "&Generate TT Include"
-       MENU-ITEM m_Clone_this_Database LABEL "&Clone this Database"
-       RULE.
-
 DEFINE MENU POPUP-MENU-btnView 
        MENU-ITEM m_View_as_text LABEL "View as TEXT"  
        MENU-ITEM m_View_as_HTML LABEL "View as HTML"  
@@ -935,8 +923,8 @@ ttTable.iNumQueries
 
 DEFINE FRAME frMain
      btnTools AT Y 4 X 2 WIDGET-ID 264
-     fiTableFilter AT Y 4 X 38 NO-LABEL
-     cbDatabaseFilter AT Y 4 X 99 COLON-ALIGNED NO-LABEL
+     fiTableFilter AT Y 3 X 38 NO-LABEL
+     cbDatabaseFilter AT Y 3 X 99 COLON-ALIGNED NO-LABEL
      btnClearTableFilter AT Y 4 X 219 WIDGET-ID 222
      btnTableFilter AT Y 4 X 239 WIDGET-ID 38
      tgSelAll AT Y 5 X 315 WIDGET-ID 6
@@ -979,7 +967,7 @@ DEFINE FRAME frMain
      btnAdd AT Y 520 X 25
      btnEdit AT Y 520 X 75
      fiFeedback AT Y 520 X 575 COLON-ALIGNED NO-LABEL WIDGET-ID 308
-     rctQuery AT Y 2 X 2
+     rctQuery AT Y 0 X 0
      rctEdit AT Y 515 X 20
      rcTableFilter AT Y 24 X 35 WIDGET-ID 254
      rcFieldFilter AT Y 24 X 292 WIDGET-ID 256
@@ -1161,7 +1149,6 @@ ASSIGN
        brIndexes:COLUMN-RESIZABLE IN FRAME frMain       = TRUE.
 
 ASSIGN 
-       brTables:POPUP-MENU IN FRAME frMain             = MENU POPUP-MENU-brTables:HANDLE
        brTables:ALLOW-COLUMN-SEARCHING IN FRAME frMain = TRUE
        brTables:COLUMN-RESIZABLE IN FRAME frMain       = TRUE.
 
@@ -2135,6 +2122,44 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON DELETE-CHARACTER OF brTables IN FRAME frMain
+OR "F8", "-",DELETE-CHARACTER OF cbDatabaseFilter
+OR "F8", "-",DELETE-CHARACTER OF brTables
+DO:
+  RUN disconnectDatabase.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON INSERT-MODE OF brTables IN FRAME frMain
+OR "F3", '+', INSERT-MODE OF cbDatabaseFilter
+OR "F3", '+', INSERT-MODE OF brTables
+DO:
+  RUN quickConnect.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON MOUSE-MENU-CLICK OF brTables IN FRAME frMain
+DO:
+  IF NOT VALID-HANDLE(brTables:POPUP-MENU) THEN
+  DO:
+    RUN createMenuTableBrowse.
+    APPLY 'mouse-menu-click' TO SELF.
+  END.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON MOUSE-SELECT-CLICK OF brTables IN FRAME frMain
 DO:
   /* When we click on a table in the browse, we don't want
@@ -2347,7 +2372,6 @@ END.
 &Scoped-define SELF-NAME btnAdd
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAdd C-Win
 ON CHOOSE OF btnAdd IN FRAME frMain /* Add */
-OR 'insert-mode' OF brTables
 DO:
   PUBLISH "setUsage" ("addRecord"). /* user behaviour */
   RUN btnAddChoose.
@@ -2541,13 +2565,12 @@ END. /* choose of btnDelete */
 &Scoped-define SELF-NAME btnConnections
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections C-Win
 ON CHOOSE OF btnConnections IN FRAME frSettings /* Con */
-, MENU-ITEM m_Manage_Connections IN MENU POPUP-MENU-brTables
 , btnConnections-txt
 OR 'CTRL-SHIFT-N' OF c-win ANYWHERE
 DO:
-  PUBLISH "setUsage" ("manageFavourites"). /* user behaviour */
+  PUBLISH "setUsage" ("manageConnections"). /* user behaviour */
   HIDE FRAME frSettings.
-  RUN btnFavouritesChoose.
+  RUN manageConnections.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2665,29 +2688,10 @@ END.
 ON CHOOSE OF btnFavourite IN FRAME frMain /* F */
 OR "f" OF brTables
 OR "*" OF brTables
-OR "CHOOSE" OF MENU-ITEM m_Toggle_as_favourite IN MENU POPUP-MENU-brTables
-OR CHOOSE OF btnFavourite
 DO:
-  DEFINE BUFFER bTable FOR ttTable.
-  PUBLISH "setUsage" ("addToFavourites"). /* user behaviour */
 
-  /* Find table and set/unset as fav */
-  FIND bTable
-    WHERE bTable.cDatabase  = gcCurrentDatabase
-      AND bTable.cTableName = gcCurrentTable.
+  RUN toggleFavourite.
 
-  /* Toggle fav-status and save */
-  bTable.lFavourite = NOT bTable.lFavourite.
-  setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
-             , SUBSTITUTE("&1:Favourite",gcCurrentTable)
-             , (IF bTable.lFavourite THEN "TRUE" ELSE ?)
-             ).
-
-  /* If we are in the favo-view then refresh the browse to get rid of this table */
-  IF glShowFavourites THEN RUN reopenTableBrowse(?).
-
-  IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
-    RUN showFavourite(bTable.lFavourite).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3039,33 +3043,6 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFavourites C-Win
-ON MOUSE-MENU-CLICK OF btnTabFavourites IN FRAME frMain /* Fav */
-DO:
-  DEFINE VARIABLE cQuery AS CHARACTER NO-UNDO.
-
-  /* Find the primary index */
-  FIND FIRST ttIndex WHERE ttIndex.cIndexFlags MATCHES '*P*' NO-ERROR.
-  IF NOT AVAILABLE ttIndex THEN RETURN.
-
-  /* Create a query expression from all the fields in the index */
-  cQuery = getQueryFromFields(ttIndex.cFieldList).
-
-  /* If needed, expand the query editor */
-  IF LOGICAL(getRegistry ("DataDigger", "AutoExpandQueryEditor")) <> NO THEN
-    setQueryEditor('visible').
-
-  /* Fill in the query on the screen */
-  ficWhere:screen-value = formatQuerySTRING(cQuery, gcQueryEditorState = 'visible').
-
-  APPLY "entry" TO ficWhere.
-  ficWhere:cursor-offset = LENGTH(ENTRY(1,cQuery,'~n')) + 2.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define SELF-NAME btnTabFields
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFields C-Win
 ON CHOOSE OF btnTabFields IN FRAME frMain /* Fld */
@@ -3088,33 +3065,6 @@ DO:
   /* Keep track of user behaviour */
   PUBLISH "setUsage" ("setPage").
   RUN setPage({&PAGE-INDEXES}).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabIndexes C-Win
-ON MOUSE-MENU-CLICK OF btnTabIndexes IN FRAME frMain /* Idx */
-DO:
-  DEFINE VARIABLE cQuery AS CHARACTER NO-UNDO.
-
-  /* Find the primary index */
-  FIND FIRST ttIndex WHERE ttIndex.cIndexFlags MATCHES '*P*' NO-ERROR.
-  IF NOT AVAILABLE ttIndex THEN RETURN.
-
-  /* Create a query expression from all the fields in the index */
-  cQuery = getQueryFromFields(ttIndex.cFieldList).
-
-  /* If needed, expand the query editor */
-  IF LOGICAL(getRegistry ("DataDigger", "AutoExpandQueryEditor")) <> NO THEN
-    setQueryEditor('visible').
-
-  /* Fill in the query on the screen */
-  ficWhere:screen-value = formatQuerySTRING(cQuery, gcQueryEditorState = 'visible').
-
-  APPLY "entry" TO ficWhere.
-  ficWhere:cursor-offset = LENGTH(ENTRY(1,cQuery,'~n')) + 2.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3234,12 +3184,14 @@ DO:
    */
   APPLY "VALUE-CHANGED" TO brTables IN FRAME frMain.
 
-  /* Check whether a table change event is pending */
-  FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR.
-  IF AVAILABLE bTimer THEN DO:
-    RUN setTimer('timedTableChange',0).
-    RUN timedTableChange.
-  END.
+/*   /* Check whether a table change event is pending */           */
+/*   FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR. */
+/*   IF AVAILABLE bTimer THEN DO:                                  */
+/*     RUN setTimer('timedTableChange',0).                         */
+/*     RUN timedTableChange.                                       */
+/*   END.                                                          */
+  /* Cancel any pending table change */
+  RUN setTimer('timedTableChange',0).
 
   /* Open the query */
   RUN reopenDataBrowse.
@@ -3627,7 +3579,15 @@ END.
 ON RETURN OF fiTableFilter IN FRAME frMain
 , cbDatabaseFilter
 DO:
-  RUN filterTables.
+
+  /* If the timer is running, then try to open the query on this table 
+   * if the timer is NOT running, user will use RETURN to filter the 
+   * table browse, since it is not done automatically
+   */
+  IF glUseTimer = TRUE THEN
+    APPLY 'CHOOSE' TO btnViewData.
+  ELSE 
+    RUN filterTables.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3670,135 +3630,6 @@ DO:
   IF LOOKUP(SELF:NAME,"fiIndexNameFilter,fiFlagsFilter,fiFieldsFilter") > 0 THEN
     RUN setTimer("timedIndexFilter", 300).
 
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME m_Clone_this_Database
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Clone_this_Database C-Win
-ON CHOOSE OF MENU-ITEM m_Clone_this_Database /* Clone this Database */
-DO:
-  DEFINE VARIABLE cNewDatabaseList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cOldDatabaseList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLogicalName     AS CHARACTER   NO-UNDO.
-
-  DO WITH FRAME frMain:
-    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
-
-    /* Get list of connected databases */
-    cOldDatabaseList = getDatabaseList().
-
-    RUN VALUE(getProgramDir() + 'dCloneDatabase.w')
-     ( INPUT-OUTPUT gcCurrentDatabase
-     , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
-     , OUTPUT cLogicalName
-     ).
-
-    /* Get all connected databases */
-    cNewDatabaseList = getDatabaseList().
-
-    IF cNewDatabaseList <> cOldDatabaseList THEN
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cNewDatabaseList.
-
-    IF LOOKUP(cLogicalName,cNewDatabaseList) > 0 THEN
-    DO:
-      cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
-      APPLY 'value-changed' TO cbDatabaseFilter.
-    END.
-
-  END.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME m_Disconnect
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Disconnect C-Win
-ON CHOOSE OF MENU-ITEM m_Disconnect /* Disconnect */
-OR "-",DELETE-CHARACTER OF cbDatabaseFilter
-OR "-",DELETE-CHARACTER OF brTables
-DO:
-  RUN disconnectDatabase.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME m_Dump_table_DF
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Dump_table_DF C-Win
-ON CHOOSE OF MENU-ITEM m_Dump_table_DF /* Dump Definitions */
-DO:
-
-  DO WITH FRAME frMain:
-
-    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
-
-    RUN VALUE(getProgramDir() + 'dDumpDf.w')
-     ( INPUT gcCurrentDatabase
-     , INPUT gcCurrentTable
-     , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
-     ).
-  END.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME m_Generate_Include
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Generate_Include C-Win
-ON CHOOSE OF MENU-ITEM m_Generate_Include /* Generate TT Include */
-DO:
-  
-    RUN VALUE(getProgramDir() + 'generateInclude.w')
-     ( INPUT gcCurrentDatabase
-     , INPUT gcCurrentTable
-     , INPUT TABLE ttField
-     , INPUT TABLE ttIndex
-     ).
-     
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME m_Quick_Connect
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Quick_Connect C-Win
-ON CHOOSE OF MENU-ITEM m_Quick_Connect /* Quick Connect */
-OR '+', INSERT-MODE OF cbDatabaseFilter
-OR '+', INSERT-MODE OF brTables
-DO:
-  DEFINE VARIABLE cPhysicalName AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLogicalName  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cTypes        AS CHARACTER   NO-UNDO INITIAL 'PROGRESS'.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iNumDbs       AS INTEGER     NO-UNDO.
-
-  iNumDbs = NUM-DBS.
-
-  RUN adecomm\_dbconn.p ( INPUT-OUTPUT cPhysicalName
-                        , INPUT-OUTPUT cLogicalName
-                        , INPUT-OUTPUT cTypes
-                        ).
-
-  IF NUM-DBS = iNumDbs THEN RETURN. /* nothing connected */
-
-  /* Get list of all tables of all databases */
-  RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-  cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
-  cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
-  APPLY 'value-changed' TO cbDatabaseFilter.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3943,11 +3774,6 @@ DO:
 END. /* CLOSE OF THIS-PROCEDURE  */
 
 
-ON 'menu-drop' OF MENU POPUP-MENU-brTables
-DO:
-  PUBLISH "setUsage" ("TableMenu"). /* user behaviour */
-  RUN setConnectionMenu.
-END.
 
 
 ON ENTRY OF ttField.cFormat IN BROWSE brFields
@@ -4476,38 +4302,6 @@ END PROCEDURE. /* btnEditChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnFavouritesChoose C-Win 
-PROCEDURE btnFavouritesChoose :
-/* Maintenance of database connection settings
- */
-  DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
-
-  cProgDir   = getProgramDir().
-
-  cDatabasesOld = getDatabaseList().
-  RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-
-  /* If needed, repopulate db combo */
-  IF cDatabases <> cDatabasesOld THEN
-  DO:
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
-
-    RUN filterTables.
-  END.
-
-END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnLoadChoose C-Win 
 PROCEDURE btnLoadChoose :
 /* Load data into table
@@ -4970,6 +4764,48 @@ END PROCEDURE. /* clearIndexFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cloneDatabase C-Win 
+PROCEDURE cloneDatabase :
+/* Clone the structure + definitions of the current
+ * database into a new, empty one.
+*/
+  DEFINE VARIABLE cNewDatabaseList AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cOldDatabaseList AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cLogicalName     AS CHARACTER   NO-UNDO.
+
+  DO WITH FRAME frMain:
+    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
+
+    /* Get list of connected databases */
+    cOldDatabaseList = getDatabaseList().
+
+    RUN VALUE(getProgramDir() + 'dCloneDatabase.w')
+     ( INPUT-OUTPUT gcCurrentDatabase
+     , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
+     , OUTPUT cLogicalName
+     ).
+
+    /* Get all connected databases */
+    cNewDatabaseList = getDatabaseList().
+
+    IF cNewDatabaseList <> cOldDatabaseList THEN
+    /* Get list of all tables of all databases */
+    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cNewDatabaseList.
+
+    IF LOOKUP(cLogicalName,cNewDatabaseList) > 0 THEN
+    DO:
+      cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
+      APPLY 'value-changed' TO cbDatabaseFilter.
+    END.
+
+  END.
+
+END PROCEDURE. /* cloneDatabase */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo C-Win 
 PROCEDURE collectFieldInfo PRIVATE :
 /* Fill the fields temp-table
@@ -5119,6 +4955,9 @@ PROCEDURE connectDatabase :
         cbDatabaseFilter:list-items   = ',' + cDatabases
         cbDatabaseFilter:SCREEN-VALUE = gcCurrentDatabase
         .
+
+      /* Rebuild context menu for table browse */
+      RUN createMenuTableBrowse. 
 
       /* Get list of all tables of all databases */
       RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
@@ -5433,79 +5272,179 @@ PROCEDURE createMenuDataBrowse :
   hMenu = createMenu(ghDataBrowse).
 
   /* Copy to clipboard */
-  hMenuItem = createMenuItem(hMenu,"Item","Copy to clipboard","copyDataToClipboard").
+  hMenuItem = createMenuItem(hMenu,"Item","Copy to clipboard").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN copyDataToClipboard IN THIS-PROCEDURE.
 
   /* Show value of field */
-  hMenuItem = createMenuItem(hMenu,"Item","Show Value","showValue").
+  hMenuItem = createMenuItem(hMenu,"Item","Show Value").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN showValue IN THIS-PROCEDURE.
 
   /* Add to filter */
-  hMenuItem = createMenuItem(hMenu,"Item","Add to filter","addFilter").
+  hMenuItem = createMenuItem(hMenu,"Item","Add to filter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN setDataFilter IN THIS-PROCEDURE (NO).
 
   /* Filter on this field only */
-  hMenuItem = createMenuItem(hMenu,"Item","Set as only filter","setFilter").
+  hMenuItem = createMenuItem(hMenu,"Item","Set as only filter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN setDataFilter IN THIS-PROCEDURE (YES).
 
   /* Filter on this field only */
-  hMenuItem = createMenuItem(hMenu,"Item","Clear Filters","clearFilter").
+  hMenuItem = createMenuItem(hMenu,"Item","Clear Filters").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnClearDataFilterChoose IN THIS-PROCEDURE.
 
   /* Set data sorting */
-  hMenuItem = createMenuItem(hMenu,"Item","Set Sorting","SortData").
+  hMenuItem = createMenuItem(hMenu,"Item","Set Sorting").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDataSortChoose IN THIS-PROCEDURE.
 
   /* Clear sorting */
-  hMenuItem = createMenuItem(hMenu,"Item","Clear Sorting","ClearSorting").
+  hMenuItem = createMenuItem(hMenu,"Item","Clear Sorting").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearDataSort IN THIS-PROCEDURE.
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","","").
+  hMenuItem = createMenuItem(hMenu,"Rule","").
 
   /* Shortcut to viewing records */
-  hMenuItem = createMenuItem(hMenu,"Item","View selected","view").
+  hMenuItem = createMenuItem(hMenu,"Item","View selected").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnViewChoose IN THIS-PROCEDURE.
 
   /* Shortcut to adding records */
-  hMenuItem = createMenuItem(hMenu,"Item","Add record","add").
+  hMenuItem = createMenuItem(hMenu,"Item","Add record").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnAddChoose IN THIS-PROCEDURE.
 
   /* Shortcut to cloning records */
-  hMenuItem = createMenuItem(hMenu,"Item","Clone record","clone").
+  hMenuItem = createMenuItem(hMenu,"Item","Clone record").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnCloneChoose IN THIS-PROCEDURE.
 
   /* Shortcut to editing records */
-  hMenuItem = createMenuItem(hMenu,"Item","Edit selected","edit").
+  hMenuItem = createMenuItem(hMenu,"Item","Edit selected").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnEditChoose IN THIS-PROCEDURE.
 
   /* Shortcut to dumping records */
-  hMenuItem = createMenuItem(hMenu,"Item","Dump selected","dump").
+  hMenuItem = createMenuItem(hMenu,"Item","Dump selected").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDumpChoose IN THIS-PROCEDURE.
 
   /* Shortcut to loading records */
-  hMenuItem = createMenuItem(hMenu,"Item","Load data","load").
+  hMenuItem = createMenuItem(hMenu,"Item","Load data").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnLoadChoose IN THIS-PROCEDURE.
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","","").
+  hMenuItem = createMenuItem(hMenu,"Rule","").
 
   /* Shortcut to hiding the column */
-  hMenuItem = createMenuItem(hMenu,"Item","Hide this column","hideColumn").
+  hMenuItem = createMenuItem(hMenu,"Item","Hide this column").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN hideColumn IN THIS-PROCEDURE.
 
   /* Shortcut to unhiding the column */
-  hMenuItem = createMenuItem(hMenu,"Item","Unhide all columns","unhideColumn").
+  hMenuItem = createMenuItem(hMenu,"Item","Unhide all columns").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN showField IN THIS-PROCEDURE('*',TRUE).
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","","").
+  hMenuItem = createMenuItem(hMenu,"Rule","").
 
   /* Shortcut to deleting records */
-  hMenuItem = createMenuItem(hMenu,"Item","Delete selected","delete").
+  hMenuItem = createMenuItem(hMenu,"Item","Delete selected").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDeleteChoose IN THIS-PROCEDURE.
 
 END PROCEDURE. /* createMenuDataBrowse */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuTableBrowse C-Win 
+PROCEDURE createMenuTableBrowse :
+/* Rebuild the connection submenu of the 'add' button
+ */
+  DEFINE VARIABLE hMenu           AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hMenuItem       AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hSubMenu        AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cProgDir        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cConnectionList AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabase       AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iConn           AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cFile           AS CHARACTER EXTENT 3 NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+      
+    hMenu = createMenu(brTables:HANDLE).
+    cProgDir = getProgramDir().
+    
+    /* Submenu 'Connections' */
+    hSubMenu = createMenuItem(hMenu,"SubMenu","Connections").
+
+    /* Quick Connect */
+    hMenuItem = createMenuItem(hSubMenu,"Item","Quick Connect").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN quickConnect IN THIS-PROCEDURE.
+    
+    /* Disconnect current db */
+    hMenuItem = createMenuItem(hSubMenu,"Item","Disconnect current db").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN disconnectDatabase IN THIS-PROCEDURE.
+    
+    /* Manage connections */
+    hMenuItem = createMenuItem(hSubMenu,"Item","Manage Connections").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN manageConnections IN THIS-PROCEDURE.
+
+    /* Rule */
+    hMenuItem = createMenuItem(hSubMenu,"Rule","").
+    
+    /* Get list of connections */
+    RUN VALUE(cProgDir + 'wConnections.w')
+      ( INPUT 'getConnections'
+      , INPUT ''
+      , OUTPUT cConnectionList
+      ).
+    
+    /* And add them to the menu */
+    DO iConn = 1 TO NUM-ENTRIES(cConnectionList):
+      cDatabase = ENTRY(iConn,cConnectionList).
+    
+      /* Skip if already connected */
+      IF NOT CONNECTED(cDatabase) THEN
+      DO:
+        hMenuItem = createMenuItem(hSubMenu,"Item", cDatabase).
+        ON 'CHOOSE' OF hMenuItem PERSISTENT RUN connectDatabase IN THIS-PROCEDURE (cDatabase).
+      END.
+    END. /* do iConn */
+    
+    /* Submenu 'Generate' */
+    hSubMenu = createMenuItem(hMenu,"SubMenu","Generate Code").
+    INPUT FROM OS-DIR(cProgDir).
+    REPEAT:
+      IMPORT cFile.
+      IF cFile[1] MATCHES 'generate-*.w' THEN
+      DO:
+        hMenuItem = createMenuItem(hSubMenu,"Item", REPLACE(ENTRY(1,cFile[1],'.'),'-', ' ')).
+        ON "CHOOSE" OF hMenuItem PERSISTENT RUN startGenerateProc IN THIS-PROCEDURE (cFile[2]).
+      END.
+    END.
+    INPUT CLOSE.
+
+    /* Set/unset as favourite */
+    hMenuItem = createMenuItem(hMenu,"Item","Set / Unset as Favourite").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN toggleFavourite IN THIS-PROCEDURE.
+    
+    /* Rule */
+    hMenuItem = createMenuItem(hMenu,"Rule","").
+    
+    /* Dump table definitions */
+    hMenuItem = createMenuItem(hMenu,"Item","Dump Definitions").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN dumpDefinitions IN THIS-PROCEDURE.
+    
+    /* Clone this Database */
+    hMenuItem = createMenuItem(hMenu,"Item","Clone this Database").
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN cloneDatabase IN THIS-PROCEDURE.
+    
+    brTables:POPUP-MENU = hMenu.
+
+  END. /* do with frame */
+END PROCEDURE. /* createMenuTableBrowse */
+
+PROCEDURE startGenerateProc:
+  DEFINE INPUT PARAMETER pcProc AS CHARACTER   NO-UNDO.
+  RUN VALUE(pcProc) ( INPUT gcCurrentDatabase
+                    , INPUT gcCurrentTable
+                    , INPUT TABLE ttField
+                    , INPUT TABLE ttIndex
+                    ).
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -6044,6 +5983,9 @@ PROCEDURE disconnectDatabase :
     gcCurrentDatabase = ""
     gcCurrentTable    = "".
 
+  /* Rebuild context menu for table browse */
+  RUN createMenuTableBrowse. 
+
   /* Get list of all tables of all databases */
   RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
 
@@ -6183,6 +6125,26 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDefinitions C-Win 
+PROCEDURE dumpDefinitions :
+/* Dump a .df of this table
+*/  
+  DO WITH FRAME frMain:
+
+    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
+
+    RUN VALUE(getProgramDir() + 'dDumpDf.w')
+     ( INPUT gcCurrentDatabase
+     , INPUT gcCurrentTable
+     , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
+     ).
+  END.
+
+END PROCEDURE. /* dumpDefinitions */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI C-Win  _DEFAULT-ENABLE
 PROCEDURE enable_UI :
 /*------------------------------------------------------------------------------
@@ -6246,12 +6208,16 @@ PROCEDURE endResize :
 /* Event handler for resize of window
    */
   {&timerStart}
-  DEFINE VARIABLE iButtonSpacingX AS INTEGER    NO-UNDO.
-  DEFINE VARIABLE iButtonSpacingY AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE iButtonSpacingX   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iButtonSpacingY   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lSuppressWarnings AS LOGICAL NO-UNDO.
+
   DEFINE BUFFER bFilter FOR ttFilter.
 
-  PUBLISH "debugInfo" (1, SUBSTITUTE("endResize start")).
-  
+  /* Suppress errors while resizing */
+  lSuppressWarnings = SESSION:SUPPRESS-WARNINGS.
+  SESSION:SUPPRESS-WARNINGS = YES.
+
   /* To catch resize errors */
   DO ON ERROR UNDO, LEAVE:
     setWindowFreeze(YES).
@@ -6312,6 +6278,7 @@ PROCEDURE endResize :
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
       btnFavourite:Y = fiTableDesc:Y
       NO-ERROR.
+
     cbFavouriteSet:MOVE-TO-TOP().
     cbFavouriteSet:SENSITIVE = YES.  
 
@@ -6495,21 +6462,21 @@ PROCEDURE endResize :
     RUN showScrollBars(FRAME frData:HANDLE, NO, NO).
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
     setWindowFreeze(NO).
-
   END.
 
   /* If something goes wrong with resizing we end up here */
   RUN unlockWindow(C-Win:HANDLE).
 
-  {&timerStop}
-
   /* Hide rectangles */
   rctEdit:VISIBLE = FALSE.
   rctQuery:VISIBLE = FALSE.
   rctData:VISIBLE = FALSE.
+  
+  /* Restore suppress-warnings setting */
+  SESSION:SUPPRESS-WARNINGS = lSuppressWarnings.
 
   APPLY "entry" TO c-win. /* dkn */
-  PUBLISH "debugInfo" (1, SUBSTITUTE("endResize start")).
+  {&timerStop}
 
 END PROCEDURE.
 
@@ -7320,7 +7287,7 @@ PROCEDURE initializeFilters :
       .
 
     /* Create menu item for context menu */
-    hMenuItem = createMenuItem(ghFieldMenu,"TOGGLE-BOX",bFilter.hColumn:LABEL,"").
+    hMenuItem = createMenuItem(ghFieldMenu,"TOGGLE-BOX",bFilter.hColumn:LABEL).
     ON "VALUE-CHANGED" OF hMenuItem PERSISTENT
       RUN filterFieldShow IN THIS-PROCEDURE(bFilter.hColumn, hMenuItem).
 
@@ -7899,7 +7866,6 @@ PROCEDURE initializeUi :
 
     WITH FRAME frMain IN WINDOW C-Win.
 
-
   /* FRAME frHint */
   DISPLAY
     edHint
@@ -7944,7 +7910,9 @@ PROCEDURE initializeUi :
     btnAbout       btnAbout-txt
     WITH FRAME frSettings IN WINDOW C-Win.
 
-END PROCEDURE.
+  RUN createMenuTableBrowse. 
+
+END PROCEDURE. /* initializeUi */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -8215,6 +8183,38 @@ PROCEDURE keepAlive :
   {&timerStop}
 
 END PROCEDURE. /* keepAlive */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE manageConnections C-Win 
+PROCEDURE manageConnections :
+/* Maintenance of database connection settings
+ */
+  DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
+
+  cProgDir   = getProgramDir().
+
+  cDatabasesOld = getDatabaseList().
+  RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
+
+  /* Get all connected databases */
+  cDatabases = getDatabaseList().
+
+  /* If needed, repopulate db combo */
+  IF cDatabases <> cDatabasesOld THEN
+  DO:
+    /* Get list of all tables of all databases */
+    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
+
+    RUN filterTables.
+  END.
+
+END PROCEDURE. /* manageConnections */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -8573,6 +8573,44 @@ END PROCEDURE. /* processQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE quickConnect C-Win 
+PROCEDURE quickConnect :
+/* Quick connect to database
+*/
+  DEFINE VARIABLE cPhysicalName AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cLogicalName  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cTypes        AS CHARACTER   NO-UNDO INITIAL 'PROGRESS'.
+  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iNumDbs       AS INTEGER     NO-UNDO.
+
+  DO WITH FRAME frMain:
+    iNumDbs = NUM-DBS.
+  
+    RUN adecomm\_dbconn.p ( INPUT-OUTPUT cPhysicalName
+                          , INPUT-OUTPUT cLogicalName
+                          , INPUT-OUTPUT cTypes
+                          ).
+  
+    IF NUM-DBS = iNumDbs THEN RETURN. /* nothing connected */
+  
+    /* Rebuild context menu for table browse */
+    RUN createMenuTableBrowse. 
+
+    /* Get list of all tables of all databases */
+    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+  
+    /* Get all connected databases */
+    cDatabases = getDatabaseList().
+    cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
+    cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
+    APPLY 'value-changed' TO cbDatabaseFilter.
+  END. 
+
+END PROCEDURE. /* QuickConnect */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilterField C-Win 
 PROCEDURE registerFilterField :
 /**/
@@ -8889,7 +8927,7 @@ PROCEDURE reopenDataBrowse-create :
       ON "CTRL-J"           PERSISTENT RUN reopenDataBrowse        IN THIS-PROCEDURE.
       ON "ROW-DISPLAY"      PERSISTENT RUN dataRowDisplay          IN THIS-PROCEDURE (ghDataBuffer).
       ON "START-SEARCH"     PERSISTENT RUN dataColumnSort          IN THIS-PROCEDURE.
-      ON "INSERT-MODE"      PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE.
+      ON "INSERT-MODE"      PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE. 
       ON "ALT-A"            PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE.
       ON "SHIFT-INS"        PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
       ON "ALT-O"            PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
@@ -9101,34 +9139,34 @@ PROCEDURE reopenDataBrowse-create :
         hFilterField:POPUP-MENU = hMenu.
 
         /* Clear all filters */
-        hMenuItem = createMenuItem(hMenu,"Item","Clear All &Filters","clearAllFilters").
+        hMenuItem = createMenuItem(hMenu,"Item","Clear All &Filters").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN applyEvent IN THIS-PROCEDURE (btnClearDataFilter:handle,"choose").
 
         /* Clear history */
-        hMenuItem = createMenuItem(hMenu,"Item","Clear &History","clearDataFilter").
+        hMenuItem = createMenuItem(hMenu,"Item","Clear &History").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearDataFilter IN THIS-PROCEDURE (hFilterField).
 
         /* Sort list */
-        hMenuItem = createMenuItem(hMenu,"Item","&Sort List","sortDataFilter").
+        hMenuItem = createMenuItem(hMenu,"Item","&Sort List").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN sortComboBox IN THIS-PROCEDURE (hFilterField).
 
         /* RULE / Cut / Copy / Paste / Delete */
-        hMenuItem = createMenuItem(hMenu,"RULE","","rule").
+        hMenuItem = createMenuItem(hMenu,"RULE","").
 
         /* Cut */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Cut","cut").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Cut").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN cutToClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Copy */
-        hMenuItem = createMenuItem(hMenu,"ITEM","C&opy","copy").
+        hMenuItem = createMenuItem(hMenu,"ITEM","C&opy").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN copyToClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Paste */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Paste","paste").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Paste").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN pasteFromClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Delete */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Delete","delete").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Delete").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearField IN THIS-PROCEDURE (hFilterField).
 
       END. /* combo */
@@ -9947,56 +9985,6 @@ END PROCEDURE. /* selectClickedRow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setConnectionMenu C-Win 
-PROCEDURE setConnectionMenu :
-/* Rebuild the connection submenu of the 'add' button
- */
-  DEFINE VARIABLE hMenuItem       AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cProgDir        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cConnectionList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabase       AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iConn           AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE hItemToDelete   AS HANDLE      NO-UNDO.
-
-  hMenuItem = brTables:popup-menu:first-child IN FRAME {&frame-name}.
-  cProgDir = getProgramDir().
-
-  /* Remove all current items except first 3 */
-  DO WHILE VALID-HANDLE(hMenuItem):
-    IF hMenuItem:DYNAMIC THEN hItemToDelete = hMenuItem.
-    hMenuItem = hMenuItem:NEXT-SIBLING.
-    IF VALID-HANDLE(hItemToDelete) THEN
-      DELETE OBJECT hItemToDelete.
-  END.
-
-  /* Get list of connections */
-  RUN value(cProgDir + 'wConnections.w')
-    ( INPUT 'getConnections'
-    , INPUT ''
-    , OUTPUT cConnectionList
-    ).
-
-  /* And add them to the menu */
-  DO iConn = 1 TO NUM-ENTRIES(cConnectionList):
-    cDatabase = ENTRY(iConn,cConnectionList).
-
-    /* Skip if already connected */
-    IF NOT CONNECTED(cDatabase) THEN
-      CREATE MENU-ITEM hMenuItem
-        ASSIGN
-          LABEL  = cDatabase
-          NAME   = cDatabase
-          PARENT = brTables:popup-menu
-        TRIGGERS:
-          ON 'CHOOSE':U PERSISTENT RUN connectDatabase IN this-procedure (cDatabase).
-        END TRIGGERS.
-  END. /* do iConn */
-
-END PROCEDURE. /* setConnectionMenu */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setCurrentTable C-Win 
 PROCEDURE setCurrentTable :
 /* Save last used table to ini
@@ -10358,7 +10346,7 @@ PROCEDURE setTable :
   DEFINE INPUT PARAMETER pcSelectedText AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cTable AS CHARACTER NO-UNDO.
 
-  PUBLISH "timerCommand" ("start", "SetTable").
+  PUBLISH "timerCommand" ("start", "setTable").
 
   IF pcSelectedText = ? THEN
   DO:
@@ -10379,7 +10367,7 @@ PROCEDURE setTable :
 
   /* If it contains multiple words, forget it, it's not gonna be a table */
   IF NUM-ENTRIES(cTable,' ') > 1 THEN cTable = ''.
-  IF LENGTH(cTable) < 3 THEN cTable = ''.
+/*   IF LENGTH(cTable) < 3 THEN cTable = ''. */
 
   /* Now see if we can do anything with the text */
   IF cTable <> "" THEN
@@ -10393,7 +10381,9 @@ PROCEDURE setTable :
       /* If we have a full match on table name, for example when text "ORDER"
        * is selected, make sure table is set to "ORDER" and not "ORDERLINE"
        */
-      FIND FIRST ttTable WHERE ttTable.cTableName MATCHES '*' + cTable + '*' AND ttTable.lShowInList NO-ERROR.
+      FIND FIRST ttTable WHERE ttTable.cTableName = cTable AND ttTable.lShowInList NO-ERROR.
+      IF NOT AVAILABLE ttTable THEN
+        FIND FIRST ttTable WHERE ttTable.cTableName MATCHES '*' + cTable + '*' AND ttTable.lShowInList NO-ERROR.
       IF AVAILABLE ttTable THEN
       DO:
         /* Set db and file name */
@@ -10429,7 +10419,7 @@ PROCEDURE setTable :
     END.
   END. /* has value */
 
-  PUBLISH "timerCommand" ("stop", "SetTable").
+  PUBLISH "timerCommand" ("stop", "setTable").
 
 END PROCEDURE. /* setTable */
 
@@ -11792,6 +11782,36 @@ END PROCEDURE. /* timedTableChange */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE toggleFavourite C-Win 
+PROCEDURE toggleFavourite :
+/* Toggle a table's favourite status 
+  */ 
+  DEFINE BUFFER bTable FOR ttTable.
+  PUBLISH "setUsage" ("addToFavourites"). /* user behaviour */
+
+  /* Find table and set/unset as fav */
+  FIND bTable
+    WHERE bTable.cDatabase  = gcCurrentDatabase
+      AND bTable.cTableName = gcCurrentTable.
+
+  /* Toggle fav-status and save */
+  bTable.lFavourite = NOT bTable.lFavourite.
+  setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
+             , SUBSTITUTE("&1:Favourite",gcCurrentTable)
+             , (IF bTable.lFavourite THEN "TRUE" ELSE ?)
+             ).
+
+  /* If we are in the favo-view then refresh the browse to get rid of this table */
+  IF glShowFavourites THEN RUN reopenTableBrowse(?).
+
+  IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
+    RUN showFavourite(bTable.lFavourite).
+
+END PROCEDURE. /* toggleFavourite */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 /* ************************  Function Implementations ***************** */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenu C-Win 
@@ -11830,7 +11850,6 @@ FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
   , pcLabel   AS CHARACTER
-  , pcName    AS CHARACTER
   ) :
 
   DEFINE VARIABLE hMenuItem AS HANDLE NO-UNDO.
@@ -11841,7 +11860,6 @@ FUNCTION createMenuItem RETURNS HANDLE
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
-          NAME         = pcName
           PARENT       = phMenu.
 
     WHEN "TOGGLE-BOX" THEN
@@ -11849,7 +11867,6 @@ FUNCTION createMenuItem RETURNS HANDLE
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
-          NAME         = pcName
           TOGGLE-BOX   = TRUE
           CHECKED      = TRUE
           PARENT       = phMenu.
@@ -11857,15 +11874,14 @@ FUNCTION createMenuItem RETURNS HANDLE
     WHEN "RULE" THEN
       CREATE MENU-ITEM hMenuItem
         ASSIGN
-          PARENT       = phMenu
-          SUBTYPE      = "rule".
+          SUBTYPE      = "rule"
+          PARENT       = phMenu.
 
     OTHERWISE
       CREATE MENU-ITEM hMenuItem
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
-          NAME         = pcName
           PARENT       = phMenu.
   END CASE.
 
@@ -12086,17 +12102,25 @@ END FUNCTION. /* getSelectedText */
 FUNCTION killMenu RETURNS LOGICAL
   ( phMenu AS HANDLE ) :
 
-  /* Delete a menu and all of its siblings
-   */
+  DEFINE VARIABLE hItemToDelete AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hMenuItem     AS HANDLE NO-UNDO.
+
   IF VALID-HANDLE(phMenu) THEN
   DO:
+    /* Delete a menu and all of its siblings
+     */
+    hMenuItem = phMenu:FIRST-CHILD.
+    
     /* Kill subitems */
-    DO WHILE VALID-HANDLE(phMenu:FIRST-CHILD):
-      DELETE OBJECT phMenu:FIRST-CHILD.
+    DO WHILE VALID-HANDLE(hMenuItem):
+      IF hMenuItem:DYNAMIC THEN hItemToDelete = hMenuItem.
+      hMenuItem = hMenuItem:NEXT-SIBLING.
+      IF VALID-HANDLE(hItemToDelete) THEN
+        DELETE OBJECT hItemToDelete NO-ERROR.
     END.
-
+    
     /* Kill the menu itself */
-    DELETE OBJECT phMenu.
+    DELETE OBJECT phMenu NO-ERROR.
   END.
 
   RETURN TRUE.   /* Function return value. */

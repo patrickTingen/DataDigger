@@ -1996,7 +1996,7 @@ PROCEDURE getTables :
         ASSIGN
           ttTable.cDatabase   = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase))
           ttTable.cTableName  = hFileBuffer::_file-name
-          ttTable.cTableDesc  = hFileBuffer::_desc
+          ttTable.cTableDesc  = (IF hFileBuffer::_file-label <> ? AND hFileBuffer::_file-label <> '' THEN hFileBuffer::_file-label ELSE hFileBuffer::_desc)
           ttTable.lHidden     = hFileBuffer::_hidden
           ttTable.lFrozen     = hFileBuffer::_frozen
           ttTable.cCrc        = hFileBuffer::_crc
@@ -4893,9 +4893,10 @@ FUNCTION setRegistry RETURNS CHARACTER
       bfConfig.cSection = pcSection
       bfConfig.cSetting = pcKey.
   END.
+  
   ASSIGN 
-    bfConfig.cValue = pcValue
-    bfConfig.lDirty = TRUE.
+    bfConfig.lDirty = (bfConfig.cValue <> pcValue)
+    bfConfig.cValue = pcValue.
 
   PUBLISH "timerCommand" ("stop", "setRegistry:save-to-tt").
 

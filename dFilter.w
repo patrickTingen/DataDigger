@@ -2,7 +2,7 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
   Name: dFilter.w
@@ -22,7 +22,7 @@ DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -33,13 +33,13 @@ DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnReset cbTableNameShow cbTableNameHide ~
-tgShowSchema tgShowVst tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow ~
-cbTableFieldHide Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 ~
-RECT-2 RECT-3
-&Scoped-Define DISPLAYED-OBJECTS cbTableNameShow cbTableNameHide ~
-tgShowSchema tgShowVst tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow ~
-cbTableFieldHide tgShowOther tgShowNormalTables
+&Scoped-Define ENABLED-OBJECTS cbTableFieldShow cbTableFieldHide ~
+cbTableNameShow cbTableNameHide tgShowNormalTables tgShowSchema tgShowVst ~
+tgShowSql tgShowOther tgShowHidden tgShowFrozen btnReset Btn_OK Btn_Cancel ~
+RECT-1 RECT-2 RECT-3 
+&Scoped-Define DISPLAYED-OBJECTS cbTableFieldShow cbTableFieldHide ~
+cbTableNameShow cbTableNameHide tgShowNormalTables tgShowSchema tgShowVst ~
+tgShowSql tgShowOther tgShowHidden tgShowFrozen 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -54,125 +54,131 @@ cbTableFieldHide tgShowOther tgShowNormalTables
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnReset
-     LABEL "&Reset"
+DEFINE BUTTON btnReset 
+     LABEL "&Reset" 
      SIZE-PIXELS 75 BY 24 TOOLTIP "reset all filters to the default value".
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY
-     LABEL "Cancel"
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO
-     LABEL "&OK"
+DEFINE BUTTON Btn_OK AUTO-GO 
+     LABEL "&OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE cbTableFieldHide AS CHARACTER
+DEFINE VARIABLE cbTableFieldHide AS CHARACTER 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
-     SIZE-PIXELS 430 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
+     SIZE-PIXELS 475 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableFieldShow AS CHARACTER
+DEFINE VARIABLE cbTableFieldShow AS CHARACTER 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
-     SIZE-PIXELS 430 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
+     SIZE-PIXELS 475 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableNameHide AS CHARACTER
+DEFINE VARIABLE cbTableNameHide AS CHARACTER 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
-     SIZE-PIXELS 425 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
+     SIZE-PIXELS 475 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
-DEFINE VARIABLE cbTableNameShow AS CHARACTER
+DEFINE VARIABLE cbTableNameShow AS CHARACTER 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN
-     SIZE-PIXELS 425 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
+     SIZE-PIXELS 475 BY 21 TOOLTIP "provide a comma separated list of (partial) field names" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
-     SIZE-PIXELS 450 BY 115.
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 495 BY 125.
 
 DEFINE RECTANGLE RECT-2
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
-     SIZE-PIXELS 450 BY 115.
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 495 BY 125.
 
 DEFINE RECTANGLE RECT-3
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL
-     SIZE-PIXELS 445 BY 118.
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 500 BY 118.
 
-DEFINE VARIABLE tgShowFrozen AS LOGICAL INITIAL NO
-     LABEL "Show &Frozen Application Tables"
+DEFINE VARIABLE tgShowFrozen AS LOGICAL INITIAL no 
+     LABEL "Show &Frozen Application Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 246 BY 17 NO-UNDO.
+     SIZE-PIXELS 245 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowHidden AS LOGICAL INITIAL NO
-     LABEL "Show &Hidden Application Tables"
+DEFINE VARIABLE tgShowHidden AS LOGICAL INITIAL no 
+     LABEL "Show &Hidden Application Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 246 BY 17 NO-UNDO.
+     SIZE-PIXELS 245 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowNormalTables AS LOGICAL INITIAL NO
-     LABEL "Show &Normal Tables"
+DEFINE VARIABLE tgShowNormalTables AS LOGICAL INITIAL no 
+     LABEL "Show &Normal Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 TOOLTIP "show or hide normal application tables" NO-UNDO.
+     SIZE-PIXELS 175 BY 17 TOOLTIP "show or hide normal application tables" NO-UNDO.
 
-DEFINE VARIABLE tgShowOther AS LOGICAL INITIAL NO
-     LABEL "Show Other &MetaTables"
+DEFINE VARIABLE tgShowOther AS LOGICAL INITIAL no 
+     LABEL "Show Other &MetaTables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 246 BY 17 TOOLTIP "show or hide tables in other categories" NO-UNDO.
+     SIZE-PIXELS 245 BY 17 TOOLTIP "show or hide tables in other categories" NO-UNDO.
 
-DEFINE VARIABLE tgShowSchema AS LOGICAL INITIAL NO
-     LABEL "Show &Schema Tables"
+DEFINE VARIABLE tgShowSchema AS LOGICAL INITIAL no 
+     LABEL "Show &Schema Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 TOOLTIP "show or hide tables like _file / _field / _index etc" NO-UNDO.
+     SIZE-PIXELS 175 BY 17 TOOLTIP "show or hide tables like _file / _field / _index etc" NO-UNDO.
 
-DEFINE VARIABLE tgShowSql AS LOGICAL INITIAL NO
-     LABEL "Show S&QL Tables"
+DEFINE VARIABLE tgShowSql AS LOGICAL INITIAL no 
+     LABEL "Show S&QL Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 145 BY 17 NO-UNDO.
+     SIZE-PIXELS 175 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL NO
-     LABEL "Show &VST Tables"
+DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL no 
+     LABEL "Show &VST Tables" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 NO-UNDO.
+     SIZE-PIXELS 175 BY 17 NO-UNDO.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnReset AT Y 423 X 15 WIDGET-ID 46
-     cbTableNameShow AT Y 50 X 15 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     cbTableNameHide AT Y 95 X 15 COLON-ALIGNED NO-LABEL WIDGET-ID 18
-     tgShowSchema AT Y 193 X 25 WIDGET-ID 24
-     tgShowVst AT Y 216 X 25 WIDGET-ID 28
-     tgShowSql AT Y 241 X 25 WIDGET-ID 40
-     tgShowHidden AT Y 216 X 204 WIDGET-ID 30
-     tgShowFrozen AT Y 241 X 204 WIDGET-ID 42
-     cbTableFieldShow AT Y 328 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 8
-     cbTableFieldHide AT Y 373 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 10
-     Btn_OK AT Y 420 X 295
-     Btn_Cancel AT Y 420 X 375
-     tgShowOther AT Y 193 X 204 WIDGET-ID 44
-     tgShowNormalTables AT Y 170 X 25 WIDGET-ID 50
+     cbTableFieldShow AT Y 68 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 8
+     cbTableFieldHide AT Y 113 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 10
+     cbTableNameShow AT Y 218 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 14
+     cbTableNameHide AT Y 263 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 18
+     tgShowNormalTables AT Y 335 X 20 WIDGET-ID 50
+     tgShowSchema AT Y 358 X 20 WIDGET-ID 24
+     tgShowVst AT Y 381 X 20 WIDGET-ID 28
+     tgShowSql AT Y 406 X 20 WIDGET-ID 40
+     tgShowOther AT Y 358 X 243 WIDGET-ID 44
+     tgShowHidden AT Y 381 X 243 WIDGET-ID 30
+     tgShowFrozen AT Y 406 X 243 WIDGET-ID 42
+     btnReset AT Y 453 X 10 WIDGET-ID 46
+     Btn_OK AT Y 450 X 345
+     Btn_Cancel AT Y 450 X 425
      "But hide these" VIEW-AS TEXT
-          SIZE-PIXELS 138 BY 18 AT Y 77 X 27 WIDGET-ID 20
+          SIZE-PIXELS 138 BY 18 AT Y 245 X 23 WIDGET-ID 20
      "But hide tables that contain any of these" VIEW-AS TEXT
-          SIZE-PIXELS 350 BY 18 AT Y 355 X 22 WIDGET-ID 12
+          SIZE-PIXELS 350 BY 18 AT Y 95 X 23 WIDGET-ID 12
      "Show only tables that contain all of these fields" VIEW-AS TEXT
-          SIZE-PIXELS 350 BY 18 AT Y 310 X 22 WIDGET-ID 6
+          SIZE-PIXELS 350 BY 18 AT Y 50 X 23 WIDGET-ID 6
      "Show these tables" VIEW-AS TEXT
-          SIZE-PIXELS 163 BY 18 AT Y 32 X 27 WIDGET-ID 16
+          SIZE-PIXELS 163 BY 18 AT Y 200 X 23 WIDGET-ID 16
      "Filter by name" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 10 X 21 WIDGET-ID 36
+          SIZE-PIXELS 99 BY 18 AT Y 163 X 23 WIDGET-ID 36
      "Filter by fields in table" VIEW-AS TEXT
-          SIZE-PIXELS 110 BY 18 AT Y 279 X 20 WIDGET-ID 38
+          SIZE-PIXELS 142 BY 18 AT Y 10 X 23 WIDGET-ID 38
      "Filter by Type" VIEW-AS TEXT
-          SIZE-PIXELS 99 BY 18 AT Y 145 X 21 WIDGET-ID 48
-     RECT-1 AT Y 15 X 10 WIDGET-ID 4
-     RECT-2 AT Y 288 X 10 WIDGET-ID 22
-     RECT-3 AT Y 155 X 15 WIDGET-ID 32
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         SIZE-PIXELS 480 BY 487
+          SIZE-PIXELS 99 BY 18 AT Y 310 X 23 WIDGET-ID 48
+     "Comma sep list, wildcards allowed" VIEW-AS TEXT
+          SIZE-PIXELS 215 BY 18 AT Y 21 X 285 WIDGET-ID 52
+          FGCOLOR 7 
+     "Comma sep list, wildcards allowed" VIEW-AS TEXT
+          SIZE-PIXELS 215 BY 18 AT Y 171 X 285 WIDGET-ID 54
+          FGCOLOR 7 
+     RECT-1 AT Y 170 X 10 WIDGET-ID 4
+     RECT-2 AT Y 19 X 10 WIDGET-ID 22
+     RECT-3 AT Y 320 X 10 WIDGET-ID 32
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         SIZE-PIXELS 521 BY 514
          TITLE "Edit table filter"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
 
@@ -194,14 +200,14 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME Custom                                                    */
-ASSIGN
+ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -268,7 +274,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
 
 
 /* ***************************  Main Block  *************************** */
@@ -288,7 +294,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN enable_UI.
   RUN initializeObject.
 
-  WAIT-FOR GO OF FRAME {&FRAME-NAME} FOCUS cbTableNameShow.
+  WAIT-FOR GO OF FRAME {&FRAME-NAME} FOCUS cbTableFieldShow.
 END.
 RUN disable_UI.
 
@@ -304,7 +310,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -323,16 +329,17 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY cbTableNameShow cbTableNameHide tgShowSchema tgShowVst tgShowSql
-          tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide
-          tgShowOther tgShowNormalTables
+  DISPLAY cbTableFieldShow cbTableFieldHide cbTableNameShow cbTableNameHide 
+          tgShowNormalTables tgShowSchema tgShowVst tgShowSql tgShowOther 
+          tgShowHidden tgShowFrozen 
       WITH FRAME Dialog-Frame.
-  ENABLE btnReset cbTableNameShow cbTableNameHide tgShowSchema tgShowVst
-         tgShowSql tgShowHidden tgShowFrozen cbTableFieldShow cbTableFieldHide
-         Btn_OK Btn_Cancel tgShowOther tgShowNormalTables RECT-1 RECT-2 RECT-3
+  ENABLE cbTableFieldShow cbTableFieldHide cbTableNameShow cbTableNameHide 
+         tgShowNormalTables tgShowSchema tgShowVst tgShowSql tgShowOther 
+         tgShowHidden tgShowFrozen btnReset Btn_OK Btn_Cancel RECT-1 RECT-2 
+         RECT-3 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -341,9 +348,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
-  /* Prepare window: set fonts and load values from registry for combo's
+/* Prepare window: set fonts and load values from registry for combo's
   */
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -382,9 +389,9 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE populateCombo Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE populateCombo Dialog-Frame 
 PROCEDURE populateCombo :
-  /* Set items in a combo box
+/* Set items in a combo box
   */
   DEFINE INPUT PARAMETER phCombo   AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcSetting AS CHARACTER   NO-UNDO.
@@ -431,9 +438,9 @@ END PROCEDURE. /* populateCombo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveComboValue Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveComboValue Dialog-Frame 
 PROCEDURE saveComboValue :
-  /* Save filter items from combo box
+/* Save filter items from combo box
   */
   DEFINE INPUT  PARAMETER phCombo   AS HANDLE      NO-UNDO.
   DEFINE INPUT  PARAMETER pcSetting AS CHARACTER   NO-UNDO.
@@ -478,3 +485,4 @@ END PROCEDURE. /* saveComboValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

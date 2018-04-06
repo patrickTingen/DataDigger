@@ -44,10 +44,13 @@ DataDigger version 24 - dd MMM 2018
 - Change: Removed SHIFT-HOME shortcut in record editor
 - Change: On v11, try to compile strict
 - Change: Detect when data is changed by other user
-- Change: Improved startup time by factor 3
+- Change: Improved startup time 
+- Change: Cleaned up context menu on table browse
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 - New   : Option to generate an include file with tt definitions
+- New   : Option to generate a class for active record pattern
+- New   : Option to generate a dump/load procedure
 - New   : Option to dump df of all connected databases #23
 
 =====================================================================================
