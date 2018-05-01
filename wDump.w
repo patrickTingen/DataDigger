@@ -1297,29 +1297,31 @@ PROCEDURE DumpData4GL :
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cBufName            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cKeyFields          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iExtBegin           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtEnd             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cFieldName          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldNameFormat    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldValue         AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE i                   AS INTEGER     NO-UNDO.
 
   ASSIGN
     cCodePage    = (IF pcCodePage <> "" THEN pcCodePage ELSE SESSION:CPSTREAM)
     iTimeStarted = ETIME
     hTTBuffer    = pihTempTable:DEFAULT-BUFFER-HANDLE
-    iNumRecords = 0
+    iNumRecords  = 0
     cKeyFields   = getIndexFields(gcDB, gcTable, "P,U")
+    cBufName     = 'b' + CAPS(SUBSTRING(gcTable,1,1)) + LC(SUBSTRING(gcTable,2)).
     .
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) convert target cCodePage.
+  OUTPUT STREAM strDump TO VALUE(picFileName) CONVERT TARGET cCodePage.
   PUT STREAM strDump UNFORMATTED
-         SUBSTITUTE("/* Generated procedure for &1.&2 ", gcDB, gcTable)
-    SKIP SUBSTITUTE(" * Date: &1 ", STRING(NOW,"99-99-9999 HH:MM"))
-    SKIP SUBSTITUTE(" * By  : &1 ", getUsername() )
+         SUBSTITUTE("/* Data-create procedure for &1.&2 ", gcDB, gcTable)
+    SKIP SUBSTITUTE(" * Generated &1 by &2", STRING(NOW,"99-99-9999 HH:MM"), getUsername() )
     SKIP SUBSTITUTE(" */" )
-    SKIP SUBSTITUTE("DEFINE BUFFER bData FOR &1.&2.", gcDB, gcTable)
+    SKIP SUBSTITUTE("DEFINE BUFFER &1 FOR &2.&3.", cBufName, gcDB, gcTable)
     SKIP SUBSTITUTE(" ")
     .
 
@@ -1328,6 +1330,12 @@ PROCEDURE DumpData4GL :
   hQuery:SET-BUFFERS(hTTBuffer).
   hQuery:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1 NO-LOCK", hTTBuffer:NAME)).
   hQuery:QUERY-OPEN().
+
+  /* Calc max key field length */
+  DO i = 1 TO NUM-ENTRIES(cKeyfields):
+    iMaxLength = MAXIMUM(iMaxLength,LENGTH(ENTRY(i,cKeyfields))).
+  END.
+  cFieldNameFormat = SUBSTITUTE("X(&1)",iMaxLength).
 
 
   /* Pump the table data into the table */
@@ -1347,7 +1355,7 @@ PROCEDURE DumpData4GL :
     iNumRecords = iNumRecords + 1.
 
     PUT STREAM strDump UNFORMATTED
-      SKIP "FIND bData".
+      SKIP SUBSTITUTE("FIND &1 EXCLUSIVE-LOCK", cBufName).
 
     /* Keyfields and calculation of name length */
     iNumFields = 0.
@@ -1363,28 +1371,29 @@ PROCEDURE DumpData4GL :
 
         IF LOOKUP(hField:NAME, cKeyfields) > 0 OR cKeyfields = "" THEN
         DO:
-            iNumFields = iNumFields + 1.
-            cFieldValue = getFieldValue(hField,iExtent).
+          iNumFields = iNumFields + 1.
+          cFieldValue = getFieldValue(hField,iExtent).
 
-            PUT STREAM strDump UNFORMATTED SKIP
-              SUBSTITUTE("  &1 bData.&2 = &3"
-                          , (IF iNumFields = 1 THEN "WHERE" ELSE "  AND")
-                          , cFieldName
-                          , cFieldValue
-                          ).
+          PUT STREAM strDump UNFORMATTED 
+            (IF NUM-ENTRIES(cKeyfields) > 2 THEN (IF iNumFields = 1 THEN "~n  " ELSE "~n    ") ELSE ' ')
+            SUBSTITUTE("&1 &2.&3 = &4"
+                        , (IF iNumFields = 1 THEN "WHERE" ELSE "AND")
+                        , cBufName
+                        , (IF NUM-ENTRIES(cKeyfields) > 2 THEN STRING(cFieldName,cFieldNameFormat) ELSE cFieldName)
+                        , cFieldValue
+                        ).
         END.
       END.
     END.
+    
+    PUT STREAM strDump UNFORMATTED
+      (IF NUM-ENTRIES(cKeyfields) > 2 THEN '~n        NO-ERROR.~n' ELSE ' NO-ERROR.').
 
     /* Calculate the format for the fields to allign then nicely */
     cFieldNameFormat = SUBSTITUTE("X(&1)",iMaxLength).
 
     PUT STREAM strDump UNFORMATTED
-      SKIP "        EXCLUSIVE-LOCK NO-ERROR."
-      SKIP " "
-      SKIP "IF NOT AVAILABLE bData THEN"
-      SKIP "  CREATE bData."
-      SKIP " ".
+      SKIP SUBSTITUTE("IF NOT AVAILABLE &1 THEN CREATE &1.", cBufName).
 
     /* data */
     iNumFields = 0.
@@ -1409,7 +1418,8 @@ PROCEDURE DumpData4GL :
         cFieldValue = getFieldValue(hField,iExtent).
 
         PUT STREAM strDump UNFORMATTED
-          SKIP SUBSTITUTE("  bData.&1 = &2"
+          SKIP SUBSTITUTE("  &1.&2 = &3"
+                          , cBufName
                           , STRING(cFieldName,cFieldNameFormat)
                           , cFieldValue
                           ).
@@ -1419,7 +1429,7 @@ PROCEDURE DumpData4GL :
 
   END. /* pumpDataLoop */
 
-  OUTPUT stream strDump close.
+  OUTPUT STREAM strDump close.
 
   /* Hide progress bar frame */
   RUN showProgressBar("", ?).
@@ -1774,17 +1784,17 @@ PROCEDURE DumpDataProgressD :
     hTTBuffer    = pihTempTable:DEFAULT-BUFFER-HANDLE
     iNrOfRecords = 0
     cTimeStamp   = STRING(YEAR( TODAY),"9999":u) + "/":u
-                 + string(MONTH(TODAY),"99":u  ) + "/":u
-                 + string(DAY(  TODAY),"99":u  ) + "-":u
-                 + string(TIME,"HH:MM:SS":u).
+                 + STRING(MONTH(TODAY),"99":u  ) + "/":u
+                 + STRING(DAY(  TODAY),"99":u  ) + "-":u
+                 + STRING(TIME,"HH:MM:SS":u).
 
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hTTBuffer).
-  hQuery:QUERY-PREPARE( SUBSTITUTE( "for each &1 no-lock", hTTBuffer:NAME)).
+  hQuery:QUERY-PREPARE( SUBSTITUTE( "FOR EACH &1 NO-LOCK", hTTBuffer:NAME)).
   hQuery:QUERY-OPEN().
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) no-echo no-map convert target cCodePage.
+  OUTPUT STREAM strDump TO VALUE(picFileName) NO-ECHO NO-MAP CONVERT TARGET cCodePage.
   EXPORT STREAM strDump ?.
   iBack = SEEK(strDump) - 1.
   SEEK STREAM strDump TO 0.
@@ -2552,3 +2562,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

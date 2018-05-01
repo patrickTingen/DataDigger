@@ -1,0 +1,1339 @@
+First Step
+
+Collection: First Step
+Author: monry
+Copyright: (c) monry
+Date: April-December 1999
+
+These levels are copyright (c) by "monry" and may be freely distributed for 
+non-commercial use provided they remain unchanged, credited with the author's 
+name, and provided the author is notified. 
+
+This collection was downloaded from http://sokoban-jd.blogspot.com
+
+
+
+####
+#. ##
+# $ #
+# @ #
+#####
+Author: monry
+Title: FirstStep 101
+Limit: 6
+
+
+#####
+#   ####
+#   $@.#
+########
+Author: monry
+Title: FirstStep 102
+Limit: 10
+
+
+##########
+##  ##  ##
+#        #
+#  ####  #
+##  $ # ##
+#.  #@# ##
+#######  #
+#        #
+#   ##  ##
+##########
+Author: monry
+Title: FirstStep 103
+Limit: 59
+
+
+########
+#   #  #
+# @    #
+## ###.#
+ # $   #
+ #   ###
+ #####
+Author: monry
+Title: FirstStep 104
+Limit: 32
+
+
+#####
+#.  ##
+#    ##
+##    ##
+ ##  $ #
+  ##  @#
+   #####
+Author: monry
+Title: FirstStep 105
+Limit: 20
+
+
+############
+#         .#
+# ## ##### #
+# #     ## #
+#    #     #
+##  #  ## ##
+##    #   ##
+## #    # ##
+#  $ ## # @#
+#  ##      #
+#  ##   #  #
+############
+Author: monry
+Title: FirstStep 106
+Limit: 190
+
+
+#####
+# @.#
+# $ #
+#.$ #
+#####
+Author: monry
+Title: FirstStep 201
+Limit: 8
+
+
+#####
+#.. ##
+#    ##
+##    ##
+ ## $$ #
+  ##  @#
+   #####
+Author: monry
+Title: FirstStep 202
+Limit: 43
+
+
+############
+#     ## @ #
+#   $ .. $ #
+############
+Author: monry
+Title: FirstStep 203
+Limit: 39
+
+
+#######
+#..  ##
+# #$  #
+#  $  #
+#### @#
+#######
+Author: monry
+Title: FirstStep 204
+Limit: 33
+
+
+#######
+#    .#
+# ###.#####
+# $ $    @#
+###   #   #
+  #########
+Author: monry
+Title: FirstStep 205
+Limit: 44
+
+
+#########
+#   #   #
+# # # # #
+# .   . #
+###$#$###
+#   #   #
+# ##### #
+#   @   #
+#########
+Author: monry
+Title: FirstStep 206
+Limit: 63
+
+
+  ####
+###  ###
+# ..$$ #
+# ## # #
+#     @#
+########
+Author: monry
+Title: FirstStep 207
+Limit: 42
+
+
+  ####
+###  ###
+#  .$$ #
+#  . # #
+# #  # #
+# #### #
+#     @#
+########
+Author: monry
+Title: FirstStep 208
+Limit: 70
+
+
+#####
+#   ###
+# $   #
+##$## #
+#.    #
+#. @###
+#####
+Author: monry
+Title: FirstStep 209
+Limit: 37
+
+
+ ########
+ #  #   #
+ #  @ $ #
+##$### ##
+#..    #
+########
+Author: monry
+Title: FirstStep 210
+Limit: 31
+
+
+#####
+#   ###
+# ..  #####
+## ##    @#
+#   ##### #
+# $     # #
+#   ##  # #
+###### ## #
+  #    #  #
+  # $# # ##
+  ##     #
+   #######
+Author: monry
+Title: FirstStep 211
+Limit: 89
+
+
+#####
+#   ####
+# .    #
+##.###$##
+#     @ #
+# $##   #
+#  ######
+####
+Author: monry
+Title: FirstStep 212
+Limit: 67
+
+
+   #####
+####.  #
+#   .# #
+# #  $ #
+#   #$##
+###@  #
+  #####
+Author: monry
+Title: FirstStep 213
+Limit: 67
+
+
+#####
+#   ###
+# #.. #
+#     #
+##$#$##
+ # @ #
+ #####
+Author: monry
+Title: FirstStep 214
+Limit: 39
+
+
+#########
+#  ###  #
+#       #
+#.## #$.#
+###  $@##
+###   ###
+#########
+Author: monry
+Title: FirstStep 215
+Limit: 35
+
+
+#########
+#       #
+#@ . .# #
+#### #  #
+#    #$##
+#     $ #
+#   #   #
+#########
+Author: monry
+Title: FirstStep 216
+Limit: 107
+
+
+#####
+#   ###
+# #$$ #
+#..  @#
+## # ##
+ #   #
+ #####
+Author: monry
+Title: FirstStep 217
+Limit: 60
+
+
+    ####
+    #  #
+    #  #
+    #  #
+##### ##
+#     @#
+#  $*. #
+#   ####
+#####
+Author: monry
+Title: FirstStep 218
+Limit: 42
+
+
+####
+#  #######
+#        #
+# ..##$# #
+#   #  $@#
+#####   ##
+    #   #
+    #####
+Author: monry
+Title: FirstStep 219
+Limit: 82
+
+
+#####   #####
+#   #####   #
+# $   @   $ #
+## ####### ##
+#    . .    #
+#   # # #   #
+#####   #####
+    #####
+Author: monry
+Title: FirstStep 220
+Limit: 78
+
+
+#######
+#  @  #
+#  $  #
+#.$.$.#
+#######
+Author: monry
+Title: FirstStep 301
+Limit: 17
+
+
+   ####
+   #  ###
+   #    #
+####.$  #
+# $..####
+#@  $#
+###  #
+  ####
+Author: monry
+Title: FirstStep 302
+Limit: 22
+
+
+######
+#..  ##
+#.#$$@#
+#  $  #
+#  ####
+####
+Author: monry
+Title: FirstStep 303
+Limit: 27
+
+
+######
+#... #
+#$$@ #
+#  $ #
+#  ###
+####
+Author: monry
+Title: FirstStep 304
+Limit: 25
+
+
+ ####
+##  ###
+# ..$ ##
+# .#$  #
+#   $  #
+#### @##
+   ####
+Author: monry
+Title: FirstStep 305
+Limit: 32
+
+
+######
+#... #
+#$$$@#
+#  # #
+#    #
+######
+Author: monry
+Title: FirstStep 306
+Limit: 38
+
+
+#########
+#       #
+# # ### #
+# #...# #
+# $ @ $ #
+# ##$## #
+#       #
+#########
+Author: monry
+Title: FirstStep 307
+Limit: 69
+
+
+######
+#    ###
+# #$$$ #
+# ...  #
+### # ##
+  #  @#
+  #####
+Author: monry
+Title: FirstStep 308
+Limit: 45
+
+
+######
+#    ###
+# #*.. #
+#  $   #
+###$# ##
+  #  @#
+  #####
+Author: monry
+Title: FirstStep 309
+Limit: 66
+
+
+  ######
+###    #
+# $  #$##
+# #*..  #
+#@  #   #
+#########
+Author: monry
+Title: FirstStep 310
+Limit: 36
+
+
+#########
+#   #   #
+#  .*.  #
+## #$# ##
+ #  $  #
+ #  @  #
+ #######
+Author: monry
+Title: FirstStep 311
+Limit: 56
+
+
+   ####
+####  #
+# $   #
+# # # ##
+#.*.#  #
+#   $ @#
+#  ##  #
+########
+Author: monry
+Title: FirstStep 312
+Limit: 59
+
+
+#######
+##   ##
+#  $  #
+# # #@#
+#..*# #
+#   $ #
+#  ## #
+#######
+Author: monry
+Title: FirstStep 313
+Limit: 40
+
+
+#########
+#@ ##   #
+#   #. .#
+# $$    #
+# $ #  .#
+##  #   #
+#########
+Author: monry
+Title: FirstStep 314
+Limit: 56
+
+
+    ####
+    #  #
+    #  #
+    #  #
+##### ##
+#    $@#
+#  $*..#
+#   ####
+#####
+Author: monry
+Title: FirstStep 315
+Limit: 58
+
+
+ #####
+ #   ###
+## #.  #
+#  ..# #
+# #  $ #
+#  $#$##
+###@  #
+  #####
+Author: monry
+Title: FirstStep 316
+Limit: 72
+
+
+  #######
+  #     #
+###.### #
+#  * @# #
+#  *  # #
+## $### #
+ #      #
+ ########
+Author: monry
+Title: FirstStep 317
+Limit: 44
+
+
+ #######
+ #     ###
+## ###   #
+#  #...  #
+# $$  #$##
+#  ## @ #
+#########
+Author: monry
+Title: FirstStep 318
+Limit: 81
+
+
+  #####
+###   #
+#  .#$##
+# $..  #
+## # $ #
+ #  @###
+ #####
+Author: monry
+Title: FirstStep 319
+Limit: 93
+
+
+###########
+#...      #
+### ##### #
+### #   # #
+#   # $$$ #
+# #@    ###
+#   #   #
+#########
+Author: monry
+Title: FirstStep 320
+Limit: 193
+
+
+   ########
+   #.     #
+   #.#### #
+####.#  # #
+#    #  $@#
+# #   $$###
+#   #   #
+#########
+Author: monry
+Title: FirstStep 321
+Limit: 169
+
+
+     #####
+  ####   #
+  #... @ #
+#### ## ##
+#    ##  #
+# ##$    #
+# # $ #  #
+# # #$####
+#     #
+#######
+Author: monry
+Title: FirstStep 322
+Limit: 150
+
+
+#####
+#   ####
+# ..   #
+##.# $ #
+#  ###$##
+# $     #
+#@ ##   #
+#########
+Author: monry
+Title: FirstStep 323
+Limit: 129
+
+
+####  ####
+#  ####  #
+#       .#
+#  #####.#
+## $@  #.#
+ # ##$$  #
+ #     ###
+ ###   #
+   #####
+Author: monry
+Title: FirstStep 324
+Limit: 133
+
+
+#############
+#           #
+# #### #### ##
+#   .$.$.  @ #
+####$### #   #
+   #     #####
+   #######
+Author: monry
+Title: FirstStep 325
+Limit: 134
+
+
+####
+#  #######
+#        #
+#..*##$# #
+#   #  $@#
+#####   ##
+    #   #
+    #####
+Author: monry
+Title: FirstStep 326
+Limit: 125
+
+
+    #####
+    #   #
+    # # #
+#####. @#
+#  $ . ##
+# #$#. #
+#  $  ##
+##   ##
+ #####
+Author: monry
+Title: FirstStep 327
+Limit: 134
+
+
+ ######
+ #@   #
+ #  $ #
+ # #$##
+## . #
+#  .$#
+#  . #
+######
+Author: monry
+Title: FirstStep 328
+Limit: 75
+
+
+ #####
+ #   #
+ # # ##
+##... #
+#   # #
+# $$$ #
+###  ##
+  # @#
+  ####
+Author: monry
+Title: FirstStep 329
+Limit: 53
+
+
+############
+#       ...#
+# ## ##### #
+# #     ## #
+# $  #     #
+##$ #  ## ##
+##    #   ##
+## #    # ##
+#  $ ## # @#
+#  ##      #
+#  ##   #  #
+############
+Author: monry
+Title: FirstStep 330
+Limit: 572
+
+
+########
+#@ #   #
+# $$   #
+#  ## ##
+##$##..#
+#   $..#
+# # ## #
+#      #
+########
+Author: monry
+Title: FirstStep 401
+Limit: 98
+
+
+#########
+#       #
+# ##$## #
+# #. .# #
+# # @ # #
+# #. .  #
+# ##$## #
+# $   $ #
+#       #
+#########
+Author: monry
+Title: FirstStep 402
+Limit: 85
+
+
+  ###
+  #.#
+  #.#
+  #.#
+###.###
+# $ $ #
+# $$  #
+#  #  #
+#  @  #
+#######
+Author: monry
+Title: FirstStep 403
+Limit: 59
+
+
+   ###
+   #+#
+   #*#
+   #.#
+####.####
+#     $ #
+# $   # #
+# ###$# #
+#       #
+#########
+Author: monry
+Title: FirstStep 404
+Limit: 128
+
+
+######
+#...+#
+#$$$$###
+#  #   #
+#    # #
+####   #
+   #####
+Author: monry
+Title: FirstStep 405
+Limit: 43
+
+
+   ####
+   #  #
+#### @####
+#  $$$$  #
+#  ....  #
+####  ####
+   #  #
+   ####
+Author: monry
+Title: FirstStep 406
+Limit: 61
+
+
+  ######
+  #    #
+###$## #
+# $. # #
+# #. $ #
+#  .$#@#
+###. # #
+  ##   #
+  ######
+Author: monry
+Title: FirstStep 407
+Date: 1999.10.15
+Limit: 108
+
+
+  ####
+###  #
+#    ###
+# #..  #
+# $  # #
+###**$ #
+  #@ ###
+  #  #
+  ####
+Author: monry
+Title: FirstStep 408
+Date: 1999.04.07
+Limit: 55
+
+
+  ####
+###  #
+#   $###
+# #.*  #
+#  ..# #
+### $$@#
+  #  ###
+  #  #
+  ####
+Author: monry
+Title: FirstStep 409
+Date: 1999.04.07
+Limit: 75
+
+
+  ####
+###  #
+#  .$###
+# #.$  #
+#  . # #
+###.$$@#
+  #  ###
+  #  #
+  ####
+Author: monry
+Title: FirstStep 410
+Date: 1999.04.07
+Limit: 90
+
+
+########
+#  #   #
+#  $ $@#
+#  ##*##
+## ##.#
+#   $.#
+# # #.##
+#      #
+####   #
+   #####
+Author: monry
+Title: FirstStep 411
+Limit: 81
+
+
+#########
+#       #
+# #$### #
+# #   # #
+# # ..# #
+# $ ..# #
+# # $ # #
+# #$### #
+#   @   #
+#########
+Author: monry
+Title: FirstStep 412
+Limit: 102
+
+
+#########
+#   @   #
+# ##### #
+# #   # #
+# $.. # #
+##$ #$# #
+## ..$  #
+###   ###
+  #####
+Author: monry
+Title: FirstStep 413
+Limit: 101
+
+
+    ####
+    #  #
+ ####  ###
+ #  #. $ #
+##$ *. # #
+#   #.$  #
+# # # # ##
+#@  #   #
+#########
+Author: monry
+Title: FirstStep 414
+Limit: 87
+
+
+#########
+#   @   #
+# ##### #
+# # ..  #
+# $$#.# #
+#   #*# #
+##   $  #
+###   ###
+  #####
+Author: monry
+Title: FirstStep 415
+Limit: 130
+
+
+########
+#  #  @#
+# .*   #
+# .* # #
+##$# $ #
+ #   ###
+ #####
+Author: monry
+Title: FirstStep 416
+Limit: 127
+
+
+#####   #####
+#...## ##   #
+#.   ###    #
+##  $ #  $ ##
+ ##    $$ ##
+  ##  # @##
+   #######
+Author: monry
+Title: FirstStep 417
+Limit: 107
+
+
+#####
+#   #
+# # #
+#   #
+##  ##
+# *$.#
+#@$  #
+# * .#
+######
+Author: monry
+Title: FirstStep 418
+Limit: 47
+
+
+ #######
+ #     #
+ # $ $ #
+ #@$ $ #
+##### ###
+#. .    #
+#       #
+#. .#####
+#####
+Author: monry
+Title: FirstStep 419
+Limit: 120
+
+
+##########
+#   #. . #
+# $   #  #
+##$# . .@#
+#   $$# ##
+# # #    #
+#   #    #
+##########
+Author: monry
+Title: FirstStep 420
+Limit: 102
+
+
+   #####
+   #   #
+####$# #
+#  *.# #
+#  *@# #
+#  **# #
+#  # # #
+#      #
+########
+Author: monry
+Title: FirstStep 501
+Limit: 38
+
+
+  ######
+  #    #
+###*## #
+# $. $ #
+# #. # #
+# #.$$@#
+#  . # #
+####   #
+   #####
+Author: monry
+Title: FirstStep 502
+Date: 1999.10.16
+Limit: 124
+
+
+ #######
+ #    @#
+##$# # #
+# $. $ #
+# #. # #
+# #. # #
+# #.$$ #
+#  . ###
+######
+Author: monry
+Title: FirstStep 503
+Limit: 170
+
+
+#####
+#   ####
+# $  $ #
+##*#.# #
+# ...  #
+#  # # #
+## # # #
+#@ # # #
+#  $ $ #
+#  #####
+####
+Author: monry
+Title: FirstStep 504
+Limit: 182
+
+
+##########
+#    #   #
+# #  # # #
+# # .*$# #
+# ## *@  #
+# ##.*$###
+#    # #
+####   #
+   #####
+Author: monry
+Title: FirstStep 505
+Limit: 100
+
+
+ #####
+## @ ##
+#  #  #
+#$$$$$#
+#.....#
+#     #
+#######
+Author: monry
+Title: FirstStep 506
+Limit: 32
+
+
+ #######
+ #  #  #
+##     ##
+# $$$$$ #
+# #.#.# #
+#  ... @#
+#########
+Author: monry
+Title: FirstStep 507
+Limit: 94
+
+
+  #######
+  #     #
+### ### ###
+#  .....  #
+# #$#@#$# #
+#  $ $ $  #
+##   #   ##
+ #########
+Author: monry
+Title: FirstStep 508
+Limit: 118
+
+
+#########
+#  #   ##
+# $..#$ #
+# $#.   #
+#  ..#$##
+#@#   $ #
+#   #   #
+#########
+Author: monry
+Title: FirstStep 509
+Limit: 84
+
+
+##########
+#   #..  #
+# #  .#  #
+#@$ #..  #
+###$# #$##
+#        #
+# $# ##$ #
+#    ##  #
+##########
+Author: monry
+Title: FirstStep 510
+Limit: 178
+
+
+#########
+### @ ###
+##  $  ##
+#  $ $  #
+#.*.$.*.#
+#########
+Author: monry
+Title: FirstStep 601
+Limit: 28
+
+
+#########
+#  #    #
+# $$ ## #
+#  # ## #
+## $ ## #
+ # #..# #
+ # #..# #
+ # #..# #
+ # ## $ #
+ #@   # #
+ #### # #
+   #  # #
+   # $$ #
+   #  ###
+   ####
+Author: monry
+Title: FirstStep 602
+Limit: 207
+
+
+ #########
+ #   @   #
+ # ##### #
+ # #   # #
+## $..$# #
+#  $..$  #
+# #$..$ ##
+# #   # #
+# ##### #
+#       #
+#########
+Author: monry
+Title: FirstStep 603
+Limit: 65
+
+
+#######
+#..#  #
+#..$$ #
+#*.#  #
+# $#  #
+#  $$ #
+#  # @#
+#######
+Author: monry
+Title: FirstStep 604
+Date: 1999.12.28
+Limit: 60
+
+
+#########
+#       #
+# #$### #
+#   $ # #
+###*..  #
+#  *..###
+# # $   #
+# #$### #
+#   @   #
+#########
+Author: monry
+Title: FirstStep 605
+Date: 1999.04.03
+Limit: 153
+
+
+          ####
+ ##########  #
+ #        $  #
+ # ## #####  #
+ # # ...  # ##
+ # # ...  # ##
+##$#####$##$##
+# $        $ #
+#   ### @#   #
+##############
+Author: monry
+Title: FirstStep 606
+Limit: 320
+
+
+    ####
+#####  #
+#      ####
+# # #..#  #
+# # #..$$ #
+# # #..#  #
+# # ## #$ #
+# #$$  $  #
+#   #### @#
+#####  ####
+Author: monry
+Title: FirstStep 607
+Date: 1999.12.18
+Limit: 182
+
+
+####
+#  ###
+# $$ ######
+#  #...   #
+## $... # #
+## #### $@#
+#  $ $  ###
+#       #
+#########
+Author: monry
+Title: FirstStep 608
+Limit: 252
+
+
+   #########
+   #   ##  #
+#### #   $ #
+#    $$##  #
+# #### ## ##
+# #...  # @#
+# #...  # ##
+# ##$####  #
+#   $    $ #
+### # ###  #
+  #   # ####
+  #####
+Author: monry
+Title: FirstStep 609
+Limit: 291
+
+
+  ####
+###  ###
+#      ###
+#  **#.$ #
+# #  * # #
+# #  # # #
+# ##*#*  #
+#     @###
+########
+Author: monry
+Title: FirstStep 610
+Limit: 150
+
+
+###########
+#  #   #  #
+# $#...#$ #
+#   .$.   #
+# $#...#$ #
+#  # $ #  #
+# $# @ #$ #
+#  #   #  #
+#  #   #  #
+###########
+Author: monry
+Title: FirstStep 801
+Limit: 158
+
+
+   #####
+####   ####
+#  . * .  #
+# $$* *$$ #
+#  . * .  #
+#### @ ####
+   #####
+Author: monry
+Title: FirstStep 802
+Limit: 50
+
+
+##########
+#        #
+#  $ $$$ #
+#@$ $  $ #
+####### ##
+#...     #
+#. . $   #
+#...######
+#####
+Author: monry
+Title: FirstStep 803
+Limit: 252
+
+
+  #######
+### $ . ##
+#  $ * . #
+#@$ * * .#
+#  $ * . #
+### $ . ##
+  #######
+Author: monry
+Title: FirstStep 901
+Limit: 64
+
