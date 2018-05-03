@@ -4118,13 +4118,16 @@ PROCEDURE btnDeleteChoose :
   END.
 
   RUN showHelp('ConfirmDelete', STRING(ghDataBrowse:NUM-SELECTED-ROWS)).
-  IF getRegistry('DataDigger:help', 'ConfirmDelete:answer') <> '1' THEN RETURN.
+  IF getRegistry('DataDigger:help', 'ConfirmDelete:answer') <> '1' THEN 
+  DO:
+    /* Don't save 'NO' or 'CANCEL' as answer to this question */
+    setRegistry('DataDigger:help', 'ConfirmDelete:answer', ?).
+    setRegistry('DataDigger:help', 'ConfirmDelete:hidden', ?).
+    RETURN.
+  END.
 
   /* Dump the record as a backup */
-  RUN dumpRecord( INPUT 'Delete'
-                , INPUT ghDataBrowse
-                , OUTPUT lContinue
-                ).
+  RUN dumpRecord( INPUT 'Delete', INPUT ghDataBrowse, OUTPUT lContinue).
   IF NOT lContinue THEN RETURN.
 
   setWindowFreeze(YES).
@@ -4371,16 +4374,13 @@ END PROCEDURE. /* btnQueriesChoose */
 PROCEDURE btnSettingsChoose :
 /* Show DataDigger settings window
  */
-  DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lOkClicked   AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cSettingsFile AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE lOkClicked    AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE cSettingsDir  AS CHARACTER NO-UNDO.
 
   /* Load or create personalized ini file */
   cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
-  cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini'
-                           , cSettingsDir
-                           , getUserName()
-                           ).
+  cSettingsFile = SUBSTITUTE('&1DataDigger-&2.ini', cSettingsDir, getUserName() ).
 
   /* Save window pos & size because the initializeObject will reset it to its last known
    * position and size. That might be differentfrom the actual position of the window.
@@ -4389,13 +4389,14 @@ PROCEDURE btnSettingsChoose :
   RUN saveWindow.
 
   RUN VALUE(getProgramDir() + '\wSettings.w')
-     ( INPUT cEnvironment
+     ( INPUT cSettingsFile
      , OUTPUT lOkClicked
      ).
 
   IF lOkClicked THEN
   DO:
     setWindowFreeze(YES).
+
     RUN clearRegistryCache.
     RUN initializeObjects.
 
@@ -5221,6 +5222,9 @@ PROCEDURE convertSettings :
       /* DumpDf settings now in their own section */
       PUT-KEY-VALUE SECTION "DataDigger" KEY "DumpDF:dir" VALUE ? NO-ERROR.
       PUT-KEY-VALUE SECTION "DataDigger" KEY "DumpDF:open" VALUE ? NO-ERROR.
+
+      /* Answer to confirm delete should not be saved when NO or CANCEL */
+      PUT-KEY-VALUE SECTION "DataDigger:help" KEY "ConfirmDelete:hidden" VALUE ? NO-ERROR.
 
       /* dHint.w is not used */
       OS-DELETE dHint.w.
@@ -11459,63 +11463,55 @@ END PROCEDURE. /* startDiggerLib */
 PROCEDURE startSession :
 /* Show a welcome message to the user.
    */
-  DEFINE VARIABLE cBuild     AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hWindow    AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iStackSize AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iVersion   AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE lNewBuild  AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lNewUser   AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lUpgraded  AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lOpenBlog  AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE iChannel   AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cBuild      AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hWindow     AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iStackSize  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iVersion    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lNewBuild   AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lNewUser    AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lNewVersion AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lUpgraded   AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lOpenBlog   AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE iChannel    AS INTEGER   NO-UNDO.
 
   /* Set debug flag */
   setDebugMode(LOGICAL(getRegistry('DataDigger:debugger','DebugMode'))).
 
-  /* Check if this is the first run with a new version */
-  iVersion = INTEGER(getRegistry('DataDigger', 'Version')) NO-ERROR.
-  IF iVersion = ? THEN lNewUser = TRUE.
+  /* Check if this is the first run, a new version or a new build */
+  iVersion    = INTEGER(getRegistry('DataDigger', 'Version')) NO-ERROR.
+  IF iVersion = ? THEN iVersion = 0.
 
-  cBuild = getRegistry('DataDigger', 'Build').
-  IF cBuild = ? THEN cBuild = "".
+  cBuild      = getRegistry('DataDigger', 'Build').
+  IF cBuild = ? THEN cBuild = ''.
 
-  /* obsolete files, only for beta-users, only for first build after 20140314 */
-  OS-DELETE VALUE( "dDump.w").
-  OS-DELETE VALUE( "dDump.r").
+  lNewUser    = (iVersion = ?).
+  lNewVersion = (iVersion <> {&version}).
+  lNewBuild   = (cBuild <> '{&build}').
 
-  IF iVersion <> {&VERSION} OR cBuild <> '{&build}' THEN
+  /* Save current version/build nr */
+  setRegistry('DataDigger', 'Version', '{&version}').
+  setRegistry('DataDigger', 'Build', '{&build}').
+
+  /* If we come from an older version, do some conversions */
+  IF lNewVersion OR lNewBuild THEN
   DO:
     lUpgraded = TRUE.
 
-    /* If we come from an older version, do some conversions */
-    IF iVersion <> ? THEN
-    DO:
-      RUN showMessage.p(INPUT "Conversion", INPUT "Please wait while your settings are converted.", OUTPUT hWindow).
+    RUN showMessage.p(INPUT "Conversion", INPUT "Please wait while your settings are converted.", OUTPUT hWindow).
 
-      /* Do one-time conversions if needed */
-      SESSION:SET-WAIT-STATE("general").
-      convLoop:
-      REPEAT:
-        RUN convertSettings(iVersion).
-        iVersion = iVersion + 1.
-        IF iVersion >= {&VERSION} THEN LEAVE convLoop.
-      END.
-      DELETE OBJECT hWindow.
-      SESSION:SET-WAIT-STATE("").
+    /* Do one-time conversions if needed */
+    SESSION:SET-WAIT-STATE("general").
+    convLoop:
+    REPEAT:
+      RUN convertSettings(iVersion).
+      iVersion = iVersion + 1.
+      IF iVersion >= {&VERSION} THEN LEAVE convLoop.
     END.
-
-    /* Save this version nr */
-    setRegistry('DataDigger', 'Version', '{&version}').
-    setRegistry('DataDigger', 'Build', '{&build}').
-  END.
-
-  /* New build nr? Then wipe disk cache */
-  IF cBuild <> '{&build}' THEN
-  DO:
-    lNewBuild = TRUE.
+    DELETE OBJECT hWindow.
+    SESSION:SET-WAIT-STATE("").
+  
+    /* Wipe disk cache */
     RUN clearDiskCache.
-    RUN convertSettings(iVersion).
-    setRegistry('DataDigger', 'Build', '{&build}').
   END.
 
   /* Check on the use of -rereadnolock */
@@ -11540,7 +11536,7 @@ PROCEDURE startSession :
   ELSE IF lUpgraded THEN RUN showNewFeatures.
 
   /* Start up the page on WordPress.com for this build */
-  IF lNewBuild THEN
+  IF lNewVersion OR lNewBuild THEN
   DO:
     lOpenBlog = LOGICAL(getRegistry('DataDigger','OpenBlogOnNewVersion')).
     IF lOpenBlog = ? OR lOpenBlog = TRUE THEN
@@ -12375,3 +12371,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

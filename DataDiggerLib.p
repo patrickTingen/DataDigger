@@ -918,7 +918,10 @@ PROCEDURE clearDiskCache :
 
   PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing disk cache")).
 
-  INPUT FROM OS-DIR(getProgramdir() + "cache").
+  FILE-INFORMATION:FILE-NAME = getProgramdir() + "cache".
+  IF FILE-INFORMATION:FULL-PATHNAME = ? THEN RETURN.
+  
+  INPUT FROM OS-DIR(FILE-INFORMATION:FULL-PATHNAME).
   REPEAT:
     IMPORT cFile.
     IF cFile[1] MATCHES "*.xml" THEN OS-DELETE VALUE( cFile[2]).
@@ -2240,7 +2243,9 @@ PROCEDURE getTableStats :
 
   cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
   cIniFile = SUBSTITUTE('&1DataDigger-&2.ini', cSettingsDir, getUserName() ).
-  INPUT from value(cIniFile).
+  IF SEARCH(cIniFile) = ? THEN RETURN.
+  
+  INPUT FROM VALUE(cIniFile).
 
   #ReadLine:
   REPEAT:
@@ -2446,6 +2451,7 @@ PROCEDURE readConfigFile :
   DEFINE BUFFER bfConfig FOR ttConfig.
 
   /* Read file in 1 pass to memory */
+  IF SEARCH(pcConfigFile) = ? THEN RETURN.
   COPY-LOB FILE pcConfigFile TO cFile NO-CONVERT NO-ERROR.
   IF ERROR-STATUS:ERROR THEN cFile = readFile(pcConfigFile).
 
@@ -2492,6 +2498,39 @@ PROCEDURE readConfigFile :
 
   {&timerStop}
 END PROCEDURE. /* readConfigFile */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-resetAnswers) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetAnswers Procedure 
+PROCEDURE resetAnswers :
+/* Reset answers to all 'do not ask again' questions 
+*/  
+  {&timerStart}
+  DEFINE BUFFER bfConfig FOR ttConfig.
+
+  USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
+  IF NOT ERROR-STATUS:ERROR THEN
+  DO:
+    FOR EACH bfConfig 
+      WHERE bfConfig.cSection = 'DataDigger:help'
+        AND (bfConfig.cSetting MATCHES '*:hidden' OR bfConfig.cSetting MATCHES '*:answer'):
+      setRegistry(bfConfig.cSection, bfConfig.cSetting, ?).
+    END. /* for each bfConfig */
+    USE "".
+  END. /* no error */
+              
+  RUN flushRegistry.
+
+  FINALLY:
+    {&timerStop}
+  END FINALLY.
+
+END PROCEDURE. /* resetAnswers */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4662,13 +4701,16 @@ FUNCTION readFile RETURNS LONGCHAR
   DEFINE VARIABLE cContent AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cLine    AS CHARACTER NO-UNDO.
 
-  INPUT FROM VALUE(pcFilename).
-  REPEAT:
-    IMPORT UNFORMATTED cLine.
-    cContent = cContent + "~n" + cLine.
+  IF SEARCH(pcFilename) <> ? THEN
+  DO:
+    INPUT FROM VALUE(pcFilename).
+    REPEAT:
+      IMPORT UNFORMATTED cLine.
+      cContent = cContent + "~n" + cLine.
+    END.
+    INPUT CLOSE.
   END.
-  INPUT CLOSE.
-
+  
   RETURN cContent.
 END FUNCTION. /* readFile */
 

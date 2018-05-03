@@ -17,15 +17,13 @@ CREATE WIDGET-POOL.
 
 { DataDigger.i }
 
-/* Parameters Definitions ---                                           */
-&if '{&file-name}' matches '*.ab' &then
-  DEFINE VARIABLE pcSettingsFile AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE plSuccess      AS LOGICAL     NO-UNDO.
-  pcSettingsFile = 'd:\Data\DropBox\DataDigger\DataDigger-nljrpti.ini'.
-&else
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
   DEFINE INPUT  PARAMETER pcSettingsFile AS CHARACTER   NO-UNDO.
   DEFINE OUTPUT PARAMETER plSuccess      AS LOGICAL     NO-UNDO.
-&endif.
+&ELSE
+  DEFINE VARIABLE pcSettingsFile AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE plSuccess      AS LOGICAL     NO-UNDO.
+&ENDIF
 
 /* Local Variable Definitions ---                                       */
 
@@ -167,7 +165,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wSettings ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger Settings"
-         HEIGHT-P           = 510
+         HEIGHT-P           = 504
          WIDTH-P            = 769
          MAX-HEIGHT-P       = 562
          MAX-WIDTH-P        = 769
@@ -467,6 +465,12 @@ ON CLOSE OF THIS-PROCEDURE
 /* Best default for GUI applications is...                              */
 PAUSE 0 BEFORE-HIDE.
 
+/* For debugging in the UIB */
+&IF DEFINED(UIB_IS_RUNNING) <> 0 &THEN
+  pcSettingsFile = 'd:\Data\DropBox\DataDigger\DataDigger-nljrpti.ini'.
+  RUN startDiggerLib.p.
+&ENDIF
+
 /* Now enable the interface and wait for the exit condition.            */
 /* (NOTE: handle ERROR and END-KEY so cleanup code will always fire.    */
 MAIN-BLOCK:
@@ -502,7 +506,7 @@ PROCEDURE collectFrames :
   DEFINE INPUT PARAMETER phParent AS HANDLE NO-UNDO.
 
   DEFINE VARIABLE hWidget AS HANDLE NO-UNDO.
-  DEFINE BUFFER ttFrame FOR ttFrame.
+  DEFINE BUFFER bFrame FOR ttFrame.
 
   IF NOT CAN-QUERY(phParent,'first-child') THEN RETURN.
 
@@ -515,12 +519,11 @@ PROCEDURE collectFrames :
 
     IF hWidget:TYPE = 'FRAME' THEN
     DO:
-
-      CREATE ttFrame.
-      ASSIGN ttFrame.hFrame = hWidget
-             ttFrame.cFrame = hWidget:NAME
-             ttFrame.cTags  = 'page' + hWidget:TITLE
-             ttFrame.iOrder = INTEGER(hWidget:TITLE) * 1000 + hWidget:Y
+      CREATE bFrame.
+      ASSIGN bFrame.hFrame = hWidget
+             bFrame.cFrame = hWidget:NAME
+             bFrame.cTags  = 'page' + hWidget:TITLE
+             bFrame.iOrder = INTEGER(hWidget:TITLE) * 1000 + hWidget:Y
              .
 
       hWidget:TITLE = ?.
@@ -574,6 +577,68 @@ PROCEDURE enable_UI :
   VIEW FRAME frSettings IN WINDOW wSettings.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE factoryReset wSettings 
+PROCEDURE factoryReset :
+/* Delete settings file from disk
+*/
+  DEFINE VARIABLE cFolders    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFolderList AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFile       AS CHARACTER EXTENT 3 NO-UNDO.
+  DEFINE VARIABLE lReset      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE i           AS INTEGER   NO-UNDO.
+
+  /* Get a list of all folders in the DD dir */
+  INPUT FROM OS-DIR(getProgramDir()).
+  REPEAT:
+    IMPORT cFile.
+    IF NOT cFile[3] BEGINS 'D' THEN NEXT.
+    IF cFile[1] BEGINS '.' THEN NEXT.
+    IF cFile[1] = 'image' THEN NEXT.
+    cFolders = cFolders + '~n - delete folder ' + cFile[2].
+    cFolderList = TRIM(SUBSTITUTE('&1~n&2',cFolderList,cFile[2]),'~n').
+  END.
+  INPUT CLOSE. 
+
+  MESSAGE 
+    'This action will:~n'
+    '~n - erase your personal settings;'
+    '~n - delete cached files;'
+    cFolders
+    '~n - restart DataDigger.'
+    '~n~nDo you want to continue?' 
+    VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lReset.
+  IF lReset <> TRUE THEN RETURN. 
+
+  lReset = FALSE.
+  MESSAGE 'Please confirm again to go back to factory settings.~n~nAre you sure?' 
+    VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lReset.
+  IF lReset <> TRUE THEN RETURN. 
+
+  /* Delete personal settings */
+  OS-DELETE VALUE(pcSettingsFile).
+
+  /* Clear caches */
+  RUN clearDiskCache.
+  RUN clearRegistryCache.
+
+  /* Delete non-native folders in DD dir */
+  DO i = 1 TO NUM-ENTRIES(cFolderList,'~n'):
+    OS-DELETE VALUE(ENTRY(i,cFolderList,'~n')) RECURSIVE.
+  END.
+
+  RUN saveConfigFileSorted.
+  setRegistry('DataDigger', 'Version', '{&version}').
+  setRegistry('DataDigger', 'Build', '{&build}').
+  RUN flushRegistry.
+
+  plSuccess = TRUE.
+  APPLY "CLOSE" TO THIS-PROCEDURE.
+
+END PROCEDURE. /* factoryReset */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -648,6 +713,9 @@ PROCEDURE initializeObject :
   DO iScreen = 1 TO 3:
     RUN localInitialize IN hProg[iScreen] NO-ERROR.
   END.
+
+  /* Factory reset button in tab 1 */
+  SUBSCRIBE TO 'factoryReset' ANYWHERE.
 
 END PROCEDURE. /* initializeObject */
 
@@ -852,7 +920,8 @@ PROCEDURE showFrames :
   */
   DEFINE INPUT PARAMETER pcTag AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE iRow AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iRow AS INTEGER NO-UNDO.
+  DEFINE BUFFER bFrame FOR ttFrame.
 
   RUN LockWindow (INPUT wSettings:HANDLE, INPUT YES).
 
@@ -860,27 +929,27 @@ PROCEDURE showFrames :
   iRow = 15.
 
   /* Make the frame large enough to hold all settings */
-  FRAME frSettings:virtual-height-pixels = 6720.
-  FRAME frSettings:height-pixels = 390.
+  FRAME frSettings:VIRTUAL-HEIGHT-PIXELS = 6720.
+  FRAME frSettings:HEIGHT-PIXELS = 390.
 
   /* Make frames visible based on whether the tags match */
-  FOR EACH ttFrame {&TABLE-SCAN} BY ttFrame.iOrder:
+  FOR EACH bFrame {&TABLE-SCAN} BY bFrame.iOrder:
 
-    ttFrame.hFrame:visible = ( ttFrame.cTags MATCHES '*' + pcTag + '*' ).
+    bFrame.hFrame:VISIBLE = (bFrame.cTags MATCHES '*' + pcTag + '*').
 
-    IF ttFrame.hFrame:visible THEN
+    IF bFrame.hFrame:VISIBLE THEN
       ASSIGN
-        ttFrame.hFrame:x = 1
-        ttFrame.hFrame:y = iRow
-        iRow = iRow + ttFrame.hFrame:height-pixels + 2.
+        bFrame.hFrame:x = 1
+        bFrame.hFrame:y = iRow
+        iRow = iRow + bFrame.hFrame:HEIGHT-PIXELS + 2.
   END.
 
-  FRAME frSettings:width-pixels = rcSettings:width-pixels IN FRAME {&frame-name} - 10.
-  FRAME frSettings:virtual-height-pixels = MAXIMUM(iRow,390).
+  FRAME frSettings:WIDTH-PIXELS = rcSettings:WIDTH-PIXELS IN FRAME {&FRAME-NAME} - 10.
+  FRAME frSettings:VIRTUAL-HEIGHT-PIXELS = MAXIMUM(iRow,390).
 
-  RUN showScrollBars( FRAME frSettings:handle
+  RUN showScrollBars( FRAME frSettings:HANDLE
                     , NO
-                    , (FRAME frSettings:virtual-height > FRAME frSettings:height)
+                    , (FRAME frSettings:VIRTUAL-HEIGHT > FRAME frSettings:HEIGHT)
                     ).
 
   RUN LockWindow (INPUT wSettings:HANDLE, INPUT NO).
