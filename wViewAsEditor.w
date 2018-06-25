@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wEditor
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wEditor
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wEditor 
 /*------------------------------------------------------------------------
 
   Name: wViewAsEditor.w
@@ -18,13 +18,17 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */
-DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT-OUTPUT PARAMETER pcValue AS LONGCHAR NO-UNDO.
+&ELSE
+  DEFINE VARIABLE pcValue AS LONGCHAR NO-UNDO.
+&ENDIF
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -35,8 +39,8 @@ DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS edValue btnOk btnCancel
-&Scoped-Define DISPLAYED-OBJECTS edValue
+&Scoped-Define ENABLED-OBJECTS edValue btnOk btnCancel 
+&Scoped-Define DISPLAYED-OBJECTS edValue 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -49,21 +53,21 @@ DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE wEditor AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR wEditor AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnCancel AUTO-END-KEY
-     LABEL "Cancel"
+DEFINE BUTTON btnCancel AUTO-END-KEY 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON btnOk AUTO-GO
-     LABEL "OK"
+DEFINE BUTTON btnOk AUTO-GO 
+     LABEL "OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE edValue AS CHARACTER
-     VIEW-AS EDITOR SCROLLBAR-VERTICAL
+DEFINE VARIABLE edValue AS CHARACTER 
+     VIEW-AS EDITOR SCROLLBAR-VERTICAL LARGE
      SIZE-PIXELS 400 BY 130 NO-UNDO.
 
 
@@ -71,10 +75,10 @@ DEFINE VARIABLE edValue AS CHARACTER
 
 DEFINE FRAME DEFAULT-FRAME
      edValue AT Y 0 X 0 NO-LABEL WIDGET-ID 36
-     btnOk AT Y 140 X 245 WIDGET-ID 34
-     btnCancel AT Y 140 X 325 WIDGET-ID 32
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+     btnOk AT Y 140 X 234 WIDGET-ID 34
+     btnCancel AT Y 140 X 314 WIDGET-ID 32
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 400 BY 170 WIDGET-ID 100.
 
@@ -102,15 +106,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1600
          VIRTUAL-HEIGHT-P   = 6720
          VIRTUAL-WIDTH-P    = 1600
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -125,12 +129,12 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wEditor)
-THEN wEditor:HIDDEN = NO.
+THEN wEditor:HIDDEN = no.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -204,9 +208,9 @@ DO:
     /* Adjust the browse */
     edValue:WIDTH-PIXELS  = FRAME {&FRAME-NAME}:WIDTH-PIXELS.
     edValue:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 40.
-    btnOk:X               = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 155.
+    btnOk:X               = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 165.
     btnOk:Y               = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 30.
-    btnCancel:X           = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 75.
+    btnCancel:X           = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 85.
     btnCancel:Y           = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 30.
 
     /* Save settings */
@@ -238,9 +242,20 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME edValue
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL edValue wEditor
+ON CTRL-A OF edValue IN FRAME DEFAULT-FRAME
+DO:
+  edValue:SET-SELECTION(1,LENGTH(edValue:SCREEN-VALUE) + 1).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wEditor
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wEditor 
 
 
 /* ***************************  Main Block  *************************** */
@@ -291,7 +306,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -312,12 +327,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edValue
+  DISPLAY edValue 
       WITH FRAME DEFAULT-FRAME IN WINDOW wEditor.
-  ENABLE edValue btnOk btnCancel
+  ENABLE edValue btnOk btnCancel 
       WITH FRAME DEFAULT-FRAME IN WINDOW wEditor.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW wEditor.
@@ -326,9 +341,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wEditor
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wEditor 
 PROCEDURE initializeObject :
-  /* Init frame and font
+/* Init frame and font
   */
   DEFINE VARIABLE iValue AS INTEGER NO-UNDO.
 
@@ -359,3 +374,4 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

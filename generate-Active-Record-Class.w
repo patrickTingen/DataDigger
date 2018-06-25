@@ -222,7 +222,7 @@ DEFINE FRAME frMain
 IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
-         TITLE              = "Generate TempTable Include"
+         TITLE              = "Generate Active Record Class"
          HEIGHT             = 24.76
          WIDTH              = 180
          MAX-HEIGHT         = 40
@@ -826,4 +826,3 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

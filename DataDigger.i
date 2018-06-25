@@ -192,6 +192,7 @@ DEFINE TEMP-TABLE ttFilter NO-UNDO RCODE-INFORMATION
 
 /* TT for filter on database tables */
 DEFINE TEMP-TABLE ttTableFilter NO-UNDO RCODE-INFORMATION
+  FIELD lModified       AS LOGICAL
   FIELD cTableNameShow  AS CHARACTER
   FIELD cTableNameHide  AS CHARACTER
   FIELD cTableFieldShow AS CHARACTER

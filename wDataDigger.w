@@ -181,17 +181,16 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery btnTools rctEdit fiTableFilter ~
-cbDatabaseFilter btnClearTableFilter btnTableFilter tgSelAll ~
-btnClearFieldFilter fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter tgDebugMode brTables brFields btnMoveTop brIndexes ~
-btnMoveUp btnReset btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc ~
-btnWhere btnClear btnQueries btnFavourite btnClipboard btnNextQuery ~
-ficWhere btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields ~
-btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView btnAdd ~
-btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnTools ~
+cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnTabTables btnClear btnClearFieldFilter ~
+btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnQueries btnReset btnTableFilter btnWhere btnTabFavourites ~
+btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump ~
+btnLoad btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
-fiIndexNameFilter fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ~
+fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
 
 /* Custom List Definitions                                              */
@@ -199,8 +198,8 @@ ficWhere fiFeedback
 &Scoped-define List-1 btnBegins rctQueryButtons cbAndOr cbFields cbOperator ~
 ficValue btnInsert btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT ~
 btnMatches btnNE btnQt btnToday 
-&Scoped-define List-2 rcFieldFilter tgSelAll btnClearFieldFilter brFields ~
-btnMoveTop btnMoveUp btnReset btnMoveDown btnMoveBottom 
+&Scoped-define List-2 rcFieldFilter tgSelAll brFields btnClearFieldFilter ~
+btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
 &Scoped-define List-3 rcIndexFilter fiIndexNameFilter fiFlagsFilter ~
 fiFieldsFilter btnClearIndexFilter brIndexes 
 
@@ -368,11 +367,11 @@ DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
 DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnClearDataFilter 
+DEFINE BUTTON btnClearDataFilter  NO-FOCUS FLAT-BUTTON
      LABEL "C" 
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnDataSort 
+DEFINE BUTTON btnDataSort  NO-FOCUS FLAT-BUTTON
      LABEL "S" 
      SIZE-PIXELS 15 BY 21 TOOLTIP "set sorting".
 
@@ -386,11 +385,12 @@ DEFINE VARIABLE fiNumSelected AS CHARACTER FORMAT "X(256)":U
 
 DEFINE RECTANGLE rctData
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 785 BY 205.
+     SIZE-PIXELS 785 BY 205
+     BGCOLOR 17 .
 
 DEFINE RECTANGLE rctDataFilter
      EDGE-PIXELS 2 GRAPHIC-EDGE    
-     SIZE-PIXELS 765 BY 28
+     SIZE-PIXELS 783 BY 28
      BGCOLOR 12 .
 
 DEFINE BUTTON btGotIt 
@@ -399,7 +399,7 @@ DEFINE BUTTON btGotIt
 
 DEFINE VARIABLE edHint AS CHARACTER 
      VIEW-AS EDITOR NO-BOX
-     SIZE-PIXELS 160 BY 75
+     SIZE-PIXELS 175 BY 80
      BGCOLOR 14 FGCOLOR 9  NO-UNDO.
 
 DEFINE IMAGE imgArrow
@@ -410,11 +410,11 @@ DEFINE BUTTON btnAdd  NO-FOCUS FLAT-BUTTON
      LABEL "&Add" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "add a record #(INS)".
 
-DEFINE BUTTON btnClear 
+DEFINE BUTTON btnClear  NO-FOCUS FLAT-BUTTON
      LABEL "&C" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "clear the where field #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClearFieldFilter 
+DEFINE BUTTON btnClearFieldFilter  NO-FOCUS FLAT-BUTTON
      LABEL "C" 
      CONTEXT-HELP-ID 280
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
@@ -424,12 +424,12 @@ DEFINE BUTTON btnClearIndexFilter
      CONTEXT-HELP-ID 960
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClearTableFilter 
+DEFINE BUTTON btnClearTableFilter  NO-FOCUS FLAT-BUTTON
      LABEL "C" 
      CONTEXT-HELP-ID 950
      SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
-DEFINE BUTTON btnClipboard 
+DEFINE BUTTON btnClipboard  NO-FOCUS FLAT-BUTTON
      LABEL "Cp" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "copy the expression to the clipboard #(CTRL-C)".
 
@@ -451,25 +451,25 @@ DEFINE BUTTON btnEdit  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnFavourite  NO-FOCUS FLAT-BUTTON
      LABEL "F" 
-     SIZE-PIXELS 20 BY 20 TOOLTIP "toggle as favourite".
+     SIZE-PIXELS 20 BY 21 TOOLTIP "toggle as favourite".
 
 DEFINE BUTTON btnLoad  NO-FOCUS FLAT-BUTTON
      LABEL "&Load" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "load data #(CTRL-L)".
 
-DEFINE BUTTON btnMoveBottom 
+DEFINE BUTTON btnMoveBottom  NO-FOCUS FLAT-BUTTON
      LABEL "Btm" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field to bottom #(CTRL-SHIFT-DOWN)".
 
-DEFINE BUTTON btnMoveDown 
+DEFINE BUTTON btnMoveDown  NO-FOCUS FLAT-BUTTON
      LABEL "Dn" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field down #(CTRL-DOWN)".
 
-DEFINE BUTTON btnMoveTop 
+DEFINE BUTTON btnMoveTop  NO-FOCUS FLAT-BUTTON
      LABEL "Top" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field to top #(CTRL-SHIFT-UP)".
 
-DEFINE BUTTON btnMoveUp 
+DEFINE BUTTON btnMoveUp  NO-FOCUS FLAT-BUTTON
      LABEL "Up" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "move selected field up #(CTRL-UP)".
 
@@ -481,11 +481,11 @@ DEFINE BUTTON btnPrevQuery  NO-FOCUS FLAT-BUTTON
      LABEL "<-" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "previous query".
 
-DEFINE BUTTON btnQueries 
+DEFINE BUTTON btnQueries  NO-FOCUS FLAT-BUTTON
      LABEL "&Q" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "show previous queries on this table #(ALT-Q)".
 
-DEFINE BUTTON btnReset 
+DEFINE BUTTON btnReset  NO-FOCUS FLAT-BUTTON
      LABEL "R" 
      SIZE-PIXELS 23 BY 23 TOOLTIP "reset default ordering #(CTRL-SHIFT-HOME)".
 
@@ -496,19 +496,19 @@ DEFINE BUTTON btnResizeVer  NO-FOCUS FLAT-BUTTON
 DEFINE BUTTON btnTabFavourites  NO-FOCUS FLAT-BUTTON
      LABEL "Fav" 
      CONTEXT-HELP-ID 270
-     SIZE-PIXELS 25 BY 77 TOOLTIP "show favorites #(CTRL-2)".
+     SIZE-PIXELS 23 BY 77 TOOLTIP "show favorites #(CTRL-2)".
 
 DEFINE BUTTON btnTabFields  NO-FOCUS FLAT-BUTTON
      LABEL "Fld" 
      CONTEXT-HELP-ID 270
-     SIZE-PIXELS 25 BY 77 TOOLTIP "show fields #(CTRL-3)".
+     SIZE-PIXELS 23 BY 77 TOOLTIP "show fields #(CTRL-3)".
 
 DEFINE BUTTON btnTabIndexes  NO-FOCUS FLAT-BUTTON
      LABEL "Idx" 
      CONTEXT-HELP-ID 270
-     SIZE-PIXELS 25 BY 77 TOOLTIP "show indexes #(CTRL-4)".
+     SIZE-PIXELS 23 BY 77 TOOLTIP "show indexes #(CTRL-4)".
 
-DEFINE BUTTON btnTableFilter 
+DEFINE BUTTON btnTableFilter  NO-FOCUS FLAT-BUTTON
      LABEL "Y" 
      CONTEXT-HELP-ID 950
      SIZE-PIXELS 20 BY 21 TOOLTIP "press arrow-down for extra filter options #(CTRL-DOWN)".
@@ -516,21 +516,21 @@ DEFINE BUTTON btnTableFilter
 DEFINE BUTTON btnTabTables  NO-FOCUS FLAT-BUTTON
      LABEL "Tbl" 
      CONTEXT-HELP-ID 270
-     SIZE-PIXELS 25 BY 77 TOOLTIP "show tables #(CTRL-1)".
+     SIZE-PIXELS 23 BY 77 TOOLTIP "show tables #(CTRL-1)".
 
 DEFINE BUTTON btnTools  NO-FOCUS FLAT-BUTTON
      LABEL "Tools" 
-     SIZE-PIXELS 21 BY 21 TOOLTIP "tools and settings #(CTRL-T)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "tools and settings #(CTRL-T) = jump to #(CTRL-SHIFT-T) = show/hide".
 
 DEFINE BUTTON btnView  NO-FOCUS FLAT-BUTTON
      LABEL "&View" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "view selected records  #(ENTER) #right click to set type of view".
 
-DEFINE BUTTON btnViewData 
+DEFINE BUTTON btnViewData  NO-FOCUS FLAT-BUTTON
      LABEL "->" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "execute the query #(CTRL-ENTER)".
 
-DEFINE BUTTON btnWhere 
+DEFINE BUTTON btnWhere  NO-FOCUS FLAT-BUTTON
      LABEL "&Where" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(CTRL-ALT-W)".
 
@@ -541,11 +541,10 @@ DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U
      DROP-DOWN-LIST
      SIZE-PIXELS 59 BY 21 TOOLTIP "filter on database" NO-UNDO.
 
-DEFINE VARIABLE cbFavouriteSet AS CHARACTER FORMAT "X(256)":U 
+DEFINE VARIABLE cbFavouriteGroup AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Customers","Sales","Employee stuff","------------------------------------------","Create new set","Maintain sets" 
      DROP-DOWN-LIST
-     SIZE-PIXELS 200 BY 21 NO-UNDO.
+     SIZE-PIXELS 172 BY 21 NO-UNDO.
 
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
@@ -578,7 +577,7 @@ DEFINE VARIABLE fiIndexNameFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Index 
 
 DEFINE VARIABLE fiTableDesc AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS FILL-IN 
-     SIZE-PIXELS 200 BY 20 NO-UNDO.
+     SIZE-PIXELS 171 BY 21 NO-UNDO.
 
 DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Table filter" 
      CONTEXT-HELP-ID 950
@@ -603,7 +602,7 @@ DEFINE RECTANGLE rcIndexFilter
 
 DEFINE RECTANGLE rcTableFilter
      EDGE-PIXELS 2 GRAPHIC-EDGE    
-     SIZE-PIXELS 226 BY 236
+     SIZE-PIXELS 240 BY 236
      BGCOLOR 12 .
 
 DEFINE RECTANGLE rctEdit
@@ -613,12 +612,12 @@ DEFINE RECTANGLE rctEdit
 DEFINE RECTANGLE rctQuery
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 789 BY 290
-     BGCOLOR 18 .
+     BGCOLOR 17 .
 
 DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes 
      LABEL "" 
      VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 15 BY 13 TOOLTIP "debugging mode".
+     SIZE-PIXELS 15 BY 13 TOOLTIP "disable timers (for debugging)".
 
 DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes 
      LABEL "" 
@@ -627,36 +626,36 @@ DEFINE VARIABLE tgSelAll AS LOGICAL INITIAL yes
      SIZE-PIXELS 14 BY 15 TOOLTIP "toggle to (de)select all fields" NO-UNDO.
 
 DEFINE BUTTON btnAbout 
-     LABEL "Que" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-A)".
+     LABEL "Info" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-B)".
 
 DEFINE BUTTON btnAbout-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "About DataDigger" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-A)".
+     LABEL "A&bout" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "about the DataDigger #(CTRL-SHIFT-B)".
 
 DEFINE BUTTON btnConnections 
-     LABEL "Co&n" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "connections #(CTRL-SHIFT-N)".
+     LABEL "&Con" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "connections #(CTRL-SHIFT-C)".
 
 DEFINE BUTTON btnConnections-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Co&nnections" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "connections #(CTRL-SHIFT-N)".
+     LABEL "&Connections" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "connections #(CTRL-SHIFT-C)".
 
 DEFINE BUTTON btnDataAdmin 
      LABEL "&ADM" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "Data Administration".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "Data Administration #(CTRL-SHIFT-A)".
 
 DEFINE BUTTON btnDataAdmin-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Data Administration" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "Data Administration".
+     LABEL "Data &Admin" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "Data Administration #(CTRL-SHIFT-A)".
 
 DEFINE BUTTON btnDataDigger 
      LABEL "DD" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "start a new DataDigger window #(ALT-D)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "start a new DataDigger window #(CTRL-SHIFT-N)".
 
 DEFINE BUTTON btnDataDigger-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "New &Window" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "start a new DataDigger window #(ALT-D)".
+     LABEL "&New Window" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start a new DataDigger window #(CTRL-SHIFT-N)".
 
 DEFINE BUTTON btnDict 
      LABEL "&DD" 
@@ -664,47 +663,63 @@ DEFINE BUTTON btnDict
 
 DEFINE BUTTON btnDict-txt  NO-FOCUS FLAT-BUTTON
      LABEL "Data &Dictionary" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
+
+DEFINE BUTTON btnExpand  NO-FOCUS FLAT-BUTTON
+     LABEL "< >" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "expand or collapse the toolbar".
+
+DEFINE BUTTON btnExpand-txt  NO-FOCUS FLAT-BUTTON
+     LABEL "Expand/Collapse" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "expand or collapse the toolbar".
 
 DEFINE BUTTON btnHelp 
      LABEL "Help" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "get help about the DataDigger window".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "show quick intro #(CTRL-SHIFT-W)".
 
 DEFINE BUTTON btnHelp-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Help" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "show quick intro".
+     LABEL "&Welcome" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "show quick intro #(CTRL-SHIFT-W)".
 
 DEFINE BUTTON btnProcEdit 
      LABEL "&Ed" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "start the Procedure Editor #(SHIFT-F3)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
 
 DEFINE BUTTON btnProcEdit-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Procedure &Editor" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "start the Procedure Editor #(SHIFT-F3)".
+     LABEL "&Editor" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
 
 DEFINE BUTTON btnQueries-3 
-     LABEL "&Q" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "show previous queries #(CTRL-SHIFT-Q)".
+     LABEL "&H" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "show previous queries #(CTRL-SHIFT-H)".
 
 DEFINE BUTTON btnQueries-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Manage &Queries" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "show previous queries on this table #(CTRL-SHIFT-Q)".
+     LABEL "&History" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "show previous queries on this table #(CTRL-SHIFT-H)".
 
 DEFINE BUTTON btnQueryTester 
-     LABEL "Q&T" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "start the query tester #(CTRL-Q)".
+     LABEL "&QT" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "start MFC Query Tester #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnQueryTester-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "Query &Tester" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "start the query tester #(CTRL-SHIFT-T)".
+     LABEL "&Query Tester" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start MFC Query Tester #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnSettings 
      LABEL "&Set" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "edit your settings file #(CTRL-ALT-S)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "edit your settings file #(CTRL-SHIFT-S)".
 
 DEFINE BUTTON btnSettings-txt  NO-FOCUS FLAT-BUTTON
      LABEL "&Settings" 
-     SIZE-PIXELS 155 BY 30 TOOLTIP "edit your settings file #(CTRL-ALT-S)".
+     SIZE-PIXELS 100 BY 30 TOOLTIP "edit your settings file #(CTRL-SHIFT-S)".
+
+DEFINE BUTTON btnTools-2  NO-FOCUS FLAT-BUTTON
+     LABEL "Tools" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "tools and settings #(CTRL-T) = jump to #(CTRL-SHIFT-T) = show/hide".
+
+DEFINE BUTTON btnTools-txt  NO-FOCUS FLAT-BUTTON
+     LABEL "Show / Hide" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "show or hide the toolbar".
 
 DEFINE BUTTON btnAnd  NO-FOCUS
      LABEL "and" 
@@ -914,116 +929,111 @@ ttTable.iNumQueries
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
     WITH NO-ROW-MARKERS
-          &IF '{&WINDOW-SYSTEM}' = 'TTY':U &THEN SIZE 44 BY 10
-          &ELSE SIZE-PIXELS 220 BY 211 &ENDIF FIT-LAST-COLUMN TOOLTIP "(F) to set/unset as favourite"
+          &IF '{&WINDOW-SYSTEM}' = 'TTY':U &THEN SIZE 47 BY 10
+          &ELSE SIZE-PIXELS 234 BY 210 &ENDIF FIT-LAST-COLUMN TOOLTIP "(F) to set/unset as favourite"
          CONTEXT-HELP-ID 70.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnTools AT Y 4 X 2 WIDGET-ID 264
-     fiTableFilter AT Y 3 X 38 NO-LABEL
-     cbDatabaseFilter AT Y 3 X 99 COLON-ALIGNED NO-LABEL
-     btnClearTableFilter AT Y 4 X 219 WIDGET-ID 222
-     btnTableFilter AT Y 4 X 239 WIDGET-ID 38
-     tgSelAll AT Y 5 X 315 WIDGET-ID 6
-     btnClearFieldFilter AT Y 5 X 735 WIDGET-ID 232
-     fiIndexNameFilter AT Y 5 X 785 COLON-ALIGNED NO-LABEL WIDGET-ID 168
-     fiFlagsFilter AT Y 5 X 860 COLON-ALIGNED NO-LABEL WIDGET-ID 164
-     fiFieldsFilter AT Y 5 X 915 COLON-ALIGNED NO-LABEL WIDGET-ID 166
-     btnClearIndexFilter AT Y 5 X 1065 WIDGET-ID 160
-     tgDebugMode AT Y 25 X 5 WIDGET-ID 238 NO-TAB-STOP 
-     brTables AT Y 27 X 38 WIDGET-ID 300
-     brFields AT Y 27 X 295 WIDGET-ID 100
-     btnMoveTop AT Y 28 X 760 WIDGET-ID 198
-     brIndexes AT Y 28 X 799 WIDGET-ID 200
-     btnMoveUp AT Y 50 X 760 WIDGET-ID 192
-     btnReset AT Y 72 X 760 WIDGET-ID 196
-     btnMoveDown AT Y 94 X 760 WIDGET-ID 194
-     btnMoveBottom AT Y 116 X 760 WIDGET-ID 200
-     cbFavouriteSet AT Y 236 X 29 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     fiTableDesc AT Y 238 X 38 NO-LABEL WIDGET-ID 90
-     btnWhere AT Y 265 X 653 WIDGET-ID 236
-     btnViewData AT Y 265 X 675
-     btnClear AT Y 265 X 695 WIDGET-ID 30
-     btnQueries AT Y 265 X 715 WIDGET-ID 190
-     btnFavourite AT Y 239 X 238 WIDGET-ID 310
-     btnClipboard AT Y 265 X 735 WIDGET-ID 178
-     btnNextQuery AT Y 265 X 27 WIDGET-ID 314
-     ficWhere AT Y 266 X 50 NO-LABEL
-     btnPrevQuery AT Y 265 X 6 WIDGET-ID 312
-     fiWarning AT Y 520 X 450 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnDump AT Y 520 X 145
-     btnLoad AT Y 520 X 195 WIDGET-ID 224
-     btnTabFavourites AT Y 122 X 13 WIDGET-ID 302
-     btnTabFields AT Y 45 X 271 WIDGET-ID 156
-     btnTabIndexes AT Y 122 X 271 WIDGET-ID 158
-     btnTabTables AT Y 45 X 13 WIDGET-ID 300
-     btnDelete AT Y 520 X 250
-     btnResizeVer AT ROW 13.38 COL 1.6 WIDGET-ID 274
-     btnClone AT Y 520 X 50 WIDGET-ID 276
-     btnView AT Y 520 X 170 WIDGET-ID 4
-     btnAdd AT Y 520 X 25
-     btnEdit AT Y 520 X 75
-     fiFeedback AT Y 520 X 575 COLON-ALIGNED NO-LABEL WIDGET-ID 308
-     rctQuery AT Y 0 X 0
-     rctEdit AT Y 515 X 20
-     rcTableFilter AT Y 24 X 35 WIDGET-ID 254
-     rcFieldFilter AT Y 24 X 292 WIDGET-ID 256
-     rcIndexFilter AT Y 24 X 795 WIDGET-ID 258
+     fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnTools AT Y 0 X 1 WIDGET-ID 264
+     cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
+     tgSelAll AT Y 5 X 345 WIDGET-ID 6
+     fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
+     fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL WIDGET-ID 164
+     fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL WIDGET-ID 166
+     btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
+     brTables AT Y 27 X 56 WIDGET-ID 300
+     brFields AT Y 27 X 325 WIDGET-ID 100
+     brIndexes AT Y 28 X 829 WIDGET-ID 200
+     tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
+     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
+     ficWhere AT Y 266 X 80 NO-LABEL
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTabTables AT Y 45 X 34 WIDGET-ID 300
+     btnClear AT Y 265 X 725 WIDGET-ID 30
+     btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
+     btnClearTableFilter AT Y 4 X 237 WIDGET-ID 222
+     btnClipboard AT Y 265 X 765 WIDGET-ID 178
+     btnMoveBottom AT Y 143 X 790 WIDGET-ID 200
+     btnMoveDown AT Y 121 X 790 WIDGET-ID 194
+     btnMoveTop AT Y 55 X 790 WIDGET-ID 198
+     btnMoveUp AT Y 77 X 790 WIDGET-ID 192
+     btnQueries AT Y 265 X 745 WIDGET-ID 190
+     btnReset AT Y 99 X 790 WIDGET-ID 196
+     btnTableFilter AT Y 4 X 257 WIDGET-ID 38
+     btnViewData AT Y 265 X 705
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
+     btnTabFavourites AT Y 122 X 33 WIDGET-ID 302
+     btnTabFields AT Y 45 X 303 WIDGET-ID 156
+     btnTabIndexes AT Y 122 X 303 WIDGET-ID 158
+     btnFavourite AT Y 236 X 270 WIDGET-ID 310
+     btnNextQuery AT Y 265 X 57 WIDGET-ID 314
+     btnPrevQuery AT Y 265 X 36 WIDGET-ID 312
+     btnDump AT Y 520 X 175
+     btnLoad AT Y 520 X 225 WIDGET-ID 224
+     btnDelete AT Y 520 X 280
+     btnResizeVer AT ROW 13.38 COL 7.6 WIDGET-ID 274
+     btnClone AT Y 520 X 80 WIDGET-ID 276
+     btnView AT Y 520 X 200 WIDGET-ID 4
+     btnAdd AT Y 520 X 55
+     btnEdit AT Y 520 X 105
+     fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL WIDGET-ID 308
+     rctQuery AT Y 0 X 30
+     rctEdit AT Y 515 X 50
+     rcTableFilter AT Y 24 X 53 WIDGET-ID 254
+     rcFieldFilter AT Y 24 X 322 WIDGET-ID 256
+     rcIndexFilter AT Y 24 X 825 WIDGET-ID 258
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 1494 BY 675 DROP-TARGET.
+         SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
 DEFINE FRAME frSettings
-     btnSettings-txt AT Y 32 X 30 WIDGET-ID 200
-     btnDataDigger AT Y 0 X 0 WIDGET-ID 126
-     btnConnections AT Y 0 X 186 WIDGET-ID 212
-     btnSettings AT Y 32 X 0 WIDGET-ID 210
-     btnProcEdit AT Y 32 X 186 WIDGET-ID 228
-     btnDict AT Y 64 X 0 WIDGET-ID 224
-     btnDataAdmin AT Y 64 X 186 WIDGET-ID 214
-     btnQueries-3 AT Y 96 X 0 WIDGET-ID 190
-     btnQueryTester AT Y 96 X 186 WIDGET-ID 232
-     btnHelp AT Y 128 X 0 WIDGET-ID 260
-     btnAbout AT Y 128 X 186 WIDGET-ID 196
-     btnAbout-txt AT Y 128 X 216 WIDGET-ID 208
-     btnConnections-txt AT Y 0 X 216 WIDGET-ID 202
-     btnDataAdmin-txt AT Y 64 X 216 WIDGET-ID 206
-     btnDataDigger-txt AT Y 0 X 30 WIDGET-ID 236
-     btnDict-txt AT Y 64 X 30 WIDGET-ID 226
-     btnHelp-txt AT Y 128 X 30 WIDGET-ID 262
-     btnProcEdit-txt AT Y 32 X 216 WIDGET-ID 230
-     btnQueries-txt AT Y 96 X 30 WIDGET-ID 204
-     btnQueryTester-txt AT Y 96 X 216 WIDGET-ID 234
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 160.6 ROW 9.48 SCROLLABLE 
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnProcEdit AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnProcEdit-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
          BGCOLOR 15  WIDGET-ID 500.
 
 DEFINE FRAME frData
-     btnDataSort AT Y 5 X 15 WIDGET-ID 300
-     btnClearDataFilter AT Y 5 X 755 WIDGET-ID 76
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
      fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
      fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
      rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 12 WIDGET-ID 296
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 15.05
+         AT COL 7 ROW 15.05
          SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frHint
-     edHint AT Y 0 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 80 X 70 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1194 Y 242
-         SIZE-PIXELS 205 BY 110
-         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1056,10 +1066,20 @@ DEFINE FRAME frWhere
      rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 799 Y 370
+         AT X 830 Y 175
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1079,8 +1099,8 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger"
-         HEIGHT-P           = 697
-         WIDTH-P            = 1523
+         HEIGHT-P           = 567
+         WIDTH-P            = 1509
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
          VIRTUAL-HEIGHT-P   = 1134
@@ -1133,9 +1153,9 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
-/* BROWSE-TAB brTables tgDebugMode frMain */
+/* BROWSE-TAB brTables btnClearIndexFilter frMain */
 /* BROWSE-TAB brFields brTables frMain */
-/* BROWSE-TAB brIndexes btnMoveTop frMain */
+/* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -1236,9 +1256,8 @@ ASSIGN
 /* SETTINGS FOR TOGGLE-BOX tgSelAll IN FRAME frMain
    2                                                                    */
 /* SETTINGS FOR FRAME frSettings
-   NOT-VISIBLE Size-to-Fit                                              */
+   NOT-VISIBLE                                                          */
 ASSIGN 
-       FRAME frSettings:SCROLLABLE       = FALSE
        FRAME frSettings:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FRAME frWhere
@@ -1336,14 +1355,14 @@ OPEN QUERY {&SELF-NAME} FOR EACH ttTable.
 CREATE CONTROL-FRAME CtrlFrame ASSIGN
        FRAME           = FRAME frMain:HANDLE
        ROW             = 25.52
-       COLUMN          = 85
+       COLUMN          = 91
        HEIGHT          = 1.43
        WIDTH           = 6
        WIDGET-ID       = 292
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
-      CtrlFrame:MOVE-AFTER(FRAME frWhere:HANDLE).
+      CtrlFrame:MOVE-AFTER(FRAME frData:HANDLE).
 
 &ENDIF
 
@@ -1481,19 +1500,37 @@ ANYWHERE DO:
   &IF DEFINED (UIB_is_running) &THEN
   IF FRAME frMain:BGCOLOR = ? THEN
   DO:
-    FRAME frMain:BGCOLOR = 12.
-    FRAME frData:BGCOLOR = 12.
+    FRAME frMain:BGCOLOR = 25. /* very dark gray */
+    FRAME frMain:FGCOLOR = 8.  /* light gray */
 
-    setRegistry('DataDigger:colors', 'DataRow:odd:fg','6').
-    setRegistry('DataDigger:colors', 'DataRow:odd:bg','0').
-    setRegistry('DataDigger:colors', 'DataRow:even:fg','7').
-    setRegistry('DataDigger:colors', 'DataRow:even:bg','0').
+    FRAME frData:BGCOLOR = 25. /* very dark gray */
+    FRAME frData:FGCOLOR = 8.  /* light gray */
 
+    FRAME frSettings:BGCOLOR = 26. /* BG dark gray */
+    FRAME frSettings:FGCOLOR = 15. 
+
+    giDataOddRowColor[1]  = 15. /* FG white*/
+    giDataOddRowColor[2]  = 25. /* BG very dark gray */
+    giDataEvenRowColor[1] = 15. /* FG black */
+    giDataEvenRowColor[2] = 26. /* BG dark gray */
+
+    FRAME frSettings:WIDTH-PIXELS = 32.
   END.
   ELSE
   DO:
     FRAME frMain:BGCOLOR = ?.
+    FRAME frMain:FGCOLOR = ?.
+
     FRAME frData:BGCOLOR = ?.
+    FRAME frData:FGCOLOR = ?.
+
+    FRAME frSettings:BGCOLOR = ?.
+    FRAME frSettings:FGCOLOR = ?.
+
+    giDataOddRowColor[1]  =  0. /* FG */
+    giDataOddRowColor[2]  = 15. /* white */
+    giDataEvenRowColor[1] =  0. /* black */
+    giDataEvenRowColor[2] =  8. /* light gray */
 
 /*       WHEN 'CustomFormat:fg'           THEN iColor = 12. /* red       */ */
 /*       WHEN 'CustomOrder:fg'            THEN iColor = 12. /* red       */ */
@@ -2114,7 +2151,7 @@ END.
 ON CTRL-CURSOR-DOWN OF brTables IN FRAME frMain
 DO:
   IF giCurrentPage = {&PAGE-FAVOURITES} THEN
-    APPLY 'ENTRY' TO cbFavouriteSet.
+    APPLY 'ENTRY' TO cbFavouriteGroup.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2342,12 +2379,11 @@ END.
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnAbout
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout C-Win
-ON CHOOSE OF btnAbout IN FRAME frSettings /* Que */
-, btnAbout-txt
-OR "CTRL-SHIFT-A" OF c-win ANYWHERE
+ON CHOOSE OF btnAbout IN FRAME frSettings /* Info */
+OR "CHOOSE" OF btnAbout-txt 
+OR "CTRL-SHIFT-B" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("About"). /* user behaviour */
-  HIDE FRAME frSettings.
   RUN VALUE(getProgramDir() + 'wAbout.w').
 END.
 
@@ -2356,11 +2392,9 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout C-Win
-ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Que */
-, btnAbout-txt
+ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Info */
 DO:
   PUBLISH "setUsage" ("showChangelog"). /* user behaviour */
-  HIDE FRAME frSettings.
   OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
 END.
 
@@ -2565,11 +2599,10 @@ END. /* choose of btnDelete */
 &Scoped-define SELF-NAME btnConnections
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections C-Win
 ON CHOOSE OF btnConnections IN FRAME frSettings /* Con */
-, btnConnections-txt
-OR 'CTRL-SHIFT-N' OF c-win ANYWHERE
+OR "CHOOSE" OF btnConnections-txt 
+OR 'CTRL-SHIFT-C' OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("manageConnections"). /* user behaviour */
-  HIDE FRAME frSettings.
   RUN manageConnections.
 END.
 
@@ -2580,10 +2613,9 @@ END.
 &Scoped-define SELF-NAME btnDataAdmin
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataAdmin C-Win
 ON CHOOSE OF btnDataAdmin IN FRAME frSettings /* ADM */
-, btnDataAdmin-txt
-OR "ALT-H" OF c-win ANYWHERE
+OR "CHOOSE" OF btnDataAdmin-txt 
+OR "CTRL-SHIFT-A" OF c-win ANYWHERE
 DO:
-  HIDE FRAME frSettings.
   RUN startTool("Admin").
 END.
 
@@ -2594,7 +2626,8 @@ END.
 &Scoped-define SELF-NAME btnDataDigger
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger C-Win
 ON CHOOSE OF btnDataDigger IN FRAME frSettings /* DD */
-, btnDataDigger-txt
+OR "CHOOSE" OF btnDataDigger-txt 
+OR "CTRL-SHIFT-N" OF c-win
 OR "ALT-D" OF FRAME frMain ANYWHERE
 DO:
   /* If we're in the middle of the tour, ignore this event */
@@ -2644,7 +2677,7 @@ END. /* choose of btnDelete */
 &Scoped-define SELF-NAME btnDict
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict C-Win
 ON CHOOSE OF btnDict IN FRAME frSettings /* DD */
-, btnDict-txt
+OR "CHOOSE" OF btnDict-txt 
 OR 'CTRL-SHIFT-D' OF c-win ANYWHERE
 DO:
 
@@ -2683,6 +2716,43 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define FRAME-NAME frSettings
+&Scoped-define SELF-NAME btnExpand
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
+ON CHOOSE OF btnExpand IN FRAME frSettings /* < > */
+OR "CHOOSE" OF btnExpand-txt 
+DO:
+  DEFINE VARIABLE hFocus     AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE lExpanded  AS LOGICAL   NO-UNDO.
+
+  setWindowFreeze(YES).
+  hFocus = FOCUS.
+  lExpanded = (FRAME frSettings:WIDTH-PIXELS > 100). /* use a rough value for checking here */
+
+  RUN expandToolbar(NOT lExpanded).
+  RUN endResize.
+
+  setWindowFreeze(NO).
+  APPLY 'entry' TO hFocus.
+  
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
+ON MOUSE-MENU-CLICK OF btnExpand IN FRAME frSettings /* < > */
+DO:
+  PUBLISH "setUsage" ("showChangelog"). /* user behaviour */
+  OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnFavourite
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavourite C-Win
 ON CHOOSE OF btnFavourite IN FRAME frMain /* F */
@@ -2702,10 +2772,10 @@ END.
 &Scoped-define SELF-NAME btnHelp
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
 ON CHOOSE OF btnHelp IN FRAME frSettings /* Help */
-, btnHelp-txt
-OR "HELP" OF c-win ANYWHERE
+OR "CHOOSE" OF btnHelp-txt 
+OR "HELP" OF c-win 
+OR "CTRL-SHIFT-W" OF c-win ANYWHERE
 DO:
-  HIDE FRAME frSettings.
   RUN showTour.
   RETURN NO-APPLY.
 END.
@@ -2842,7 +2912,8 @@ END.
 &Scoped-define SELF-NAME btnProcEdit
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnProcEdit C-Win
 ON CHOOSE OF btnProcEdit IN FRAME frSettings /* Ed */
-, btnProcEdit-txt
+OR "CHOOSE" OF btnProcEdit-txt 
+OR "CTRL-SHIFT-E" OF c-win
 OR "SHIFT-F3" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("Editor"). /* user behaviour */
@@ -2890,10 +2961,10 @@ OR 'CTRL-SHIFT-Q' OF c-win
 OR 'CTRL-INS'     OF ficWhere       IN FRAME frMain
 OR 'CTRL-INS'     OF ficWhere2      IN FRAME frWhere
 OR 'CHOOSE'       OF btnQueries-2   IN FRAME frWhere
+OR 'CHOOSE'       OF btnQueries-3   IN FRAME frSettings
 OR 'CHOOSE'       OF btnQueries-txt IN FRAME frSettings
 DO:
   PUBLISH "setUsage" ("selectQuery"). /* user behaviour */
-  HIDE FRAME frSettings.
   RUN btnQueriesChoose.
 END.
 
@@ -2905,11 +2976,10 @@ END.
 &Scoped-define SELF-NAME btnQueryTester
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryTester C-Win
 ON CHOOSE OF btnQueryTester IN FRAME frSettings /* QT */
-, btnQueryTester-txt
-OR "CTRL-Q" OF c-win ANYWHERE
+OR "CHOOSE" OF btnQueryTester-txt 
+OR "CTRL-SHIFT-T" OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("QueryTester"). /* user behaviour */
-  HIDE FRAME frSettings.
   RUN VALUE(getProgramDir() + 'query-tester.w') (INPUT-OUTPUT TABLE ttTestQuery BY-REFERENCE).
 END.
 
@@ -2935,72 +3005,11 @@ END.
 &Scoped-define SELF-NAME btnSettings
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
 ON CHOOSE OF btnSettings IN FRAME frSettings /* Set */
-, btnSettings-txt
-OR 'CTRL-ALT-S' OF FRAME frMain ANYWHERE
+OR "CHOOSE" OF btnSettings-txt 
+OR 'CTRL-SHIFT-S' OF c-win ANYWHERE
 DO:
   PUBLISH "setUsage" ("Settings"). /* user behaviour */
-  HIDE FRAME frSettings.
   RUN btnSettingsChoose.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
-ON CURSOR-DOWN OF btnSettings IN FRAME frSettings /* Set */
-, btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
-, btnDict, btnDataAdmin
-, btnQueries-3, btnQueryTester
-, btnHelp, btnAbout
-DO:
-  RUN navigateSettings(SELF:HANDLE,LAST-EVENT:LABEL).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
-ON CURSOR-LEFT OF btnSettings IN FRAME frSettings /* Set */
-, btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
-, btnDict, btnDataAdmin
-, btnQueries-3, btnQueryTester
-, btnHelp, btnAbout
-DO:
-  RUN navigateSettings(SELF:HANDLE,LAST-EVENT:LABEL).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
-ON CURSOR-RIGHT OF btnSettings IN FRAME frSettings /* Set */
-, btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
-, btnDict, btnDataAdmin
-, btnQueries-3, btnQueryTester
-, btnHelp, btnAbout
-DO:
-  RUN navigateSettings(SELF:HANDLE,LAST-EVENT:LABEL).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
-ON CURSOR-UP OF btnSettings IN FRAME frSettings /* Set */
-, btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
-, btnDict, btnDataAdmin
-, btnQueries-3, btnQueryTester
-, btnHelp, btnAbout
-DO:
-  RUN navigateSettings(SELF:HANDLE,LAST-EVENT:LABEL).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3014,7 +3023,6 @@ DO:
   DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
 
   PUBLISH "setUsage" ("EditSettings"). /* user behaviour */
-  HIDE FRAME frSettings.
 
   /* Load or create personalized ini file */
   cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
@@ -3117,26 +3125,42 @@ END.
 &Scoped-define SELF-NAME btnTools
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools C-Win
 ON CHOOSE OF btnTools IN FRAME frMain /* Tools */
+OR "CHOOSE" OF btnTools-txt IN FRAME frSettings
+OR "CHOOSE" OF btnTools-2   IN FRAME frSettings
 OR "CTRL-T" OF FRAME frMain ANYWHERE
 DO:
-  PUBLISH "setUsage" ("showTools"). /* user behaviour */
-
-  IF FRAME frSettings:VISIBLE THEN
+  DEFINE VARIABLE hFocus       AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE lShowToolbar AS LOGICAL NO-UNDO.
+  
+  /* Show hint when first time entering the toolbar */
+  IF getRegistry('DataDigger:Usage', 'useToolbar:numUsed') = ? THEN
   DO:
-    RUN hideSettingsFrame.
-    RETURN NO-APPLY.
+    RUN showHint(btnTools:HANDLE,{&ARROW-LEFT-UP}          , "Be a keyboard ninja:~n~nctrl+T = jump to toolbar~nctrl+shift+T = show/hide").
+    RUN showHint(FRAME frSettings:HANDLE,{&ARROW-LEFT-DOWN}, "~nctrl+shift+Mnemonic for the toolbar buttons themselves").
   END.
 
-  /* Show settings frame */
-  FRAME frSettings:X = btnTools:X.
-  FRAME frSettings:Y = btnTools:Y + btnTools:HEIGHT-PIXELS.
-  VIEW FRAME frSettings.
+  PUBLISH "setUsage" ("useToolbar"). /* user behaviour */
 
-  /* Try to hide it every 2 seconds */
-  IF KEYLABEL(LASTKEY) <> "CTRL-T" AND glUseTimer THEN
-    RUN setTimer("hideSettingsFrame",3000).
+  /* CTRL-SHIFT-T is for showing/hiding only */
+  IF CAN-DO(GetKeyList(),'SHIFT') OR LAST-EVENT:LABEL = 'CHOOSE' THEN 
+  DO:
+    hFocus = FOCUS.
+    lShowToolbar = (NOT FRAME frSettings:VISIBLE).
+  END.
 
-  APPLY 'entry' TO btnDataDigger IN FRAME frSettings.
+  /* CTRL-T is for accessing the toolbar, 
+   * but we must make sure it is visible */
+  ELSE 
+  DO:
+    lShowToolbar = TRUE.
+    hFocus = btnDataDigger:HANDLE IN FRAME frSettings.
+  END.
+
+  /* Action! */
+  RUN showToolbar(lShowToolbar).
+  RUN endResize.
+  APPLY 'entry' TO hFocus.
+  
   RETURN NO-APPLY.
 END.
 
@@ -3144,6 +3168,86 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define FRAME-NAME frSettings
+&Scoped-define SELF-NAME btnTools-2
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+ON CURSOR-DOWN OF btnTools-2 IN FRAME frSettings /* Tools */
+, btnDataDigger, btnConnections
+, btnSettings, btnProcEdit
+, btnDict, btnDataAdmin
+, btnQueries-3, btnQueryTester
+, btnHelp, btnAbout
+DO:
+  RUN setToolbarNavigation(SELF:HANDLE,LAST-EVENT:LABEL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+ON CURSOR-LEFT OF btnTools-2 IN FRAME frSettings /* Tools */
+, btnDataDigger, btnConnections
+, btnSettings, btnProcEdit
+, btnDict, btnDataAdmin
+, btnQueries-3, btnQueryTester
+, btnHelp, btnAbout
+DO:
+  RUN setToolbarNavigation(SELF:HANDLE,LAST-EVENT:LABEL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+ON CURSOR-RIGHT OF btnTools-2 IN FRAME frSettings /* Tools */
+, btnDataDigger, btnConnections
+, btnSettings, btnProcEdit
+, btnDict, btnDataAdmin
+, btnQueries-3, btnQueryTester
+, btnHelp, btnAbout
+DO:
+  RUN setToolbarNavigation(SELF:HANDLE,LAST-EVENT:LABEL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+ON CURSOR-UP OF btnTools-2 IN FRAME frSettings /* Tools */
+, btnDataDigger, btnConnections
+, btnSettings, btnProcEdit
+, btnDict, btnDataAdmin
+, btnQueries-3, btnQueryTester
+, btnHelp, btnAbout
+DO:
+  RUN setToolbarNavigation(SELF:HANDLE,LAST-EVENT:LABEL).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+ON END-ERROR OF btnTools-2 IN FRAME frSettings /* Tools */
+, btnDataDigger, btnConnections
+, btnSettings, btnProcEdit
+, btnDict, btnDataAdmin
+, btnQueries-3, btnQueryTester
+, btnHelp, btnAbout
+DO:
+  RUN showToolbar(FALSE).
+  RUN endResize.
+  RETURN NO-APPLY.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnView
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnView C-Win
 ON CHOOSE OF btnView IN FRAME frMain /* View */
@@ -3243,6 +3347,79 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define FRAME-NAME frMain
+&Scoped-define SELF-NAME cbFavouriteGroup
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup C-Win
+ON RETURN OF cbFavouriteGroup IN FRAME frMain
+DO:
+  APPLY 'entry' TO brTables.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup C-Win
+ON VALUE-CHANGED OF cbFavouriteGroup IN FRAME frMain
+DO:
+  DEFINE VARIABLE cName  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cList  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cTable AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE i      AS INTEGER     NO-UNDO.
+
+  DEFINE BUFFER bTable FOR ttTable. 
+
+  /* Ignore separator line */
+  IF SELF:SCREEN-VALUE BEGINS '----' THEN 
+    RETURN NO-APPLY.
+
+  ELSE 
+  IF SELF:SCREEN-VALUE BEGINS 'Save' THEN
+  DO:
+    RUN dNewGroup.w(OUTPUT cName).
+    IF cName = '' THEN RETURN NO-APPLY.
+
+    FOR EACH bTable WHERE bTable.lFavourite = TRUE:
+
+      /* Get current groups of this table */
+      cList = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
+      IF cList = ? THEN cList = ''.
+
+      /* If not already in, add this group to it */
+      IF LOOKUP(cName,cList) = 0 THEN
+        setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
+                   , SUBSTITUTE("&1:Favourites",bTable.cTableName)
+                   , TRIM(SUBSTITUTE("&1,&2", cList, cName),",")
+                   ).
+    END.
+
+    /* Repopulate combo */
+    RUN getFavourites.
+  END. 
+
+  ELSE 
+  IF SELF:SCREEN-VALUE > '' THEN
+  DO:
+    /* Save chosen group for next start */
+    setRegistry('DataDigger','FavGroup', cbFavouriteGroup:SCREEN-VALUE).
+
+    FOR EACH bTable:
+      /* Get current groups of this table */
+      cList = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
+      IF cList = ? THEN cList = ''.
+      bTable.lFavourite = (LOOKUP(SELF:SCREEN-VALUE,cList) <> 0).
+    END. 
+
+    RUN setTableView(YES,YES).
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME frWhere
 &Scoped-define SELF-NAME cbFields
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFields C-Win
 ON RETURN OF cbFields IN FRAME frWhere
@@ -3994,7 +4171,20 @@ PROCEDURE btnClearTableFilterChoose :
   DO WITH FRAME {&FRAME-NAME}:
     PUBLISH "setUsage" ("clearTableFilter"). /* user behaviour */
 
-    RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
+    /* Clear the filters in two steps: if user entered something then clear 
+     * that first. In second step clear out the advanced filter settings
+     */
+    IF FilterModified(fiTableFilter:HANDLE,?) 
+      AND getRegistry('DataDigger:usage','TwoStepClearTableFilter:numUsed') = ? 
+      AND ttTableFilter.lModified THEN  
+    DO:
+      RUN showHint(fiTableFilter:HANDLE,{&ARROW-LEFT-UP}, "~nClearing the filter is now in two steps, first time this field will be cleared").
+      RUN showHint(btnTableFilter:HANDLE,{&ARROW-LEFT-UP}, "~nThe second time these settings will be cleared").
+      /* PUBLISH "setUsage" ("TwoStepClearTableFilter"). /* user behaviour */  */
+    END.
+
+    IF NOT FilterModified(fiTableFilter:HANDLE,?) THEN
+      RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
 
     /* Reset filters */
     fiTableFilter   :SCREEN-VALUE = fiTableFilter:PRIVATE-DATA.
@@ -5226,6 +5416,11 @@ PROCEDURE convertSettings :
       /* Answer to confirm delete should not be saved when NO or CANCEL */
       PUT-KEY-VALUE SECTION "DataDigger:help" KEY "ConfirmDelete:hidden" VALUE ? NO-ERROR.
 
+      /* Table browse is now slightly wider, so erase old column widths */
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "ColumnWidth:cTableName"  VALUE ? NO-ERROR.
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "ColumnWidth:cDatabase"   VALUE ? NO-ERROR.
+      PUT-KEY-VALUE SECTION "DataDigger" KEY "ColumnWidth:iNumQueries" VALUE ? NO-ERROR.
+
       /* dHint.w is not used */
       OS-DELETE dHint.w.
       OS-DELETE dHint.r.
@@ -5234,7 +5429,6 @@ PROCEDURE convertSettings :
       OS-DELETE image/default_AboutTitle.gif.
       OS-DELETE image/default_AboutTitle2.gif.
       OS-DELETE image/default_AboutTitle3.gif.
-      OS-DELETE image/default_Ball.gif.
       OS-DELETE image/default_Paddle.gif.
       OS-DELETE image/wAbout.wrx.
     END. /* 23 */
@@ -5722,7 +5916,7 @@ PROCEDURE dataRowDisplay :
     DO:
       bColumn.hColumn:FONT = giFixedFont.
       {&_proparse_ prolint-nowarn(recidkeyword)}
-      bColumn.hColumn:SCREEN-VALUE = STRING( phBrowseBuffer:RECID, "zzzzzzzzz9" ).
+      bColumn.hColumn:SCREEN-VALUE = STRING( phBrowseBuffer:RECID, "zzzzzzzzzzz9" ).
     END.
 
     /* Set font/value for ROWID field */
@@ -6170,25 +6364,25 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   RUN control_load.
   DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
-          fiFlagsFilter fiFieldsFilter cbFavouriteSet fiTableDesc ficWhere 
+          fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery btnTools rctEdit fiTableFilter cbDatabaseFilter 
-         btnClearTableFilter btnTableFilter tgSelAll btnClearFieldFilter 
+  ENABLE rctQuery rctEdit fiTableFilter btnTools cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         tgDebugMode brTables brFields btnMoveTop brIndexes btnMoveUp btnReset 
-         btnMoveDown btnMoveBottom cbFavouriteSet fiTableDesc btnWhere btnClear 
-         btnQueries btnFavourite btnClipboard btnNextQuery ficWhere 
-         btnPrevQuery btnDump btnLoad btnTabFavourites btnTabFields 
-         btnTabIndexes btnTabTables btnDelete btnResizeVer btnClone btnView 
-         btnAdd btnEdit fiFeedback 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
+         btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnQueries 
+         btnReset btnTableFilter btnWhere btnTabFavourites btnTabFields 
+         btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump btnLoad 
+         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnSettings-txt btnDataDigger btnConnections btnSettings btnProcEdit 
-         btnDict btnDataAdmin btnQueries-3 btnQueryTester btnHelp btnAbout 
-         btnAbout-txt btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
-         btnDict-txt btnHelp-txt btnProcEdit-txt btnQueries-txt 
-         btnQueryTester-txt 
+  ENABLE btnAbout-txt btnDataDigger btnSettings btnDict btnDataAdmin 
+         btnQueries-3 btnQueryTester btnConnections btnProcEdit btnHelp 
+         btnAbout btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
+         btnExpand btnHelp-txt btnProcEdit-txt btnQueries-txt 
+         btnQueryTester-txt btnSettings-txt btnTools-2 btnDict-txt 
+         btnExpand-txt btnTools-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
   DISPLAY edHint 
@@ -6196,11 +6390,6 @@ PROCEDURE enable_UI :
   ENABLE edHint btGotIt 
       WITH FRAME frHint IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frHint}
-  DISPLAY fiNumSelected fiNumRecords 
-      WITH FRAME frData IN WINDOW C-Win.
-  ENABLE rctData btnDataSort btnClearDataFilter fiNumSelected fiNumRecords 
-      WITH FRAME frData IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-frData}
   DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
       WITH FRAME frWhere IN WINDOW C-Win.
   ENABLE btnBegins rctQueryButtons cbAndOr cbFields cbOperator ficValue 
@@ -6210,6 +6399,11 @@ PROCEDURE enable_UI :
       WITH FRAME frWhere IN WINDOW C-Win.
   VIEW FRAME frWhere IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frWhere}
+  DISPLAY fiNumSelected fiNumRecords 
+      WITH FRAME frData IN WINDOW C-Win.
+  ENABLE btnClearDataFilter rctData btnDataSort fiNumSelected fiNumRecords 
+      WITH FRAME frData IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-frData}
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -6223,6 +6417,7 @@ PROCEDURE endResize :
   DEFINE VARIABLE iButtonSpacingX   AS INTEGER NO-UNDO.
   DEFINE VARIABLE iButtonSpacingY   AS INTEGER NO-UNDO.
   DEFINE VARIABLE lSuppressWarnings AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE iSettingsWidth    AS INTEGER NO-UNDO.
 
   DEFINE BUFFER bFilter FOR ttFilter.
 
@@ -6251,48 +6446,60 @@ PROCEDURE endResize :
     fiFeedback:X = 1.
     fiFeedback:Y = 1.
 
+    /* Settings frame */
+    iSettingsWidth = (IF FRAME frSettings:VISIBLE THEN FRAME frSettings:WIDTH-PIXELS ELSE 0).
+    FRAME frSettings:Y = 0.
+    FRAME frSettings:X = 0.
+    FRAME frSettings:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS.
+    btnExpand:Y = FRAME frSettings:HEIGHT-PIXELS - btnExpand:HEIGHT-PIXELS - 5.
+    btnExpand-txt:Y = btnExpand:Y.
+
     /* Set width of main rectangles */
     ASSIGN
-      rctQuery:WIDTH-PIXELS  = C-Win:WIDTH-PIXELS - 4
-      rctQuery:X             = 0
+      rctQuery:WIDTH-PIXELS  = C-Win:WIDTH-PIXELS - iSettingsWidth - 4
+      rctQuery:X             = iSettingsWidth
       rctQuery:Y             = 0
       rctQuery:HEIGHT-PIXELS = btnResizeVer:Y + 32
       NO-ERROR.
 
-    /* Buttons DD / Tools / Help */
+    tgDebugMode:X = rctQuery:X + 8.
+
+    /* Resize button */
     ASSIGN
       btnResizeVer:WIDTH-PIXELS = rctQuery:WIDTH-PIXELS
-      btnResizeVer:X = 0
+      btnResizeVer:X = iSettingsWidth
       NO-ERROR.
 
     /* Table browse */
     ASSIGN
       rcTableFilter:X = rctQuery:X + 20
       rcTableFilter:Y = rctQuery:Y + 24
-      rcTableFilter:WIDTH-PIXELS = 226
-      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y
+      rcTableFilter:WIDTH-PIXELS = 245
+      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y 
 
       brTables:X = rcTableFilter:X + 3
       brTables:Y = rcTableFilter:Y + 3
       brTables:WIDTH-PIXELS = rcTableFilter:WIDTH-PIXELS - 6
-      brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 6 - fiTableDesc:HEIGHT-PIXELS
-      btnTabTables:X = brTables:X - 23
-      btnTabFavourites:X = brTables:X - 23
+      brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 6 - fiTableDesc:HEIGHT-PIXELS - 2
+      btnTabTables:X     = brTables:X - 21
+      btnTabFavourites:X = brTables:X - 21
 
       fiTableDesc:X = brTables:X
-      fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS
+      fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS - 1
       fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS
+      fiTableDesc:HEIGHT-PIXELS = 24
 
-      cbFavouriteSet:X = fiTableDesc:X
-      cbFavouriteSet:Y = fiTableDesc:Y
-      cbFavouriteSet:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS
+      cbFavouriteGroup:X = fiTableDesc:X
+      cbFavouriteGroup:Y = fiTableDesc:Y
+      cbFavouriteGroup:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS
 
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
-      btnFavourite:Y = fiTableDesc:Y
+      btnFavourite:Y = fiTableDesc:Y 
+      btnFavourite:HEIGHT-PIXELS = fiTableDesc:HEIGHT-PIXELS
       NO-ERROR.
 
-    cbFavouriteSet:MOVE-TO-TOP().
-    cbFavouriteSet:SENSITIVE = YES.  
+    cbFavouriteGroup:MOVE-TO-TOP().
+    cbFavouriteGroup:SENSITIVE = YES.  
 
     /* Data */
     DO WITH FRAME frData:
@@ -6311,7 +6518,7 @@ PROCEDURE endResize :
         btnDataSort:X = 0
         FRAME frData:WIDTH-PIXELS  = 100
         FRAME frData:HEIGHT-PIXELS = 100
-        FRAME frData:X = 0
+        FRAME frData:X = iSettingsWidth
         FRAME frData:Y = rctQuery:Y + rctQuery:HEIGHT-PIXELS + 2
         FRAME frData:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS + 4
         FRAME frData:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34
@@ -6339,7 +6546,6 @@ PROCEDURE endResize :
         rctData:HEIGHT-PIXELS       = 1
         rctDataFilter:WIDTH-PIXELS  = 1
         rctDataFilter:HEIGHT-PIXELS = 27
-        rctData:X                   = 0
         rctData:Y                   = 1
         rctData:WIDTH-PIXELS        = FRAME frData:WIDTH-PIXELS - 0
         rctData:HEIGHT-PIXELS       = FRAME frData:HEIGHT-PIXELS - 10
@@ -6389,9 +6595,13 @@ PROCEDURE endResize :
     DO:
       /* Positioning of browse with fields */
       ASSIGN
+        ghFieldBrowse:X = rcTableFilter:X + rcTableFilter:WIDTH-PIXELS + 25
         ghFieldBrowse:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS - 322
         ghFieldBrowse:HEIGHT-PIXELS = btnResizeVer:Y - ghFieldBrowse:Y - 3
+        btnTabFields:X  = ghFieldBrowse:X - 21
+        btnTabIndexes:X = ghFieldBrowse:X - 21
         NO-ERROR.
+
 
       /* Index browse has same dimensions as field browse
        * Due to errors on resizing, first 'park' the browse in the upper
@@ -6440,11 +6650,11 @@ PROCEDURE endResize :
         ficWhere:Y = btnClipboard:Y + 1
 
         /* Buttons for field moving */
-        btnMoveUp:X       = rctQuery:WIDTH-PIXELS - 25
-        btnMoveDown:X     = rctQuery:WIDTH-PIXELS - 25
-        btnReset:X        = rctQuery:WIDTH-PIXELS - 25
-        btnMoveTop:X      = rctQuery:WIDTH-PIXELS - 25
-        btnMoveBottom:X   = rctQuery:WIDTH-PIXELS - 25
+        btnMoveUp:X       = rctQuery:X + rctQuery:WIDTH-PIXELS - 25
+        btnMoveDown:X     = rctQuery:X + rctQuery:WIDTH-PIXELS - 25
+        btnReset:X        = rctQuery:X + rctQuery:WIDTH-PIXELS - 25
+        btnMoveTop:X      = rctQuery:X + rctQuery:WIDTH-PIXELS - 25
+        btnMoveBottom:X   = rctQuery:X + rctQuery:WIDTH-PIXELS - 25
         NO-ERROR.
 
     END.
@@ -6473,6 +6683,8 @@ PROCEDURE endResize :
     RUN saveWindow.
     RUN showScrollBars(FRAME frData:HANDLE, NO, NO).
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
+    RUN showScrollbars(FRAME frSettings:HANDLE, NO, NO).
+
     setWindowFreeze(NO).
   END.
 
@@ -6480,17 +6692,44 @@ PROCEDURE endResize :
   RUN unlockWindow(C-Win:HANDLE).
 
   /* Hide rectangles */
-  rctEdit:VISIBLE = FALSE.
+  rctEdit:VISIBLE  = FALSE.
   rctQuery:VISIBLE = FALSE.
-  rctData:VISIBLE = FALSE.
+  rctData:VISIBLE  = FALSE.
   
   /* Restore suppress-warnings setting */
   SESSION:SUPPRESS-WARNINGS = lSuppressWarnings.
 
-  APPLY "entry" TO c-win. /* dkn */
+  APPLY "entry" TO c-win. 
   {&timerStop}
 
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE expandToolbar C-Win 
+PROCEDURE expandToolbar :
+/* Expand or collapse the toolbar
+*/
+  DEFINE INPUT PARAMETER plExpand AS LOGICAL NO-UNDO.
+
+  IF plExpand THEN 
+  DO:
+    FRAME frSettings:WIDTH-PIXELS = 145.
+    btnExpand-txt:LABEL = 'Collapse'.
+    btnExpand:LOAD-IMAGE(getImagePath("SidebarCollapse.gif")).
+  END.
+
+  ELSE 
+  DO:
+    FRAME frSettings:WIDTH-PIXELS = 32.
+    btnExpand-txt:LABEL = 'Expand'.
+    btnExpand:LOAD-IMAGE(getImagePath("SidebarExpand.gif")).
+  END.
+
+  setRegistry('DataDigger','Toolbar:Expanded', STRING(plExpand)). 
+
+END PROCEDURE. /* expandToolbar */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -6849,6 +7088,50 @@ END PROCEDURE. /* getDataQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFavourites C-Win 
+PROCEDURE getFavourites :
+/* Fill combo box for favourite groups 
+ */
+
+  DEFINE VARIABLE cList AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE i     AS INTEGER     NO-UNDO.
+
+  DEFINE BUFFER bTable FOR ttTable.
+  DEFINE BUFFER bItem FOR ttItem.
+
+  DO WITH FRAME frMain:
+      
+    EMPTY TEMP-TABLE ttItem. 
+    cbFavouriteGroup:LIST-ITEMS = ?.
+
+    FOR EACH bTable:
+      /* Get current groups of this table */
+      cList = getRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
+
+      DO i = 1 TO NUM-ENTRIES(cList):
+        IF NOT CAN-FIND(FIRST bItem WHERE bItem.cItem = ENTRY(i,cList)) THEN 
+        DO:
+          CREATE bItem.
+          ASSIGN bItem.cItem = ENTRY(i,cList).
+        END.
+      END.
+    END.
+
+    FOR EACH bItem:
+      cbFavouriteGroup:ADD-LAST(bItem.cItem).
+    END.
+
+    cbFavouriteGroup:ADD-LAST(FILL('-',50)).
+    cbFavouriteGroup:ADD-LAST('Save as new group').
+    cbFavouriteGroup:ADD-LAST('Edit groups').
+
+  END.
+
+END PROCEDURE. /* getFavourites */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFilterQuery C-Win 
 PROCEDURE getFilterQuery :
 /* Return a query built from fields in the filter fields
@@ -7128,28 +7411,6 @@ END PROCEDURE. /* hideColumn */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideSettingsFrame C-Win 
-PROCEDURE hideSettingsFrame :
-/* Auto-hide the settings frame after 2 seconds
- */
-
-  IF FRAME frSettings:VISIBLE THEN
-  DO:
-    IF NOT isMouseOver(FRAME frSettings:HANDLE) THEN
-    DO:
-      FRAME frSettings:VISIBLE = FALSE.
-      RUN setTimer("hideSettingsFrame",0).
-    END.
-
-    ELSE
-      RUN setTimer("hideSettingsFrame", 2000).
-  END.
-
-END PROCEDURE. /* hideSettingsFrame */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesOfTable C-Win 
 PROCEDURE incQueriesOfTable :
 /* Increment the number of queries served for a table.
@@ -7403,11 +7664,8 @@ PROCEDURE initializeObjects :
       IF plReadOnlyDigger THEN
         ASSIGN
           btnDict         :SENSITIVE = FALSE
-          btnDict-txt     :SENSITIVE = FALSE
           btnDataAdmin    :SENSITIVE = FALSE
-          btnDataAdmin-txt:SENSITIVE = FALSE
           btnProcEdit     :SENSITIVE = FALSE
-          btnProcEdit-txt :SENSITIVE = FALSE
         .
     END.
 
@@ -7423,8 +7681,8 @@ PROCEDURE initializeObjects :
       IF iValue = ? THEN
       DO:
         CASE hColumn:NAME:
-          WHEN "cTableName"  THEN iValue = 110.
-          WHEN "cDatabase"   THEN iValue =  50.
+          WHEN "cTableName"  THEN iValue = 120.
+          WHEN "cDatabase"   THEN iValue =  60.
           WHEN "iNumQueries" THEN iValue =  28.
           WHEN "tLastUsed"   THEN iValue = 103.
         END CASE.
@@ -7624,6 +7882,11 @@ PROCEDURE initializeObjects :
 
     /* Set caching in library */
     RUN setCaching.
+
+    /* Show/hide toolbar */
+    RUN showToolbar  (LOGICAL(getRegistry('DataDigger','Toolbar:Visible'))).
+    RUN expandToolbar(LOGICAL(getRegistry('DataDigger','Toolbar:Expanded'))).
+
   END. /* DO WITH FRAME */
 
   RUN endResize.
@@ -7819,6 +8082,10 @@ PROCEDURE initializeSettingsFile :
   IF getRegistry('DataDigger','TitleBarDbName') = ? THEN setRegistry('DataDigger','TitleBarDbName','ldbname').
   IF getRegistry('DataDigger','TitleStartsWithTableName') = ? THEN setRegistry('DataDigger','TitleStartsWithTableName','no').
 
+  /* Toolbar visibility */
+  IF getRegistry('DataDigger','Toolbar:Visible')  = ? THEN setRegistry('DataDigger','Toolbar:Visible' , 'YES'). 
+  IF getRegistry('DataDigger','Toolbar:Expanded') = ? THEN setRegistry('DataDigger','Toolbar:Expanded', 'NO'). 
+
   {&timerStop}
 END PROCEDURE. /* initializeSettingsFile */
 
@@ -7875,7 +8142,6 @@ PROCEDURE initializeUi :
     btnPrevQuery btnNextQuery ficWhere btnWhere btnClear btnQueries btnClipboard /* query */
     btnTools btnTabFields btnTabIndexes btnResizeVer btnClone
     btnDump btnView btnAdd btnEdit fiFeedback
-
     WITH FRAME frMain IN WINDOW C-Win.
 
   /* FRAME frHint */
@@ -7909,18 +8175,19 @@ PROCEDURE initializeUi :
     WITH FRAME frData IN WINDOW C-Win.
 
   /* FRAME frSettings */
-  ENABLE
-    btnDataDigger  btnDataDigger-txt
-    btnSettings    btnSettings-txt
-    btnDict        btnDict-txt
-    btnQueries-3   btnQueries-txt
-    btnDataAdmin btnDataAdmin-txt
-    btnConnections btnConnections-txt
-    btnProcEdit    btnProcEdit-txt
-    btnQueryTester btnQueryTester-txt
-    btnHelp        btnHelp-txt
-    btnAbout       btnAbout-txt
-    WITH FRAME frSettings IN WINDOW C-Win.
+  ENABLE ALL WITH FRAME frSettings.
+/*     btnTools-2                             */
+/*     btnDataDigger                          */
+/*     btnSettings                            */
+/*     btnDict                                */
+/*     btnQueries-3                           */
+/*     btnDataAdmin                           */
+/*     btnConnections                         */
+/*     btnProcEdit                            */
+/*     btnQueryTester                         */
+/*     btnHelp                                */
+/*     btnAbout                               */
+/*     WITH FRAME frSettings IN WINDOW C-Win. */
 
   RUN createMenuTableBrowse. 
 
@@ -7942,8 +8209,9 @@ PROCEDURE initializeVisuals :
    * Entries 0-23 are for the user and entry 24 will be used for
    * the color defined by "ButtonFace" ON the local system. We will
    * use this color if the user sets "use system colors"
+   * Entry 25/26 are for dark mode
    */
-  IF COLOR-TABLE:NUM-ENTRIES < 25 THEN COLOR-TABLE:NUM-ENTRIES = 25.
+  IF COLOR-TABLE:NUM-ENTRIES < 27 THEN COLOR-TABLE:NUM-ENTRIES = 27.
   DO iColor = 0 TO COLOR-TABLE:NUM-ENTRIES - 1:
     /* Make all colors dynamic so the user can change them */
     COLOR-TABLE:SET-DYNAMIC(iColor, TRUE).
@@ -7961,6 +8229,10 @@ PROCEDURE initializeVisuals :
   /* Get the RGB value for "ButtonFace" and set color 24 */
   RUN GetSysColor(15, OUTPUT iRgbValue).
   COLOR-TABLE:SET-RGB-VALUE(24, iRgbValue).
+
+  /* Set colors for dark mode */
+  COLOR-TABLE:SET-RGB-VALUE(25, RGB-VALUE(70,70,70)). /* dark gray */
+  COLOR-TABLE:SET-RGB-VALUE(26, RGB-VALUE(90,90,90)). /* even darker gray */
 
   /* Set icon */
   C-Win:LOAD-ICON(getImagePath("DataDigger.ico")).
@@ -8033,9 +8305,9 @@ PROCEDURE initializeVisuals :
 
       /* Set properties for settings FRAME */
       FRAME frSettings:FONT          = giDefaultFont.
-      FRAME frSettings:WIDTH-PIXELS  = btnAbout-txt:X + btnAbout-txt:WIDTH-PIXELS + 4.
-      FRAME frSettings:HEIGHT-PIXELS = btnAbout-txt:Y + btnAbout-txt:HEIGHT-PIXELS + 4.
 
+      btnTools:LOAD-IMAGE         (getImagePath("Tools.gif")).
+      btnTools-2:LOAD-IMAGE       (getImagePath("Tools.gif")).
       btnSettings:LOAD-IMAGE      (getImagePath("Settings.gif")).
       btnConnections:LOAD-IMAGE   (getImagePath("Connections.gif")).
       btnDict:LOAD-IMAGE          (getImagePath("Dictionary.gif")).
@@ -8047,8 +8319,10 @@ PROCEDURE initializeVisuals :
       btnResizeVer:LOAD-IMAGE     (getImagePath("ResizeVer.gif")).
       btnDataDigger:LOAD-IMAGE    (getImagePath("DataDigger24x24.gif")).
       btnHelp:LOAD-IMAGE          (getImagePath("Help.gif")).
+      btnExpand:LOAD-IMAGE        (getImagePath("SidebarCollapse.gif")).
 
       /* Text buttons for tools menu */
+      btnTools-txt:FONT       = giDefaultFont.
       btnSettings-txt:FONT    = giDefaultFont.
       btnConnections-txt:FONT = giDefaultFont.
       btnDict-txt:FONT        = giDefaultFont.
@@ -8059,9 +8333,8 @@ PROCEDURE initializeVisuals :
       btnAbout-txt:FONT       = giDefaultFont.
       btnDataDigger-txt:FONT  = giDefaultFont.
       btnHelp-txt:FONT        = giDefaultFont.
+      
     END.
-
-    btnTools:LOAD-IMAGE           (getImagePath("Tools.gif")).
 
     btnTableFilter:LOAD-IMAGE     (getImagePath("Filter.gif")).
     btnClearTableFilter:LOAD-IMAGE(getImagePath("Clear.gif")).
@@ -8411,58 +8684,6 @@ PROCEDURE moveField :
   setWindowFreeze(NO).
 
 END PROCEDURE. /* moveField */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE navigateSettings C-Win 
-PROCEDURE navigateSettings :
-/*
- * Navigate between the buttons in the settings frame
- */
-  DEFINE INPUT  PARAMETER phButton AS HANDLE      NO-UNDO.
-  DEFINE INPUT  PARAMETER pcAction AS CHARACTER   NO-UNDO.
-
-  DEFINE VARIABLE hButton    AS HANDLE EXTENT 10 NO-UNDO.
-  DEFINE VARIABLE iButton    AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iNewButton AS INTEGER NO-UNDO.
-
-  DO WITH FRAME frSettings:
-    hButton[01] = btnDataDigger:HANDLE.
-    hButton[02] = btnConnections:HANDLE.
-    hButton[03] = btnSettings:HANDLE.
-    hButton[04] = btnProcEdit:HANDLE.
-    hButton[05] = btnDict:HANDLE.
-    hButton[06] = btnDataAdmin:HANDLE.
-    hButton[07] = btnQueries-3:HANDLE.
-    hButton[08] = btnQueryTester:HANDLE.
-    hButton[09] = btnHelp:HANDLE.
-    hButton[10] = btnAbout:HANDLE.
-
-    DO iButton = 1 TO 10:
-      IF hButton[iButton] = phButton THEN
-      DO:
-        CASE pcAction:
-          WHEN 'cursor-down'  THEN iNewButton = iButton + 2.
-          WHEN 'cursor-up'    THEN iNewButton = iButton - 2.
-          WHEN 'cursor-right' THEN iNewButton = iButton + 1.
-          WHEN 'cursor-left'  THEN iNewButton = iButton - 1.
-          OTHERWISE RETURN.
-        END CASE.
-
-        /* Special cases */
-        IF iButton = 2 AND iNewButton =  0 THEN iNewButton = 2.
-        IF iButton = 9 AND iNewButton = 11 THEN iNewButton = 9.
-
-        IF iNewButton < 1  THEN iNewButton = 1.
-        IF iNewButton > 10 THEN iNewButton = 10.
-        APPLY "ENTRY" TO hButton[iNewButton].
-      END.
-    END.
-
-  END.
-
-END PROCEDURE. /* navigateSettings */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -10147,6 +10368,7 @@ PROCEDURE setPage :
  */
   {&timerStart}
   DEFINE INPUT PARAMETER piPage AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cGroup AS CHARACTER   NO-UNDO.
 
   /* If we are already on this page, then we're ready */
   IF giCurrentPage = piPage THEN RETURN.
@@ -10196,18 +10418,33 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_active.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_inactive.gif' )).
         btnTableFilter:SENSITIVE = TRUE.
-        cbFavouriteSet:SENSITIVE = FALSE.
-        cbFavouriteSet:VISIBLE = FALSE.
+        cbFavouriteGroup:SENSITIVE = FALSE.
+        cbFavouriteGroup:VISIBLE = FALSE.
         RUN setTableView(NO,NO).
       END.
 
       WHEN {&PAGE-FAVOURITES} THEN
       DO:
+        /* Populate favorites combo if needed */
+        IF cbFavouriteGroup:LIST-ITEMS = ? THEN
+        DO:
+          RUN getFavourites.
+
+          /* Set favourites to last chosen group */
+          cGroup = getRegistry('DataDigger','FavGroup').
+          IF cGroup = ? THEN cGroup = ENTRY(1,cbFavouriteGroup:LIST-ITEMS). 
+          IF LOOKUP(cGroup,cbFavouriteGroup:LIST-ITEMS) > 0 THEN
+          DO:
+            cbFavouriteGroup:SCREEN-VALUE = cGroup.
+            APPLY 'value-changed' TO cbFavouriteGroup.
+          END.
+        END.
+
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_active.gif' )).
         btnTableFilter:SENSITIVE = FALSE.
-        cbFavouriteSet:SENSITIVE = TRUE.
-        cbFavouriteSet:VISIBLE = TRUE.
+        cbFavouriteGroup:SENSITIVE = TRUE.
+        cbFavouriteGroup:VISIBLE = TRUE.
         RUN setTableView(YES,NO).
       END.
     END CASE. /* piPage */
@@ -10697,6 +10934,59 @@ PROCEDURE setTimerInterval :
   END.
 
 END PROCEDURE. /* setTimerInterval */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setToolbarNavigation C-Win 
+PROCEDURE setToolbarNavigation :
+/*
+ * Navigate between the buttons in the settings frame
+ */
+  DEFINE INPUT  PARAMETER phButton AS HANDLE      NO-UNDO.
+  DEFINE INPUT  PARAMETER pcAction AS CHARACTER   NO-UNDO.
+
+  DEFINE VARIABLE hButton    AS HANDLE EXTENT 11 NO-UNDO.
+  DEFINE VARIABLE iButton    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iNewButton AS INTEGER NO-UNDO.
+
+  DO WITH FRAME frSettings:
+
+    hButton[01] = btnTools-2:HANDLE.
+    hButton[02] = btnDataDigger:HANDLE.
+    hButton[03] = btnSettings:HANDLE.
+    hButton[04] = btnDict:HANDLE.
+    hButton[05] = btnDataAdmin:HANDLE.
+    hButton[06] = btnQueries-3:HANDLE.
+    hButton[07] = btnQueryTester:HANDLE.
+    hButton[08] = btnConnections:HANDLE.
+    hButton[09] = btnProcEdit:HANDLE.
+    hButton[10] = btnHelp:HANDLE.
+    hButton[11] = btnAbout:HANDLE.
+
+    #FindButton:
+    DO iButton = 2 TO 11: /* first button is no-focus */
+      IF hButton[iButton] = phButton THEN
+      DO:
+        CASE pcAction:
+          WHEN 'cursor-down'  THEN iNewButton = iButton + 1.
+          WHEN 'cursor-up'    THEN iNewButton = iButton - 1.
+          WHEN 'cursor-right' THEN iNewButton = iButton + 1.
+          WHEN 'cursor-left'  THEN iNewButton = iButton - 1.
+          OTHERWISE RETURN.
+        END CASE.
+
+        IF iNewButton < 2  THEN iNewButton = 2.
+        IF iNewButton > 11 THEN iNewButton = 11.
+
+        APPLY "ENTRY" TO hButton[iNewButton].
+        LEAVE #FindButton.
+      END.
+    END. /* #FindButton */
+
+  END.
+
+END PROCEDURE. /* setToolbarNavigation */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -11223,6 +11513,20 @@ END PROCEDURE. /* showNumSelected */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showToolbar C-Win 
+PROCEDURE showToolbar :
+/* Make toolbar visible
+*/
+  DEFINE INPUT PARAMETER plShow AS LOGICAL NO-UNDO.
+
+  FRAME frSettings:VISIBLE = plShow.
+  setRegistry('DataDigger','Toolbar:visible', STRING(plShow)).
+
+END PROCEDURE. /* showToolbar */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTour C-Win 
 PROCEDURE showTour :
 /* Highlight some of the main features of DD
@@ -11588,7 +11892,6 @@ PROCEDURE startTool :
   /* Don't allow in read only mode */
   IF plReadOnlyDigger THEN RETURN.
 
-  HIDE FRAME frSettings.
   CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
 
   /* Turn off KeepAlive timer to avoid "DB has changed warnings" */
@@ -11793,24 +12096,29 @@ PROCEDURE toggleFavourite :
   DEFINE BUFFER bTable FOR ttTable.
   PUBLISH "setUsage" ("addToFavourites"). /* user behaviour */
 
-  /* Find table and set/unset as fav */
-  FIND bTable
-    WHERE bTable.cDatabase  = gcCurrentDatabase
-      AND bTable.cTableName = gcCurrentTable.
+  DO WITH FRAME frMain:
+    /* if no tables in browser, do nothing */
+    IF NOT brTables:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN. 
 
-  /* Toggle fav-status and save */
-  bTable.lFavourite = NOT bTable.lFavourite.
-  setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
-             , SUBSTITUTE("&1:Favourite",gcCurrentTable)
-             , (IF bTable.lFavourite THEN "TRUE" ELSE ?)
-             ).
-
-  /* If we are in the favo-view then refresh the browse to get rid of this table */
-  IF glShowFavourites THEN RUN reopenTableBrowse(?).
-
-  IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
-    RUN showFavourite(bTable.lFavourite).
-
+    /* Find table and set/unset as fav */
+    FIND bTable
+      WHERE bTable.cDatabase  = gcCurrentDatabase
+        AND bTable.cTableName = gcCurrentTable.
+  
+    /* Toggle fav-status and save */
+    bTable.lFavourite = NOT bTable.lFavourite.
+    setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
+               , SUBSTITUTE("&1:Favourite",gcCurrentTable)
+               , (IF bTable.lFavourite THEN "TRUE" ELSE ?)
+               ).
+  
+    /* If we are in the favo-view then refresh the browse */
+    IF glShowFavourites THEN RUN reopenTableBrowse(?).
+  
+    IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
+      RUN showFavourite(bTable.lFavourite).
+  END.
+  
 END PROCEDURE. /* toggleFavourite */
 
 /* _UIB-CODE-BLOCK-END */

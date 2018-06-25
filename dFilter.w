@@ -215,34 +215,7 @@ ASSIGN
 
 &Scoped-define SELF-NAME Dialog-Frame
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON WINDOW-CLOSE OF FRAME Dialog-Frame /* Edit table filter */
-DO:
-  APPLY "END-ERROR":U TO SELF.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnReset
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnReset Dialog-Frame
-ON CHOOSE OF btnReset IN FRAME Dialog-Frame /* Reset */
-DO:
-
-  RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
-  RUN initializeObject.
-  APPLY 'CHOOSE' TO Btn_OK IN FRAME Dialog-Frame.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME Btn_OK
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Btn_OK Dialog-Frame
-ON CHOOSE OF Btn_OK IN FRAME Dialog-Frame /* OK */
-OR 'go' OF FRAME {&FRAME-NAME}
+ON GO OF FRAME Dialog-Frame /* Edit table filter */
 DO:
 
   /* Save settings to ttTableFilter */
@@ -265,6 +238,44 @@ DO:
   RUN saveComboValue(cbTableNameHide:HANDLE , 'TableNameHide').
   RUN saveComboValue(cbTableFieldShow:HANDLE, 'TableFieldShow').
   RUN saveComboValue(cbTableFieldHide:HANDLE, 'TableFieldHide').
+
+  /* Find out if user entered anything */
+  ttTableFilter.lModified = (   NOT tgShowNormalTables:CHECKED     
+                             OR tgShowSchema:CHECKED          
+                             OR tgShowVst:CHECKED             
+                             OR tgShowSql:CHECKED             
+                             OR tgShowOther:CHECKED           
+                             OR tgShowHidden:CHECKED          
+                             OR tgShowFrozen:CHECKED          
+                             OR cbTableNameShow :SCREEN-VALUE <> ?
+                             OR cbTableNameHide :SCREEN-VALUE <> ? 
+                             OR cbTableFieldShow:SCREEN-VALUE <> ?
+                             OR cbTableFieldHide:SCREEN-VALUE <> ?).
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
+ON WINDOW-CLOSE OF FRAME Dialog-Frame /* Edit table filter */
+DO:
+  APPLY "END-ERROR":U TO SELF.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME btnReset
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnReset Dialog-Frame
+ON CHOOSE OF btnReset IN FRAME Dialog-Frame /* Reset */
+DO:
+
+  RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
+  RUN initializeObject.
+  APPLY 'CHOOSE' TO Btn_OK IN FRAME Dialog-Frame.
 
 END.
 

@@ -556,7 +556,7 @@ ON CHOOSE OF btnEditor IN FRAME frMain /* Edit */
 OR "F3" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
   /* View-as editor */
-  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cValue AS LONGCHAR NO-UNDO.
 
   /* Check if allowed to run */
   IF NOT btnEditor:SENSITIVE

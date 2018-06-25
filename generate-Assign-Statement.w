@@ -61,11 +61,10 @@ CREATE WIDGET-POOL.
 &Scoped-define FRAME-NAME frMain
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS RECT-2 RECT-5 RECT-6 edDefinition rsDumpLoad ~
-cbIndent tgLowerCase tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers ~
-btnSave 
-&Scoped-Define DISPLAYED-OBJECTS edDefinition rsDumpLoad cbIndent ~
-tgLowerCase tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers 
+&Scoped-Define ENABLED-OBJECTS RECT-6 edDefinition cbIndent tgSelectedOnly ~
+tgLowerCase tgIncludeDb btnCopy 
+&Scoped-Define DISPLAYED-OBJECTS edDefinition cbIndent tgSelectedOnly ~
+tgLowerCase tgIncludeDb 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -81,8 +80,8 @@ tgLowerCase tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers
 DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnSave 
-     LABEL "&Save program" 
+DEFINE BUTTON btnCopy 
+     LABEL "&Copy to clipboard" 
      SIZE-PIXELS 180 BY 24.
 
 DEFINE VARIABLE cbIndent AS CHARACTER FORMAT "X(256)":U 
@@ -99,71 +98,37 @@ DEFINE VARIABLE edDefinition AS CHARACTER
      SIZE-PIXELS 700 BY 340
      FONT 0 NO-UNDO.
 
-DEFINE VARIABLE rsDumpLoad AS CHARACTER 
-     VIEW-AS RADIO-SET HORIZONTAL
-     RADIO-BUTTONS 
-          "Dump", "Dump",
-"Load", "Load"
-     SIZE-PIXELS 125 BY 25 NO-UNDO.
-
-DEFINE RECTANGLE RECT-2
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 73.
-
-DEFINE RECTANGLE RECT-5
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 48.
-
 DEFINE RECTANGLE RECT-6
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 180 BY 130.
 
-DEFINE VARIABLE tgDelete AS LOGICAL INITIAL no 
-     LABEL "&Delete record" 
-     VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 TOOLTIP "add delete statement" NO-UNDO.
-
-DEFINE VARIABLE tgDisableTriggers AS LOGICAL INITIAL no 
-     LABEL "Disable Load &Triggers" 
-     VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 TOOLTIP "disable load triggers" NO-UNDO.
-
 DEFINE VARIABLE tgIncludeDb AS LOGICAL INITIAL no 
-     LABEL "Include &DB Name"
+     LABEL "Include &DB Name" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 165 BY 17 TOOLTIP "include DB name in the code" NO-UNDO.
-
-DEFINE VARIABLE tgLoadInChunks AS LOGICAL INITIAL no 
-     LABEL "Load In &Chunks" 
-     VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 160 BY 17 TOOLTIP "Load data in chunks of 100 records" NO-UNDO.
 
 DEFINE VARIABLE tgLowerCase AS LOGICAL INITIAL no 
      LABEL "Keywords in &Lower Case" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 165 BY 17 TOOLTIP "use lower case for keywords" NO-UNDO.
 
+DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no 
+     LABEL "&Selected fields only" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 160 BY 17 TOOLTIP "export only the fields that are selected in the main window" NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
      edDefinition AT Y 5 X 205 NO-LABEL WIDGET-ID 2
-     rsDumpLoad AT Y 13 X 30 NO-LABEL WIDGET-ID 78
-     cbIndent AT Y 44 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     tgLowerCase AT Y 75 X 25 WIDGET-ID 84
-     tgIncludeDb AT Y 100 X 25 WIDGET-ID 86
-     tgDelete AT Y 175 X 30 WIDGET-ID 10
-     tgLoadInChunks AT Y 245 X 30 WIDGET-ID 12
-     tgDisableTriggers AT Y 265 X 30 WIDGET-ID 76
-     btnSave AT Y 320 X 15 WIDGET-ID 36
-     "Load" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 220 X 25 WIDGET-ID 74
+     cbIndent AT Y 17 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
+     tgSelectedOnly AT Y 55 X 25 WIDGET-ID 8
+     tgLowerCase AT Y 80 X 25 WIDGET-ID 84
+     tgIncludeDb AT Y 105 X 25 WIDGET-ID 86
+     btnCopy AT Y 320 X 15 WIDGET-ID 90
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
-     "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 150 X 25 WIDGET-ID 48
-     RECT-2 AT Y 227 X 15 WIDGET-ID 24
-     RECT-5 AT Y 157 X 15 WIDGET-ID 58
+          SIZE-PIXELS 40 BY 20 AT Y 18 X 25 WIDGET-ID 68
      RECT-6 AT Y 5 X 15 WIDGET-ID 82
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
@@ -187,7 +152,7 @@ DEFINE FRAME frMain
 IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
-         TITLE              = "Generate Dump/Load Procedures"
+         TITLE              = "Generate Assign statement"
          HEIGHT             = 16.95
          WIDTH              = 183.4
          MAX-HEIGHT         = 40
@@ -230,7 +195,7 @@ THEN C-Win:HIDDEN = no.
 
 &Scoped-define SELF-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON END-ERROR OF C-Win /* Generate Dump/Load Procedures */
+ON END-ERROR OF C-Win /* Generate Assign statement */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
   /* This case occurs when the user presses the "Esc" key.
      In a persistently run window, just ignore this.  If we did not, the
@@ -243,7 +208,7 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON WINDOW-CLOSE OF C-Win /* Generate Dump/Load Procedures */
+ON WINDOW-CLOSE OF C-Win /* Generate Assign statement */
 DO:
   /* This event will close the window and terminate the procedure.  */
   RUN saveSettings.
@@ -256,7 +221,7 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON WINDOW-RESIZED OF C-Win /* Generate Dump/Load Procedures */
+ON WINDOW-RESIZED OF C-Win /* Generate Assign statement */
 DO:
 
   RUN windowResized.
@@ -267,62 +232,25 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btnSave
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSave C-Win
-ON CHOOSE OF btnSave IN FRAME frMain /* Save program */
+&Scoped-define SELF-NAME btnCopy
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnCopy C-Win
+ON CHOOSE OF btnCopy IN FRAME frMain /* Copy to clipboard */
 OR 'go' OF FRAME {&FRAME-NAME} ANYWHERE
 DO:
-  DEFINE VARIABLE lOkay     AS LOGICAL    NO-UNDO.
-  DEFINE VARIABLE cFileName AS CHARACTER  NO-UNDO.
-  DEFINE VARIABLE cText     AS LONGCHAR   NO-UNDO. 
   
-  cFileName = TRIM(STRING('tt' + LC(pcTable), 'xx!x(20)')) + '.i'.
+  CLIPBOARD:VALUE = edDefinition:SCREEN-VALUE.
 
-  SYSTEM-DIALOG GET-FILE cFilename
-    FILTERS ".i Include file (*.i)" "*.i",
-            "Any File (*.*)" "*.*"
-    INITIAL-FILTER 1
-    ASK-OVERWRITE
-    USE-FILENAME
-    CREATE-TEST-FILE
-    DEFAULT-EXTENSION ".i"
-    SAVE-AS
-    UPDATE lOkay.
-
-  IF NOT lOkay THEN
-    RETURN NO-APPLY.
-    
-  cText = edDefinition:SCREEN-VALUE IN FRAME frMain.
-  COPY-LOB cText TO FILE cFileName.
-  
-  APPLY "END-ERROR":U TO FRAME frMain.
+  APPLY "END-ERROR":U TO FRAME frMain.  
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME rsDumpLoad
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL rsDumpLoad C-Win
-ON VALUE-CHANGED OF rsDumpLoad IN FRAME frMain
-DO:
-
-  tgDelete         :SENSITIVE = (SELF:SCREEN-VALUE = 'Dump').
-  tgLoadInChunks   :SENSITIVE = (SELF:SCREEN-VALUE = 'Load').
-  tgDisableTriggers:SENSITIVE = (SELF:SCREEN-VALUE = 'Load').
-
-  RUN generateCode.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME tgDelete
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgDelete C-Win
-ON VALUE-CHANGED OF tgDelete IN FRAME frMain /* Delete record */
-, cbIndent, tgLowerCase, tgDelete, tgLoadInChunks, tgDisableTriggers
+&Scoped-define SELF-NAME tgSelectedOnly
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelectedOnly C-Win
+ON VALUE-CHANGED OF tgSelectedOnly IN FRAME frMain /* Selected fields only */
+, tgLowerCase, cbIndent, tgIncludeDb
 DO:
   RUN generateCode.
 END.
@@ -401,11 +329,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edDefinition rsDumpLoad cbIndent tgLowerCase tgIncludeDb tgDelete 
-          tgLoadInChunks tgDisableTriggers 
+  DISPLAY edDefinition cbIndent tgSelectedOnly tgLowerCase tgIncludeDb 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE RECT-2 RECT-5 RECT-6 edDefinition rsDumpLoad cbIndent tgLowerCase 
-         tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers btnSave 
+  ENABLE RECT-6 edDefinition cbIndent tgSelectedOnly tgLowerCase tgIncludeDb 
+         btnCopy 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -436,14 +363,15 @@ END PROCEDURE. /* fillTT */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateCode C-Win 
 PROCEDURE generateCode :
-DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
-  DEFINE VARIABLE cMask         AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cHeader       AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cIndent       AS CHARACTER NO-UNDO.
+DEFINE VARIABLE cText     AS LONGCHAR  NO-UNDO.
+  DEFINE VARIABLE cIndent   AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE iMaxName  AS INTEGER   NO-UNDO.
   
+  DEFINE BUFFER bField FOR ttField.
+
   DO WITH FRAME frMain:
     
-    ASSIGN rsDumpLoad cbIndent tgLowerCase tgDelete tgLoadInChunks tgDisableTriggers.
+    ASSIGN cbIndent tgLowerCase tgSelectedOnly tgIncludeDb.
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -452,50 +380,34 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('    File        : &1-&2.p ~n', rsDumpLoad, pcTable )
-            + SUBSTITUTE('    Description : &1 program for &2.&3 ~n', rsDumpLoad, pcDatabase, pcTable )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('    History: ~n' )
-            + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('/*          This file was generated with the DataDigger                 */ ~n' )
-            + SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
-            .
+    cText = SUBSTITUTE('/* Assign &1.&2 ~n */~n', pcDatabase, pcTable ).
+    cText = cText + (IF tgLowerCase:CHECKED THEN 'assign' ELSE 'ASSIGN').
             
-    CASE rsDumpLoad:
-      WHEN 'dump' THEN 
-      DO:
-        cMask = '~nOUTPUT TO <folder><table>.<ext>.'
-              + '~n'
-              + '~nFOR EACH <db>.<table> ' + TRIM(STRING(tgDelete,'EXCLUSIVE-LOCK/NO-LOCK')) + ':'
-              + '~n<indent>EXPORT <db>.<table>.'
-              .
-        IF tgDelete THEN
-          cMask = cMask + '~n<indent>DELETE <db>.<table>.'.
+    /* Get max lengths */
+    FOR EACH bField
+      WHERE bField.cFieldName <> 'RECID'
+        AND bField.cFieldName <> 'ROWID'
+        AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
+      iMaxName = MAXIMUM(iMaxName, LENGTH(bField.cFieldName)).
+    END. 
 
-        cMask = cMask + '~nEND.'
-              + '~n '
-              + '~nOUTPUT CLOSE.'.
-      END. 
+    /* Add the fields */
+    FOR EACH bField
+      WHERE bField.cFieldName <> 'RECID'
+        AND bField.cFieldName <> 'ROWID'
+        AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
 
-      WHEN 'load' THEN
-      DO:
-      END.
+      cText = SUBSTITUTE('&1~n&2&3&4.&5 = '
+                        , cText 
+                        , cIndent
+                        , (IF tgIncludeDb THEN pcDatabase + '.' ELSE '')
+                        , pcTable
+                        , STRING(bField.cFieldName, FILL('X',iMaxName))
+                        ).
+    END. 
 
-    END CASE.
+    cText = SUBSTITUTE('&1~n&2.~n', cText, cIndent).
 
-    cText = cHeader + (IF tgLowerCase THEN LC(cMask) ELSE CAPS(cMask)).
-
-    cText = REPLACE(cText,'<folder>', 'c:\temp\').
-    cText = REPLACE(cText,'<ext>'   , 'd').
-    IF tgIncludeDb 
-      THEN cText = REPLACE(cText,'<db>', pcDatabase + '.').
-      ELSE cText = REPLACE(cText,'<db>', '').
-    cText = REPLACE(cText,'<table>' , pcTable).
-    cText = REPLACE(cText,'<indent>', cIndent).
- 
     edDefinition:SCREEN-VALUE = cText.
   END.
   
@@ -525,34 +437,28 @@ PROCEDURE initObject :
 
     /* Init the settings in case they do not yet exist */
     /* Window size */
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'Window:width' ) = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).  
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'Window:height') = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ). 
+    IF getRegistry('DataDigger:GenerateAssign', 'Window:width' ) = ? THEN setRegistry('DataDigger:GenerateAssign', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).  
+    IF getRegistry('DataDigger:GenerateAssign', 'Window:height') = ? THEN setRegistry('DataDigger:GenerateAssign', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ). 
 
     /* User settings */
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'DumpLoad')        = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'DumpLoad','Dump').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'Indent')          = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'Indent','2').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'LowerCase')       = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'LowerCase','no').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'IncludeDbName')   = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'IncludeDbName','no').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord')    = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord','no').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks')    = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks','no').
-    IF getRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers') = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers','no').
+    IF getRegistry('DataDigger:GenerateAssign', 'Indent')        = ? THEN setRegistry('DataDigger:GenerateAssign', 'Indent','2').
+    IF getRegistry('DataDigger:GenerateAssign', 'SelectedOnly')  = ? THEN setRegistry('DataDigger:GenerateAssign', 'SelectedOnly','no').
+    IF getRegistry('DataDigger:GenerateAssign', 'LowerCase')     = ? THEN setRegistry('DataDigger:GenerateAssign', 'LowerCase','no').
+    IF getRegistry('DataDigger:GenerateAssign', 'IncludeDbName') = ? THEN setRegistry('DataDigger:GenerateAssign', 'IncludeDbName','no').
 
     /* Get user settings */
-    rsDumpLoad:SCREEN-VALUE   = getRegistry('DataDigger:GenerateDumpLoad', 'DumpLoad').
-    cbIndent:SCREEN-VALUE     = getRegistry('DataDigger:GenerateDumpLoad', 'Indent').
-    tgLowerCase:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'LowerCase')).
-    tgIncludeDb:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'IncludeDbName')).
-    tgDelete:CHECKED          = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord')).
-    tgLoadInChunks:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks')).
-    tgDisableTriggers:CHECKED = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers')).
+    cbIndent:SCREEN-VALUE     = getRegistry('DataDigger:GenerateAssign', 'Indent').
+    tgSelectedOnly:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'SelectedOnly')).
+    tgLowerCase:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'LowerCase')).
+    tgIncludeDb:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'IncludeDbName')).
 
-    APPLY 'VALUE-CHANGED' TO rsDumpLoad.
+    APPLY 'VALUE-CHANGED' TO cbIndent.
     
     /* Restore window size */
-    iSetting = INTEGER(getRegistry('DataDigger:GenerateDumpLoad', 'Window:width' )) NO-ERROR.
+    iSetting = INTEGER(getRegistry('DataDigger:GenerateAssign', 'Window:width' )) NO-ERROR.
     IF iSetting <> ? THEN {&WINDOW-NAME}:WIDTH-PIXELS = iSetting.
 
-    iSetting = INTEGER(getRegistry('DataDigger:GenerateDumpLoad', 'Window:height')) NO-ERROR.
+    iSetting = INTEGER(getRegistry('DataDigger:GenerateAssign', 'Window:height')) NO-ERROR.
     IF iSetting <> ? THEN {&WINDOW-NAME}:HEIGHT-PIXELS = iSetting.
 
     RUN windowResized.
@@ -572,17 +478,14 @@ PROCEDURE saveSettings :
     /* Window size (don't save x,y pos because you might place it on a second monitor and 
      * later try to restore it when your second monitor is gone) 
      */
-    setRegistry('DataDigger:GenerateDumpLoad', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).
-    setRegistry('DataDigger:GenerateDumpLoad', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ).
+    setRegistry('DataDigger:GenerateAssign', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).
+    setRegistry('DataDigger:GenerateAssign', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ).
 
     /* User settings */
-    setRegistry('DataDigger:GenerateDumpLoad', 'DumpLoad'       , rsDumpLoad:SCREEN-VALUE  ).
-    setRegistry('DataDigger:GenerateDumpLoad', 'Indent'         , cbIndent:SCREEN-VALUE    ).
-    setRegistry('DataDigger:GenerateDumpLoad', 'LowerCase'      , tgLowerCase:SCREEN-VALUE    ).
-    setRegistry('DataDigger:GenerateDumpLoad', 'IncludeDbName'  , STRING(tgIncludeDb:CHECKED      )).
-    setRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord'   , STRING(tgDelete:CHECKED         )).
-    setRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks'   , STRING(tgLoadInChunks:CHECKED   )).
-    setRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers', STRING(tgDisableTriggers:CHECKED)).
+    setRegistry('DataDigger:GenerateAssign', 'Indent'       , STRING(cbIndent:SCREEN-VALUE  )).
+    setRegistry('DataDigger:GenerateAssign', 'SelectedOnly' , STRING(tgSelectedOnly:CHECKED )).
+    setRegistry('DataDigger:GenerateAssign', 'LowerCase'    , STRING(tgLowerCase:CHECKED    )).
+    setRegistry('DataDigger:GenerateAssign', 'IncludeDbName', STRING(tgIncludeDb:CHECKED    )).
 
   END.
 
@@ -615,3 +518,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
