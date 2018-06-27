@@ -7,6 +7,8 @@
 
 DataDigger version 24 - dd MMM 2018 
 
+BetaDigger 20180627
+
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
 - Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendörfer)
