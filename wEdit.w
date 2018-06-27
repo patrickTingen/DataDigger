@@ -890,7 +890,6 @@ DO:
     brRecord:TOOLTIP = "fields to edit".
 /*     ttColumn.cNewValue = ttColumn.cOldValue. */
     RUN enableToolbar("").
-    MESSAGE ttColumn.cFullName ttColumn.cOldValue '--->' ttColumn.cNewValue VIEW-AS ALERT-BOX INFO BUTTONS OK.
   END.
 END. /* leave cNewValue */
 
@@ -1733,4 +1732,3 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
