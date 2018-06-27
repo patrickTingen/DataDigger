@@ -25,8 +25,11 @@
 &GLOBAL-DEFINE CHECK-STABLE 1
 &GLOBAL-DEFINE CHECK-BETA   2
 
-/* Constant for collecting statistics */
-&GLOBAL-DEFINE PINGBACKURL https://goo.gl/24deK3
+/* Constant for collecting statistics
+ * changed from https://goo.gl/24deK3 to bit.ly because google has ended the service
+ * get analytics for the bit.ly link by adding a + (plus) to it
+*/
+&GLOBAL-DEFINE PINGBACKURL https://bit.ly/datadigger
 
 /* Table scan is not available for pre-v11 */
 &IF PROVERSION >= '11' &THEN

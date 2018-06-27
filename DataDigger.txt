@@ -52,6 +52,7 @@ DataDigger version 24 - dd MMM 2018
 - Change: Clear table filter now works in two steps
 - Change: Option menu is now (an optional) sidebar
 - Change: Shortcut keys in option menu changed
+- Change: DataDigger phone home now via bit.ly instead of goo.gl
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 - New   : Option to generate an include file with tt definitions

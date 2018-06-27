@@ -12045,7 +12045,7 @@ PROCEDURE startSession :
   DO:
     /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
      * version on GitHub. This to track the use of DataDigger.
-     * Interested yourself? Check https://goo.gl/24deK3+ to see statistics
+     * Interested yourself? Check https://bit.ly/datadigger+ to see statistics
     */
     IF getRegistry('DataDigger:Update','PingBack') <> ? THEN
       RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).
@@ -12876,4 +12876,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
