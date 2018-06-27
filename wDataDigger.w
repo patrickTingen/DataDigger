@@ -181,14 +181,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnTools ~
-cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnTabTables btnClear btnClearFieldFilter ~
-btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
-btnMoveUp btnQueries btnReset btnTableFilter btnWhere btnTabFavourites ~
-btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump ~
-btnLoad btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS btnView rctQuery rctEdit fiTableFilter ~
+btnQueries cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
+fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
+fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
+btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere ~
+btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -482,8 +483,8 @@ DEFINE BUTTON btnPrevQuery  NO-FOCUS FLAT-BUTTON
      SIZE-PIXELS 20 BY 23 TOOLTIP "previous query".
 
 DEFINE BUTTON btnQueries  NO-FOCUS FLAT-BUTTON
-     LABEL "&Q" 
-     SIZE-PIXELS 20 BY 23 TOOLTIP "show previous queries on this table #(ALT-Q)".
+     LABEL "&H" 
+     SIZE-PIXELS 20 BY 23 TOOLTIP "show query history of this table #(ALT-Q)".
 
 DEFINE BUTTON btnReset  NO-FOCUS FLAT-BUTTON
      LABEL "R" 
@@ -524,7 +525,7 @@ DEFINE BUTTON btnTools  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnView  NO-FOCUS FLAT-BUTTON
      LABEL "&View" 
-     SIZE-PIXELS 25 BY 23 TOOLTIP "view selected records  #(ENTER) #right click to set type of view".
+     SIZE-PIXELS 25 BY 23 TOOLTIP "view selected records  #(SHIFT-ENTER) #right click to set type of view".
 
 DEFINE BUTTON btnViewData  NO-FOCUS FLAT-BUTTON
      LABEL "->" 
@@ -665,6 +666,14 @@ DEFINE BUTTON btnDict-txt  NO-FOCUS FLAT-BUTTON
      LABEL "Data &Dictionary" 
      SIZE-PIXELS 100 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
 
+DEFINE BUTTON btnEditor 
+     LABEL "&Ed" 
+     SIZE-PIXELS 30 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
+
+DEFINE BUTTON btnEditor-txt  NO-FOCUS FLAT-BUTTON
+     LABEL "&Editor" 
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
+
 DEFINE BUTTON btnExpand  NO-FOCUS FLAT-BUTTON
      LABEL "< >" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "expand or collapse the toolbar".
@@ -681,24 +690,16 @@ DEFINE BUTTON btnHelp-txt  NO-FOCUS FLAT-BUTTON
      LABEL "&Welcome" 
      SIZE-PIXELS 100 BY 30 TOOLTIP "show quick intro #(CTRL-SHIFT-W)".
 
-DEFINE BUTTON btnProcEdit 
-     LABEL "&Ed" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
-
-DEFINE BUTTON btnProcEdit-txt  NO-FOCUS FLAT-BUTTON
-     LABEL "&Editor" 
-     SIZE-PIXELS 100 BY 30 TOOLTIP "start a Procedure Editor #(CTRL-SHIFT-E)".
-
 DEFINE BUTTON btnQueries-3 
      LABEL "&H" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "show previous queries #(CTRL-SHIFT-H)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "show previous queries #(ALT-Q)".
 
 DEFINE BUTTON btnQueries-txt  NO-FOCUS FLAT-BUTTON
      LABEL "&History" 
      SIZE-PIXELS 100 BY 30 TOOLTIP "show previous queries on this table #(CTRL-SHIFT-H)".
 
 DEFINE BUTTON btnQueryTester 
-     LABEL "&QT" 
+     LABEL "&Q" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start MFC Query Tester #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnQueryTester-txt  NO-FOCUS FLAT-BUTTON
@@ -937,8 +938,9 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
+     btnView AT Y 520 X 200 WIDGET-ID 4
      fiTableFilter AT Y 3 X 56 NO-LABEL
-     btnTools AT Y 0 X 1 WIDGET-ID 264
+     btnQueries AT Y 265 X 745 WIDGET-ID 190
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -953,6 +955,7 @@ DEFINE FRAME frMain
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTools AT Y 0 X 1 WIDGET-ID 264
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
      btnClear AT Y 265 X 725 WIDGET-ID 30
      btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
@@ -962,7 +965,6 @@ DEFINE FRAME frMain
      btnMoveDown AT Y 121 X 790 WIDGET-ID 194
      btnMoveTop AT Y 55 X 790 WIDGET-ID 198
      btnMoveUp AT Y 77 X 790 WIDGET-ID 192
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnReset AT Y 99 X 790 WIDGET-ID 196
      btnTableFilter AT Y 4 X 257 WIDGET-ID 38
      btnViewData AT Y 265 X 705
@@ -978,7 +980,6 @@ DEFINE FRAME frMain
      btnDelete AT Y 520 X 280
      btnResizeVer AT ROW 13.38 COL 7.6 WIDGET-ID 274
      btnClone AT Y 520 X 80 WIDGET-ID 276
-     btnView AT Y 520 X 200 WIDGET-ID 4
      btnAdd AT Y 520 X 55
      btnEdit AT Y 520 X 105
      fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL WIDGET-ID 308
@@ -992,48 +993,15 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnProcEdit AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnProcEdit-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1071,15 +1039,48 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
+
+DEFINE FRAME frSettings
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1374,12 +1375,12 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
 &Scoped-define SELF-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON ALT-CTRL-D OF C-Win /* DataDigger */
+ANYWHERE 
 DO:
-  DEFINE VARIABLE cDebuggerPath AS CHARACTER   NO-UNDO.
+  READKEY PAUSE 0. /* to suppress strange characters */
 
-  /* Start debugger if found */
-  cDebuggerPath = getRegistry('debugger', 'path').
-  IF SEARCH(cDebuggerPath) = ? THEN RUN VALUE(cDebuggerPath).
+  PUBLISH "setUsage" ("debugger"). /* user behaviour */
+  RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1416,6 +1417,16 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON ALT-Q OF C-Win /* DataDigger */
+DO:
+  RUN btnQueriesChoose.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON ALT-T OF C-Win /* DataDigger */
 ANYWHERE DO:
   APPLY 'entry' TO fiTableFilter IN FRAME {&frame-name}.
@@ -1431,6 +1442,121 @@ ON ALT-W OF C-Win /* DataDigger */
 ANYWHERE DO:
   APPLY 'entry' TO ficWhere IN FRAME {&frame-name}.
   RETURN NO-APPLY.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-A OF C-Win /* DataDigger */
+OR "CTRL-SHIFT-A" OF c-win ANYWHERE
+DO:
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
+    RUN startTool("Admin").
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-B OF C-Win /* DataDigger */
+DO:
+  
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
+    RUN btnAboutChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-C OF C-Win /* DataDigger */
+OR 'CTRL-SHIFT-C' OF c-win ANYWHERE  
+DO:
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN btnConnectionsChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-D OF C-Win /* DataDigger */
+OR 'CTRL-SHIFT-D' OF c-win ANYWHERE
+DO:
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN startTool('dict').
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-N OF C-Win /* DataDigger */
+OR "CTRL-SHIFT-N" OF c-win ANYWHERE
+DO:
+
+  READKEY PAUSE 0. /* to suppress strange characters */
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN btnDataDiggerChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-Q OF C-Win /* DataDigger */
+OR "CTRL-SHIFT-Q" OF c-win ANYWHERE
+DO:
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN btnQueryTesterChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-S OF C-Win /* DataDigger */
+OR 'CTRL-SHIFT-S' OF c-win ANYWHERE 
+DO:
+  READKEY PAUSE 0. /* to suppress strange characters */
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN btnSettingsChoose.
+  ELSE 
+    RUN btnDumpChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
+ON CTRL-W OF C-Win /* DataDigger */
+OR "CTRL-SHIFT-W" OF c-win ANYWHERE
+DO:
+  
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+    RUN btnHelpChoose.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2383,8 +2509,9 @@ ON CHOOSE OF btnAbout IN FRAME frSettings /* Info */
 OR "CHOOSE" OF btnAbout-txt 
 OR "CTRL-SHIFT-B" OF c-win ANYWHERE
 DO:
-  PUBLISH "setUsage" ("About"). /* user behaviour */
-  RUN VALUE(getProgramDir() + 'wAbout.w').
+
+  RUN btnAboutChoose.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2600,10 +2727,10 @@ END. /* choose of btnDelete */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections C-Win
 ON CHOOSE OF btnConnections IN FRAME frSettings /* Con */
 OR "CHOOSE" OF btnConnections-txt 
-OR 'CTRL-SHIFT-C' OF c-win ANYWHERE
 DO:
-  PUBLISH "setUsage" ("manageConnections"). /* user behaviour */
-  RUN manageConnections.
+
+  RUN btnConnectionsChoose.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2614,7 +2741,6 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataAdmin C-Win
 ON CHOOSE OF btnDataAdmin IN FRAME frSettings /* ADM */
 OR "CHOOSE" OF btnDataAdmin-txt 
-OR "CTRL-SHIFT-A" OF c-win ANYWHERE
 DO:
   RUN startTool("Admin").
 END.
@@ -2627,19 +2753,9 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger C-Win
 ON CHOOSE OF btnDataDigger IN FRAME frSettings /* DD */
 OR "CHOOSE" OF btnDataDigger-txt 
-OR "CTRL-SHIFT-N" OF c-win
 OR "ALT-D" OF FRAME frMain ANYWHERE
 DO:
-  /* If we're in the middle of the tour, ignore this event */
-  IF FRAME frHint:VISIBLE THEN RETURN NO-APPLY.
-
-  PUBLISH "setUsage" ("newInstance"). /* user behaviour */
-
-  /* Set the X and Y a little higher so the new window appears cascaded */
-  setRegistry("DataDigger", "Window:x", STRING(c-win:X + 20) ).
-  setRegistry("DataDigger", "Window:y", STRING(c-win:Y + 20) ).
-
-  RUN VALUE(getProgramDir() + 'wDataDigger.w') PERSISTENT (INPUT plReadOnlyDigger) .
+  RUN btnDataDiggerChoose.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2678,10 +2794,9 @@ END. /* choose of btnDelete */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict C-Win
 ON CHOOSE OF btnDict IN FRAME frSettings /* DD */
 OR "CHOOSE" OF btnDict-txt 
-OR 'CTRL-SHIFT-D' OF c-win ANYWHERE
 DO:
 
-  RUN startTool("Dict").
+  RUN startTool('Dict').
 
 END.
 
@@ -2693,10 +2808,9 @@ END.
 &Scoped-define SELF-NAME btnDump
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDump C-Win
 ON CHOOSE OF btnDump IN FRAME frMain /* Save */
-OR "CTRL-S" OF c-win ANYWHERE
 DO:
 
-  IF btnDump:SENSITIVE IN FRAME frMain THEN RUN btnDumpChoose.
+  RUN btnDumpChoose.
 
 END.
 
@@ -2717,6 +2831,22 @@ END.
 
 
 &Scoped-define FRAME-NAME frSettings
+&Scoped-define SELF-NAME btnEditor
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEditor C-Win
+ON CHOOSE OF btnEditor IN FRAME frSettings /* Ed */
+OR "CHOOSE" OF btnEditor-txt 
+OR "CTRL-SHIFT-E" OF c-win
+OR "SHIFT-F3" OF c-win ANYWHERE
+DO:
+
+  RUN btnEditorChoose.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME btnExpand
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
 ON CHOOSE OF btnExpand IN FRAME frSettings /* < > */
@@ -2774,10 +2904,10 @@ END.
 ON CHOOSE OF btnHelp IN FRAME frSettings /* Help */
 OR "CHOOSE" OF btnHelp-txt 
 OR "HELP" OF c-win 
-OR "CTRL-SHIFT-W" OF c-win ANYWHERE
 DO:
-  RUN showTour.
-  RETURN NO-APPLY.
+
+  RUN btnHelpChoose.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2908,30 +3038,6 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frSettings
-&Scoped-define SELF-NAME btnProcEdit
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnProcEdit C-Win
-ON CHOOSE OF btnProcEdit IN FRAME frSettings /* Ed */
-OR "CHOOSE" OF btnProcEdit-txt 
-OR "CTRL-SHIFT-E" OF c-win
-OR "SHIFT-F3" OF c-win ANYWHERE
-DO:
-  PUBLISH "setUsage" ("Editor"). /* user behaviour */
-
-  /* Return if progress version is runtime */
-  IF PROGRESS = "Run-time" THEN RETURN.
-
-  /* In read-only mode, return */
-  IF plReadOnlyDigger THEN RETURN.
-
-  RUN _edit.p.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frWhere
 &Scoped-define SELF-NAME btnQt
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQt C-Win
 ON CHOOSE OF btnQt IN FRAME frWhere /* "" */
@@ -2955,16 +3061,13 @@ END.
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnQueries
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueries C-Win
-ON CHOOSE OF btnQueries IN FRAME frMain /* Q */
-OR 'ALT-Q'        OF c-win
-OR 'CTRL-SHIFT-Q' OF c-win
+ON CHOOSE OF btnQueries IN FRAME frMain /* H */
 OR 'CTRL-INS'     OF ficWhere       IN FRAME frMain
 OR 'CTRL-INS'     OF ficWhere2      IN FRAME frWhere
 OR 'CHOOSE'       OF btnQueries-2   IN FRAME frWhere
 OR 'CHOOSE'       OF btnQueries-3   IN FRAME frSettings
 OR 'CHOOSE'       OF btnQueries-txt IN FRAME frSettings
 DO:
-  PUBLISH "setUsage" ("selectQuery"). /* user behaviour */
   RUN btnQueriesChoose.
 END.
 
@@ -2975,12 +3078,10 @@ END.
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnQueryTester
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryTester C-Win
-ON CHOOSE OF btnQueryTester IN FRAME frSettings /* QT */
+ON CHOOSE OF btnQueryTester IN FRAME frSettings /* Q */
 OR "CHOOSE" OF btnQueryTester-txt 
-OR "CTRL-SHIFT-T" OF c-win ANYWHERE
 DO:
-  PUBLISH "setUsage" ("QueryTester"). /* user behaviour */
-  RUN VALUE(getProgramDir() + 'query-tester.w') (INPUT-OUTPUT TABLE ttTestQuery BY-REFERENCE).
+  RUN btnQueryTesterChoose.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3006,9 +3107,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
 ON CHOOSE OF btnSettings IN FRAME frSettings /* Set */
 OR "CHOOSE" OF btnSettings-txt 
-OR 'CTRL-SHIFT-S' OF c-win ANYWHERE
 DO:
-  PUBLISH "setUsage" ("Settings"). /* user behaviour */
   RUN btnSettingsChoose.
 END.
 
@@ -3159,7 +3258,7 @@ DO:
   /* Action! */
   RUN showToolbar(lShowToolbar).
   RUN endResize.
-  APPLY 'entry' TO hFocus.
+  IF VALID-HANDLE(hFocus) THEN APPLY 'entry' TO hFocus.
   
   RETURN NO-APPLY.
 END.
@@ -3173,7 +3272,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
 ON CURSOR-DOWN OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
+, btnSettings, btnEditor
 , btnDict, btnDataAdmin
 , btnQueries-3, btnQueryTester
 , btnHelp, btnAbout
@@ -3188,7 +3287,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
 ON CURSOR-LEFT OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
+, btnSettings, btnEditor
 , btnDict, btnDataAdmin
 , btnQueries-3, btnQueryTester
 , btnHelp, btnAbout
@@ -3203,7 +3302,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
 ON CURSOR-RIGHT OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
+, btnSettings, btnEditor
 , btnDict, btnDataAdmin
 , btnQueries-3, btnQueryTester
 , btnHelp, btnAbout
@@ -3218,7 +3317,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
 ON CURSOR-UP OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
+, btnSettings, btnEditor
 , btnDict, btnDataAdmin
 , btnQueries-3, btnQueryTester
 , btnHelp, btnAbout
@@ -3233,7 +3332,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
 ON END-ERROR OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
-, btnSettings, btnProcEdit
+, btnSettings, btnEditor
 , btnDict, btnDataAdmin
 , btnQueries-3, btnQueryTester
 , btnHelp, btnAbout
@@ -3288,12 +3387,15 @@ DO:
    */
   APPLY "VALUE-CHANGED" TO brTables IN FRAME frMain.
 
-/*   /* Check whether a table change event is pending */           */
-/*   FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR. */
-/*   IF AVAILABLE bTimer THEN DO:                                  */
-/*     RUN setTimer('timedTableChange',0).                         */
-/*     RUN timedTableChange.                                       */
-/*   END.                                                          */
+  /* Check whether a table change event is pending 
+   * this happens if you change tables in the browse and IMMEDIATELY press enter
+   * then the fields table is not yet populated
+   */
+  FIND bTimer WHERE bTimer.cProc = 'timedTableChange' NO-ERROR.
+  IF AVAILABLE bTimer THEN DO:
+    RUN setTimer('timedTableChange',0).
+    RUN timedTableChange.
+  END.
   /* Cancel any pending table change */
   RUN setTimer('timedTableChange',0).
 
@@ -3754,7 +3856,7 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
 ON RETURN OF fiTableFilter IN FRAME frMain
-, cbDatabaseFilter
+, cbDatabaseFilter, brTables
 DO:
 
   /* If the timer is running, then try to open the query on this table 
@@ -3765,6 +3867,8 @@ DO:
     APPLY 'CHOOSE' TO btnViewData.
   ELSE 
     RUN filterTables.
+
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3851,7 +3955,7 @@ END.
 ON VALUE-CHANGED OF tgDebugMode IN FRAME frMain
 DO:
 
-  setDebugMode(SELF:checked).
+  setDebugMode(SELF:CHECKED).
 
 END.
 
@@ -4026,13 +4130,6 @@ DO:
   END CASE.
 END. /* CTRL-TAB OF C-Win anywhere */
 
-
-ON "CTRL-ALT-D" OF C-Win ANYWHERE /* Debugger */
-DO:
-  PUBLISH "setUsage" ("debugger"). /* user behaviour */
-  RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
-END.
-
 /* Best default for GUI applications is...                              */
 PAUSE 0 BEFORE-HIDE.
 
@@ -4073,6 +4170,19 @@ END.
 
 
 /* **********************  Internal Procedures  *********************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAboutChoose C-Win 
+PROCEDURE btnAboutChoose :
+/* About DataDigger
+*/
+
+  PUBLISH "setUsage" ("About"). /* user behaviour */
+  RUN VALUE(getProgramDir() + 'wAbout.w').
+
+END PROCEDURE. /* btnAboutChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose C-Win 
 PROCEDURE btnAddChoose :
@@ -4134,8 +4244,7 @@ END PROCEDURE. /* btnClearDataFilterChoose */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearFieldFilterChoose C-Win 
 PROCEDURE btnClearFieldFilterChoose :
-/*
- * Clear field filters and set focus to field browse
+/* Clear field filters and set focus to field browse
  */
   RUN clearFieldFilter.
   RUN filterFieldsBrowse.
@@ -4148,8 +4257,7 @@ END PROCEDURE. /* btnClearFieldFilterChoose */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearIndexFilterChoose C-Win 
 PROCEDURE btnClearIndexFilterChoose :
-/*
- * Clear index filters
+/* Clear index filters
  */
   PUBLISH "setUsage" ("clearIndexFilter"). /* user behaviour */
 
@@ -4258,6 +4366,60 @@ PROCEDURE btnCloneChoose :
   END.
 
 END PROCEDURE. /* btnCloneChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnConnectionsChoose C-Win 
+PROCEDURE btnConnectionsChoose :
+/* Maintenance of database connection settings
+ */
+  DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
+
+  PUBLISH "setUsage" ("btnConnectionsChoose"). /* user behaviour */
+  cProgDir   = getProgramDir().
+
+  cDatabasesOld = getDatabaseList().
+  RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
+
+  /* Get all connected databases */
+  cDatabases = getDatabaseList().
+
+  /* If needed, repopulate db combo */
+  IF cDatabases <> cDatabasesOld THEN
+  DO:
+    /* Get list of all tables of all databases */
+    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
+
+    RUN filterTables.
+  END.
+
+END PROCEDURE. /* btnConnectionsChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataDiggerChoose C-Win 
+PROCEDURE btnDataDiggerChoose :
+/* Start new instance
+*/
+
+  /* If we're in the middle of the tour, ignore this event */
+  IF FRAME frHint:VISIBLE THEN RETURN NO-APPLY.
+
+  PUBLISH "setUsage" ("newInstance"). /* user behaviour */
+
+  /* Set the X and Y a little higher so the new window appears cascaded */
+  setRegistry("DataDigger", "Window:x", STRING(c-win:X + 20) ).
+  setRegistry("DataDigger", "Window:y", STRING(c-win:Y + 20) ).
+
+  RUN VALUE(getProgramDir() + 'wDataDigger.w') PERSISTENT (INPUT plReadOnlyDigger) .
+
+END PROCEDURE. /* btnDataDiggerChoose */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4407,6 +4569,7 @@ PROCEDURE btnDumpChoose :
 
   /* Prevent illegal calls */
   IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
+  IF NOT btnDump:SENSITIVE IN FRAME frMain THEN RETURN. 
 
   /* If no data then go back */
   IF ghDataBrowse:QUERY:num-results = 0
@@ -4469,28 +4632,61 @@ PROCEDURE btnEditChoose :
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0 THEN
     ghDataBrowse:SELECT-FOCUSED-ROW().
 
-  IF NOT ghDataBrowse:QUERY:get-buffer-handle(1):available THEN
+  IF NOT ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN
   DO:
     RUN showHelp('RecordGone', '').
     ghDataBrowse:REFRESH().
     RETURN.
   END.
 
-  RUN VALUE(getProgramDir() + 'wEdit.w')
-    ( INPUT plReadOnlyDigger
-    , INPUT 'Edit'
-    , INPUT ghDataBrowse
-    , INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
-    , INPUT TABLE ttField  /* do not use by-reference ! */
-    , INPUT TABLE ttColumn /* do not use by-reference ! */
-    , OUTPUT lRecordsUpdated
-    , OUTPUT rNewRecord /* not handled here */
-    ).
-
-  IF lRecordsUpdated THEN ghDataBrowse:REFRESH().
+  /* If shift key pressed, then display instead of edit */
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
+    RUN btnViewChoose.
+  ELSE 
+  DO:
+    RUN VALUE(getProgramDir() + 'wEdit.w')
+      ( INPUT plReadOnlyDigger
+      , INPUT 'Edit'
+      , INPUT ghDataBrowse
+      , INPUT gcCurrentDatabase
+      , INPUT gcCurrentTable
+      , INPUT TABLE ttField  /* do not use by-reference ! */
+      , INPUT TABLE ttColumn /* do not use by-reference ! */
+      , OUTPUT lRecordsUpdated
+      , OUTPUT rNewRecord /* not handled here */
+      ).
+  
+    IF lRecordsUpdated THEN ghDataBrowse:REFRESH().
+  END.
 
 END PROCEDURE. /* btnEditChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditorChoose C-Win 
+PROCEDURE btnEditorChoose :
+/* Open procedure editor
+*/
+
+  /* Return if progress version is runtime or in read-only mode */
+  IF PROGRESS = "Run-time" OR plReadOnlyDigger THEN RETURN.
+
+  PUBLISH "setUsage" ("Editor"). /* user behaviour */
+  RUN _edit.p.
+
+END PROCEDURE. /* btnEditorChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnHelpChoose C-Win 
+PROCEDURE btnHelpChoose :
+/* Show welcome tour
+*/
+  RUN showTour.
+
+END PROCEDURE. /* btnHelpChoose */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4533,6 +4729,7 @@ PROCEDURE btnQueriesChoose :
   DEFINE VARIABLE iQuery  AS INTEGER NO-UNDO.
   DEFINE VARIABLE hEditor AS HANDLE  NO-UNDO.
 
+  PUBLISH "setUsage" ("selectQuery"). /* user behaviour */
   hEditor = getActiveQueryEditor().
 
   RUN value(getProgramDir() + 'dQueries.w')
@@ -4560,6 +4757,18 @@ END PROCEDURE. /* btnQueriesChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueryTesterChoose C-Win 
+PROCEDURE btnQueryTesterChoose :
+/* Start Marius' query tester
+*/
+  PUBLISH "setUsage" ("QueryTester"). /* user behaviour */
+  RUN VALUE(getProgramDir() + 'query-tester.w') (INPUT-OUTPUT TABLE ttTestQuery BY-REFERENCE).
+
+END PROCEDURE. /* btnQueryTesterChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSettingsChoose C-Win 
 PROCEDURE btnSettingsChoose :
 /* Show DataDigger settings window
@@ -4567,6 +4776,8 @@ PROCEDURE btnSettingsChoose :
   DEFINE VARIABLE cSettingsFile AS CHARACTER NO-UNDO.
   DEFINE VARIABLE lOkClicked    AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE cSettingsDir  AS CHARACTER NO-UNDO.
+
+  PUBLISH "setUsage" ("Settings"). /* user behaviour */
 
   /* Load or create personalized ini file */
   cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
@@ -4906,7 +5117,8 @@ PROCEDURE clearField :
  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
   phWidget:SCREEN-VALUE = "".
-END PROCEDURE.
+
+END PROCEDURE. /* clearField */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4989,7 +5201,6 @@ PROCEDURE cloneDatabase :
       cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
       APPLY 'value-changed' TO cbDatabaseFilter.
     END.
-
   END.
 
 END PROCEDURE. /* cloneDatabase */
@@ -5002,7 +5213,6 @@ PROCEDURE collectFieldInfo PRIVATE :
 /* Fill the fields temp-table
  */
   DEFINE INPUT PARAMETER pcTableName AS CHARACTER NO-UNDO.
-
   DEFINE BUFFER bTable FOR ttTable.
 
   /* Collect fields from target table */
@@ -5161,7 +5371,7 @@ PROCEDURE connectDatabase :
     APPLY 'value-changed' TO cbDatabaseFilter.
   END.
 
-END PROCEDURE.
+END PROCEDURE. /* connectDatabase */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5463,7 +5673,8 @@ PROCEDURE copyToClipboard :
  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
   CLIPBOARD:VALUE = phWidget:SCREEN-VALUE.
-END PROCEDURE.
+
+END PROCEDURE. /* copyToClipboard */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5478,7 +5689,7 @@ PROCEDURE createMenuDataBrowse :
   hMenu = createMenu(ghDataBrowse).
 
   /* Copy to clipboard */
-  hMenuItem = createMenuItem(hMenu,"Item","Copy to clipboard").
+  hMenuItem = createMenuItem(hMenu,"Item","Copy field to clipboard").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN copyDataToClipboard IN THIS-PROCEDURE.
 
   /* Show value of field */
@@ -5509,27 +5720,27 @@ PROCEDURE createMenuDataBrowse :
   hMenuItem = createMenuItem(hMenu,"Rule","").
 
   /* Shortcut to viewing records */
-  hMenuItem = createMenuItem(hMenu,"Item","View selected").
+  hMenuItem = createMenuItem(hMenu,"Item","View selected (SHIFT-ENTER)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnViewChoose IN THIS-PROCEDURE.
 
   /* Shortcut to adding records */
-  hMenuItem = createMenuItem(hMenu,"Item","Add record").
+  hMenuItem = createMenuItem(hMenu,"Item","Add record (INS)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnAddChoose IN THIS-PROCEDURE.
 
   /* Shortcut to cloning records */
-  hMenuItem = createMenuItem(hMenu,"Item","Clone record").
+  hMenuItem = createMenuItem(hMenu,"Item","Clone record (ALT-O)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnCloneChoose IN THIS-PROCEDURE.
 
   /* Shortcut to editing records */
-  hMenuItem = createMenuItem(hMenu,"Item","Edit selected").
+  hMenuItem = createMenuItem(hMenu,"Item","Edit selected (ALT-E)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnEditChoose IN THIS-PROCEDURE.
 
   /* Shortcut to dumping records */
-  hMenuItem = createMenuItem(hMenu,"Item","Dump selected").
+  hMenuItem = createMenuItem(hMenu,"Item","Dump selected (CTRL-S)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDumpChoose IN THIS-PROCEDURE.
 
   /* Shortcut to loading records */
-  hMenuItem = createMenuItem(hMenu,"Item","Load data").
+  hMenuItem = createMenuItem(hMenu,"Item","Load data (CTRL-L)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnLoadChoose IN THIS-PROCEDURE.
 
   /* Rule */
@@ -5547,7 +5758,7 @@ PROCEDURE createMenuDataBrowse :
   hMenuItem = createMenuItem(hMenu,"Rule","").
 
   /* Shortcut to deleting records */
-  hMenuItem = createMenuItem(hMenu,"Item","Delete selected").
+  hMenuItem = createMenuItem(hMenu,"Item","Delete selected (DEL)").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDeleteChoose IN THIS-PROCEDURE.
 
 END PROCEDURE. /* createMenuDataBrowse */
@@ -5586,7 +5797,7 @@ PROCEDURE createMenuTableBrowse :
     
     /* Manage connections */
     hMenuItem = createMenuItem(hSubMenu,"Item","Manage Connections").
-    ON "CHOOSE" OF hMenuItem PERSISTENT RUN manageConnections IN THIS-PROCEDURE.
+    ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnConnectionsChoose IN THIS-PROCEDURE.
 
     /* Rule */
     hMenuItem = createMenuItem(hSubMenu,"Rule","").
@@ -5642,15 +5853,6 @@ PROCEDURE createMenuTableBrowse :
 
   END. /* do with frame */
 END PROCEDURE. /* createMenuTableBrowse */
-
-PROCEDURE startGenerateProc:
-  DEFINE INPUT PARAMETER pcProc AS CHARACTER   NO-UNDO.
-  RUN VALUE(pcProc) ( INPUT gcCurrentDatabase
-                    , INPUT gcCurrentTable
-                    , INPUT TABLE ttField
-                    , INPUT TABLE ttIndex
-                    ).
-END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5711,7 +5913,7 @@ PROCEDURE cutToClipboard :
   CLIPBOARD:VALUE = phWidget:SCREEN-VALUE.
   phWidget:SCREEN-VALUE = "".
 
-END PROCEDURE.
+END PROCEDURE. /* cutToClipboard */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5855,11 +6057,9 @@ END PROCEDURE. /* dataGotoFilter */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
 PROCEDURE dataOffHome :
-/* Show message that this is changed as from DataDigger 21.
-         */
-
-        /* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back */
-        RUN showHelp('JumpToFilter', '').
+/* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back 
+*/
+ RUN showHelp('JumpToFilter', '').
 
 END PROCEDURE. /* dataOffHome */
 
@@ -6035,13 +6235,19 @@ PROCEDURE dataSelectAll :
   DEFINE INPUT PARAMETER phBrowse AS HANDLE     NO-UNDO.
   {&timerStart}
 
-  setWindowFreeze(YES).
-  SESSION:SET-WAIT-STATE('general').
-  phBrowse:SELECT-ALL().
-  RUN showNumSelected.
-  setUpdatePanel('display'). /* Activate buttons */
-  setWindowFreeze(NO).
-  SESSION:SET-WAIT-STATE('').
+  /* If shift-key is pressed, go to data admin */
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
+    RUN startTool("Admin").
+  ELSE 
+  DO:
+    setWindowFreeze(YES).
+    SESSION:SET-WAIT-STATE('general').
+    phBrowse:SELECT-ALL().
+    RUN showNumSelected.
+    setUpdatePanel('display'). /* Activate buttons */
+    setWindowFreeze(NO).
+    SESSION:SET-WAIT-STATE('').
+  END.
 
   {&timerStop}
 END PROCEDURE. /* dataSelectAll */
@@ -6367,22 +6573,22 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnTools cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
-         btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnQueries 
-         btnReset btnTableFilter btnWhere btnTabFavourites btnTabFields 
-         btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump btnLoad 
-         btnDelete btnResizeVer btnClone btnView btnAdd btnEdit fiFeedback 
+  ENABLE btnView rctQuery rctEdit fiTableFilter btnQueries cbDatabaseFilter 
+         tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
+         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
+         fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear 
+         btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom 
+         btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere 
+         btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd 
+         btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnAbout-txt btnDataDigger btnSettings btnDict btnDataAdmin 
-         btnQueries-3 btnQueryTester btnConnections btnProcEdit btnHelp 
-         btnAbout btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
-         btnExpand btnHelp-txt btnProcEdit-txt btnQueries-txt 
-         btnQueryTester-txt btnSettings-txt btnTools-2 btnDict-txt 
-         btnExpand-txt btnTools-txt 
+  ENABLE btnEditor-txt btnDataDigger btnSettings btnDict btnDataAdmin 
+         btnQueries-3 btnQueryTester btnConnections btnEditor btnHelp btnAbout 
+         btnQueryTester-txt btnAbout-txt btnConnections-txt btnDataAdmin-txt 
+         btnDataDigger-txt btnExpand btnHelp-txt btnQueries-txt btnSettings-txt 
+         btnTools-2 btnDict-txt btnExpand-txt btnTools-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
   DISPLAY edHint 
@@ -7663,9 +7869,9 @@ PROCEDURE initializeObjects :
       /* Disable these WHEN plReadOnlyDigger */
       IF plReadOnlyDigger THEN
         ASSIGN
-          btnDict         :SENSITIVE = FALSE
-          btnDataAdmin    :SENSITIVE = FALSE
-          btnProcEdit     :SENSITIVE = FALSE
+          btnDict       :SENSITIVE = FALSE
+          btnDataAdmin  :SENSITIVE = FALSE
+          btnEditor     :SENSITIVE = FALSE
         .
     END.
 
@@ -8183,7 +8389,7 @@ PROCEDURE initializeUi :
 /*     btnQueries-3                           */
 /*     btnDataAdmin                           */
 /*     btnConnections                         */
-/*     btnProcEdit                            */
+/*     btnEditor                            */
 /*     btnQueryTester                         */
 /*     btnHelp                                */
 /*     btnAbout                               */
@@ -8311,7 +8517,7 @@ PROCEDURE initializeVisuals :
       btnSettings:LOAD-IMAGE      (getImagePath("Settings.gif")).
       btnConnections:LOAD-IMAGE   (getImagePath("Connections.gif")).
       btnDict:LOAD-IMAGE          (getImagePath("Dictionary.gif")).
-      btnProcEdit:LOAD-IMAGE      (getImagePath("Editor.gif")).
+      btnEditor:LOAD-IMAGE      (getImagePath("Editor.gif")).
       btnQueries-3:LOAD-IMAGE     (getImagePath("SavedQueries.gif")).
       btnQueryTester:LOAD-IMAGE   (getImagePath("QTester.gif")).
       btnDataAdmin:LOAD-IMAGE(getImagePath("Administration.gif")).
@@ -8326,7 +8532,7 @@ PROCEDURE initializeVisuals :
       btnSettings-txt:FONT    = giDefaultFont.
       btnConnections-txt:FONT = giDefaultFont.
       btnDict-txt:FONT        = giDefaultFont.
-      btnProcEdit-txt:FONT    = giDefaultFont.
+      btnEditor-txt:FONT    = giDefaultFont.
       btnQueries-txt:FONT     = giDefaultFont.
       btnQueryTester-txt:FONT = giDefaultFont.
       btnDataAdmin-txt:FONT   = giDefaultFont.
@@ -8468,38 +8674,6 @@ PROCEDURE keepAlive :
   {&timerStop}
 
 END PROCEDURE. /* keepAlive */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE manageConnections C-Win 
-PROCEDURE manageConnections :
-/* Maintenance of database connection settings
- */
-  DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
-
-  cProgDir   = getProgramDir().
-
-  cDatabasesOld = getDatabaseList().
-  RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-
-  /* If needed, repopulate db combo */
-  IF cDatabases <> cDatabasesOld THEN
-  DO:
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
-
-    RUN filterTables.
-  END.
-
-END PROCEDURE. /* manageConnections */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -9165,6 +9339,7 @@ PROCEDURE reopenDataBrowse-create :
       ON "SHIFT-INS"        PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
       ON "ALT-O"            PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
       ON "ALT-E"            PERSISTENT RUN btnEditChoose           IN THIS-PROCEDURE.
+      ON "RETURN"           PERSISTENT RUN btnEditChoose           IN THIS-PROCEDURE.
       ON "DELETE-CHARACTER" PERSISTENT RUN btnDeleteChoose         IN THIS-PROCEDURE.
       ON "VALUE-CHANGED"    PERSISTENT RUN dataRowValueChanged     IN THIS-PROCEDURE.
       ON "SCROLL-NOTIFY"    PERSISTENT RUN dataScrollNotify        IN THIS-PROCEDURE (ghDataBrowse).
@@ -10960,7 +11135,7 @@ PROCEDURE setToolbarNavigation :
     hButton[06] = btnQueries-3:HANDLE.
     hButton[07] = btnQueryTester:HANDLE.
     hButton[08] = btnConnections:HANDLE.
-    hButton[09] = btnProcEdit:HANDLE.
+    hButton[09] = btnEditor:HANDLE.
     hButton[10] = btnHelp:HANDLE.
     hButton[11] = btnAbout:HANDLE.
 
@@ -11763,6 +11938,24 @@ END PROCEDURE. /* startDiggerLib */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startGenerateProc C-Win 
+PROCEDURE startGenerateProc :
+/* Start a generate-procedure 
+*/  
+  DEFINE INPUT PARAMETER pcProc AS CHARACTER   NO-UNDO.
+
+  RUN VALUE(pcProc) 
+    ( INPUT gcCurrentDatabase
+    , INPUT gcCurrentTable
+    , INPUT TABLE ttField
+    , INPUT TABLE ttIndex
+    ).
+
+END PROCEDURE. /* startGenerateProc */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startSession C-Win 
 PROCEDURE startSession :
 /* Show a welcome message to the user.
@@ -12195,7 +12388,9 @@ FUNCTION createMenuItem RETURNS HANDLE
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
           PARENT       = phMenu.
+
   END CASE.
+
 
   RETURN hMenuItem.
 
@@ -12482,7 +12677,9 @@ FUNCTION setDebugMode RETURNS LOGICAL
    */
   IF plDebugMode = ? THEN RETURN NO.
   glDebugMode = plDebugMode.
+
   IF glUseTimer THEN chCtrlFrame:pstimer:ENABLED = NOT glDebugMode.
+  IF plDebugMode THEN glUseTimer = NO.
 
   RETURN TRUE.
 END FUNCTION. /* setDebugMode */

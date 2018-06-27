@@ -786,7 +786,8 @@ DO:
   hDataField = brRecord:GET-BROWSE-COLUMN( {&field-cNewValue} ) IN FRAME {&FRAME-NAME}.
   APPLY "ENTRY" TO hDataField.
   RETURN NO-APPLY.
-END.
+END. /* RETURN lShow */
+
 
 ON " " OF ttColumn.lShow IN BROWSE brRecord
 DO:
@@ -796,7 +797,8 @@ DO:
     APPLY "value-changed" TO ttColumn.lShow IN BROWSE brRecord.
     brRecord:SELECT-NEXT-ROW().
   END.
-END.
+END. /* space lShow */
+
 
 ON VALUE-CHANGED OF ttColumn.lShow IN BROWSE brRecord
 DO:
@@ -809,7 +811,8 @@ DO:
       brRecord:GET-BROWSE-COLUMN( {&field-cNewValue} ):SCREEN-VALUE = "".
     END.
   END.
-END.
+END. /* value-changed lShow */
+
 
 ON "PAGE-DOWN" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
@@ -827,9 +830,9 @@ DO:
       LEAVE findNext.
     END.
   END.
-
   RETURN NO-APPLY.
-END.
+END. /* page-down cNewValue */
+
 
 ON "PAGE-UP" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
@@ -847,9 +850,9 @@ DO:
       LEAVE findPrev.
     END.
   END.
-
   RETURN NO-APPLY.
-END.
+END. /* page-up cNewValue */
+
 
 ON VALUE-CHANGED OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
@@ -858,7 +861,8 @@ DO:
   DO WITH FRAME {&FRAME-NAME}:
     brRecord:GET-BROWSE-COLUMN( {&field-lShow} ):SCREEN-VALUE = "YES".
   END.
-END.
+END. /* value-changed cNewValue */
+
 
 ON "entry" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
@@ -877,16 +881,19 @@ DO:
 
     RUN enableToolbar(ttField.cDataType).
   END.
-END.
+END. /* entry cNewValue */
+
 
 ON "leave" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
   DO WITH FRAME {&FRAME-NAME}:
     brRecord:TOOLTIP = "fields to edit".
-    ttColumn.cNewValue = ttColumn.cOldValue.
+/*     ttColumn.cNewValue = ttColumn.cOldValue. */
     RUN enableToolbar("").
+    MESSAGE ttColumn.cFullName ttColumn.cOldValue '--->' ttColumn.cNewValue VIEW-AS ALERT-BOX INFO BUTTONS OK.
   END.
-END.
+END. /* leave cNewValue */
+
 
 /* Clean field */
 ON "SHIFT-DEL" OF ttColumn.cNewValue IN BROWSE brRecord
@@ -904,7 +911,7 @@ DO:
       WHEN "logical"   THEN SELF:SCREEN-VALUE = ?.
     END CASE.
   END.
-END.
+END. /* shift-del cNewValue */
 
 
 /* Set date to today */
@@ -923,7 +930,7 @@ DO:
     IF dValue <> ? OR ttField.cDataType = "date"
       THEN SELF:SCREEN-VALUE = STRING(TODAY) NO-ERROR.
   END.
-END.
+END. /* home cNewValue */
 
 
 /* Best default for GUI applications is...                              */

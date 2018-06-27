@@ -36,6 +36,7 @@ DataDigger version 24 - dd MMM 2018
 - Solved: Resizing window takes up to 2 seconds
 - Solved: Hiding 'Delete record' question prevents deletion of records (Hans Kaman)
 - Solved: Recid does not show in large databases (René Postma)
+- Solved: Last field in update was not assigned (Steven Peeters)
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
@@ -50,6 +51,7 @@ DataDigger version 24 - dd MMM 2018
 - Change: Cleaned up context menu on table browse
 - Change: Clear table filter now works in two steps
 - Change: Option menu is now (an optional) sidebar
+- Change: Shortcut keys in option menu changed
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 - New   : Option to generate an include file with tt definitions
