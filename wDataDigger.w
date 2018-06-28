@@ -181,10 +181,10 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnView rctQuery rctEdit fiTableFilter ~
-btnQueries cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
-fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnView ~
+cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnQueries btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
 btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere ~
 btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery ~
@@ -578,7 +578,7 @@ DEFINE VARIABLE fiIndexNameFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Index 
 
 DEFINE VARIABLE fiTableDesc AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS FILL-IN 
-     SIZE-PIXELS 171 BY 21 NO-UNDO.
+     SIZE-PIXELS 171 BY 24 NO-UNDO.
 
 DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Table filter" 
      CONTEXT-HELP-ID 950
@@ -676,11 +676,11 @@ DEFINE BUTTON btnEditor-txt  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnExpand  NO-FOCUS FLAT-BUTTON
      LABEL "< >" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "expand or collapse the toolbar".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "expand or collapse the toolbar #(CTRL-ALT-T)".
 
 DEFINE BUTTON btnExpand-txt  NO-FOCUS FLAT-BUTTON
      LABEL "Expand/Collapse" 
-     SIZE-PIXELS 100 BY 30 TOOLTIP "expand or collapse the toolbar".
+     SIZE-PIXELS 100 BY 30 TOOLTIP "expand or collapse the toolbar #(CTRL-ALT-T)".
 
 DEFINE BUTTON btnHelp 
      LABEL "Help" 
@@ -938,9 +938,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnView AT Y 520 X 200 WIDGET-ID 4
      fiTableFilter AT Y 3 X 56 NO-LABEL
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
+     btnView AT Y 520 X 200 WIDGET-ID 4
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -955,6 +954,7 @@ DEFINE FRAME frMain
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnTools AT Y 0 X 1 WIDGET-ID 264
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
      btnClear AT Y 265 X 725 WIDGET-ID 30
@@ -993,15 +993,48 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+DEFINE FRAME frSettings
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1039,48 +1072,15 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frSettings
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1377,7 +1377,7 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
 ON ALT-CTRL-D OF C-Win /* DataDigger */
 ANYWHERE 
 DO:
-  READKEY PAUSE 0. /* to suppress strange characters */
+  READKEY PAUSE 0. /* to eat strange characters */
 
   PUBLISH "setUsage" ("debugger"). /* user behaviour */
   RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
@@ -1508,7 +1508,7 @@ ON CTRL-N OF C-Win /* DataDigger */
 OR "CTRL-SHIFT-N" OF c-win ANYWHERE
 DO:
 
-  READKEY PAUSE 0. /* to suppress strange characters */
+  READKEY PAUSE 0. /* to eat strange characters */
   IF CAN-DO(GetKeyList(),'SHIFT') THEN 
     RUN btnDataDiggerChoose.
 
@@ -1536,7 +1536,7 @@ END.
 ON CTRL-S OF C-Win /* DataDigger */
 OR 'CTRL-SHIFT-S' OF c-win ANYWHERE 
 DO:
-  READKEY PAUSE 0. /* to suppress strange characters */
+  READKEY PAUSE 0. /* to eat strange characters */
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN 
     RUN btnSettingsChoose.
@@ -2851,14 +2851,18 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
 ON CHOOSE OF btnExpand IN FRAME frSettings /* < > */
 OR "CHOOSE" OF btnExpand-txt 
+OR "CTRL-ALT-T" OF c-win ANYWHERE
 DO:
   DEFINE VARIABLE hFocus     AS HANDLE    NO-UNDO.
   DEFINE VARIABLE lExpanded  AS LOGICAL   NO-UNDO.
+
+  READKEY PAUSE 0. /* to eat strange characters */
 
   setWindowFreeze(YES).
   hFocus = FOCUS.
   lExpanded = (FRAME frSettings:WIDTH-PIXELS > 100). /* use a rough value for checking here */
 
+  RUN showToolbar(TRUE).
   RUN expandToolbar(NOT lExpanded).
   RUN endResize.
 
@@ -3102,6 +3106,7 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME btnResizeVer
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnSettings
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
@@ -6573,22 +6578,22 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE btnView rctQuery rctEdit fiTableFilter btnQueries cbDatabaseFilter 
-         tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
-         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear 
-         btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom 
-         btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere 
-         btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery 
-         btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd 
-         btnEdit fiFeedback 
+  ENABLE rctQuery rctEdit fiTableFilter btnView cbDatabaseFilter tgSelAll 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnQueries btnTools btnTabTables btnClear btnClearFieldFilter 
+         btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
+         btnMoveUp btnReset btnTableFilter btnWhere btnTabFavourites 
+         btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery 
+         btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit 
+         fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnEditor-txt btnDataDigger btnSettings btnDict btnDataAdmin 
-         btnQueries-3 btnQueryTester btnConnections btnEditor btnHelp btnAbout 
-         btnQueryTester-txt btnAbout-txt btnConnections-txt btnDataAdmin-txt 
-         btnDataDigger-txt btnExpand btnHelp-txt btnQueries-txt btnSettings-txt 
-         btnTools-2 btnDict-txt btnExpand-txt btnTools-txt 
+  ENABLE btnExpand btnExpand-txt btnEditor-txt btnDataDigger btnSettings 
+         btnDict btnDataAdmin btnQueries-3 btnQueryTester btnConnections 
+         btnEditor btnHelp btnAbout btnQueryTester-txt btnAbout-txt 
+         btnConnections-txt btnDataAdmin-txt btnDataDigger-txt btnHelp-txt 
+         btnQueries-txt btnSettings-txt btnTools-2 btnDict-txt btnTools-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
   DISPLAY edHint 
@@ -6681,19 +6686,19 @@ PROCEDURE endResize :
       rcTableFilter:X = rctQuery:X + 20
       rcTableFilter:Y = rctQuery:Y + 24
       rcTableFilter:WIDTH-PIXELS = 245
-      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y 
+      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y - 2
 
       brTables:X = rcTableFilter:X + 3
       brTables:Y = rcTableFilter:Y + 3
       brTables:WIDTH-PIXELS = rcTableFilter:WIDTH-PIXELS - 6
-      brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 6 - fiTableDesc:HEIGHT-PIXELS - 2
+      fiTableDesc:HEIGHT-PIXELS = 24
+      brTables:HEIGHT-PIXELS = rcTableFilter:HEIGHT-PIXELS - 4 - fiTableDesc:HEIGHT-PIXELS - 2
       btnTabTables:X     = brTables:X - 21
       btnTabFavourites:X = brTables:X - 21
 
       fiTableDesc:X = brTables:X
-      fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS - 1
+      fiTableDesc:Y = brTables:Y + brTables:HEIGHT-PIXELS - 0
       fiTableDesc:WIDTH-PIXELS = brTables:WIDTH-PIXELS - btnFavourite:WIDTH-PIXELS
-      fiTableDesc:HEIGHT-PIXELS = 24
 
       cbFavouriteGroup:X = fiTableDesc:X
       cbFavouriteGroup:Y = fiTableDesc:Y
@@ -8382,18 +8387,6 @@ PROCEDURE initializeUi :
 
   /* FRAME frSettings */
   ENABLE ALL WITH FRAME frSettings.
-/*     btnTools-2                             */
-/*     btnDataDigger                          */
-/*     btnSettings                            */
-/*     btnDict                                */
-/*     btnQueries-3                           */
-/*     btnDataAdmin                           */
-/*     btnConnections                         */
-/*     btnEditor                            */
-/*     btnQueryTester                         */
-/*     btnHelp                                */
-/*     btnAbout                               */
-/*     WITH FRAME frSettings IN WINDOW C-Win. */
 
   RUN createMenuTableBrowse. 
 
@@ -12876,3 +12869,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
