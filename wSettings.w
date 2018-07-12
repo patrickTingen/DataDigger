@@ -295,6 +295,7 @@ DO:
   
   SESSION:SET-WAIT-STATE("general").
   RUN saveSettings.
+  RUN flushRegistry.
   SESSION:SET-WAIT-STATE("").
 
   RUN checkBackupFolder(OUTPUT lOk).

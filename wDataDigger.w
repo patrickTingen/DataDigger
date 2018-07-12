@@ -181,9 +181,9 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnQueries rctQuery rctEdit btnView ~
-fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnQueries ~
+cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnView ~
 fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
 btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere ~
@@ -938,9 +938,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
-     btnView AT Y 520 X 200 WIDGET-ID 4
      fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnQueries AT Y 265 X 745 WIDGET-ID 190
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -951,11 +950,12 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     btnView AT Y 520 X 200 WIDGET-ID 4
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnTools AT Y 0 X 1 WIDGET-ID 264
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTools AT Y 0 X 1 WIDGET-ID 264
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
      btnClear AT Y 265 X 725 WIDGET-ID 30
      btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
@@ -1055,17 +1055,17 @@ DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
      btnDataDigger AT Y 35 X 1 WIDGET-ID 126
      btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
      btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
      btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
      btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
      btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
      btnConnections AT Y 245 X 1 WIDGET-ID 212
      btnEditor AT Y 280 X 1 WIDGET-ID 228
      btnHelp AT Y 315 X 1 WIDGET-ID 260
      btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
      btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
      btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
      btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
@@ -1469,9 +1469,11 @@ END.
 ON CTRL-C OF C-Win /* DataDigger */
 OR 'CTRL-SHIFT-C' OF c-win ANYWHERE  
 DO:
-
+  
   IF CAN-DO(GetKeyList(),'SHIFT') THEN 
     RUN btnConnectionsChoose.
+  ELSE 
+    FOCUS:EDIT-COPY() NO-ERROR.
 
 END.
 
@@ -5678,7 +5680,7 @@ PROCEDURE copyToClipboard :
 /* Copy value to clipboard
  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
-  CLIPBOARD:VALUE = phWidget:SCREEN-VALUE.
+  phWidget:EDIT-COPY() NO-ERROR.
 
 END PROCEDURE. /* copyToClipboard */
 
@@ -5916,8 +5918,7 @@ PROCEDURE cutToClipboard :
 /* Copy value to clipboard and delete current value
  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
-  CLIPBOARD:VALUE = phWidget:SCREEN-VALUE.
-  phWidget:SCREEN-VALUE = "".
+  phWidget:EDIT-CUT() NO-ERROR.
 
 END PROCEDURE. /* cutToClipboard */
 
@@ -6579,10 +6580,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE btnQueries rctQuery rctEdit btnView fiTableFilter cbDatabaseFilter 
-         tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
-         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTools btnTabTables btnClear 
+  ENABLE rctQuery rctEdit fiTableFilter btnQueries cbDatabaseFilter tgSelAll 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
+         brTables brFields brIndexes tgDebugMode btnView fiTableDesc 
+         cbFavouriteGroup ficWhere btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom 
          btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere 
          btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery 
@@ -6590,11 +6591,11 @@ PROCEDURE enable_UI :
          btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
-  ENABLE btnQueries-txt btnDataDigger btnSettings btnExpand btnDict 
-         btnExpand-txt btnDataAdmin btnQueries-3 btnQueryTester btnEditor-txt 
-         btnConnections btnEditor btnHelp btnAbout btnQueryTester-txt 
-         btnAbout-txt btnConnections-txt btnDataAdmin-txt btnDataDigger-txt 
-         btnHelp-txt btnSettings-txt btnTools-2 btnDict-txt btnTools-txt 
+  ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
+         btnQueries-3 btnQueryTester btnConnections btnEditor btnHelp btnAbout 
+         btnExpand btnExpand-txt btnEditor-txt btnQueryTester-txt btnAbout-txt 
+         btnConnections-txt btnDataAdmin-txt btnDataDigger-txt btnHelp-txt 
+         btnSettings-txt btnTools-2 btnDict-txt btnTools-txt 
       WITH FRAME frSettings IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
   DISPLAY edHint 
@@ -8861,7 +8862,7 @@ PROCEDURE pasteFromClipboard :
 /* Paste value from clipboard to a widget
  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
-  phWidget:SCREEN-VALUE = CLIPBOARD:VALUE.
+  phWidget:EDIT-PASTE() NO-ERROR.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -12039,7 +12040,7 @@ PROCEDURE startSession :
   DO:
     /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
      * version on GitHub. This to track the use of DataDigger.
-     * Interested yourself? Check https://bit.ly/datadigger+ to see statistics
+     * Interested yourself? Check https://is.gd/DataDigger- to see statistics
     */
     IF getRegistry('DataDigger:Update','PingBack') <> ? THEN
       RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).

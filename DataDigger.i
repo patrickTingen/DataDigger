@@ -26,10 +26,11 @@
 &GLOBAL-DEFINE CHECK-BETA   2
 
 /* Constant for collecting statistics
- * changed from https://goo.gl/24deK3 to bit.ly because google has ended the service
- * get analytics for the bit.ly link by adding a + (plus) to it
+ * changed from https://goo.gl/24deK3 to is.gd because google has ended the service
+ * get analytics for the is.gd link by adding a - (minus) to it
 */
-&GLOBAL-DEFINE PINGBACKURL https://bit.ly/datadigger
+&GLOBAL-DEFINE PINGBACKURL https://is.gd/DataDigger
+&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/DataDigger-
 
 /* Table scan is not available for pre-v11 */
 &IF PROVERSION >= '11' &THEN
