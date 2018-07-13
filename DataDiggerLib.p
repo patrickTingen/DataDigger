@@ -149,6 +149,10 @@ DEFINE VARIABLE glCacheSettings  AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
 
+/* Vars for caching dirnames */
+DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
+DEFINE VARIABLE gcWorkFolder AS CHARACTER NO-UNDO.
+
 /* Locking / unlocking windows */
 &GLOBAL-DEFINE WM_SETREDRAW     11
 &GLOBAL-DEFINE RDW_ALLCHILDREN 128
@@ -454,6 +458,17 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getWorkFolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWorkFolder Procedure 
+FUNCTION getWorkFolder RETURNS CHARACTER
+  ( /* parameter-definitions */ )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getXmlNodeName) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getXmlNodeName Procedure 
@@ -644,7 +659,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
          HEIGHT             = 36
-         WIDTH              = 45.4.
+         WIDTH              = 53.4.
 /* END WINDOW DEFINITION */
                                                                         */
 &ANALYZE-RESUME
@@ -918,7 +933,7 @@ PROCEDURE clearDiskCache :
 
   PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing disk cache")).
 
-  FILE-INFORMATION:FILE-NAME = getProgramdir() + "cache".
+  FILE-INFORMATION:FILE-NAME = getWorkFolder() + "cache".
   IF FILE-INFORMATION:FULL-PATHNAME = ? THEN RETURN.
   
   INPUT FROM OS-DIR(FILE-INFORMATION:FULL-PATHNAME).
@@ -1488,14 +1503,14 @@ PROCEDURE getDumpFileName :
 
   /* Dump dir / backup dir / last-used dir from settings */
   cDumpDir = RIGHT-TRIM(getRegistry("DumpAndLoad", "DumpDir"),'/\') + '\'.
-  IF cDumpDir = ? OR cDumpDir = '' THEN cDumpDir = "<PROGDIR>dump\".
+  IF cDumpDir = ? OR cDumpDir = '' THEN cDumpDir = "<WORKDIR>dump\".
 
   cBackupDir  = RIGHT-TRIM(getRegistry("DataDigger:Backup", "BackupDir"),'/\') + '\'.
-  IF cBackupDir = ? OR cBackupDir = '' THEN cBackupDir = "<PROGDIR>backup\".
+  IF cBackupDir = ? OR cBackupDir = '' THEN cBackupDir = "<WORKDIR>backup\".
 
   cLastDir = RIGHT-TRIM(getRegistry("DumpAndLoad", "DumpLastFileName"),'/\').
   cLastDir = SUBSTRING(cLastDir,1,R-INDEX(cLastDir,"\")).
-  IF cLastDir = ? THEN cLastDir = "<PROGDIR>dump".
+  IF cLastDir = ? THEN cLastDir = "<WORKDIR>dump".
   cLastDir = RIGHT-TRIM(cLastDir,'\').
 
   /* Find _file for the dump-name */
@@ -1521,7 +1536,8 @@ PROCEDURE getDumpFileName :
   pcFileName = REPLACE(pcFileName,"<DUMPDIR>"  , cDumpDir                    ).
   pcFileName = REPLACE(pcFileName,"<BACKUPDIR>", cBackupDir                  ).
   pcFileName = REPLACE(pcFileName,"<LASTDIR>"  , cLastDir                    ).
-  pcFileName = REPLACE(pcFileName,"<PROGDIR>"  , getProgramDir()             ).
+  pcFileName = REPLACE(pcFileName,"<PROGDIR>"  , getWorkFolder()             ).
+  pcFileName = REPLACE(pcFileName,"<WORKDIR>"  , getWorkFolder()             ).
 
   pcFileName = REPLACE(pcFileName,"<ACTION>"   , pcAction                    ).
   pcFileName = REPLACE(pcFileName,"<USERID>"   , USERID(LDBNAME(1))          ).
@@ -1663,7 +1679,7 @@ PROCEDURE getFields :
     END.
 
     /* See if disk cache exists */
-    cCacheFile = SUBSTITUTE('&1cache\&2.xml', getProgramDir(), bTable.cCacheId).
+    cCacheFile = SUBSTITUTE('&1cache\&2.xml', getWorkFolder(), bTable.cCacheId).
     PUBLISH "debugInfo" (2, SUBSTITUTE("Cachefile: &1", cCacheFile)).
 
     IF SEARCH(cCacheFile) <> ? THEN
@@ -1957,7 +1973,7 @@ PROCEDURE getTables :
       CREATE BUFFER hDbStatusBuffer FOR TABLE LDBNAME(iDatabase) + "._DbStatus" IN WIDGET-POOL "metaInfo".
       hDbStatusBuffer:FIND-FIRST("",NO-LOCK).
       cCacheFile = SUBSTITUTE("&1cache\db.&2.&3.xml"
-                            , getProgramDir()
+                            , getWorkFolder()
                             , LDBNAME(iDatabase)
                             , REPLACE(REPLACE(hDbStatusBuffer::_dbstatus-cachestamp," ","_"),":","")
                             ).
@@ -2230,7 +2246,6 @@ PROCEDURE getTableStats :
   DEFINE VARIABLE cLine       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSection    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDatabase   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
 
   /* Read the ini file as plain text and parse the lines.
    *
@@ -2241,8 +2256,7 @@ PROCEDURE getTableStats :
    */
   {&timerStart}
 
-  cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
-  cIniFile = SUBSTITUTE('&1DataDigger-&2.ini', cSettingsDir, getUserName() ).
+  cIniFile = SUBSTITUTE('&1DataDigger-&2.ini', getWorkFolder(), getUserName() ).
   IF SEARCH(cIniFile) = ? THEN RETURN.
   
   INPUT FROM VALUE(cIniFile).
@@ -2336,6 +2350,42 @@ PROCEDURE initTableFilter :
   IF ttTableFilter.lShowSchema = ? THEN ttTableFilter.lShowSchema = NO.
 
 END PROCEDURE. /* initTableFilter */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-loadSettings) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadSettings Procedure 
+PROCEDURE loadSettings :
+/* Load settings from ini files
+*/
+  DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
+
+  /* Help file is least important, so read that first */
+  RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini", getProgramDir() )).
+  
+  /* General DD settings (always in program folder) */
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini", getProgramDir() )).
+
+  /* Per-user settings */
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() )).
+
+  /* When all ini-files have been read, we can determine whether
+   * caching needs to be enabled
+   */
+  lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
+  IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
+
+  lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
+  IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
+
+  /* If we do not want to cache the registry, empty it now */
+  IF NOT glCacheSettings THEN RUN clearRegistryCache.
+
+END PROCEDURE. /* loadSettings */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -2709,14 +2759,11 @@ PROCEDURE saveConfigFileSorted :
 /* Save settings file sorted
   */
   DEFINE VARIABLE cUserConfigFile AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
-
   DEFINE BUFFER bfConfig FOR ttConfig.
 
   {&timerStart}
 
-  cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
-  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", cSettingsDir, getUserName() ).
+  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ).
 
   /* Config table holds data from 3 .ini sources, so start fresh */
   EMPTY TEMP-TABLE bfConfig.
@@ -4068,25 +4115,25 @@ FUNCTION getProgramDir RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
   /* Return the DataDigger install dir, including a backslash
   */
-  DEFINE VARIABLE cProgDir AS CHARACTER NO-UNDO.
 
-  /* this-procedure:file-name will return the .p name without path when the
-   * procedure us run without full path. We need to seek it in the propath.
-   */
-  FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
+  /* Cached the value in a global var (about 100x as fast) */
+  IF gcProgramDir = '' THEN 
   DO:
-    IF SUBSTRING(THIS-PROCEDURE:FILE-NAME,LENGTH(THIS-PROCEDURE:FILE-NAME) - 1, 2) = ".p" THEN
-      FILE-INFO:FILE-NAME = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,LENGTH(THIS-PROCEDURE:FILE-NAME) - 2) + ".r".
+    /* this-procedure:file-name will return the .p name without path when the
+     * procedure us run without full path. We need to seek it in the propath.
+     */
+    FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
+    IF FILE-INFO:FULL-PATHNAME = ? THEN
+    DO:
+      IF SUBSTRING(THIS-PROCEDURE:FILE-NAME,LENGTH(THIS-PROCEDURE:FILE-NAME) - 1, 2) = ".p" THEN
+        FILE-INFO:FILE-NAME = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,LENGTH(THIS-PROCEDURE:FILE-NAME) - 2) + ".r".
+    END.
+  
+    gcProgramDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
+    PUBLISH "message"(50,gcProgramDir).
   END.
 
-  cProgDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
-  PUBLISH "message"
-    ( 50
-    , cProgDir
-    ).
-
-  RETURN cProgDir. /* Function return value. */
+  RETURN gcProgramDir.
 
 END FUNCTION. /* getProgramDir */
 
@@ -4171,88 +4218,48 @@ FUNCTION getRegistry RETURNS CHARACTER
   /* Get a value from the registry.
   */
   DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
 
   {&timerStart}
-  DEFINE BUFFER bfConfig FOR ttConfig.
+  DEFINE BUFFER bDatabase FOR ttDatabase.
+  DEFINE BUFFER bConfig   FOR ttConfig.
 
   /* If this is a DB-specific section then replace db name if needed */
   IF pcSection BEGINS "DB:" THEN
   DO:
-    FIND ttDatabase WHERE ttDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
-    IF AVAILABLE ttDatabase THEN pcSection = "DB:" + ttDatabase.cSection.
+    FIND bDatabase WHERE bDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
+    IF AVAILABLE bDatabase THEN pcSection = "DB:" + bDatabase.cSection.
   END.
 
   IF glCacheSettings THEN
   DO:
     /* Load settings if there is nothing in the config table */
     IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
-    DO:
-      /* Help file is least important */
-      RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini"
-                                    , getProgramDir()
-                                    )).
-      /* General DD settings */
-      cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
-      RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini"
-                                    , cSettingsDir
-                                    )).
-      /* Per-user settings */
-      RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini"
-                                    , cSettingsDir
-                                    , getUserName()
-                                    )).
-
-      /* When all ini-files have been read, we can determine whether
-       * caching needs to be enabled
-       */
-      lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
-      IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
-
-      lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
-      IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
-
-      /* If we do not want to cache the registry, empty it now */
-      IF NOT glCacheSettings THEN RUN clearRegistryCache.
-    END.
+      RUN loadSettings.
 
     /* Search in settings tt */
-    FIND bfConfig
-      WHERE bfConfig.cSection = pcSection
-        AND bfConfig.cSetting = pcKey
-            NO-ERROR.
+    FIND bConfig WHERE bConfig.cSection = pcSection AND bConfig.cSetting = pcKey NO-ERROR.
 
     {&timerStop}
-    RETURN ( IF AVAILABLE bfConfig THEN bfConfig.cValue ELSE ? ).
+    RETURN ( IF AVAILABLE bConfig THEN bConfig.cValue ELSE ? ).
   END.
 
   ELSE
   DO:
     USE SUBSTITUTE('DataDigger-&1', getUserName() ).
-    GET-KEY-VALUE
-      SECTION pcSection
-      KEY     pcKey
-      VALUE   cValue.
+    GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
 
     /* If not in personal INI then check DataDigger.ini */
     IF cValue = ? THEN
     DO:
       USE 'DataDigger'.
-      GET-KEY-VALUE
-        SECTION pcSection
-        KEY     pcKey
-        VALUE   cValue.
+      GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
     END.
 
     /* If still not found check DataDiggerHelp.ini */
     IF cValue = ? THEN
     DO:
       USE 'DataDiggerHelp'.
-      GET-KEY-VALUE
-        SECTION pcSection
-        KEY     pcKey
-        VALUE   cValue.
+      GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
     END.
 
     /* Clean up and return */
@@ -4419,6 +4426,40 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
   RETURN ?.
 
 END FUNCTION. /* getWidgetUnderMouse */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getWorkFolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWorkFolder Procedure 
+FUNCTION getWorkFolder RETURNS CHARACTER
+  ( /* parameter-definitions */ ) :
+
+  /* Cached the value in a global var  */
+  IF gcWorkFolder = '' THEN
+  DO:
+    gcWorkFolder = getRegistry("DataDigger", "WorkFolder").
+  
+    /* Possibility to specify where DD files are created */
+    IF gcWorkFolder = ? OR gcWorkFolder = '' THEN 
+      gcWorkFolder = getProgramDir().
+    ELSE 
+    DO:
+      gcWorkFolder = RIGHT-TRIM(gcWorkFolder,'/\') + '\'.
+      gcWorkFolder = resolveOsVars(gcWorkFolder).
+      RUN createFolder(gcWorkFolder).
+
+      FILE-INFO:FILE-NAME = gcWorkFolder.
+      IF FILE-INFO:FULL-PATHNAME = ? THEN gcWorkFolder = getProgramDir().
+    END.
+  END.
+
+  RETURN gcWorkFolder.
+
+END FUNCTION. /* getWorkFolder */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4743,8 +4784,20 @@ END FUNCTION. /* removeConnection */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION resolveOsVars Procedure 
 FUNCTION resolveOsVars RETURNS CHARACTER
   ( pcString AS CHARACTER ) :
+
   /* Return a string with OS vars resolved
   */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
+  
+  DO i = 1 TO NUM-ENTRIES(pcString,'%'):
+    IF i MODULO 2 = 0 
+      AND OS-GETENV(ENTRY(i,pcString,'%')) <> ? THEN
+      ENTRY(i,pcString,'%') = OS-GETENV(ENTRY(i,pcString,'%')).
+  END. 
+  pcString = REPLACE(pcString,'%','').
+  RETURN pcString. 
+
+  /*
   DEFINE VARIABLE iPercStart   AS INTEGER NO-UNDO.
   DEFINE VARIABLE iPercEnd     AS INTEGER NO-UNDO.
   DEFINE VARIABLE cEnvVarName  AS CHARACTER NO-UNDO.
@@ -4786,7 +4839,7 @@ FUNCTION resolveOsVars RETURNS CHARACTER
   END.
 
   RETURN cReturnValue.
-
+  */
 END FUNCTION. /* resolveOsVars */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4923,7 +4976,6 @@ FUNCTION setRegistry RETURNS CHARACTER
   DEFINE BUFFER bfConfig FOR ttConfig.
 
   /* Update the local cache of the registry as well */
-  PUBLISH "timerCommand" ("start", "setRegistry:save-to-tt").
   FIND bfConfig
     WHERE bfConfig.cSection = pcSection
       AND bfConfig.cSetting = pcKey NO-ERROR.
@@ -4939,8 +4991,6 @@ FUNCTION setRegistry RETURNS CHARACTER
   ASSIGN 
     bfConfig.lDirty = (bfConfig.cValue <> pcValue)
     bfConfig.cValue = pcValue.
-
-  PUBLISH "timerCommand" ("stop", "setRegistry:save-to-tt").
 
   {&timerStop}
   RETURN "". /* Function return value. */

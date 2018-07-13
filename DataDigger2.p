@@ -24,7 +24,11 @@
 
 /* ***************************  Definitions  ************************** */
 /* This one is also defined in dataReader.p and set to TRUE there */
-DEFINE INPUT PARAMETER plReadOnlyDigger AS LOGICAL NO-UNDO.
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT PARAMETER plReadOnlyDigger AS LOGICAL NO-UNDO.
+&ELSE
+  DEFINE VARIABLE plReadOnlyDigger AS LOGICAL NO-UNDO.
+&ENDIF
 
 DEFINE VARIABLE giNumDiggers AS INTEGER   NO-UNDO.
 DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
@@ -132,6 +136,19 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-setRegistry) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure 
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER 
+  , pcSetting AS CHARACTER
+  , pcValue   AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 
 /* *********************** Procedure Settings ************************ */
 
@@ -150,7 +167,7 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 23.29
+         HEIGHT             = 21.38
          WIDTH              = 46.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -296,9 +313,6 @@ END PROCEDURE. /* getSourceFiles */
 PROCEDURE initializeObject :
 /* Initialize all kind of things.
   */
-  DEFINE VARIABLE cDebuggerStart AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSettingsDir AS CHARACTER NO-UNDO.
-
   /* Are we at least 10.1C ? */
   IF PROVERSION < "10.1C" THEN
   DO:
@@ -309,36 +323,39 @@ PROCEDURE initializeObject :
   END.
 
   /* Where are we running from? */
-  FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
-    FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME, '.p', '.r').
-
-  gcProgramDir = REPLACE(FILE-INFO:FULL-PATHNAME,"\","/").
-  gcProgramDir = SUBSTRING(gcProgramDir,1,R-INDEX(gcProgramDir,'/')).
+  &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+    FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
+    IF FILE-INFO:FULL-PATHNAME = ? THEN
+      FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME, '.p', '.r').
+  
+    gcProgramDir = REPLACE(FILE-INFO:FULL-PATHNAME,"\","/").
+    gcProgramDir = SUBSTRING(gcProgramDir,1,R-INDEX(gcProgramDir,'/')).
+  &ELSE
+    /* Debugging */
+    gcProgramDir = 'c:\Data\DropBox\DataDigger\Src\'.
+  &ENDIF
 
   /* Add program dir to propath (if not already in) */
   IF SEARCH('datadigger.txt') = ? THEN
     PROPATH = gcProgramDir + ',' + PROPATH.
 
-  /* See if general ini has moved. In that case use that folder for all settings */
-  cSettingsDir = REPLACE(SEARCH('DataDigger.ini'),'DataDigger.ini','').
-
   /* If the general ini file does not exist, create it */
-  IF cSettingsDir = ? THEN
+  IF SEARCH(gcProgramDir + "DataDigger.ini") = ? THEN
   DO:
     OUTPUT TO VALUE(gcProgramDir + "DataDigger.ini").
     OUTPUT CLOSE.
-    cSettingsDir = gcProgramDir.
   END.
 
   /* In any case, load it */
-  LOAD 'DataDigger' DIR cSettingsDir BASE-KEY 'ini' NO-ERROR.
+  LOAD 'DataDigger' DIR gcProgramDir BASE-KEY 'ini' NO-ERROR.
 
-  /* See if we should start the DD-Debugger */
-  cDebuggerStart = getRegistry('debugger', 'start').
+  /* Check some basic settings */
+  IF getRegistry("DataDigger", "AutoCompile")   = ? THEN setRegistry("DataDigger", "AutoCompile"  , "yes").
+  IF getRegistry("DataDigger", "StartDebugger") = ? THEN setRegistry("DataDigger", "StartDebugger", "no" ).
+  IF getRegistry("DataDigger", "WorkFolder")    = ? THEN setRegistry("DataDigger", "WorkFolder"   , " " ).
 
   /* Start debugger if needed */
-  IF LOGICAL(cDebuggerStart) THEN
+  IF LOGICAL(getRegistry('DataDigger', 'StartDebugger')) = TRUE THEN 
     RUN VALUE(gcProgramDir + "wDebugger.w") PERSISTENT.
 
   PUBLISH "timerCommand" ("start", "Startup").
@@ -381,9 +398,10 @@ PROCEDURE recompileDataDigger :
     END.
 
     RUN recompileSelf.
-  END.
 
-  RUN startDiggerLib(INPUT lRecompile).
+    /* Force a restart of the library */
+    RUN startDiggerLib(INPUT lRecompile).
+  END.
 
 END PROCEDURE. /* recompileDataDigger */
 
@@ -410,6 +428,7 @@ PROCEDURE recompileSelf :
   DEFINE VARIABLE hWindow            AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cWorkfolder        AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
@@ -439,9 +458,6 @@ PROCEDURE recompileSelf :
   /* Get Windows version info */
   RUN adecomm\_winsys.p(OUTPUT cSystem, OUTPUT cMemory).
 
-  ETIME(YES).
-  RUN showMessage.p("DataDigger", "Please wait while DataDigger is recompiled.", OUTPUT hWindow).
-
   /* Check whether there are any sources. If you distribute DD without
    * sources, you definitely do not want to delete object files!
    */
@@ -461,6 +477,7 @@ PROCEDURE recompileSelf :
    * to avoid flashing of windows
    */
   ETIME(YES).
+  RUN showMessage.p("DataDigger", "Please wait while DataDigger is recompiled.", OUTPUT hWindow).
   SESSION:SET-WAIT-STATE("general").
 
   /* Open log */
@@ -470,6 +487,9 @@ PROCEDURE recompileSelf :
   FILE-INFO:FILE-NAME = "prowin32.exe".
   cProgressDriveType = getDriveType(ENTRY(1,FILE-INFO:FULL-PATHNAME,"\")).
   cDiggerDriveType   = getDriveType(ENTRY(1,gcProgramDir,"\")).
+
+  cWorkfolder = getRegistry("DataDigger", "WorkFolder").
+  IF cWorkfolder = ? OR cWorkfolder = '' THEN cWorkfolder = gcProgramDir.
 
   PUT UNFORMATTED SKIP(1) "DataDigger Buildnr   : " cBuildNr.
   PUT UNFORMATTED SKIP(1) "ENVIRONMENT".
@@ -485,6 +505,7 @@ PROCEDURE recompileSelf :
 
   PUT UNFORMATTED SKIP(1) "SESSION INFO".
   PUT UNFORMATTED SKIP(0) "  Program dir        : " gcProgramDir.
+  PUT UNFORMATTED SKIP(0) "  Work folder        : " cWorkfolder.
   PUT UNFORMATTED SKIP(0) "  Drive type         : " cDiggerDriveType.
   PUT UNFORMATTED SKIP(0) "  Codepage           : " SESSION:CPINTERNAL.
   PUT UNFORMATTED SKIP(0) "  Character size     : " SESSION:PIXELS-PER-COLUMN " x " SESSION:PIXELS-PER-ROW.
@@ -517,11 +538,7 @@ PROCEDURE recompileSelf :
   cFileList = getRegistry("DataDigger:files", "").
   DO iFile = 1 TO NUM-ENTRIES(cFileList):
     IF SEARCH(gcProgramDir + ENTRY(iFile,cFileList)) = ? THEN
-    DO:
-      USE "DataDigger".
-      PUT-KEY-VALUE SECTION "DataDigger:files" KEY ENTRY(iFile,cFileList) VALUE ?.
-      USE "".
-    END.
+      setRegistry("DataDigger:files", ENTRY(iFile,cFileList), ?).
   END.
 
   /* Recompile sources */
@@ -558,9 +575,7 @@ PROCEDURE recompileSelf :
 
   /* Save date/time of all files in INI-file */
   FOR EACH bOsFile {&TABLE-SCAN}:
-    USE "DataDigger".
-    PUT-KEY-VALUE SECTION "DataDigger:files" KEY bOsFile.cFileName VALUE STRING(bOsFile.cModified).
-    USE "".
+    setRegistry("DataDigger:files", bOsFile.cFileName, bOsFile.cModified).
   END.
 
   IF NOT lCompileError THEN
@@ -592,7 +607,7 @@ PROCEDURE recompileSelf :
   OUTPUT CLOSE.
 
   /* Show the window at least some time, otherwise it will flash, which is annoying */
-  REPEAT WHILE ETIME < 1500:
+  REPEAT WHILE ETIME < 1000:
     PROCESS EVENTS.
   END.
 
@@ -841,6 +856,27 @@ FUNCTION isRecompileNeeded RETURNS LOGICAL
   RETURN CAN-FIND(FIRST bOsFile WHERE bOsFile.cStatus <> '').
 
 END FUNCTION. /* isRecompileNeeded */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-setRegistry) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry Procedure 
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER 
+  , pcSetting AS CHARACTER
+  , pcValue   AS CHARACTER ) :
+
+  USE 'DataDigger.ini' NO-ERROR.
+  IF NOT ERROR-STATUS:ERROR THEN PUT-KEY-VALUE SECTION pcSection KEY pcSetting VALUE pcValue NO-ERROR.
+  USE "".
+              
+  RETURN "".   /* Function return value. */
+
+END FUNCTION. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

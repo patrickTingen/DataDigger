@@ -7,8 +7,18 @@
 
 DataDigger version 24 - dd MMM 2018 
 
-BetaDigger 20180627
+BetaDigger 20180713
+- New   : Option to use other folder as workfolder (movedoa)
+- Change: Label <PROGDIR> changed to <WORKDIR>
 
+BetaDigger 20180712
+- Solved: CTRL-C does not work
+- Solved: Settings not saved in settings screen
+- Change: Shortcut for query history changed to CTRL-SHIFT-P
+- Change: DataDigger phone home now via is.gd instead of goo.gl
+- Change: Shortcut for query history changed to CTRL-SHIFT-P
+
+BetaDigger 20180627
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
 - Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendörfer)
