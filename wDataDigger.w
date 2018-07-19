@@ -181,15 +181,14 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnQueries ~
-cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
-btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnWhere ~
-btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+&Scoped-Define ENABLED-OBJECTS btnWhere rctQuery rctEdit fiTableFilter ~
+btnQueries cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
+fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
+fiTableDesc cbFavouriteGroup ficWhere btnView btnTools btnTabTables ~
+btnClear btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
+btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnTabFavourites ~
+btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump ~
+btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -533,7 +532,7 @@ DEFINE BUTTON btnViewData  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnWhere  NO-FOCUS FLAT-BUTTON
      LABEL "&Where" 
-     SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(CTRL-ALT-W)".
+     SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(ALT-DOWN)".
 
 DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 950
@@ -938,6 +937,7 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
      fiTableFilter AT Y 3 X 56 NO-LABEL
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
@@ -968,7 +968,6 @@ DEFINE FRAME frMain
      btnReset AT Y 99 X 790 WIDGET-ID 196
      btnTableFilter AT Y 4 X 257 WIDGET-ID 38
      btnViewData AT Y 265 X 705
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnTabFavourites AT Y 122 X 33 WIDGET-ID 302
      btnTabFields AT Y 45 X 303 WIDGET-ID 156
      btnTabIndexes AT Y 122 X 303 WIDGET-ID 158
@@ -1061,8 +1060,8 @@ DEFINE FRAME frWhere
      btnNE AT Y 35 X 57 WIDGET-ID 68
      btnQt AT Y 79 X 57 WIDGET-ID 72
      btnToday AT Y 189 X 17 WIDGET-ID 122
-     "CTRL-ALT-W also opens this window" VIEW-AS TEXT
-          SIZE-PIXELS 250 BY 20 AT Y 235 X 10 WIDGET-ID 218
+     "Use ALT-DOWN / UP to open or close this window" VIEW-AS TEXT
+          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 WIDGET-ID 218
           FGCOLOR 7 
      rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
@@ -2589,7 +2588,7 @@ END.
 ON CHOOSE OF btnCancel-2 IN FRAME frWhere /* Cancel */
 DO:
   PUBLISH "setUsage" ("useWherePanel"). /* user behaviour */
-  ficWhere2:screen-value IN FRAME frWhere = ficWhere:screen-value IN FRAME frMain.
+  ficWhere2:SCREEN-VALUE IN FRAME frWhere = ficWhere:SCREEN-VALUE IN FRAME frMain.
   setQueryEditor('Hidden').
 END.
 
@@ -3618,6 +3617,29 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+ON CTRL-A OF ficWhere IN FRAME frMain
+DO:
+  SELF:SET-SELECTION(1,LENGTH(SELF:SCREEN-VALUE) + 1).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+ON CTRL-D OF ficWhere IN FRAME frMain
+DO:
+  DEFINE VARIABLE i AS INTEGER     NO-UNDO.
+  i = SELF:CURSOR-OFFSET.
+  SELF:SET-SELECTION(0,0).
+  SELF:CURSOR-OFFSET = i.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
 ON PAGE-DOWN OF ficWhere IN FRAME frMain
 OR "CHOOSE" OF btnPrevQuery
 OR "ALT-CURSOR-LEFT" OF ficWhere
@@ -3669,6 +3691,29 @@ ON ALT-CURSOR-UP OF ficWhere2 IN FRAME frWhere
 DO:
   setQueryEditor('hidden').
   APPLY 'entry' TO ficWhere IN FRAME frMain.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
+ON CTRL-A OF ficWhere2 IN FRAME frWhere
+DO:
+  SELF:SET-SELECTION(1,LENGTH(SELF:SCREEN-VALUE) + NUM-ENTRIES(SELF:SCREEN-VALUE,'~n')).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
+ON CTRL-D OF ficWhere2 IN FRAME frWhere
+DO:
+  DEFINE VARIABLE i AS INTEGER     NO-UNDO.
+  i = SELF:CURSOR-OFFSET.
+  SELF:SET-SELECTION(0,0).
+  SELF:CURSOR-OFFSET = i.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -5871,6 +5916,13 @@ PROCEDURE createMenuTableBrowse :
     /* Clone this Database */
     hMenuItem = createMenuItem(hMenu,"Item","Clone this Database").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN cloneDatabase IN THIS-PROCEDURE.
+
+    /* I'm feeling lucky */
+    IF getRegistry("DataDigger", "FeelingLucky") = ? THEN
+    DO:
+      hMenuItem = createMenuItem(hMenu,"Item","I'm feeling lucky").
+      ON "CHOOSE" OF hMenuItem PERSISTENT RUN feelingLucky IN THIS-PROCEDURE.
+    END.
     
     brTables:POPUP-MENU = hMenu.
 
@@ -6595,15 +6647,15 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnQueries cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnView btnTools btnTabTables btnClear btnClearFieldFilter 
-         btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
-         btnMoveUp btnReset btnTableFilter btnWhere btnTabFavourites 
-         btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery 
-         btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit 
-         fiFeedback 
+  ENABLE btnWhere rctQuery rctEdit fiTableFilter btnQueries cbDatabaseFilter 
+         tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
+         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
+         fiTableDesc cbFavouriteGroup ficWhere btnView btnTools btnTabTables 
+         btnClear btnClearFieldFilter btnClearTableFilter btnClipboard 
+         btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter 
+         btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery 
+         btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd 
+         btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -6958,6 +7010,20 @@ PROCEDURE expandToolbar :
   setRegistry('DataDigger','Toolbar:Expanded', STRING(plExpand)). 
 
 END PROCEDURE. /* expandToolbar */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE feelingLucky C-Win 
+PROCEDURE feelingLucky :
+/* Feeling lucky
+ * Start link https://is.gd/FeelingLucky 
+ */
+  setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
+  OS-COMMAND NO-WAIT START VALUE("https://is.gd/FeelingLucky").
+  RUN createMenuTableBrowse.
+
+END PROCEDURE. /* feelingLucky */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -7350,7 +7416,8 @@ PROCEDURE getFavourites :
     END.
 
     cbFavouriteGroup:ADD-LAST(FILL('-',50)).
-    cbFavouriteGroup:ADD-LAST('Save as new group').
+    IF TEMP-TABLE bItem:HAS-RECORDS THEN
+      cbFavouriteGroup:ADD-LAST('Save as new group').
     cbFavouriteGroup:ADD-LAST('Edit groups').
 
   END.

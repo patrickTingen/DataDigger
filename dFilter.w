@@ -150,11 +150,14 @@ DEFINE FRAME Dialog-Frame
      tgShowOther AT Y 358 X 243 WIDGET-ID 44
      tgShowHidden AT Y 381 X 243 WIDGET-ID 30
      tgShowFrozen AT Y 406 X 243 WIDGET-ID 42
-     btnReset AT Y 453 X 10 WIDGET-ID 46
+     btnReset AT Y 450 X 10 WIDGET-ID 46
      Btn_OK AT Y 450 X 345
      Btn_Cancel AT Y 450 X 425
      "But hide these" VIEW-AS TEXT
           SIZE-PIXELS 138 BY 18 AT Y 245 X 23 WIDGET-ID 20
+     "Use ALT-DOWN to open this window" VIEW-AS TEXT
+          SIZE-PIXELS 250 BY 18 AT Y 453 X 90 WIDGET-ID 56
+          FGCOLOR 7 
      "But hide tables that contain any of these" VIEW-AS TEXT
           SIZE-PIXELS 350 BY 18 AT Y 95 X 23 WIDGET-ID 12
      "Show only tables that contain all of these fields" VIEW-AS TEXT
