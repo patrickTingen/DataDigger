@@ -7,6 +7,9 @@
 
 DataDigger version 24 - dd MMM 2018 
 
+- Solved: Small layout errors on settings screen (movedoa)
+- New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints (movedoa)
+
 BetaDigger 20180713
 - New   : Option to use other folder as workfolder (movedoa)
 - Change: Label <PROGDIR> changed to <WORKDIR>

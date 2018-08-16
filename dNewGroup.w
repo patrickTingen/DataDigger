@@ -16,7 +16,13 @@
 { DataDigger.i }
 
 /* Parameters Definitions --- */
-DEFINE OUTPUT PARAMETER pcGroupname AS CHARACTER NO-UNDO.
+
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT PARAMETER TABLE FOR ttFavGroup.
+  DEFINE OUTPUT PARAMETER pcNewName AS CHARACTER NO-UNDO.
+&ELSE
+  DEFINE VARIABLE pcNewName AS CHARACTER NO-UNDO.
+&ENDIF
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -117,7 +123,18 @@ ASSIGN
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
 ON GO OF FRAME Dialog-Frame /* Dump Definitions */
 DO:
-  pcGroupname = fiGroupname:SCREEN-VALUE.
+  IF CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = fiGroupname:SCREEN-VALUE) THEN
+  DO:
+    MESSAGE 'This group already exists, please use another name'
+      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+    RETURN NO-APPLY.
+  END.
+
+  CREATE ttFavGroup.
+  ASSIGN ttFavGroup.cGroup = fiGroupname:SCREEN-VALUE.
+
+  ASSIGN pcNewName = ttFavGroup.cGroup.
+
   APPLY 'close' TO THIS-PROCEDURE.
 END.
 
