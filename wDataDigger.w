@@ -12042,7 +12042,7 @@ PROCEDURE startSession :
 
   /* Check if this is the first run, a new version or a new build */
   iVersion    = INTEGER(getRegistry('DataDigger', 'Version')) NO-ERROR.
-  IF iVersion = ? THEN iVersion = 0.
+  IF iVersion = ? THEN iVersion = {&version}.
 
   cBuild      = getRegistry('DataDigger', 'Build').
   IF cBuild = ? THEN cBuild = ''.
