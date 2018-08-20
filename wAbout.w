@@ -84,7 +84,7 @@ DEFINE VARIABLE fiDataDigger-2 AS CHARACTER FORMAT "X(256)":U INITIAL "Build ~{&
 
 DEFINE VARIABLE fiWebsite AS CHARACTER FORMAT "X(256)":U INITIAL "https://datadigger.wordpress.com/" 
       VIEW-AS TEXT 
-     SIZE-PIXELS 210 BY 20
+     SIZE-PIXELS 179 BY 20
      FGCOLOR 9  NO-UNDO.
 
 DEFINE IMAGE imgBall
@@ -110,8 +110,8 @@ DEFINE FRAME DEFAULT-FRAME
      edChangelog AT Y 60 X 5 NO-LABEL WIDGET-ID 72
      fiDataDigger-1 AT Y 15 X 40 COLON-ALIGNED NO-LABEL WIDGET-ID 74
      fiDataDigger-2 AT Y 32 X 40 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-     fiWebsite AT Y 425 X 190 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     imgPlayer AT ROW 2.43 COL 59 WIDGET-ID 328
+     fiWebsite AT Y 425 X 227 NO-LABEL WIDGET-ID 298
+     imgPlayer AT ROW 2.43 COL 60.6 WIDGET-ID 328
      imgBall AT ROW 5.43 COL 59.8 WIDGET-ID 330
      rcCord AT ROW 4.05 COL 60.6 WIDGET-ID 332
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
@@ -177,6 +177,8 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FILL-IN fiDataDigger-2 IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
+/* SETTINGS FOR FILL-IN fiWebsite IN FRAME DEFAULT-FRAME
+   ALIGN-L                                                              */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wAbout)
 THEN wAbout:HIDDEN = yes.
 
@@ -346,21 +348,24 @@ PROCEDURE blinkLogo :
     END.
     IF xx <= 5 THEN LEAVE #Bounce.
 
+    RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, YES).
     btnDataDigger:X = xx.
     btnDataDigger:Y = yy.
-
     btnDataDigger:MOVE-TO-TOP().
-    RUN justWait(8).
+    RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
+
+    RUN justWait(10).
   END.
 
   btnDataDigger:X = 10.
   btnDataDigger:Y = 15.
 
+  /* Blink logo */
   DO ii = 1 TO 2:
     btnDataDigger:SENSITIVE = NO.
-    RUN justWait(250).
+    RUN justWait(300).
     btnDataDigger:SENSITIVE = YES.
-    RUN justWait(250).
+    RUN justWait(300).
   END.
   fiDataDigger-1:VISIBLE = TRUE.
   fiDataDigger-2:VISIBLE = TRUE.
@@ -368,16 +373,18 @@ PROCEDURE blinkLogo :
   RUN justWait(500).
 
   /* player jumps */
-  DO ii = 30 TO 425 BY 3:
+  DO ii = 30 TO 425 BY 4:
     imgPlayer:Y = ii.
     IF ii > 90 THEN 
     DO: 
-      imgBall:Y = imgBall:Y + 3.
-      rcCord:Y = rcCord:Y + 3.
-      edChangelog:HEIGHT-PIXELS = edChangelog:HEIGHT-PIXELS + 3.
+      RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, YES).
+      imgBall:Y = imgBall:Y + 4.
+      rcCord:Y = rcCord:Y + 4.
+      edChangelog:HEIGHT-PIXELS = edChangelog:HEIGHT-PIXELS + 4.
+      RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
     END.
 
-    RUN justWait(5).
+    RUN justWait(10).
   END.
 
   BtnOK:VISIBLE = TRUE.
@@ -416,12 +423,22 @@ END PROCEDURE.
 PROCEDURE initializeObject :
 /* Init frame
   */
+  DEFINE VARIABLE xx AS INTEGER NO-UNDO.
+  DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+
   DO WITH FRAME {&FRAME-NAME}:
     wAbout:VISIBLE = FALSE.
 
     /* Position frame relative to main window */
-    wAbout:X = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
-    wAbout:Y = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
+    xx = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
+    yy = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
+
+    /* Or centered on the screen */
+    IF xx = ? THEN xx = (SESSION:WIDTH-PIXELS - FRAME {&FRAME-NAME}:WIDTH-PIXELS) / 2.
+    IF yy = ? THEN yy = (SESSION:HEIGHT-PIXELS - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 2.
+
+    wAbout:X = xx.
+    wAbout:Y = yy.
 
     /* Prepare frame */
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
