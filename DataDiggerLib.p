@@ -145,7 +145,6 @@ DEFINE TEMP-TABLE ttWidget NO-UNDO RCODE-INFORMATION
   INDEX iPrim AS PRIMARY hWidget.
 
 /* If you have trouble with the cache, disable it in the settings screen */
-DEFINE VARIABLE glCacheSettings  AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
 
@@ -693,7 +692,6 @@ SUBSCRIBE TO "setUsage" ANYWHERE.
  */
 glCacheTableDefs = TRUE.
 glCacheFieldDefs = TRUE.
-glCacheSettings  = TRUE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -2376,14 +2374,8 @@ PROCEDURE loadSettings :
   /* When all ini-files have been read, we can determine whether
    * caching needs to be enabled
    */
-  lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
-  IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
-
   lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
   IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
-
-  /* If we do not want to cache the registry, empty it now */
-  IF NOT glCacheSettings THEN RUN clearRegistryCache.
 
 END PROCEDURE. /* loadSettings */
 
@@ -2974,7 +2966,6 @@ PROCEDURE setCaching :
   */
   glCacheTableDefs = LOGICAL( getRegistry("DataDigger:Cache","TableDefs") ).
   glCacheFieldDefs = LOGICAL( getRegistry("DataDigger:Cache","FieldDefs") ).
-  glCacheSettings  = LOGICAL( getRegistry("DataDigger:Cache","Settings")  ).
 
 END PROCEDURE. /* setCaching */
 
@@ -4217,8 +4208,6 @@ FUNCTION getRegistry RETURNS CHARACTER
     ) :
   /* Get a value from the registry.
   */
-  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
-
   {&timerStart}
   DEFINE BUFFER bDatabase FOR ttDatabase.
   DEFINE BUFFER bConfig   FOR ttConfig.
@@ -4226,47 +4215,19 @@ FUNCTION getRegistry RETURNS CHARACTER
   /* If this is a DB-specific section then replace db name if needed */
   IF pcSection BEGINS "DB:" THEN
   DO:
-    FIND bDatabase WHERE bDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
+    FIND bDatabase WHERE bDatabase.cLogicalName = ENTRY(2,pcSection,":") NO-ERROR.
     IF AVAILABLE bDatabase THEN pcSection = "DB:" + bDatabase.cSection.
   END.
 
-  IF glCacheSettings THEN
-  DO:
-    /* Load settings if there is nothing in the config table */
-    IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
-      RUN loadSettings.
+  /* Load settings if there is nothing in the config table */
+  IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
+    RUN loadSettings.
 
-    /* Search in settings tt */
-    FIND bConfig WHERE bConfig.cSection = pcSection AND bConfig.cSetting = pcKey NO-ERROR.
+  /* Search in settings tt */
+  FIND bConfig WHERE bConfig.cSection = pcSection AND bConfig.cSetting = pcKey NO-ERROR.
 
-    {&timerStop}
-    RETURN ( IF AVAILABLE bConfig THEN bConfig.cValue ELSE ? ).
-  END.
-
-  ELSE
-  DO:
-    USE SUBSTITUTE('DataDigger-&1', getUserName() ).
-    GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
-
-    /* If not in personal INI then check DataDigger.ini */
-    IF cValue = ? THEN
-    DO:
-      USE 'DataDigger'.
-      GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
-    END.
-
-    /* If still not found check DataDiggerHelp.ini */
-    IF cValue = ? THEN
-    DO:
-      USE 'DataDiggerHelp'.
-      GET-KEY-VALUE SECTION pcSection KEY pcKey VALUE cValue.
-    END.
-
-    /* Clean up and return */
-    USE "".
-    {&timerStop}
-    RETURN cValue.
-  END.
+  {&timerStop}
+  RETURN ( IF AVAILABLE bConfig THEN bConfig.cValue ELSE ? ).
 
 END FUNCTION. /* getRegistry */
 
@@ -5001,4 +4962,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

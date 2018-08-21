@@ -112,6 +112,7 @@ DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO INITIAL FALSE.
 DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glshowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
+DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to override 'ShowHints=no' setting */
 
 DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
 DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
@@ -549,7 +550,7 @@ DEFINE VARIABLE cbFavouriteGroup AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
      VIEW-AS EDITOR NO-WORD-WRAP
-     SIZE-PIXELS 595 BY 21 TOOLTIP "query on your table  #(ALT-W)"
+     SIZE-PIXELS 595 BY 21 TOOLTIP "query on your table  #(CTRL-CURSOR-DOWN)"
      FONT 2 NO-UNDO.
 
 DEFINE VARIABLE fiFeedback AS CHARACTER FORMAT "X(256)":U INITIAL "Got a question or feedback?" 
@@ -992,64 +993,6 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
-
-DEFINE FRAME frWhere
-     btnBegins AT Y 123 X 17 WIDGET-ID 74
-     cbAndOr AT Y 5 X 46 COLON-ALIGNED WIDGET-ID 10
-     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
-     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
-     btnInsert AT Y 5 X 595 WIDGET-ID 18
-     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
-     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
-     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
-     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
-     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
-     btnOK AT Y 230 X 460 WIDGET-ID 132
-     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
-     btnOr AT Y 101 X 57 WIDGET-ID 24
-     btnAnd AT Y 101 X 17 WIDGET-ID 22
-     btnBracket AT Y 79 X 17 WIDGET-ID 28
-     btnContains AT Y 145 X 17 WIDGET-ID 116
-     btnEq AT Y 35 X 17 WIDGET-ID 62
-     btnGT AT Y 57 X 57 WIDGET-ID 66
-     btnLT AT Y 57 X 17 WIDGET-ID 64
-     btnMatches AT Y 167 X 17 WIDGET-ID 114
-     btnNE AT Y 35 X 57 WIDGET-ID 68
-     btnQt AT Y 79 X 57 WIDGET-ID 72
-     btnToday AT Y 189 X 17 WIDGET-ID 122
-     "Use ALT-DOWN / UP to open or close this window" VIEW-AS TEXT
-          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 WIDGET-ID 218
-          FGCOLOR 7 
-     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 830 Y 175
-         SIZE-PIXELS 656 BY 285
-         TITLE "Query Editor"
-         DEFAULT-BUTTON btnOK WIDGET-ID 400.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
-
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
      btnDataDigger AT Y 35 X 1 WIDGET-ID 126
@@ -1080,6 +1023,64 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frWhere
+     btnBegins AT Y 123 X 17 WIDGET-ID 74
+     cbAndOr AT Y 5 X 46 COLON-ALIGNED WIDGET-ID 10
+     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
+     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
+     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
+     btnInsert AT Y 5 X 595 WIDGET-ID 18
+     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
+     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
+     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
+     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
+     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
+     btnOK AT Y 230 X 460 WIDGET-ID 132
+     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
+     btnOr AT Y 101 X 57 WIDGET-ID 24
+     btnAnd AT Y 101 X 17 WIDGET-ID 22
+     btnBracket AT Y 79 X 17 WIDGET-ID 28
+     btnContains AT Y 145 X 17 WIDGET-ID 116
+     btnEq AT Y 35 X 17 WIDGET-ID 62
+     btnGT AT Y 57 X 57 WIDGET-ID 66
+     btnLT AT Y 57 X 17 WIDGET-ID 64
+     btnMatches AT Y 167 X 17 WIDGET-ID 114
+     btnNE AT Y 35 X 57 WIDGET-ID 68
+     btnQt AT Y 79 X 57 WIDGET-ID 72
+     btnToday AT Y 189 X 17 WIDGET-ID 122
+     "Use CTRL-DOWN / UP to open or close this window" VIEW-AS TEXT
+          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 WIDGET-ID 218
+          FGCOLOR 7 
+     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 830 Y 175
+         SIZE-PIXELS 656 BY 285
+         TITLE "Query Editor"
+         DEFAULT-BUTTON btnOK WIDGET-ID 400.
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -2914,7 +2915,9 @@ OR "CHOOSE" OF btnHelp-txt
 OR "HELP" OF c-win 
 DO:
 
+  glShowTour = TRUE.
   RUN btnHelpChoose.
+  glShowTour = FALSE.
 
 END.
 
@@ -3437,6 +3440,8 @@ DO:
     END.
 
   END CASE.
+  
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3587,6 +3592,7 @@ END.
 &Scoped-define SELF-NAME ficWhere
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
 ON ALT-CURSOR-DOWN OF ficWhere IN FRAME frMain
+OR 'CTRL-CURSOR-DOWN' OF ficWhere
 DO:
   setQueryEditor('visible').
   APPLY 'entry' TO ficWhere2 IN FRAME frWhere.
@@ -3668,6 +3674,7 @@ END.
 &Scoped-define SELF-NAME ficWhere2
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
 ON ALT-CURSOR-UP OF ficWhere2 IN FRAME frWhere
+OR 'CTRL-CURSOR-UP' OF ficWhere2
 DO:
   setQueryEditor('hidden').
   APPLY 'entry' TO ficWhere IN FRAME frMain.
@@ -5649,6 +5656,7 @@ PROCEDURE convertSettings :
       /* Settings removed */
       setRegistry("DataDigger", "AddDataColumnForRecid", ?).
       setRegistry("DataDigger", "AddDataColumnForRowid", ?).
+      setRegistry("DataDigger:Cache","Settings",?).
 
       /* DumpDf settings now in their own section */
       setRegistry("DataDigger", "DumpDF:dir" , ?).
@@ -8298,7 +8306,6 @@ PROCEDURE initializeSettingsFile :
   OS-CREATE-DIR VALUE(SUBSTITUTE("&1cache", cWorkFolder)).
 
   /* Cache */
-  IF getRegistry("DataDigger:Cache","Settings")         = ? THEN setRegistry("DataDigger:Cache","Settings","true").
   IF getRegistry("DataDigger:Cache","TableDefs")        = ? THEN setRegistry("DataDigger:Cache","TableDefs","true").
   IF getRegistry("DataDigger:Cache","FieldDefs")        = ? THEN setRegistry("DataDigger:Cache","FieldDefs","true").
   IF getRegistry("DataDigger:Cache","preCache")         = ? THEN setRegistry("DataDigger:Cache","preCache", "true").
@@ -11460,8 +11467,10 @@ PROCEDURE showHint :
   DEFINE VARIABLE iTargetY  AS INTEGER NO-UNDO.
   DEFINE VARIABLE hMyWidget AS HANDLE  NO-UNDO.
 
-  /* If user opted to NEVER see hints, just exit */
-  IF LOGICAL(getRegistry("DataDigger", "ShowHints")) = FALSE THEN RETURN.
+  /* If user opted to NEVER see hints, just exit, except
+   * when she pressed the 'help' button */
+  IF NOT glShowTour
+    AND LOGICAL(getRegistry("DataDigger", "ShowHints")) = FALSE THEN RETURN.
   
   /* If user pressed ESC during show of hint, this is TRUE */
   IF glHintCancelled THEN RETURN.
@@ -11787,7 +11796,7 @@ PROCEDURE showTour :
    */
   hintBlock:
   DO WITH FRAME frMain:
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nWelcome to the DataDigger 1 minute tour").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nWelcome to 'DataDigger in 1 minute'").
     IF glHintCancelled THEN LEAVE hintBlock.
 
     /* Select a table and show data */

@@ -11,6 +11,8 @@ DataDigger version 24 - dd MMM 2018
 - Solved: Check for PingBack is wrong #33 (movedoa)
 - Solved: Small layout errors on settings screen #35 (movedoa)
 - New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
+- New   : Use CTRL-DOWN / CTRL-UP to expand query editor
+- Change: Option to not cache the settings removed #32 (movedoa)
 
 BetaDigger 20180713
 - New   : Option to use other folder as workfolder (movedoa)

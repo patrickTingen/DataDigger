@@ -130,7 +130,7 @@ DEFINE FRAME DEFAULT-FRAME
      btPage3 AT Y 174 X 20 WIDGET-ID 10
      BtnCancel-2 AT Y 470 X 575 WIDGET-ID 98
      BtnOK AT Y 470 X 660 WIDGET-ID 94
-     "CTRL-ALT-S also opens this window" VIEW-AS TEXT
+     "CTRL-SHIFT-S also opens this window" VIEW-AS TEXT
           SIZE-PIXELS 240 BY 20 AT Y 475 X 15 WIDGET-ID 100
           FGCOLOR 7 
      rcSettings AT Y 60 X 150 WIDGET-ID 92
@@ -964,4 +964,3 @@ END PROCEDURE. /* showFrames */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
