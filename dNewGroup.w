@@ -39,7 +39,7 @@
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS RECT-1 fiGroupname Btn_OK Btn_Cancel 
+&Scoped-Define ENABLED-OBJECTS RECT-1 fiGroupname Btn_Cancel 
 &Scoped-Define DISPLAYED-OBJECTS fiGroupname 
 
 /* Custom List Definitions                                              */
@@ -85,7 +85,7 @@ DEFINE FRAME Dialog-Frame
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 405 BY 168
-         TITLE "Dump Definitions"
+         TITLE "New Favourites Group"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
 
 
@@ -110,6 +110,8 @@ ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
+/* SETTINGS FOR BUTTON Btn_OK IN FRAME Dialog-Frame
+   NO-ENABLE                                                            */
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
@@ -121,8 +123,10 @@ ASSIGN
 
 &Scoped-define SELF-NAME Dialog-Frame
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON GO OF FRAME Dialog-Frame /* Dump Definitions */
+ON GO OF FRAME Dialog-Frame /* New Favourites Group */
 DO:
+  IF NOT btn_ok:SENSITIVE THEN RETURN NO-APPLY.
+
   IF CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = fiGroupname:SCREEN-VALUE) THEN
   DO:
     MESSAGE 'This group already exists, please use another name'
@@ -143,9 +147,20 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON WINDOW-CLOSE OF FRAME Dialog-Frame /* Dump Definitions */
+ON WINDOW-CLOSE OF FRAME Dialog-Frame /* New Favourites Group */
 DO:
   APPLY "END-ERROR":U TO SELF.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME fiGroupname
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiGroupname Dialog-Frame
+ON VALUE-CHANGED OF fiGroupname IN FRAME Dialog-Frame /* Group name */
+DO:
+  Btn_OK:SENSITIVE = (SELF:SCREEN-VALUE <> '').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -211,7 +226,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY fiGroupname 
       WITH FRAME Dialog-Frame.
-  ENABLE RECT-1 fiGroupname Btn_OK Btn_Cancel 
+  ENABLE RECT-1 fiGroupname Btn_Cancel 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}

@@ -182,14 +182,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnWhere ~
-cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnQueries btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom ~
-btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter btnTabFavourites ~
-btnTabFields btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump ~
-btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS btnAddFavGroup rctQuery rctEdit ~
+fiTableFilter btnWhere cbDatabaseFilter tgSelAll fiIndexNameFilter ~
+fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnQueries ~
+btnView btnTools btnTabTables btnClear btnClearFieldFilter ~
+btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTableFilter btnTabFavourites btnTabFields ~
+btnTabIndexes btnFavourite btnNextQuery btnPrevQuery btnDump btnLoad ~
+btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -411,6 +412,10 @@ DEFINE BUTTON btnAdd  NO-FOCUS FLAT-BUTTON
      LABEL "&Add" 
      SIZE-PIXELS 25 BY 23 TOOLTIP "add a record #(INS)".
 
+DEFINE BUTTON btnAddFavGroup  NO-FOCUS FLAT-BUTTON
+     LABEL "+" 
+     SIZE-PIXELS 20 BY 21 TOOLTIP "add favourites group".
+
 DEFINE BUTTON btnClear  NO-FOCUS FLAT-BUTTON
      LABEL "&C" 
      SIZE-PIXELS 20 BY 23 TOOLTIP "clear the where field #(SHIFT-DEL)".
@@ -545,7 +550,7 @@ DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE cbFavouriteGroup AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS COMBO-BOX INNER-LINES 10
      DROP-DOWN-LIST
-     SIZE-PIXELS 172 BY 21 NO-UNDO.
+     SIZE-PIXELS 155 BY 21 NO-UNDO.
 
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
@@ -578,7 +583,7 @@ DEFINE VARIABLE fiIndexNameFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Index 
 
 DEFINE VARIABLE fiTableDesc AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS FILL-IN 
-     SIZE-PIXELS 171 BY 21 NO-UNDO.
+     SIZE-PIXELS 188 BY 21 NO-UNDO.
 
 DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Table filter" 
      CONTEXT-HELP-ID 950
@@ -938,6 +943,7 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
+     btnAddFavGroup AT Y 236 X 249 WIDGET-ID 318
      fiTableFilter AT Y 3 X 56 NO-LABEL
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
@@ -993,46 +999,17 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1070,17 +1047,46 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -2293,7 +2299,10 @@ ON DELETE-CHARACTER OF brTables IN FRAME frMain
 OR "F8", "-",DELETE-CHARACTER OF cbDatabaseFilter
 OR "F8", "-",DELETE-CHARACTER OF brTables
 DO:
-  RUN disconnectDatabase.
+  CASE giCurrentPage:
+    WHEN {&PAGE-TABLES}     THEN RUN disconnectDatabase.
+    WHEN {&PAGE-FAVOURITES} THEN RUN toggleFavourite.
+  END CASE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2305,7 +2314,10 @@ ON INSERT-MODE OF brTables IN FRAME frMain
 OR "F3", '+', INSERT-MODE OF cbDatabaseFilter
 OR "F3", '+', INSERT-MODE OF brTables
 DO:
-  RUN quickConnect.
+  CASE giCurrentPage:
+    WHEN {&PAGE-TABLES}     THEN RUN quickConnect.
+    WHEN {&PAGE-FAVOURITES} THEN RUN btnAddFavGroupChoose.
+  END CASE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2541,6 +2553,18 @@ ON CHOOSE OF btnAdd IN FRAME frMain /* Add */
 DO:
   PUBLISH "setUsage" ("addRecord"). /* user behaviour */
   RUN btnAddChoose.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME btnAddFavGroup
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAddFavGroup C-Win
+ON CHOOSE OF btnAddFavGroup IN FRAME frMain /* + */
+OR 'insert-mode' OF cbFavouriteGroup
+DO:
+  RUN btnAddFavGroupChoose.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3475,21 +3499,8 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup C-Win
 ON VALUE-CHANGED OF cbFavouriteGroup IN FRAME frMain
 DO:
-  DEFINE VARIABLE cName  AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cList  AS CHARACTER NO-UNDO.
   DEFINE BUFFER bTable FOR ttTable. 
-
-  /* Ignore separator line */
-  IF SELF:SCREEN-VALUE BEGINS '----' THEN 
-    RETURN NO-APPLY.
-
-  ELSE 
-  IF SELF:SCREEN-VALUE = ':Create new group' THEN
-  DO:
-    RUN dNewGroup.w(INPUT TABLE ttFavGroup BY-REFERENCE, OUTPUT cName).
-    RUN getFavourites.
-    cbFavouriteGroup:SCREEN-VALUE = cName.
-  END. 
 
   IF SELF:SCREEN-VALUE > '' THEN
   DO:
@@ -3505,7 +3516,6 @@ DO:
 
     RUN setTableView(YES,YES).
   END.
-
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4255,6 +4265,23 @@ PROCEDURE btnAddChoose :
   END.
 
 END PROCEDURE. /* btnAddChoose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddFavGroupChoose C-Win 
+PROCEDURE btnAddFavGroupChoose :
+/* Add favourites group
+*/
+  DEFINE VARIABLE cName AS CHARACTER NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+    RUN dNewGroup.w(INPUT TABLE ttFavGroup BY-REFERENCE, OUTPUT cName).
+    RUN getFavourites.
+    cbFavouriteGroup:SCREEN-VALUE = cName.
+  END.
+
+END PROCEDURE. /* btnAddFavGroupChoose */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -6635,15 +6662,15 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnWhere cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnQueries btnView btnTools btnTabTables btnClear 
-         btnClearFieldFilter btnClearTableFilter btnClipboard btnMoveBottom 
-         btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter 
-         btnTabFavourites btnTabFields btnTabIndexes btnFavourite btnNextQuery 
-         btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd 
-         btnEdit fiFeedback 
+  ENABLE btnAddFavGroup rctQuery rctEdit fiTableFilter btnWhere 
+         cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter 
+         fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes 
+         tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnQueries btnView 
+         btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
+         btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
+         btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
+         btnFavourite btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
+         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -6759,11 +6786,15 @@ PROCEDURE endResize :
 
       cbFavouriteGroup:X = fiTableDesc:X
       cbFavouriteGroup:Y = fiTableDesc:Y
-      cbFavouriteGroup:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS
+      cbFavouriteGroup:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS - btnAddFavGroup:WIDTH-PIXELS
 
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
       btnFavourite:Y = fiTableDesc:Y 
       btnFavourite:HEIGHT-PIXELS = fiTableDesc:HEIGHT-PIXELS
+
+      btnAddFavGroup:X = btnFavourite:X - btnAddFavGroup:WIDTH-PIXELS
+      btnAddFavGroup:Y = btnFavourite:Y
+      btnAddFavGroup:HEIGHT-PIXELS = btnFavourite:HEIGHT-PIXELS
       NO-ERROR.
 
     cbFavouriteGroup:MOVE-TO-TOP().
@@ -7375,7 +7406,7 @@ PROCEDURE getFavourites :
 /* Fill combo box for favourite groups 
  */
   DEFINE VARIABLE i        AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cList    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cGroups  AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
   DEFINE VARIABLE lUnnamed AS LOGICAL   NO-UNDO.
 
@@ -7387,8 +7418,8 @@ PROCEDURE getFavourites :
     /* Conversion */
     FOR EACH bTable WHERE bTable.lFavourite = TRUE:
       /* Get current groups of this table */
-      cList = getRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
-      IF cList = ? THEN setRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName),'MyFavourites').
+      cGroups = getRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
+      IF cGroups = ? THEN setRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName),'MyFavourites').
     END.
 
     /* Keep current value */
@@ -7399,18 +7430,25 @@ PROCEDURE getFavourites :
      */
     FOR EACH bTable:
       /* Get current groups of this table */
-      cList = getRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
+      cGroups = getRegistry( SUBSTITUTE("DB:&1",bTable.cDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)).
 
       /* See if there are tables with 'unnamed' favgroup */
-      IF bTable.lFavourite = TRUE AND (cList = '' OR cList = ?) THEN lUnnamed = TRUE.
+      IF bTable.lFavourite = TRUE AND (cGroups = '' OR cGroups = ?) THEN lUnnamed = TRUE.
 
-      DO i = 1 TO NUM-ENTRIES(cList):
-        IF NOT CAN-FIND(FIRST bFavGroup WHERE bFavGroup.cGroup = ENTRY(i,cList)) THEN
+      DO i = 1 TO NUM-ENTRIES(cGroups):
+        IF NOT CAN-FIND(FIRST bFavGroup WHERE bFavGroup.cGroup = ENTRY(i,cGroups)) THEN
         DO:
           CREATE bFavGroup.
-          ASSIGN bFavGroup.cGroup = ENTRY(i,cList).
+          ASSIGN bFavGroup.cGroup = ENTRY(i,cGroups).
         END.
       END.
+    END.
+
+    /* If no groups are found, create a default one */
+    IF NOT TEMP-TABLE bFavGroup:HAS-RECORDS THEN
+    DO:
+      CREATE bFavGroup.
+      ASSIGN bFavGroup.cGroup = 'MyFavourites'.
     END.
 
     /* Now re-populate the combo */
@@ -7419,10 +7457,6 @@ PROCEDURE getFavourites :
     FOR EACH bFavGroup BY bFavGroup.cGroup:
       cbFavouriteGroup:ADD-LAST(bFavGroup.cGroup).
     END.
-
-    cbFavouriteGroup:ADD-LAST(FILL('-',50)).
-    cbFavouriteGroup:ADD-LAST(':Create new group').
-    cbFavouriteGroup:ADD-LAST(':Edit groups').
 
     /* Restore old value */
     IF CAN-FIND(bFavGroup WHERE bFavGroup.cGroup = cValue) THEN
@@ -8627,7 +8661,7 @@ PROCEDURE initializeVisuals :
     btnQueries:LOAD-IMAGE         (getImagePath("SavedQueries_small.gif")).
     btnClipboard:LOAD-IMAGE       (getImagePath("Clipboard.gif")).
 
-    /* Same buttons ON editor FRAME */
+    /* Same buttons on editor FRAME */
     btnViewData-2:LOAD-IMAGE      (getImagePath("Execute.gif")).
     btnClear-2:LOAD-IMAGE         (getImagePath("Clear.gif")).
     btnQueries-2:LOAD-IMAGE       (getImagePath("SavedQueries_small.gif")).
@@ -8645,9 +8679,10 @@ PROCEDURE initializeVisuals :
     btnClone:LOAD-IMAGE           (getImagePath("Clone.gif")).
     btnEdit:LOAD-IMAGE            (getImagePath("Edit.gif")).
     btnDelete:LOAD-IMAGE          (getImagePath("Delete.gif")).
-
     btnDump:LOAD-IMAGE            (getImagePath("Dump.gif")).
     btnLoad:LOAD-IMAGE            (getImagePath("Load.gif")).
+
+    btnAddFavGroup:LOAD-IMAGE     (getImagePath("Add.gif")).
 
     btnMoveUp:MOVE-TO-TOP().
     btnMoveDown:MOVE-TO-TOP().
@@ -10621,6 +10656,7 @@ PROCEDURE setPage :
   /* remember page */
   giCurrentPage = piPage.
   setWindowFreeze(YES).
+  PUBLISH "setUsage" (SUBSTITUTE("setPage-&1",piPage)).
 
   DO WITH FRAME {&FRAME-NAME}:
     CASE piPage:
@@ -10663,8 +10699,13 @@ PROCEDURE setPage :
         btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_active.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_inactive.gif' )).
         btnTableFilter:SENSITIVE = TRUE.
+
         cbFavouriteGroup:SENSITIVE = FALSE.
         cbFavouriteGroup:VISIBLE = FALSE.
+        fiTableDesc:VISIBLE = TRUE.
+        btnAddFavGroup:SENSITIVE = FALSE.
+        btnAddFavGroup:VISIBLE = FALSE.
+
         RUN setTableView(NO,NO).
       END.
 
@@ -10685,11 +10726,16 @@ PROCEDURE setPage :
           END.
         END.
 
-        btnTabTables   :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
+        btnTabTables    :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_active.gif' )).
-        btnTableFilter:SENSITIVE = FALSE.
+        btnTableFilter  :SENSITIVE = FALSE.
+
         cbFavouriteGroup:SENSITIVE = TRUE.
         cbFavouriteGroup:VISIBLE = TRUE.
+        fiTableDesc:VISIBLE = FALSE.
+        btnAddFavGroup:SENSITIVE = TRUE.
+        btnAddFavGroup:VISIBLE = TRUE.
+
         RUN setTableView(YES,NO).
       END.
     END CASE. /* piPage */
@@ -10699,6 +10745,15 @@ PROCEDURE setPage :
 
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   setWindowFreeze(NO).
+
+  /* Show additional info on first use of favourites tab */
+  IF piPage = {&PAGE-FAVOURITES} 
+    AND getRegistry("DataDigger:Usage", SUBSTITUTE("setPage-&1:numUsed",piPage)) = '1' THEN
+  DO:
+    RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"~nI created a default group for your favourites").
+    RUN showHint(btnAddFavGroup:HANDLE  ,{&ARROW-LEFT-DOWN},"~nIf you like, you can create additional groups").
+    RUN showHint(brTables:HANDLE        ,{&ARROW-LEFT-UP}  ,"~nBy removing all tables from a group, it will be automatically deleted when you close DataDigger").
+  END.
 
   {&timerStop}
 
@@ -12361,14 +12416,13 @@ END PROCEDURE. /* timedTableChange */
 PROCEDURE toggleFavourite :
 /* Toggle a table's favourite status 
   */ 
-  DEFINE VARIABLE cName AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cList AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName   AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cGroups AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bTable FOR ttTable.
-  PUBLISH "setUsage" ("addToFavourites"). /* user behaviour */
+  DEFINE BUFFER bFavGroup FOR ttFavGroup.
 
-  MESSAGE 'dbg:toggleFavourite'
-    VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  PUBLISH "setUsage" ("addToFavourites"). /* user behaviour */
 
   DO WITH FRAME frMain:
     /* if no tables in browser, do nothing */
@@ -12376,7 +12430,13 @@ PROCEDURE toggleFavourite :
 
     /* get current favgroup */
     cName = cbFavouriteGroup:SCREEN-VALUE.
-    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN cName = ''.
+    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN 
+    DO:
+      RUN getFavourites.
+      FIND FIRST bFavGroup NO-ERROR.
+      IF AVAILABLE bFavGroup THEN cName = bFavGroup.cGroup.
+    END.
+    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN RETURN. 
 
     /* Find table and set/unset as fav */
     FIND bTable
@@ -12387,23 +12447,24 @@ PROCEDURE toggleFavourite :
     bTable.lFavourite = NOT bTable.lFavourite.
     setRegistry(SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourite",gcCurrentTable), (IF bTable.lFavourite THEN "TRUE" ELSE ?)).
   
-    cList = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",gcCurrentTable)).
-    IF cList = ? THEN cList = ''.
+    cGroups = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",gcCurrentTable)).
+    IF cGroups = ? THEN cGroups = ''.
 
     /* Remove or add to list */
-    IF LOOKUP(cName,cList) > 0 THEN
+    IF NOT bTable.lFavourite AND LOOKUP(cName,cGroups) > 0 THEN
     DO:
-      ENTRY(LOOKUP(cName,cList),cList) = ''.
-      cList = REPLACE(cList,',,',',').
-      cList = TRIM(cList,',').
+      ENTRY(LOOKUP(cName,cGroups),cGroups) = ''.
+      cGroups = REPLACE(cGroups,',,',',').
+      cGroups = TRIM(cGroups,',').
     END.
-    ELSE
+
+    IF bTable.lFavourite AND LOOKUP(cName,cGroups) = 0 THEN
     DO:
-      cList = SUBSTITUTE('&1,&2', cList, cName).
-      cList = TRIM(cList,',').
+      cGroups = SUBSTITUTE('&1,&2', cGroups, cName).
+      cGroups = TRIM(cGroups,',').
     END.
       
-    setRegistry(SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",gcCurrentTable), cList).
+    setRegistry(SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",gcCurrentTable), cGroups).
 
     /* If we are in the favo-view then refresh the browse */
     IF glshowFavourites THEN RUN reopenTableBrowse(?).
@@ -12413,20 +12474,6 @@ PROCEDURE toggleFavourite :
   END.
   
 END PROCEDURE. /* toggleFavourite */
-
-/*     FOR EACH bTable WHERE bTable.lFavourite = TRUE:                                                               */
-/*                                                                                                                   */
-/*       /* Get current groups of this table */                                                                      */
-/*       cList = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Favourites",bTable.cTableName)). */
-/*       IF cList = ? THEN cList = ''.                                                                               */
-/*                                                                                                                   */
-/*       /* If not already in, add this group to it */                                                               */
-/*       IF LOOKUP(cName,cList) = 0 THEN                                                                             */
-/*         setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)                                                        */
-/*                    , SUBSTITUTE("&1:Favourites",bTable.cTableName)                                                */
-/*                    , TRIM(SUBSTITUTE("&1,&2", cList, cName),",")                                                  */
-/*                    ).                                                                                             */
-/*     END.                                                                                                          */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
