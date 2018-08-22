@@ -13,7 +13,7 @@
 /* ***************************  Definitions  ************************** */
 
 &GLOBAL-DEFINE version {version.i}
-&GLOBAL-DEFINE edition Easter Egg
+&GLOBAL-DEFINE edition Pure Gold
 &GLOBAL-DEFINE build {build.i}
 
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
