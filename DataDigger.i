@@ -63,6 +63,7 @@ DEFINE TEMP-TABLE ttTable NO-UNDO RCODE-INFORMATION
   FIELD lCached       AS LOGICAL   LABEL "" /* for preCaching */
   FIELD iFileNumber   AS INTEGER   LABEL "_File-Number"
   FIELD cCategory     AS CHARACTER LABEL "Category"
+  FIELD lFavouriteOrg AS LOGICAL   LABEL "" /* for edit groups */
   INDEX idxPrim IS PRIMARY cDatabase cTableName
   INDEX idxSec cTableName
   .

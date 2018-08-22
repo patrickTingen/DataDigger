@@ -16,16 +16,17 @@
 
 /* ***************************  Definitions  ************************** */
 { DataDigger.i }
-DEFINE TEMP-TABLE ttTableOk LIKE ttTable.
 
 /* Parameters Definitions --- */
 
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
-  DEFINE INPUT  PARAMETER TABLE FOR ttTable.
-  DEFINE OUTPUT PARAMETER TABLE FOR ttTableOk.
+  DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTable.
+  DEFINE OUTPUT PARAMETER plOk AS LOGICAL NO-UNDO.
 &ELSE
 
-  DEFINE VARIABLE hLib AS HANDLE NO-UNDO.
+  DEFINE VARIABLE hLib AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE plOk AS LOGICAL NO-UNDO.
+  
   RUN datadiggerlib.p PERSISTENT SET hLib.
   THIS-PROCEDURE:ADD-SUPER-PROCEDURE(hLib,SEARCH-TARGET).
   RUN fillTT.
@@ -65,8 +66,8 @@ DEFINE TEMP-TABLE ttTableOk LIKE ttTable.
     ~{&OPEN-QUERY-brTables}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS fiTableFilter Btn_OK brTables btnSelectAll ~
-btnDeselectAll 
+&Scoped-Define ENABLED-OBJECTS fiTableFilter Btn_OK btnSelectAll ~
+btnDeselectAll brTables 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter 
 
 /* Custom List Definitions                                              */
@@ -124,13 +125,14 @@ ttTable.cDatabase     COLUMN-LABEL "DB"
 DEFINE FRAME Dialog-Frame
      fiTableFilter AT Y 10 X 5 COLON-ALIGNED NO-LABEL WIDGET-ID 2
      Btn_OK AT Y 265 X 340
-     brTables AT ROW 2.67 COL 4 WIDGET-ID 200
      btnSelectAll AT Y 75 X 340 WIDGET-ID 6
      btnDeselectAll AT Y 110 X 340 WIDGET-ID 8
+     brTables AT ROW 2.67 COL 4 WIDGET-ID 200
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 435 BY 333
-         TITLE "Edit favourites group" WIDGET-ID 100.
+         TITLE "Edit favourites group"
+         DEFAULT-BUTTON Btn_OK WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -150,7 +152,7 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-/* BROWSE-TAB brTables Btn_OK Dialog-Frame */
+/* BROWSE-TAB brTables btnDeselectAll Dialog-Frame */
 ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
@@ -184,8 +186,7 @@ OPEN QUERY {&SELF-NAME}
 ON GO OF FRAME Dialog-Frame /* Edit favourites group */
 DO:
 
-  /* Apply changes */
-  RUN copyData.
+  plOk = TRUE.
 
 END.
 
@@ -207,7 +208,6 @@ END.
 &Scoped-define SELF-NAME brTables
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables Dialog-Frame
 ON DEFAULT-ACTION OF brTables IN FRAME Dialog-Frame
-OR 'ENTER' OF brTables 
 OR ' ' OF brTables 
 DO:
   ttTable.lFavourite = NOT ttTable.lFavourite.
@@ -292,7 +292,9 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
   /* Create initial set */
-  RUN copyData.
+  FOR EACH ttTable:
+    ttTable.lFavouriteOrg = ttTable.lFavourite.
+  END.
 
   RUN enable_UI.
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
@@ -305,25 +307,6 @@ RUN disable_UI.
 
 
 /* **********************  Internal Procedures  *********************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyData Dialog-Frame 
-PROCEDURE copyData :
-/* Copy the table data 
-*/
-  DEFINE BUFFER bTable   FOR ttTable.
-  DEFINE BUFFER bTableOk FOR ttTableOk.
-
-  EMPTY TEMP-TABLE bTableOk.
-
-  FOR EACH bTable:
-    CREATE bTableOk.
-    BUFFER-COPY bTable TO bTableOk.
-  END.
-
-END PROCEDURE. /* copyData */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI Dialog-Frame  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
@@ -355,7 +338,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY fiTableFilter 
       WITH FRAME Dialog-Frame.
-  ENABLE fiTableFilter Btn_OK brTables btnSelectAll btnDeselectAll 
+  ENABLE fiTableFilter Btn_OK btnSelectAll btnDeselectAll brTables 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
