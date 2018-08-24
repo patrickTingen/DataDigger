@@ -1379,31 +1379,11 @@ PROCEDURE flushRegistry :
 /* Flush all dirty registry settings to disk
 */
   {&timerStart}
-  DEFINE BUFFER bfConfig FOR ttConfig.
 
-  /* Don't do anything if nothing is dirty */
-  IF NOT CAN-FIND(FIRST bfConfig WHERE bfConfig.lDirty = TRUE) THEN RETURN. 
-      
-  USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
+  IF CAN-FIND(FIRST ttConfig WHERE ttConfig.lUser = TRUE AND ttConfig.lDirty = TRUE) THEN
+    RUN saveConfigFileSorted.
 
-  IF NOT ERROR-STATUS:ERROR THEN
-  DO:
-    FOR EACH bfConfig WHERE bfConfig.lDirty = TRUE:
-        PUT-KEY-VALUE
-          SECTION bfConfig.cSection
-          KEY     bfConfig.cSetting
-          VALUE   bfConfig.cValue
-          NO-ERROR
-          .
-        bfConfig.lDirty = FALSE.
-    END. /* for each bfConfig */
-    USE "".
-  END. /* no error */
-              
-  FINALLY:
-    {&timerStop}
-  END FINALLY.
-              
+  {&timerStop}
 END PROCEDURE. /* flushRegistry */
 
 /* _UIB-CODE-BLOCK-END */
@@ -1938,6 +1918,21 @@ END PROCEDURE. /* getQueryTable */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getRegistryTable) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getRegistryTable Procedure 
+PROCEDURE getRegistryTable :
+/* Return complete registry tt
+  */
+  DEFINE OUTPUT PARAMETER TABLE FOR ttConfig.
+
+END PROCEDURE. /* getRegistryTable */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getTables) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTables Procedure 
@@ -2363,13 +2358,13 @@ PROCEDURE loadSettings :
   DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
 
   /* Help file is least important, so read that first */
-  RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini", getProgramDir() )).
+  RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini", getProgramDir() ), FALSE).
   
   /* General DD settings (always in program folder) */
-  RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini", getProgramDir() )).
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini", getProgramDir() ), FALSE).
 
   /* Per-user settings */
-  RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() )).
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ), TRUE).
 
   /* When all ini-files have been read, we can determine whether
    * caching needs to be enabled
@@ -2480,7 +2475,8 @@ END PROCEDURE. /* lockWindow */
 PROCEDURE readConfigFile :
 /* Read the ini-file and create tt records for it
   */
-  DEFINE INPUT PARAMETER pcConfigFile AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcConfigFile   AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER plUserSettings AS LOGICAL   NO-UNDO.
 
   DEFINE VARIABLE cFile      AS LONGCHAR    NO-UNDO.
   DEFINE VARIABLE cLine      AS CHARACTER   NO-UNDO.
@@ -2535,7 +2531,9 @@ PROCEDURE readConfigFile :
     /* Config line /might/ already exist. This can happen if you have
      * the same setting in multiple .ini files.
      */
-    ASSIGN bfConfig.cValue = TRIM(SUBSTRING(cLine, INDEX(cLine,"=") + 1)).
+    ASSIGN
+      bfConfig.cValue = TRIM(SUBSTRING(cLine, INDEX(cLine,"=") + 1))
+      bfConfig.lUser  = plUserSettings.
   END.
 
   {&timerStop}
@@ -2555,17 +2553,12 @@ PROCEDURE resetAnswers :
   {&timerStart}
   DEFINE BUFFER bfConfig FOR ttConfig.
 
-  USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
-  IF NOT ERROR-STATUS:ERROR THEN
-  DO:
-    FOR EACH bfConfig 
-      WHERE bfConfig.cSection = 'DataDigger:help'
-        AND (bfConfig.cSetting MATCHES '*:hidden' OR bfConfig.cSetting MATCHES '*:answer'):
-      setRegistry(bfConfig.cSection, bfConfig.cSetting, ?).
-    END. /* for each bfConfig */
-    USE "".
-  END. /* no error */
-              
+  FOR EACH bfConfig
+    WHERE bfConfig.cSection = 'DataDigger:help'
+      AND (bfConfig.cSetting MATCHES '*:hidden' OR bfConfig.cSetting MATCHES '*:answer'):
+    setRegistry(bfConfig.cSection, bfConfig.cSetting, ?).
+  END. /* for each bfConfig */
+
   RUN flushRegistry.
 
   FINALLY:
@@ -2756,19 +2749,16 @@ PROCEDURE saveConfigFileSorted :
   {&timerStart}
 
   cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ).
-
-  /* Config table holds data from 3 .ini sources, so start fresh */
-  EMPTY TEMP-TABLE bfConfig.
-  RUN readConfigFile(cUserConfigFile).
-
-  /* Now write back, sorted */
   OUTPUT TO VALUE(cUserConfigFile).
 
   FOR EACH bfConfig
     WHERE bfConfig.cSection BEGINS "DataDigger"
+      AND bfConfig.lUser    = TRUE
       AND bfConfig.cSetting <> ''
       AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection:
+    BREAK BY bfConfig.cSection BY bfConfig.cSetting:
+
+    bfConfig.lDirty = FALSE.
 
     IF FIRST-OF(bfConfig.cSection) THEN
       PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
@@ -2781,9 +2771,12 @@ PROCEDURE saveConfigFileSorted :
 
   FOR EACH bfConfig
     WHERE NOT bfConfig.cSection BEGINS "DataDigger"
+      AND bfConfig.lUser    = TRUE
       AND bfConfig.cSetting <> ''
       AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection:
+    BREAK BY bfConfig.cSection BY bfConfig.cSetting:
+
+    bfConfig.lDirty = FALSE.
 
     IF FIRST-OF(bfConfig.cSection) THEN
       PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
@@ -3080,54 +3073,18 @@ END PROCEDURE. /* setTransparency */
 PROCEDURE setUsage :
 /* Save DataDigger usage in the INI file
   */
-  DEFINE INPUT PARAMETER pcUsageId AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
 
-  DEFINE VARIABLE iNumUsed   AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iNumDays   AS INTEGER NO-UNDO.
-  DEFINE VARIABLE cEventType AS CHARACTER   NO-UNDO.
+  {&timerStart}
 
-  /* Save DataDigger usage in the INI file
-   *
-   * [DataDigger:Usage]
-   * btnAdd:lastDate  = 2013-05-06      /* last date it is used */
-   * btnAdd:numUsed   = 32              /* nr of times it is used */
-   * btnAdd:numDays   = 2               /* nr of days on which it is used */
-   * btnAdd:eventType = keypress        /* how was it invoked */
-   *
-   * Valid event types are:
-   *   "KEYPRESS" - Keyboard event identified by key label, such as ESC, CTRL+A, or A.
-   *   "MOUSE"    - Portable or three-button mouse event, such as MOUSE-SELECT-UP or LEFT-MOUSE-UP.
-   *   "PROGRESS" - High-level ABL event. These include all events identified as direct manipulation,
-   *                key function, developer, and other miscellaneous events, such as SELECTION,
-   *                DELETE-LINE, U1, or CHOOSE.
-   */
-  cEventType = getRegistry("DataDigger:Usage", SUBSTITUTE("&1:eventType", pcUsageId)).
-  IF cEventType = ? THEN cEventType = "".
-  IF LOOKUP(LAST-EVENT:EVENT-TYPE, cEventType) = 0 THEN
-  DO:
-    cEventType = TRIM(cEventType + "," + LAST-EVENT:EVENT-TYPE,",").
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:eventType", pcUsageId), cEventType).
-  END.
-
-  iNumDays = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numDays", pcUsageId))).
-  IF iNumDays = ? THEN iNumDays = 0.
-
-  /* Update lastDate and numDays only first time per day */
-  IF getRegistry("DataDigger:Usage", SUBSTITUTE("&1:lastDate" , pcUsageId)) <> ISO-DATE(TODAY) THEN
-  DO:
-    /* Num days on which the function is used */
-    iNumDays = iNumDays + 1.
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numDays" , pcUsageId), STRING(iNumDays)).
-
-    /* Date last used */
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:lastDate" , pcUsageId), ISO-DATE(TODAY)).
-  END.
-
-  /* Number of times used */
-  iNumUsed = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcUsageId))).
-  IF iNumUsed = ? THEN iNumUsed = 0.
-  iNumUsed = iNumUsed + 1.
-  setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcUsageId), STRING(iNumUsed)).
+  i = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName))).
+  IF i = ? THEN i = 0.
+  
+  i = i + 1.
+  setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName), STRING(i)).
+  
+  {&timerStop}
 
 END PROCEDURE. /* setUsage */
 
@@ -4936,7 +4893,6 @@ FUNCTION setRegistry RETURNS CHARACTER
   {&timerStart}
   DEFINE BUFFER bfConfig FOR ttConfig.
 
-  /* Update the local cache of the registry as well */
   FIND bfConfig
     WHERE bfConfig.cSection = pcSection
       AND bfConfig.cSetting = pcKey NO-ERROR.
@@ -4949,9 +4905,13 @@ FUNCTION setRegistry RETURNS CHARACTER
       bfConfig.cSetting = pcKey.
   END.
   
-  ASSIGN 
-    bfConfig.lDirty = (bfConfig.cValue <> pcValue)
-    bfConfig.cValue = pcValue.
+  IF pcValue = ? THEN
+    DELETE bfConfig.
+  ELSE
+    ASSIGN
+      bfConfig.lDirty = bfConfig.lDirty OR (bfConfig.cValue <> pcValue)
+      bfConfig.lUser  = TRUE
+      bfConfig.cValue = pcValue.
 
   {&timerStop}
   RETURN "". /* Function return value. */

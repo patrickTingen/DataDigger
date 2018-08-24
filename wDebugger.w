@@ -60,10 +60,10 @@ END PROCEDURE.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS fiLevelFrom fiLevelTo fiFilterText btnFilter ~
-btnClear edMessageBox fiFindString btnTimers 
-&Scoped-Define DISPLAYED-OBJECTS fiLevelFrom fiLevelTo fiFilterText ~
-edMessageBox fiFindString 
+&Scoped-Define ENABLED-OBJECTS tgUpdate fiLevelFrom fiLevelTo fiFilterText ~
+btnFilter btnClear edMessageBox fiFindString btnTimers 
+&Scoped-Define DISPLAYED-OBJECTS tgUpdate fiLevelFrom fiLevelTo ~
+fiFilterText edMessageBox fiFindString 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -101,16 +101,16 @@ DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnClear 
-     LABEL "&Clear All" 
-     SIZE-PIXELS 70 BY 21 TOOLTIP "clear all messages".
+     LABEL "&Clear" 
+     SIZE-PIXELS 50 BY 21 TOOLTIP "clear messages".
 
 DEFINE BUTTON btnFilter 
-     LABEL "&Filter Now" 
-     SIZE-PIXELS 70 BY 21 TOOLTIP "(re)apply the filter".
+     LABEL "&Filter" 
+     SIZE-PIXELS 50 BY 21 TOOLTIP "(re)apply the filter".
 
 DEFINE BUTTON btnTimers 
      LABEL "&Timers" 
-     SIZE-PIXELS 70 BY 21 TOOLTIP "show timers".
+     SIZE-PIXELS 50 BY 21 TOOLTIP "show timers".
 
 DEFINE VARIABLE edMessageBox AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL LARGE
@@ -128,7 +128,7 @@ DEFINE VARIABLE fiFindString AS CHARACTER FORMAT "X(256)":U
      SIZE-PIXELS 165 BY 21 TOOLTIP "Find text (CTRL-F) use F9 / SHIFT-F9 to search again" NO-UNDO.
 
 DEFINE VARIABLE fiLevelFrom AS INTEGER FORMAT ">>9":U INITIAL 0 
-     LABEL "&Level from" 
+     LABEL "&Level" 
      VIEW-AS FILL-IN 
      SIZE-PIXELS 35 BY 21 TOOLTIP "select the lower limit of the levelfilter"
      FONT 0 NO-UNDO.
@@ -139,18 +139,24 @@ DEFINE VARIABLE fiLevelTo AS INTEGER FORMAT ">>9":U INITIAL 999
      SIZE-PIXELS 35 BY 21 TOOLTIP "select the upper limit of the levelfilter"
      FONT 0 NO-UNDO.
 
+DEFINE VARIABLE tgUpdate AS LOGICAL INITIAL yes 
+     LABEL "Update" 
+     VIEW-AS TOGGLE-BOX
+     SIZE 14 BY .81 NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     fiLevelFrom AT Y 2 X 50 COLON-ALIGNED
-     fiLevelTo AT Y 2 X 105 COLON-ALIGNED
-     fiFilterText AT Y 2 X 180 COLON-ALIGNED
-     btnFilter AT Y 2 X 315
-     btnClear AT Y 2 X 708
+     tgUpdate AT ROW 1.24 COL 28 WIDGET-ID 18
+     fiLevelFrom AT Y 2 X 26 COLON-ALIGNED
+     fiLevelTo AT Y 2 X 78 COLON-ALIGNED
+     fiFilterText AT Y 2 X 233 COLON-ALIGNED
+     btnFilter AT Y 2 X 364
+     btnClear AT Y 2 X 707
      edMessageBox AT Y 25 X 0 NO-LABEL
-     fiFindString AT Y 2 X 425 COLON-ALIGNED WIDGET-ID 14
-     btnTimers AT Y 2 X 620 WIDGET-ID 16
+     fiFindString AT Y 2 X 454 COLON-ALIGNED WIDGET-ID 14
+     btnTimers AT Y 2 X 656 WIDGET-ID 16
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -256,7 +262,7 @@ END.
 
 &Scoped-define SELF-NAME btnClear
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClear C-Win
-ON CHOOSE OF btnClear IN FRAME DEFAULT-FRAME /* Clear All */
+ON CHOOSE OF btnClear IN FRAME DEFAULT-FRAME /* Clear */
 DO:
   RUN initializeDebugger.
 END.
@@ -267,7 +273,7 @@ END.
 
 &Scoped-define SELF-NAME btnFilter
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFilter C-Win
-ON CHOOSE OF btnFilter IN FRAME DEFAULT-FRAME /* Filter Now */
+ON CHOOSE OF btnFilter IN FRAME DEFAULT-FRAME /* Filter */
 OR 'return' OF fiLevelFrom, fiLevelTo, fiFilterText
 DO:
   RUN applyFilter.
@@ -361,7 +367,7 @@ END.
 
 &Scoped-define SELF-NAME fiLevelFrom
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiLevelFrom C-Win
-ON SHIFT-DEL OF fiLevelFrom IN FRAME DEFAULT-FRAME /* Level from */
+ON SHIFT-DEL OF fiLevelFrom IN FRAME DEFAULT-FRAME /* Level */
 , fiLevelTo, fiFilterText
 DO:
   fiLevelFrom:SCREEN-VALUE  = "0".
@@ -371,6 +377,17 @@ DO:
   RUN saveSettings.
 
   RETURN NO-APPLY.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME tgUpdate
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgUpdate C-Win
+ON VALUE-CHANGED OF tgUpdate IN FRAME DEFAULT-FRAME /* Update */
+DO:
+  RUN subscribeEvents(SELF:CHECKED).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -540,10 +557,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiLevelFrom fiLevelTo fiFilterText edMessageBox fiFindString 
+  DISPLAY tgUpdate fiLevelFrom fiLevelTo fiFilterText edMessageBox fiFindString 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE fiLevelFrom fiLevelTo fiFilterText btnFilter btnClear edMessageBox 
-         fiFindString btnTimers 
+  ENABLE tgUpdate fiLevelFrom fiLevelTo fiFilterText btnFilter btnClear 
+         edMessageBox fiFindString btnTimers 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -605,10 +622,7 @@ PROCEDURE initializeDebugger :
     gnPrevProg = "".
 
     /* Subscribe to all events */
-    SUBSCRIBE TO "debugInfo" ANYWHERE RUN-PROCEDURE "debugInfo".
-    SUBSCRIBE TO "query"        ANYWHERE RUN-PROCEDURE "debugInfo".
-    SUBSCRIBE TO "timerCommand" ANYWHERE RUN-PROCEDURE "timerCommand".
-
+    RUN subscribeEvents(TRUE).
     RUN enable_UI.
 
     /* Window x-position */
@@ -817,6 +831,30 @@ PROCEDURE showMessage :
       .
   END.
 END PROCEDURE. /* showMessage */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE subscribeEvents C-Win 
+PROCEDURE subscribeEvents :
+/* Optionally turn off refreshing
+*/
+  DEFINE INPUT PARAMETER plUpdate AS LOGICAL NO-UNDO.
+
+  IF plUpdate THEN
+  DO:
+    SUBSCRIBE TO "debugInfo"    ANYWHERE RUN-PROCEDURE "debugInfo".
+    SUBSCRIBE TO "query"        ANYWHERE RUN-PROCEDURE "debugInfo".
+    SUBSCRIBE TO "timerCommand" ANYWHERE RUN-PROCEDURE "timerCommand".
+  END.
+  ELSE 
+  DO:
+    UNSUBSCRIBE TO "debugInfo"    .
+    UNSUBSCRIBE TO "query"        .
+    UNSUBSCRIBE TO "timerCommand" .
+  END.
+
+END PROCEDURE. /* subscribeEvents */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

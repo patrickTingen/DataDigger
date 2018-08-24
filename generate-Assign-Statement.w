@@ -4,19 +4,8 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*------------------------------------------------------------------------
 
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+  Name: generate-Assign-Statement.w
+  Desc: Generate assign statement for current file
 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
@@ -518,4 +507,3 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

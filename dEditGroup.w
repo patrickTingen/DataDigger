@@ -55,8 +55,8 @@
 &Scoped-define FIELDS-IN-QUERY-brTables ttTable.lFavourite ttTable.cTableName ttTable.cDatabase   
 &Scoped-define ENABLED-FIELDS-IN-QUERY-brTables   
 &Scoped-define SELF-NAME brTables
-&Scoped-define QUERY-STRING-brTables FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE)
-&Scoped-define OPEN-QUERY-brTables OPEN QUERY {&SELF-NAME}   FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE).
+&Scoped-define QUERY-STRING-brTables FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE)
+&Scoped-define OPEN-QUERY-brTables OPEN QUERY {&SELF-NAME}   FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE).
 &Scoped-define TABLES-IN-QUERY-brTables ttTable
 &Scoped-define FIRST-TABLE-IN-QUERY-brTables ttTable
 
@@ -67,8 +67,8 @@
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS fiTableFilter Btn_OK btnSelectAll ~
-btnDeselectAll brTables 
-&Scoped-Define DISPLAYED-OBJECTS fiTableFilter 
+btnDeselectAll brTables cbDatabase 
+&Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabase 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -98,9 +98,15 @@ DEFINE BUTTON Btn_OK AUTO-GO
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
+DEFINE VARIABLE cbDatabase AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS COMBO-BOX INNER-LINES 5
+     LIST-ITEMS "Item 1" 
+     DROP-DOWN-LIST
+     SIZE 25 BY 1 NO-UNDO.
+
 DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS FILL-IN 
-     SIZE-PIXELS 310 BY 21 TOOLTIP "filter the list of tables" NO-UNDO.
+     SIZE-PIXELS 185 BY 21 TOOLTIP "filter the list of tables" NO-UNDO.
 
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
@@ -123,16 +129,16 @@ ttTable.cDatabase     COLUMN-LABEL "DB"
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiTableFilter AT Y 10 X 5 COLON-ALIGNED NO-LABEL WIDGET-ID 2
-     Btn_OK AT Y 265 X 340
-     btnSelectAll AT Y 75 X 340 WIDGET-ID 6
-     btnDeselectAll AT Y 110 X 340 WIDGET-ID 8
-     brTables AT ROW 2.67 COL 4 WIDGET-ID 200
+     fiTableFilter AT Y 6 X 7 NO-LABEL WIDGET-ID 2
+     Btn_OK AT Y 261 X 332
+     btnSelectAll AT Y 71 X 332 WIDGET-ID 6
+     btnDeselectAll AT Y 106 X 332 WIDGET-ID 8
+     brTables AT ROW 2.48 COL 2.4 WIDGET-ID 200
+     cbDatabase AT ROW 1.29 COL 37.4 COLON-ALIGNED NO-LABEL WIDGET-ID 10
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 435 BY 333
-         TITLE "Edit favourites group"
-         DEFAULT-BUTTON Btn_OK WIDGET-ID 100.
+         SIZE-PIXELS 425 BY 328
+         TITLE "Edit favourites group" WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -157,6 +163,8 @@ ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
+/* SETTINGS FOR FILL-IN fiTableFilter IN FRAME Dialog-Frame
+   ALIGN-L                                                              */
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
@@ -169,6 +177,7 @@ ASSIGN
 OPEN QUERY {&SELF-NAME}
   FOR EACH ttTable
     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'
+      AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)
       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE).
      _END_FREEFORM
      _Query            is OPENED
@@ -209,6 +218,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables Dialog-Frame
 ON DEFAULT-ACTION OF brTables IN FRAME Dialog-Frame
 OR ' ' OF brTables 
+OR 'RETURN' OF brTables
 DO:
   ttTable.lFavourite = NOT ttTable.lFavourite.
   BROWSE brTables:REFRESH().
@@ -266,6 +276,7 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter Dialog-Frame
 ON VALUE-CHANGED OF fiTableFilter IN FRAME Dialog-Frame
+, cbDatabase
 DO:
   {&open-query-brTables}
 END.
@@ -295,6 +306,10 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   FOR EACH ttTable:
     ttTable.lFavouriteOrg = ttTable.lFavourite.
   END.
+
+  /* Set databases */
+  cbDatabase:LIST-ITEMS = ',' + getDatabaseList().
+  cbDatabase:SCREEN-VALUE = getRegistry('DataDigger','Database') NO-ERROR.
 
   RUN enable_UI.
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
@@ -336,9 +351,9 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiTableFilter 
+  DISPLAY fiTableFilter cbDatabase 
       WITH FRAME Dialog-Frame.
-  ENABLE fiTableFilter Btn_OK btnSelectAll btnDeselectAll brTables 
+  ENABLE fiTableFilter Btn_OK btnSelectAll btnDeselectAll brTables cbDatabase 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -384,6 +399,7 @@ PROCEDURE selectTables :
 
     FOR EACH bTable 
       WHERE bTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'
+        AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)
         AND (bTable.lShowInList = TRUE OR bTable.lFavourite = TRUE):
       bTable.lFavourite = plSelect.
     END. 

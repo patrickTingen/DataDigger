@@ -1,3 +1,4 @@
+=====================================================================================
         ____     __    ____    __     ____   ____   ___    ___   ____   ____
        (  _ \   /__\  (_  _)  /__\   (  _ \ (_  _) / __)  / __) ( ___) (  _ \
         )(_) ) /(__)\   )(   /(__)\   )(_) ) _)(_ ( (_-. ( (_-.  )__)   )   /
@@ -10,7 +11,11 @@ DataDigger version 24 - dd MMM 2018
 - Solved: Update cannot be set in DataDigger ini #37 (movedoa)
 - Solved: Check for PingBack is wrong #33 (movedoa)
 - Solved: Small layout errors on settings screen #35 (movedoa)
+- Solved: Saving settings takes relatively long 
+- Solved: Strange characters on the about-screen
 - Change: Option to not cache the settings removed #32 (movedoa)
+- Change: Usage info is saved to settings but never used.
+- Change: Cleaned up images folder
 - New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
 - New   : Use CTRL-DOWN / CTRL-UP to expand query editor
 - New   : Option to use multiple favourites groups
@@ -29,9 +34,9 @@ BetaDigger 20180712
 BetaDigger 20180627
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
-- Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschend�rfer)
+- Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschend?rfer)
 - Solved: Extra filter refused to hide normal tables (Edwin Schutten)
-- Solved: Query fails when search condition contains pipe symbol (Mike Raschend�rfer)
+- Solved: Query fails when search condition contains pipe symbol (Mike Raschend?rfer)
 - Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
 - Solved: Table browse shows normal tables when disabled in filter #8 (Edwin Schutten)
 - Solved: Backups not saved with default myDataDigger code #11
@@ -55,7 +60,7 @@ BetaDigger 20180627
 - Solved: ICO file corrupt (Arno van der Ende)
 - Solved: Resizing window takes up to 2 seconds
 - Solved: Hiding 'Delete record' question prevents deletion of records (Hans Kaman)
-- Solved: Recid does not show in large databases (Ren� Postma)
+- Solved: Recid does not show in large databases (Ren? Postma)
 - Solved: Last field in update was not assigned (Steven Peeters)
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
@@ -137,7 +142,7 @@ DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
 
 - Solved: Nr of selected rows not cleared on table change (Mike Derrick)
 - Solved: Error when using fields that end in 'by' in the where-box (Andrew Fornek)
-- Solved: Error when started with relative path (Mike Raschend�rfer)
+- Solved: Error when started with relative path (Mike Raschend?rfer)
 - Solved: Settings screen still refered to OEHive (Marius Fiere)
 - Solved: Error when started without timer OCX (Annamarie Fortgens)
 - Solved: When large font is used, feedback text in lower right corner is truncated
@@ -179,7 +184,7 @@ DataDigger version 20 - 29 september 2016 (Coffee Version)
 - Solved: Query reposition error after data load
 - Solved: Copy value to clipboard on databrowse copies wrong field if browse is scrolled horizontally
 - Solved: Complain about CRC changes in the database when security list is changed (Albert Flikkema)
-- Solved: Issues with reading additional spaces in the settings file (Thomas Bl�hmann)
+- Solved: Issues with reading additional spaces in the settings file (Thomas Bl?hmann)
 - Solved: Settings for caching Fields and Tables were mixed up (Albert Flikkema)
 - Solved: Invalid handle error when table contains more fields than are shown (Alex Leenstra)
 - Solved: Sort on extent fields resulted in query error
@@ -205,12 +210,12 @@ DataDigger version 20 - 29 september 2016 (Coffee Version)
 - Change: Navigate query buttons re-introduced (Rob Willoughby)
 - Change: Removed auto-refresh widgets
 - Change: INI file is sorted when saved (Jeroen Beugels)
-- Change: Query is not opened when WHERE-phrase contains an error (Mike Raschend�rfer)
+- Change: Query is not opened when WHERE-phrase contains an error (Mike Raschend?rfer)
 - Change: Changed the tool menu, some buttons moved to this menu
 - Change: Digger now always starts with Fieldbrowse
 - Change: Shortcuts for dumping and loading changed to CTRL-S and CTRL-L
 - Change: Open procedure editor shortcut changed from CTRL-SHIFT-E to SHIFT-F3
-- Change: DELETE triggers are enabled by default (Mike Raschend�rfer)
+- Change: DELETE triggers are enabled by default (Mike Raschend?rfer)
 - Change: Auto-update function removed since it was not working consistently
 - Change: View record also shows RECID and ROWID values
 - Change: Removed Filter buttons on fields- index- and data browse (Jeroen Commandeur)
@@ -265,7 +270,7 @@ DataDigger version 19 - 22 jul 2014 (Straight A's)
 - Solved: Error for PSTimer on closing DD (Didier Dujardin)
 - Solved: Extent fields show their own name as filter value
 - Solved: Flashing scrollbars (Richard Kelters)
-- Solved: Format for custom format too short (Jani Gy�rgy)
+- Solved: Format for custom format too short (Jani Gy?rgy)
 - Solved: Replace-error when running with codepage other than UTF-8/1252 (Edwin Schutten)
 - Solved: No chance to abort dumping process
 - Solved: Error when dumping data to DD-dir and opening dump-dir (Erik Weiffenbach)

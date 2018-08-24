@@ -182,10 +182,10 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnAddFavGroup btnFavourite rctQuery rctEdit ~
-fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables brFields btnWhere brIndexes ~
-tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnQueries btnView ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
+cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
 btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
 btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
 btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
@@ -457,7 +457,7 @@ DEFINE BUTTON btnEdit  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnFavourite  NO-FOCUS FLAT-BUTTON
      LABEL "F" 
-     SIZE-PIXELS 21 BY 21 TOOLTIP "toggle as favourite".
+     SIZE-PIXELS 19 BY 21 TOOLTIP "toggle as favourite".
 
 DEFINE BUTTON btnLoad  NO-FOCUS FLAT-BUTTON
      LABEL "&Load" 
@@ -943,9 +943,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -954,13 +953,14 @@ DEFINE FRAME frMain
      btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
      brTables AT Y 27 X 56 WIDGET-ID 300
      brFields AT Y 27 X 325 WIDGET-ID 100
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -1162,7 +1162,7 @@ ASSIGN
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables btnClearIndexFilter frMain */
 /* BROWSE-TAB brFields brTables frMain */
-/* BROWSE-TAB brIndexes btnWhere frMain */
+/* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -2952,6 +2952,21 @@ END.
 &ANALYZE-RESUME
 
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
+ON MOUSE-MENU-CLICK OF btnHelp IN FRAME frSettings /* Help */
+, btnHelp-txt 
+DO:
+
+  glShowTour = TRUE.
+  RUN showNewFeatures.
+  glShowTour = FALSE.
+  
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define FRAME-NAME frWhere
 &Scoped-define SELF-NAME btnInsert
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnInsert C-Win
@@ -4087,8 +4102,7 @@ DO:
   IF FRAME frHint:visible THEN RETURN NO-APPLY.
 
   /* Cancel all running timer events */
-  IF glUseTimer THEN
-    chCtrlFrame:pstimer:ENABLED = FALSE.
+  IF glUseTimer THEN chCtrlFrame:pstimer:ENABLED = FALSE.
 
   /* Save size and position of the window */
   RUN saveWindow.
@@ -4105,8 +4119,6 @@ DO:
 
   RUN disable_UI.
 END. /* CLOSE OF THIS-PROCEDURE  */
-
-
 
 
 ON ENTRY OF ttField.cFormat IN BROWSE brFields
@@ -4137,6 +4149,7 @@ DO:
     RETURN NO-APPLY.
   END.
 END. /* on entry of ttField.cFormat */
+
 
 ON LEAVE OF ttField.cFormat IN BROWSE brFields
 DO:
@@ -5608,20 +5621,20 @@ PROCEDURE convertSettings :
       OS-DELETE frLoadMapping.w.
       OS-DELETE frLoadMapping.r.
       OS-DELETE DataDigger.chm.
-      OS-DELETE images/default_ReleaseNotes.gif.
-      OS-DELETE images/default_FilterCombo.gif.
-      OS-DELETE images/default_FilterComboRed.gif.
-      OS-DELETE images/default_Star.gif.
-      OS-DELETE images/default_Tables.gif.
-      OS-DELETE images/default_PrevQuery.gif.
-      OS-DELETE images/default_NextQuery.gif.
-      OS-DELETE images/default_ViewAsList.gif.
-      OS-DELETE images/default_Pinned.gif.
-      OS-DELETE images/default_Unpinned.gif.
-      OS-DELETE images/default_Undock.gif.
-      OS-DELETE images/default_Dock.gif.
-      OS-DELETE images/default_Tab_Favorites_Active.gif.
-      OS-DELETE images/default_Tab_Favorites_Inactive.gif.
+      OS-DELETE image/default_ReleaseNotes.gif.
+      OS-DELETE image/default_FilterCombo.gif.
+      OS-DELETE image/default_FilterComboRed.gif.
+      OS-DELETE image/default_Star.gif.
+      OS-DELETE image/default_Tables.gif.
+      OS-DELETE image/default_PrevQuery.gif.
+      OS-DELETE image/default_NextQuery.gif.
+      OS-DELETE image/default_ViewAsList.gif.
+      OS-DELETE image/default_Pinned.gif.
+      OS-DELETE image/default_Unpinned.gif.
+      OS-DELETE image/default_Undock.gif.
+      OS-DELETE image/default_Dock.gif.
+      OS-DELETE image/default_Tab_Favorites_Active.gif.
+      OS-DELETE image/default_Tab_Favorites_Inactive.gif.
 
       /* Erase widths of table browse */
       setRegistry('DataDigger','ColumnWidth:cTableName',?).
@@ -5708,12 +5721,21 @@ PROCEDURE convertSettings :
       OS-DELETE dHint.w.
       OS-DELETE dHint.r.
 
-      /* Old easter egg images */
+      /* Obsolete stuff */
+      OS-DELETE wAbout.wrx.
       OS-DELETE image/default_AboutTitle.gif.
       OS-DELETE image/default_AboutTitle2.gif.
       OS-DELETE image/default_AboutTitle3.gif.
       OS-DELETE image/default_Paddle.gif.
-      OS-DELETE image/wAbout.wrx.
+      OS-DELETE image/default_Download.gif.
+      OS-DELETE image/default_Download_ins.gif.
+      OS-DELETE image/default_Upload.gif.
+      OS-DELETE image/default_ResizeHor.gif.
+      OS-DELETE image/default_Ok.gif.
+      OS-DELETE image/default_Back.gif.
+      OS-DELETE image/default_Compare.gif.
+      OS-DELETE image/default_DataDigger16x16.gif.
+      OS-DELETE image/default_Forward.gif.
 
       /* Setting '<PROGDIR>' renamed to '<WORKDIR>' */
       cValue = getRegistry("DataDigger:Backup", "BackupDir").
@@ -5727,14 +5749,21 @@ PROCEDURE convertSettings :
 
       cValue = getRegistry("DumpAndLoad", "DumpFileTemplate").
       setRegistry("DumpAndLoad", "DumpFileTemplate", REPLACE(cValue,'<PROGDIR>', '<WORKDIR>')).
-      RUN flushRegistry.
+
+      /* Remove usage info, except for numUsed */
+      RUN getRegistryTable(OUTPUT TABLE bfConfig).
+      FOR EACH bfConfig WHERE bfConfig.cSection = 'DataDigger:Usage':
+        IF NOT bfConfig.cSetting MATCHES '*:NumUsed' THEN 
+          setRegistry(bfConfig.cSection,bfConfig.cSetting,?).
+      END.
+      EMPTY TEMP-TABLE bfConfig.
 
       /* Old setting got re-created due to bug in DD23 */
       setRegistry("DumpAndLoad", "DumpFileDir", ?).
     END. /* 23 */
-
   END CASE. /* old version */
 
+  RUN flushRegistry.
   SESSION:SET-WAIT-STATE("").
 
 END PROCEDURE. /* convertSettings */
@@ -6663,6 +6692,8 @@ PROCEDURE editFavourites :
   RUN VALUE(getProgramDir() + 'dEditGroup.w')
     ( INPUT-OUTPUT TABLE ttTable, OUTPUT lOk).
 
+  SESSION:SET-WAIT-STATE('general').
+
   IF lOk THEN
   DO:
     FOR EACH bTable WHERE bTable.lFavourite <> bTable.lFavouriteOrg:
@@ -6670,6 +6701,14 @@ PROCEDURE editFavourites :
     END.
     RUN reopenTableBrowse(?).
   END.
+  ELSE 
+  DO:
+    FOR EACH bTable: 
+      bTable.lFavourite = bTable.lFavouriteOrg.
+    END.
+  END.
+
+  SESSION:SET-WAIT-STATE('').
 
 END PROCEDURE. /* editFavourites */
 
@@ -6692,15 +6731,15 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE btnAddFavGroup btnFavourite rctQuery rctEdit fiTableFilter 
-         cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter 
-         fiFieldsFilter btnClearIndexFilter brTables brFields btnWhere 
-         brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnQueries 
-         btnView btnTools btnTabTables btnClear btnClearFieldFilter 
-         btnClearTableFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
-         btnMoveUp btnReset btnTableFilter btnTabFavourites btnTabFields 
-         btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
-         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+  ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
+         btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
+         btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
+         btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
+         btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
+         btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -8250,7 +8289,7 @@ PROCEDURE initializeObjects :
     END.
 
     /* Flush registry timer */
-    RUN setTimer('flushRegistry',5000).
+    RUN setTimer('flushRegistry',5000). 
 
     /* Set caching in library */
     RUN setCaching.
@@ -11196,36 +11235,39 @@ PROCEDURE setTableView :
   DEFINE VARIABLE iNumFav   AS INTEGER NO-UNDO.
   DEFINE VARIABLE lFirstRun AS LOGICAL NO-UNDO.
 
-  /* What view are we in? */
-  glshowFavourites = plFavouritesView.
-
-  /* If we switch manually to Fav-view for the first time... */
-  IF NOT plFiredBySystem
-    AND glshowFavourites = TRUE
-    AND getRegistry("DataDigger:Usage", "switchTableView:numUsed") = ? THEN
-  DO:
-    lFirstRun = TRUE.
-
-    #SetFav:
-    FOR EACH ttTable
-      WHERE ttTable.lHidden     = FALSE
-        AND ttTable.iNumQueries > 0
-      BY ttTable.iNumQueries DESCENDING
-      BY ttTable.tLastUsed DESCENDING:
-
-      ttTable.lFavourite = TRUE.
-      setRegistry( SUBSTITUTE("DB:&1",ttTable.cDatabase)
-                 , SUBSTITUTE("&1:Favourite",ttTable.cTableName)
-                 , "TRUE"
-                 ).
-      iNumFav = iNumFav + 1.
-      IF iNumFav >= 4 THEN LEAVE #SetFav.
+  DO WITH FRAME {&FRAME-NAME}:
+    /* What view are we in? */
+    glshowFavourites = plFavouritesView.
+  
+    IF glshowFavourites THEN RUN showFavouriteIcon(TRUE).
+    btnFavourite:TOOLTIP = STRING(glshowFavourites,'edit this group/toggle as favourite').
+  
+    /* If we switch manually to Fav-view for the first time... */
+    IF NOT plFiredBySystem
+      AND glshowFavourites = TRUE
+      AND getRegistry("DataDigger:Usage", "switchTableView:numUsed") = ? THEN
+    DO:
+      lFirstRun = TRUE.
+  
+      #SetFav:
+      FOR EACH ttTable
+        WHERE ttTable.lHidden     = FALSE
+          AND ttTable.iNumQueries > 0
+        BY ttTable.iNumQueries DESCENDING
+        BY ttTable.tLastUsed DESCENDING:
+  
+        ttTable.lFavourite = TRUE.
+        setRegistry( SUBSTITUTE("DB:&1",ttTable.cDatabase)
+                   , SUBSTITUTE("&1:Favourite",ttTable.cTableName)
+                   , "TRUE"
+                   ).
+        iNumFav = iNumFav + 1.
+        IF iNumFav >= 4 THEN LEAVE #SetFav.
+      END.
     END.
-  END.
-
-  PUBLISH "setUsage" ("switchTableView"). /* user behaviour */
-
-  DO WITH FRAME frMain:
+  
+    PUBLISH "setUsage" ("switchTableView"). /* user behaviour */
+  
     setRegistry("DataDigger","TableView", STRING(glshowFavourites,"F/T")).
     RUN reopenTableBrowse(?).
 
@@ -11765,12 +11807,11 @@ PROCEDURE showNewFeatures :
     /* This will be checked within showHint */
     glHintCancelled = FALSE.
 
-    /* New in 23
+    /* New in 24
 
-    - New : Support for SQL Server
-    - New : Multi-sort on data columns now possible
-    - New : Row coloring now depending on chosen sort
-    - New : Right-click on data browse now shows total, min, max, avg of selected rows
+    - New : Option to use multiple favourites groups
+    - New : Option to generate an include file with tt definitions
+    - New : Toolbar now docked
 
     &GLOBAL-DEFINE ARROW-NONE       0
     &GLOBAL-DEFINE ARROW-LEFT-UP    1
@@ -11782,29 +11823,20 @@ PROCEDURE showNewFeatures :
     /* Wait until databrowse is ready (due to timer) */
     DO WHILE NOT VALID-HANDLE(ghDataBrowse): PROCESS EVENTS. END.
 
-    /* Multi-sort on data columns now possible */
-    #Column:
-    FOR EACH bColumn:
-      IF NOT bColumn.hColumn:VISIBLE THEN NEXT #Column.
-      iColumnNr = iColumnNr + 1.
-      IF iColumnNr > 1 THEN
-      DO:
-        RUN showHint(bColumn.hColumn, {&ARROW-LEFT-UP}, "~nUse CONTROL + CLICK to add up to 9 sort levels").
-        IF glHintCancelled THEN LEAVE demoLoop.
-        LEAVE #Column.
-      END.
-    END.
-
+    /* Toolbar */
+    RUN showHint(FRAME frSettings:HANDLE, {&ARROW-LEFT-DOWN}, "1/4~n~nThe toolbar is now docked, but can be hidden or expanded/collapsed").
+    IF glHintCancelled THEN LEAVE demoLoop.
+    
     /* Sort button */
-    RUN showHint(btnDataSort:HANDLE IN FRAME frData, {&ARROW-LEFT-DOWN}, "~nOr maintain them here").
+    RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "2/4~n~nGenerate different types of code from the context menu").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* Right-click on data browse now shows total, min, max, avg of selected rows */
-    RUN showHint(ghDataBrowse, {&ARROW-RIGHT-DOWN}, "~nShow Total/Min/Max/Avg of selected rows on right-click").
+    RUN showHint(btnTabFavourites:HANDLE, {&ARROW-LEFT-DOWN}, "3/4~n~nYou can now have multiple groups with favourites").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* feedback */
-    RUN showHint(fiFeedback:HANDLE, 3, "~nGot some feedback? ~nClick here to mail me").
+    RUN showHint(fiFeedback:HANDLE, 3, "4/4~n~nGot some feedback? ~nClick here to mail me").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* Done! */
@@ -12195,7 +12227,7 @@ PROCEDURE startSession :
   setRegistry('DataDigger', 'Build', '{&build}').
 
   /* If we come from an older version, do some conversions */
-  IF lNewVersion OR lNewBuild THEN
+  IF lNewVersion OR lNewBuild THEN 
   DO:
     lUpgraded = TRUE.
 
