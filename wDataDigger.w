@@ -110,7 +110,7 @@ DEFINE VARIABLE giMaxExtent                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxFilterHistory         AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO INITIAL FALSE.
 DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glshowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
+DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to override 'ShowHints=no' setting */
 
@@ -2083,10 +2083,6 @@ DO:
 
   /* scroll-notify detects a mouse action in the scrollbar area of a browse. */
   RUN resizeFilters(INPUT giCurrentPage).
-/*   RUN resizeFilters(INPUT {&PAGE-TABLES}).     */
-/*   RUN resizeFilters(INPUT {&PAGE-FAVOURITES}). */
-/*   RUN resizeFilters(INPUT {&PAGE-FIELDS}).     */
-/*   RUN resizeFilters(INPUT {&PAGE-INDEXES}).    */
 
   FINALLY:
     SET-SIZE(lp) = 0.
@@ -2310,6 +2306,18 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON f OF brTables IN FRAME frMain
+DO:
+  
+  RUN toggleFavourite.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON INSERT-MODE OF brTables IN FRAME frMain
 OR "F3", '+', INSERT-MODE OF cbDatabaseFilter
 OR "F3", '+', INSERT-MODE OF brTables
@@ -2416,7 +2424,7 @@ DO:
     fiTableDesc:SCREEN-VALUE = hBuffer::cTableDesc.
     fiTableDesc:TOOLTIP      = hBuffer::cTableDesc.
 
-    RUN showFavouriteIcon(hBuffer::lFavourite).
+    RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE hBuffer::lFavourite).
 
     PUBLISH "debugInfo" (2,SUBSTITUTE("Select table &1.&2", gcCurrentDatabase, gcCurrentTable)).
   END.
@@ -2434,7 +2442,7 @@ DO:
     fiTableDesc:SCREEN-VALUE = "".
     fiTableDesc:TOOLTIP      = ''.
 
-    RUN showFavouriteIcon(FALSE).
+    RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE FALSE).
   END.
 
   /* Switch on/off UI */
@@ -2919,8 +2927,6 @@ END.
 &Scoped-define SELF-NAME btnFavourite
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavourite C-Win
 ON CHOOSE OF btnFavourite IN FRAME frMain /* F */
-OR "f" OF brTables
-OR "*" OF brTables
 DO:
 
   CASE giCurrentPage:
@@ -5756,6 +5762,14 @@ PROCEDURE convertSettings :
         IF NOT bfConfig.cSetting MATCHES '*:NumUsed' THEN 
           setRegistry(bfConfig.cSection,bfConfig.cSetting,?).
       END.
+
+      /* Move old favourites to group 'myFavourites' */
+      FOR EACH bfConfig WHERE bfConfig.cSection BEGINS 'DB:'
+                          AND bfConfig.cSetting MATCHES '*:favourite':
+        RUN setFavourite(ENTRY(2,bfConfig.cSection,':'), ENTRY(1,bfConfig.cSetting,':'), 'myFavourites', TRUE).
+        setRegistry(bfConfig.cSection,bfConfig.cSetting,?).
+      END.
+
       EMPTY TEMP-TABLE bfConfig.
 
       /* Old setting got re-created due to bug in DD23 */
@@ -6695,9 +6709,9 @@ PROCEDURE editFavourites :
   SESSION:SET-WAIT-STATE('general').
 
   IF lOk THEN
-  DO:
+  DO WITH FRAME {&FRAME-NAME}:
     FOR EACH bTable WHERE bTable.lFavourite <> bTable.lFavouriteOrg:
-      RUN setFavourite(bTable.cDatabase, bTable.cTableName, bTable.lFavourite).
+      RUN setFavourite(bTable.cDatabase, bTable.cTableName, cbFavouriteGroup:SCREEN-VALUE, bTable.lFavourite).
     END.
     RUN reopenTableBrowse(?).
   END.
@@ -8263,8 +8277,8 @@ PROCEDURE initializeObjects :
 
     /* Set Table or Favourites view */
     cSetting = getRegistry("DataDigger","TableView").
-    glshowFavourites = (cSetting BEGINS "F" AND CAN-FIND(FIRST ttTable WHERE ttTable.lFavourite = TRUE)).
-    RUN setTableView(glshowFavourites,YES).
+    glShowFavourites = (cSetting BEGINS "F" AND CAN-FIND(FIRST ttTable WHERE ttTable.lFavourite = TRUE)).
+    RUN setTableView(glShowFavourites,YES).
 
     /* Hide or view the query editor */
     cSetting = getRegistry("DataDigger", "QueryEditorState").
@@ -10163,7 +10177,7 @@ PROCEDURE reopenTableBrowse :
     FIND bTable
       WHERE bTable.cTableName  = fiTableFilter:SCREEN-VALUE
         AND bTable.lShowInList = TRUE
-        AND (NOT glshowFavourites OR bTable.lFavourite = TRUE)
+        AND (NOT glShowFavourites OR bTable.lFavourite = TRUE)
             NO-ERROR.
     IF AVAILABLE bTable THEN rCurrentRecord = ROWID(bTable).
 
@@ -10202,7 +10216,7 @@ PROCEDURE reopenTableBrowse :
     RUN setSortArrow(brTables:handle, cNewSort, lAscending).
 
     /* Close query, which may be open */
-    IF VALID-HANDLE(brTables:query) THEN brTables:query:query-close().
+    IF VALID-HANDLE(brTables:QUERY) THEN brTables:QUERY:QUERY-CLOSE().
 
     /* Build the query */
     IF NOT VALID-HANDLE(ghTableQuery) THEN
@@ -10213,17 +10227,17 @@ PROCEDURE reopenTableBrowse :
     END.
 
     /* If Favourites-view then limited restrictions. Just show the list*/
-    IF glshowFavourites THEN
+    IF glShowFavourites THEN
       cQuery = 'FOR EACH ttTable WHERE ttTable.lFavourite = TRUE'.
     ELSE
     DO:
       /* Base query */
       cQuery = 'FOR EACH ttTable WHERE ttTable.lShowInList = TRUE'.
-
-      /* Show only tables of selected database (if set) */
-      IF cDatabaseFilter <> '*' THEN
-        cQuery = SUBSTITUTE('&1 AND cDatabase MATCHES &2', cQuery, QUOTER(cDatabaseFilter)).
     END.
+
+    /* Show only tables of selected database (if set) */
+    IF cDatabaseFilter <> '*' THEN
+      cQuery = SUBSTITUTE('&1 AND cDatabase MATCHES &2', cQuery, QUOTER(cDatabaseFilter)).
 
     /* Show only the tables that match the table name filter (if set) */
     IF cTableFilter <> "*" THEN
@@ -10696,11 +10710,11 @@ PROCEDURE setFavourite :
 */
   DEFINE INPUT  PARAMETER pcDatabase  AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcTable     AS CHARACTER   NO-UNDO.
+  DEFINE INPUT  PARAMETER pcGroupName AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER plFavourite AS LOGICAL     NO-UNDO.
 
   DEFINE BUFFER bTable FOR ttTable.
-  DEFINE VARIABLE cGroups AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName   AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cGroupList AS CHARACTER   NO-UNDO.
 
   /* Find table and set/unset as fav */
   FIND bTable
@@ -10709,26 +10723,27 @@ PROCEDURE setFavourite :
 
   /* Set fav-status and save */
   bTable.lFavourite = (IF plFavourite = ? THEN NOT bTable.lFavourite ELSE plFavourite).
-  setRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourite",pcTable), (IF bTable.lFavourite THEN "TRUE" ELSE ?)).
+/*   setRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourite",pcTable), (IF bTable.lFavourite THEN "TRUE" ELSE ?)). */
 
-  cGroups = getRegistry( SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourites",pcTable)).
-  IF cGroups = ? THEN cGroups = ''.
+  pcGroupName = cbFavouriteGroup:SCREEN-VALUE IN FRAME {&FRAME-NAME}.
+  cGroupList = getRegistry( SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourites",pcTable)).
+  IF cGroupList = ? THEN cGroupList = ''.
 
   /* Remove or add to list */
-  IF NOT bTable.lFavourite AND LOOKUP(cName,cGroups) > 0 THEN
+  IF NOT bTable.lFavourite AND LOOKUP(pcGroupName,cGroupList) > 0 THEN
   DO:
-    ENTRY(LOOKUP(cName,cGroups),cGroups) = ''.
-    cGroups = REPLACE(cGroups,',,',',').
-    cGroups = TRIM(cGroups,',').
+    ENTRY(LOOKUP(pcGroupName,cGroupList),cGroupList) = ''.
+    cGroupList = REPLACE(cGroupList,',,',',').
+    cGroupList = TRIM(cGroupList,',').
   END.
 
-  IF bTable.lFavourite AND LOOKUP(cName,cGroups) = 0 THEN
+  IF bTable.lFavourite AND LOOKUP(pcGroupName,cGroupList) = 0 THEN
   DO:
-    cGroups = SUBSTITUTE('&1,&2', cGroups, cName).
-    cGroups = TRIM(cGroups,',').
+    cGroupList = SUBSTITUTE('&1,&2', cGroupList, pcGroupName).
+    cGroupList = TRIM(cGroupList,',').
   END.
 
-  setRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourites",pcTable), cGroups).
+  setRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:Favourites",pcTable), cGroupList).
 
 END PROCEDURE. /* setFavourite */
 
@@ -11234,33 +11249,30 @@ PROCEDURE setTableView :
 
   DEFINE VARIABLE iNumFav   AS INTEGER NO-UNDO.
   DEFINE VARIABLE lFirstRun AS LOGICAL NO-UNDO.
+  DEFINE BUFFER bTable FOR ttTable.
 
   DO WITH FRAME {&FRAME-NAME}:
     /* What view are we in? */
-    glshowFavourites = plFavouritesView.
+    glShowFavourites = plFavouritesView.
   
-    IF glshowFavourites THEN RUN showFavouriteIcon(TRUE).
-    btnFavourite:TOOLTIP = STRING(glshowFavourites,'edit this group/toggle as favourite').
+    IF glShowFavourites THEN RUN showFavouriteIcon(TRUE).
+    btnFavourite:TOOLTIP = STRING(glShowFavourites,'edit this group/toggle as favourite').
   
     /* If we switch manually to Fav-view for the first time... */
     IF NOT plFiredBySystem
-      AND glshowFavourites = TRUE
+      AND glShowFavourites = TRUE
       AND getRegistry("DataDigger:Usage", "switchTableView:numUsed") = ? THEN
     DO:
       lFirstRun = TRUE.
   
       #SetFav:
-      FOR EACH ttTable
-        WHERE ttTable.lHidden     = FALSE
-          AND ttTable.iNumQueries > 0
-        BY ttTable.iNumQueries DESCENDING
-        BY ttTable.tLastUsed DESCENDING:
+      FOR EACH bTable
+        WHERE bTable.lHidden     = FALSE
+          AND bTable.iNumQueries > 0
+        BY bTable.iNumQueries DESCENDING
+        BY bTable.tLastUsed DESCENDING:
   
-        ttTable.lFavourite = TRUE.
-        setRegistry( SUBSTITUTE("DB:&1",ttTable.cDatabase)
-                   , SUBSTITUTE("&1:Favourite",ttTable.cTableName)
-                   , "TRUE"
-                   ).
+        RUN setFavourite(bTable.cDatabase, bTable.cTableName, 'myFavourites', TRUE).
         iNumFav = iNumFav + 1.
         IF iNumFav >= 4 THEN LEAVE #SetFav.
       END.
@@ -11268,10 +11280,10 @@ PROCEDURE setTableView :
   
     PUBLISH "setUsage" ("switchTableView"). /* user behaviour */
   
-    setRegistry("DataDigger","TableView", STRING(glshowFavourites,"F/T")).
+    setRegistry("DataDigger","TableView", STRING(glShowFavourites,"F/T")).
     RUN reopenTableBrowse(?).
 
-    IF lFirstRun AND CAN-FIND(FIRST ttTable WHERE ttTable.lFavourite = TRUE) THEN
+    IF lFirstRun AND CAN-FIND(FIRST bTable WHERE bTable.lFavourite = TRUE) THEN
       RUN showHint(brTables:HANDLE,4,"To give you a start, I added your most used tables to the favourites. Add or remove them by hitting F on the browse.").
   END.
 
@@ -12545,15 +12557,13 @@ PROCEDURE toggleFavourite :
     END.
     IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN RETURN. 
 
-    RUN setFavourite(gcCurrentDatabase, gcCurrentTable, ?).
+    RUN setFavourite(gcCurrentDatabase, gcCurrentTable, cbFavouriteGroup:SCREEN-VALUE, ?).
 
     /* If we are in the favo-view then refresh the browse */
-    IF glshowFavourites THEN RUN reopenTableBrowse(?).
+    IF glShowFavourites THEN RUN reopenTableBrowse(?).
   
     IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
       APPLY 'value-changed' TO brTables.
-/*     IF giCurrentPage <> {&PAGE-FAVOURITES} THEN */
-/*       RUN showFavouriteIcon(bTable.lFavourite). */
   END.
   
 END PROCEDURE. /* toggleFavourite */

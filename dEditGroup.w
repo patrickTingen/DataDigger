@@ -66,8 +66,8 @@
     ~{&OPEN-QUERY-brTables}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS fiTableFilter Btn_OK btnSelectAll ~
-btnDeselectAll brTables cbDatabase 
+&Scoped-Define ENABLED-OBJECTS fiTableFilter cbDatabase brTables ~
+btnSelectAll btnDeselectAll Btn_OK 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabase 
 
 /* Custom List Definitions                                              */
@@ -130,11 +130,11 @@ ttTable.cDatabase     COLUMN-LABEL "DB"
 
 DEFINE FRAME Dialog-Frame
      fiTableFilter AT Y 6 X 7 NO-LABEL WIDGET-ID 2
-     Btn_OK AT Y 261 X 332
+     cbDatabase AT ROW 1.29 COL 37.4 COLON-ALIGNED NO-LABEL WIDGET-ID 10
+     brTables AT ROW 2.48 COL 2.4 WIDGET-ID 200
      btnSelectAll AT Y 71 X 332 WIDGET-ID 6
      btnDeselectAll AT Y 106 X 332 WIDGET-ID 8
-     brTables AT ROW 2.48 COL 2.4 WIDGET-ID 200
-     cbDatabase AT ROW 1.29 COL 37.4 COLON-ALIGNED NO-LABEL WIDGET-ID 10
+     Btn_OK AT Y 261 X 332
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 425 BY 328
@@ -157,8 +157,8 @@ DEFINE FRAME Dialog-Frame
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
-   FRAME-NAME                                                           */
-/* BROWSE-TAB brTables btnDeselectAll Dialog-Frame */
+   FRAME-NAME Custom                                                    */
+/* BROWSE-TAB brTables cbDatabase Dialog-Frame */
 ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
@@ -191,6 +191,16 @@ OPEN QUERY {&SELF-NAME}
 /* ************************  Control Triggers  ************************ */
 
 &Scoped-define SELF-NAME Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
+ON ALT-T OF FRAME Dialog-Frame /* Edit favourites group */
+DO:
+  APPLY 'ENTRY' TO fiTableFilter.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
 ON GO OF FRAME Dialog-Frame /* Edit favourites group */
 DO:
@@ -353,7 +363,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY fiTableFilter cbDatabase 
       WITH FRAME Dialog-Frame.
-  ENABLE fiTableFilter Btn_OK btnSelectAll btnDeselectAll brTables cbDatabase 
+  ENABLE fiTableFilter cbDatabase brTables btnSelectAll btnDeselectAll Btn_OK 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -399,8 +409,9 @@ PROCEDURE selectTables :
 
     FOR EACH bTable 
       WHERE bTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'
-        AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)
+        AND (cbDatabase:SCREEN-VALUE = ? OR bTable.cDatabase = cbDatabase:SCREEN-VALUE)
         AND (bTable.lShowInList = TRUE OR bTable.lFavourite = TRUE):
+
       bTable.lFavourite = plSelect.
     END. 
   
