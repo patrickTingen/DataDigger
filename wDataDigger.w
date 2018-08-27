@@ -185,7 +185,7 @@ END PROCEDURE. /* URLDownloadToFileA */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
+btnAddFavGroup cbFavouriteGroup ficWhere btnWhere btnQueries btnView ~
 btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
 btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
 btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
@@ -956,10 +956,10 @@ DEFINE FRAME frMain
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
@@ -5729,6 +5729,7 @@ PROCEDURE convertSettings :
 
       /* Obsolete stuff */
       OS-DELETE wAbout.wrx.
+      OS-DELETE dChooseFont.w. /* replaced with adecomm/_chsfont.p */
       OS-DELETE image/default_AboutTitle.gif.
       OS-DELETE image/default_AboutTitle2.gif.
       OS-DELETE image/default_AboutTitle3.gif.
@@ -6747,8 +6748,8 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
+         brTables brFields brIndexes tgDebugMode fiTableDesc btnAddFavGroup 
+         cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools 
          btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
          btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
          btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 

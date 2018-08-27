@@ -15,10 +15,13 @@ DataDigger version 24 - dd MMM 2018
 - Solved: Strange characters on the about-screen
 - Solved: Editing favourites selects too many tables
 - Solved: Favourites icon below table browse sometimes disabled
+- Solved: Saving fonts did not survive a restart #38 (Dubravko Labaš)
+
 - Change: Option to not cache the settings removed #32 (movedoa)
 - Change: Usage info is saved to settings but never used.
 - Change: Cleaned up images folder
 - Change: Favourites view now also respects database filter
+
 - New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
 - New   : Use CTRL-DOWN / CTRL-UP to expand query editor
 - New   : Option to use multiple favourites groups
