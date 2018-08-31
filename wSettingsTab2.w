@@ -62,43 +62,12 @@ DEFINE VARIABLE rsTitleBarDbName AS CHARACTER
 
 DEFINE RECTANGLE RECT-22
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 120.
+     SIZE-PIXELS 400 BY 114.
 
 DEFINE VARIABLE tgTitleStartsWithTableName AS LOGICAL INITIAL no 
      LABEL "Start Title With Table Name" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 275 BY 17 TOOLTIP "use table name as first element in the title" NO-UNDO.
-
-DEFINE BUTTON btnRecordCountComplete 
-     LABEL "Set" 
-     SIZE-PIXELS 50 BY 21.
-
-DEFINE BUTTON btnRecordCountIncomplete 
-     LABEL "Set" 
-     SIZE-PIXELS 50 BY 21.
-
-DEFINE BUTTON btnRecordCountSelected 
-     LABEL "Set" 
-     SIZE-PIXELS 50 BY 21.
-
-DEFINE VARIABLE fiRecordCountComplete AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Complete" 
-     LABEL "All records fetched" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiRecordCountIncomplete AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Incomplete" 
-     LABEL "Not all records fetched" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiRecordCountSelected AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Selected" 
-     LABEL "Nr of selected records" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE RECTANGLE RECT-18
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 104.
 
 DEFINE BUTTON btnDefaultFont 
      LABEL "&Default Font" 
@@ -117,105 +86,21 @@ DEFINE VARIABLE tgAutoFont AS LOGICAL INITIAL no
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 215 BY 17 NO-UNDO.
 
-DEFINE BUTTON btnEvenBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnEvenFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnFieldFilterBG 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnFieldFilterFG 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnOddBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnOddFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE VARIABLE fiEvenRow AS CHARACTER FORMAT "X(256)":U INITIAL "Data Row: even" 
-     LABEL "Even rows" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiFieldFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Matched by Field Filter" 
-     LABEL "Matched by Field Filter" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiOddRow AS CHARACTER FORMAT "X(256)":U INITIAL "Data Row: odd" 
-     LABEL "Odd rows" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE RECTANGLE RECT-14
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 144.
-
-DEFINE VARIABLE tgUseSystemColors AS LOGICAL INITIAL no 
-     LABEL "Use &System Colors" 
-     VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 150 BY 17 NO-UNDO.
-
-DEFINE BUTTON btnfiCustomFormatBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnfiCustomFormatFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnfiCustomOrderBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnfiCustomOrderFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnFilterBox 
+DEFINE BUTTON btnFavouriteTable 
      LABEL "Set" 
      SIZE-PIXELS 50 BY 21.
 
-DEFINE BUTTON btnWarningBoxBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
+DEFINE BUTTON btnfiCustomFormat 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
 
-DEFINE BUTTON btnWarningBoxFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
+DEFINE BUTTON btnfiCustomOrder 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
 
-DEFINE VARIABLE fiCustomFormat AS CHARACTER FORMAT "X(256)":U INITIAL "CustomFormat" 
-     LABEL "User-defined format" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiCustomOrder AS CHARACTER FORMAT "X(256)":U INITIAL "CustomOrder" 
-     LABEL "User-defined order" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiFilterBox AS CHARACTER FORMAT "X(256)":U INITIAL "FilterBox" 
-     LABEL "Box color when filter used" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE VARIABLE fiWarningBox AS CHARACTER FORMAT "X(256)":U INITIAL "WarningBox" 
-     LABEL "Changed format warning" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
-
-DEFINE RECTANGLE RECT-17
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 124.
+DEFINE BUTTON btnFieldFilter 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
 
 DEFINE BUTTON btnIndexInactive 
      LABEL "Set" 
@@ -225,54 +110,125 @@ DEFINE BUTTON btnPrimIndex
      LABEL "Set" 
      SIZE-PIXELS 50 BY 21.
 
+DEFINE BUTTON btnWarningBox 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE VARIABLE fiCustomFormat AS CHARACTER FORMAT "X(256)":U INITIAL "CustomFormat" 
+     LABEL "User-defined format" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiCustomOrder AS CHARACTER FORMAT "X(256)":U INITIAL "CustomOrder" 
+     LABEL "User-defined order" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiFavouriteTable AS CHARACTER FORMAT "X(256)":U INITIAL "Favourite Table" 
+     LABEL "Favourite Table" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiFieldFilter AS CHARACTER FORMAT "X(256)":U INITIAL "Matched by Field Filter" 
+     LABEL "Table matches Field Filter" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
 DEFINE VARIABLE fiIndexInactive AS CHARACTER FORMAT "X(256)":U INITIAL "IndexInactive" 
-     LABEL "Index Inactive" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
+     LABEL "Inactive Index" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
 
 DEFINE VARIABLE fiPrimIndex AS CHARACTER FORMAT "X(256)":U INITIAL "PrimIndex" 
      LABEL "Primary Index" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
 
-DEFINE RECTANGLE RECT-15
+DEFINE VARIABLE fiWarningBox AS CHARACTER FORMAT "X(256)":U INITIAL "WarningBox" 
+     LABEL "Changed format" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE RECTANGLE RECT-14
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 84.
+     SIZE-PIXELS 400 BY 224.
 
-DEFINE BUTTON btnQueryCounter 
+DEFINE VARIABLE tgHighlightFavouriteTables AS LOGICAL INITIAL yes 
+     LABEL "Highlight Favourite tables" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 180 BY 17 NO-UNDO.
+
+DEFINE BUTTON btnEven 
      LABEL "Set" 
      SIZE-PIXELS 50 BY 21.
 
-DEFINE BUTTON btnQueryErrorBg 
-     LABEL "BG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnQueryErrorFg 
-     LABEL "FG" 
-     SIZE-PIXELS 25 BY 21.
-
-DEFINE BUTTON btnQueryInfo 
+DEFINE BUTTON btnFilterBox 
      LABEL "Set" 
      SIZE-PIXELS 50 BY 21.
 
-DEFINE VARIABLE fiQueryCounter AS CHARACTER FORMAT "X(256)":U INITIAL "QueryCounter" 
-     LABEL "Nr of queries served" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
+DEFINE BUTTON btnOdd 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE BUTTON btnQueryError 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE BUTTON btnRecordCountComplete 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE BUTTON btnRecordCountIncomplete 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE BUTTON btnRecordCountSelected 
+     LABEL "Set" 
+     SIZE-PIXELS 50 BY 21.
+
+DEFINE VARIABLE fiEvenRow AS CHARACTER FORMAT "X(256)":U INITIAL "Data Row: even" 
+     LABEL "Even rows" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiFilterBox AS CHARACTER FORMAT "X(256)":U INITIAL "FilterBox" 
+     LABEL "Box color when filter used" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiOddRow AS CHARACTER FORMAT "X(256)":U INITIAL "Data Row: odd" 
+     LABEL "Odd rows" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
 
 DEFINE VARIABLE fiQueryError AS CHARACTER FORMAT "X(256)":U INITIAL "QueryError" 
      LABEL "Error on opening query" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
 
-DEFINE VARIABLE fiQueryInfo AS CHARACTER FORMAT "X(256)":U INITIAL "QueryInfo" 
-     LABEL "Query-information" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 160 BY 21 NO-UNDO.
+DEFINE VARIABLE fiRecordCountComplete AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Complete" 
+     LABEL "All records fetched" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
 
-DEFINE RECTANGLE RECT-16
+DEFINE VARIABLE fiRecordCountIncomplete AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Incomplete" 
+     LABEL "Not all records fetched" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiRecordCountSelected AS CHARACTER FORMAT "X(256)":U INITIAL "RecordCount:Selected" 
+     LABEL "Nr of selected records" 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 170 BY 21 NO-UNDO.
+
+DEFINE RECTANGLE RECT-17
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 400 BY 104.
+     SIZE-PIXELS 400 BY 224.
+
+DEFINE VARIABLE tgUseSystemColors AS LOGICAL INITIAL no 
+     LABEL "Use &System Colors" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 150 BY 17 NO-UNDO.
 
 DEFINE VARIABLE fiExample AS CHARACTER FORMAT "X(256)":U 
      LABEL "Example" 
@@ -299,7 +255,19 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 196.4 BY 37.62 WIDGET-ID 100.
+         SIZE 184 BY 31.38 WIDGET-ID 100.
+
+DEFINE FRAME FRAME-AB
+     rsTitleBarDbName AT Y 28 X 85 NO-LABEL WIDGET-ID 186
+     tgTitleStartsWithTableName AT Y 95 X 85 WIDGET-ID 190
+     "Database Name in Title Bar" VIEW-AS TEXT
+          SIZE-PIXELS 180 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     RECT-22 AT Y 11 X 5 WIDGET-ID 176
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 465 Y 40
+         SIZE-PIXELS 415 BY 150
+         TITLE "2" WIDGET-ID 3000.
 
 DEFINE FRAME FRAME-J
      tgAutoFont AT Y 25 X 88 WIDGET-ID 122
@@ -313,95 +281,57 @@ DEFINE FRAME FRAME-J
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 15
-         SIZE-PIXELS 440 BY 115
+         SIZE-PIXELS 415 BY 115
          TITLE "2" WIDGET-ID 1200.
 
-DEFINE FRAME FRAME-AF
-     fiRecordCountComplete AT Y 30 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnRecordCountComplete AT Y 30 X 344 WIDGET-ID 116
-     fiRecordCountIncomplete AT Y 56 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnRecordCountIncomplete AT Y 56 X 344 WIDGET-ID 170
-     fiRecordCountSelected AT Y 82 X 160 COLON-ALIGNED WIDGET-ID 176 NO-TAB-STOP 
-     btnRecordCountSelected AT Y 82 X 344 WIDGET-ID 174
-     "Nr of Records color" VIEW-AS TEXT
-          SIZE-PIXELS 140 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-18 AT Y 11 X 5 WIDGET-ID 178
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 620
-         SIZE-PIXELS 440 BY 150
-         TITLE "2" WIDGET-ID 2800.
-
-DEFINE FRAME FRAME-W
-     fiIndexInactive AT Y 30 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnIndexInactive AT Y 30 X 344 WIDGET-ID 116
-     fiPrimIndex AT Y 56 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnPrimIndex AT Y 56 X 344 WIDGET-ID 170
-     "Index colors" VIEW-AS TEXT
-          SIZE-PIXELS 100 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-15 AT Y 11 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 545
-         SIZE-PIXELS 440 BY 130
-         TITLE "2" WIDGET-ID 2200.
-
 DEFINE FRAME FRAME-T
-     tgUseSystemColors AT Y 30 X 170 WIDGET-ID 122
-     fiOddRow AT Y 53 X 160 COLON-ALIGNED WIDGET-ID 110 NO-TAB-STOP 
-     btnOddFg AT Y 53 X 344 WIDGET-ID 114
-     btnOddBg AT Y 53 X 369 WIDGET-ID 118
-     fiEvenRow AT Y 78 X 160 COLON-ALIGNED WIDGET-ID 112 NO-TAB-STOP 
-     btnEvenFg AT Y 78 X 344 WIDGET-ID 170
-     btnEvenBg AT Y 78 X 369 WIDGET-ID 120
-     fiFieldFilter AT Y 118 X 160 COLON-ALIGNED WIDGET-ID 186 NO-TAB-STOP 
-     btnFieldFilterFG AT Y 118 X 344 WIDGET-ID 184
-     btnFieldFilterBG AT Y 118 X 369 WIDGET-ID 182
-     "Data Row colors" VIEW-AS TEXT
-          SIZE-PIXELS 125 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     tgHighlightFavouriteTables AT Y 20 X 170 WIDGET-ID 192
+     fiFavouriteTable AT Y 39 X 160 COLON-ALIGNED WIDGET-ID 190 NO-TAB-STOP 
+     btnFavouriteTable AT Y 39 X 344 WIDGET-ID 188
+     fiFieldFilter AT Y 74 X 160 COLON-ALIGNED WIDGET-ID 186 NO-TAB-STOP 
+     btnFieldFilter AT Y 74 X 344 WIDGET-ID 184
+     fiCustomOrder AT Y 100 X 160 COLON-ALIGNED WIDGET-ID 200 NO-TAB-STOP 
+     btnfiCustomOrder AT Y 100 X 344 WIDGET-ID 194
+     fiCustomFormat AT Y 126 X 160 COLON-ALIGNED WIDGET-ID 198 NO-TAB-STOP 
+     btnfiCustomFormat AT Y 126 X 344 WIDGET-ID 182
+     fiWarningBox AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 202 NO-TAB-STOP 
+     btnWarningBox AT Y 152 X 344 WIDGET-ID 196
+     fiIndexInactive AT Y 179 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
+     btnIndexInactive AT Y 179 X 344 WIDGET-ID 116
+     fiPrimIndex AT Y 205 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
+     btnPrimIndex AT Y 205 X 344 WIDGET-ID 204
+     "Schema highlighting colors" VIEW-AS TEXT
+          SIZE-PIXELS 175 BY 17 AT Y 2 X 15 WIDGET-ID 180
      RECT-14 AT Y 11 X 5 WIDGET-ID 176
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 230
-         SIZE-PIXELS 440 BY 195
+         AT X 465 Y 205
+         SIZE-PIXELS 415 BY 275
          TITLE "2" WIDGET-ID 2000.
 
-DEFINE FRAME FRAME-Y
-     fiQueryCounter AT Y 25 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnQueryCounter AT Y 25 X 344 WIDGET-ID 116
-     fiQueryInfo AT Y 51 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnQueryInfo AT Y 51 X 344 WIDGET-ID 170
-     fiQueryError AT Y 77 X 160 COLON-ALIGNED WIDGET-ID 174 NO-TAB-STOP 
-     btnQueryErrorFg AT Y 77 X 344 WIDGET-ID 114
-     btnQueryErrorBg AT Y 77 X 369 WIDGET-ID 118
-     "Query Info colors" VIEW-AS TEXT
-          SIZE-PIXELS 125 BY 17 AT Y 2 X 15 WIDGET-ID 178
-     RECT-16 AT Y 11 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 360
-         SIZE-PIXELS 440 BY 140
-         TITLE "2" WIDGET-ID 2400.
-
 DEFINE FRAME FRAME-V
-     fiFilterBox AT Y 25 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnFilterBox AT Y 25 X 344 WIDGET-ID 116
-     fiCustomOrder AT Y 51 X 160 COLON-ALIGNED WIDGET-ID 190 NO-TAB-STOP 
-     btnfiCustomOrderFg AT Y 51 X 344 WIDGET-ID 188
-     btnfiCustomOrderBg AT Y 51 X 369 WIDGET-ID 186
-     fiCustomFormat AT Y 77 X 160 COLON-ALIGNED WIDGET-ID 184 NO-TAB-STOP 
-     btnfiCustomFormatFg AT Y 77 X 344 WIDGET-ID 182
-     btnfiCustomFormatBg AT Y 77 X 369 WIDGET-ID 180
-     fiWarningBox AT Y 103 X 160 COLON-ALIGNED WIDGET-ID 170 NO-TAB-STOP 
-     btnWarningBoxFg AT Y 103 X 344 WIDGET-ID 114
-     btnWarningBoxBg AT Y 103 X 369 WIDGET-ID 118
-     "Warning colors" VIEW-AS TEXT
-          SIZE-PIXELS 115 BY 17 AT Y 2 X 15 WIDGET-ID 178
+     tgUseSystemColors AT Y 25 X 170 WIDGET-ID 122
+     fiOddRow AT Y 45 X 160 COLON-ALIGNED WIDGET-ID 110 NO-TAB-STOP 
+     btnOdd AT Y 45 X 344 WIDGET-ID 196
+     fiEvenRow AT Y 68 X 160 COLON-ALIGNED WIDGET-ID 112 NO-TAB-STOP 
+     btnEven AT Y 68 X 344 WIDGET-ID 194
+     fiFilterBox AT Y 102 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
+     btnFilterBox AT Y 102 X 344 WIDGET-ID 116
+     fiQueryError AT Y 127 X 160 COLON-ALIGNED WIDGET-ID 174 NO-TAB-STOP 
+     btnQueryError AT Y 127 X 344 WIDGET-ID 192
+     fiRecordCountComplete AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 204 NO-TAB-STOP 
+     btnRecordCountComplete AT Y 152 X 344 WIDGET-ID 198
+     fiRecordCountIncomplete AT Y 178 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
+     btnRecordCountIncomplete AT Y 178 X 344 WIDGET-ID 200
+     fiRecordCountSelected AT Y 204 X 160 COLON-ALIGNED WIDGET-ID 206 NO-TAB-STOP 
+     btnRecordCountSelected AT Y 204 X 344 WIDGET-ID 202
+     "Data / query highlighting colors" VIEW-AS TEXT
+          SIZE-PIXELS 225 BY 17 AT Y 2 X 15 WIDGET-ID 178
      RECT-17 AT Y 11 X 5 WIDGET-ID 176
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 440
-         SIZE-PIXELS 440 BY 165
+         AT X 10 Y 340
+         SIZE-PIXELS 415 BY 265
          TITLE "2" WIDGET-ID 2100.
 
 DEFINE FRAME FRAME-Z
@@ -413,20 +343,8 @@ DEFINE FRAME FRAME-Z
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 155
-         SIZE-PIXELS 440 BY 170
+         SIZE-PIXELS 415 BY 170
          TITLE "2" WIDGET-ID 2900.
-
-DEFINE FRAME FRAME-AB
-     rsTitleBarDbName AT Y 28 X 85 NO-LABEL WIDGET-ID 186
-     tgTitleStartsWithTableName AT Y 95 X 85 WIDGET-ID 190
-     "Database Name in Title Bar" VIEW-AS TEXT
-          SIZE-PIXELS 180 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-22 AT Y 11 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 40
-         SIZE-PIXELS 440 BY 170
-         TITLE "2" WIDGET-ID 3000.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -446,8 +364,8 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "<insert window title>"
-         HEIGHT             = 38.19
-         WIDTH              = 200.8
+         HEIGHT             = 31.71
+         WIDTH              = 185.8
          MAX-HEIGHT         = 40.52
          MAX-WIDTH          = 235.6
          VIRTUAL-HEIGHT     = 40.52
@@ -474,12 +392,9 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* REPARENT FRAME */
 ASSIGN FRAME FRAME-AB:FRAME = FRAME DEFAULT-FRAME:HANDLE
-       FRAME FRAME-AF:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-J:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-T:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-V:FRAME = FRAME DEFAULT-FRAME:HANDLE
-       FRAME FRAME-W:FRAME = FRAME DEFAULT-FRAME:HANDLE
-       FRAME FRAME-Y:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-Z:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 
 /* SETTINGS FOR FRAME DEFAULT-FRAME
@@ -487,10 +402,7 @@ ASSIGN FRAME FRAME-AB:FRAME = FRAME DEFAULT-FRAME:HANDLE
 
 DEFINE VARIABLE XXTABVALXX AS LOGICAL NO-UNDO.
 
-ASSIGN XXTABVALXX = FRAME FRAME-W:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-AF:HANDLE)
-       XXTABVALXX = FRAME FRAME-V:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-W:HANDLE)
-       XXTABVALXX = FRAME FRAME-Y:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-V:HANDLE)
-       XXTABVALXX = FRAME FRAME-T:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-Y:HANDLE)
+ASSIGN XXTABVALXX = FRAME FRAME-T:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-V:HANDLE)
        XXTABVALXX = FRAME FRAME-Z:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-T:HANDLE)
        XXTABVALXX = FRAME FRAME-AB:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-Z:HANDLE)
        XXTABVALXX = FRAME FRAME-J:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-AB:HANDLE)
@@ -512,26 +424,6 @@ ASSIGN
        tgTitleStartsWithTableName:PRIVATE-DATA IN FRAME FRAME-AB     = 
                 "DataDigger,TitleStartsWithTableName".
 
-/* SETTINGS FOR FRAME FRAME-AF
-   NOT-VISIBLE                                                          */
-ASSIGN 
-       FRAME FRAME-AF:HIDDEN           = TRUE.
-
-ASSIGN 
-       fiRecordCountComplete:READ-ONLY IN FRAME FRAME-AF        = TRUE
-       fiRecordCountComplete:PRIVATE-DATA IN FRAME FRAME-AF     = 
-                "DataDigger:colors,RecordCount:Complete".
-
-ASSIGN 
-       fiRecordCountIncomplete:READ-ONLY IN FRAME FRAME-AF        = TRUE
-       fiRecordCountIncomplete:PRIVATE-DATA IN FRAME FRAME-AF     = 
-                "DataDigger:colors,RecordCount:Incomplete".
-
-ASSIGN 
-       fiRecordCountSelected:READ-ONLY IN FRAME FRAME-AF        = TRUE
-       fiRecordCountSelected:PRIVATE-DATA IN FRAME FRAME-AF     = 
-                "DataDigger:colors,RecordCount:Selected".
-
 /* SETTINGS FOR FRAME FRAME-J
    NOT-VISIBLE                                                          */
 ASSIGN 
@@ -539,15 +431,15 @@ ASSIGN
 
 ASSIGN 
        btnDefaultFont:PRIVATE-DATA IN FRAME FRAME-J     = 
-                "DataDigger:fonts,default".
+                "DataDigger:Fonts,default".
 
 ASSIGN 
        btnFixedFont:PRIVATE-DATA IN FRAME FRAME-J     = 
-                "DataDigger:fonts,fixed".
+                "DataDigger:Fonts,fixed".
 
 ASSIGN 
        tgAutoFont:PRIVATE-DATA IN FRAME FRAME-J     = 
-                "DataDigger:fonts,AutoSetFont".
+                "DataDigger:Fonts,AutoSetFont".
 
 /* SETTINGS FOR FRAME FRAME-T
    NOT-VISIBLE                                                          */
@@ -555,23 +447,43 @@ ASSIGN
        FRAME FRAME-T:HIDDEN           = TRUE.
 
 ASSIGN 
-       fiEvenRow:READ-ONLY IN FRAME FRAME-T        = TRUE
-       fiEvenRow:PRIVATE-DATA IN FRAME FRAME-T     = 
-                "DataDigger:colors,DataRow:even".
+       fiCustomFormat:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiCustomFormat:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,CustomFormat".
+
+ASSIGN 
+       fiCustomOrder:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiCustomOrder:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,CustomOrder".
+
+ASSIGN 
+       fiFavouriteTable:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiFavouriteTable:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,FavouriteTable".
 
 ASSIGN 
        fiFieldFilter:READ-ONLY IN FRAME FRAME-T        = TRUE
        fiFieldFilter:PRIVATE-DATA IN FRAME FRAME-T     = 
-                "DataDigger:colors,FieldFilter".
+                "DataDigger:Colors,FieldFilter".
 
 ASSIGN 
-       fiOddRow:READ-ONLY IN FRAME FRAME-T        = TRUE
-       fiOddRow:PRIVATE-DATA IN FRAME FRAME-T     = 
-                "DataDigger:colors,DataRow:odd".
+       fiIndexInactive:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiIndexInactive:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,IndexInactive".
 
 ASSIGN 
-       tgUseSystemColors:PRIVATE-DATA IN FRAME FRAME-T     = 
-                "DataDigger:colors,DataRow:UseSystem".
+       fiPrimIndex:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiPrimIndex:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,PrimIndex".
+
+ASSIGN 
+       fiWarningBox:READ-ONLY IN FRAME FRAME-T        = TRUE
+       fiWarningBox:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,WarningBox".
+
+ASSIGN 
+       tgHighlightFavouriteTables:PRIVATE-DATA IN FRAME FRAME-T     = 
+                "DataDigger:Colors,FavouriteTable:HiLite".
 
 /* SETTINGS FOR FRAME FRAME-V
    NOT-VISIBLE                                                          */
@@ -579,59 +491,43 @@ ASSIGN
        FRAME FRAME-V:HIDDEN           = TRUE.
 
 ASSIGN 
-       fiCustomFormat:READ-ONLY IN FRAME FRAME-V        = TRUE
-       fiCustomFormat:PRIVATE-DATA IN FRAME FRAME-V     = 
-                "DataDigger:colors,CustomFormat".
-
-ASSIGN 
-       fiCustomOrder:READ-ONLY IN FRAME FRAME-V        = TRUE
-       fiCustomOrder:PRIVATE-DATA IN FRAME FRAME-V     = 
-                "DataDigger:colors,CustomOrder".
+       fiEvenRow:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiEvenRow:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,DataRow:even".
 
 ASSIGN 
        fiFilterBox:READ-ONLY IN FRAME FRAME-V        = TRUE
        fiFilterBox:PRIVATE-DATA IN FRAME FRAME-V     = 
-                "DataDigger:colors,FilterBox".
+                "DataDigger:Colors,FilterBox".
 
 ASSIGN 
-       fiWarningBox:READ-ONLY IN FRAME FRAME-V        = TRUE
-       fiWarningBox:PRIVATE-DATA IN FRAME FRAME-V     = 
-                "DataDigger:colors,WarningBox".
-
-/* SETTINGS FOR FRAME FRAME-W
-   NOT-VISIBLE                                                          */
-ASSIGN 
-       FRAME FRAME-W:HIDDEN           = TRUE.
+       fiOddRow:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiOddRow:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,DataRow:odd".
 
 ASSIGN 
-       fiIndexInactive:READ-ONLY IN FRAME FRAME-W        = TRUE
-       fiIndexInactive:PRIVATE-DATA IN FRAME FRAME-W     = 
-                "DataDigger:colors,IndexInactive".
+       fiQueryError:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiQueryError:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,QueryError".
 
 ASSIGN 
-       fiPrimIndex:READ-ONLY IN FRAME FRAME-W        = TRUE
-       fiPrimIndex:PRIVATE-DATA IN FRAME FRAME-W     = 
-                "DataDigger:colors,PrimIndex".
-
-/* SETTINGS FOR FRAME FRAME-Y
-   NOT-VISIBLE                                                          */
-ASSIGN 
-       FRAME FRAME-Y:HIDDEN           = TRUE.
+       fiRecordCountComplete:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiRecordCountComplete:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,RecordCount:Complete".
 
 ASSIGN 
-       fiQueryCounter:READ-ONLY IN FRAME FRAME-Y        = TRUE
-       fiQueryCounter:PRIVATE-DATA IN FRAME FRAME-Y     = 
-                "DataDigger:colors,QueryCounter".
+       fiRecordCountIncomplete:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiRecordCountIncomplete:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,RecordCount:Incomplete".
 
 ASSIGN 
-       fiQueryError:READ-ONLY IN FRAME FRAME-Y        = TRUE
-       fiQueryError:PRIVATE-DATA IN FRAME FRAME-Y     = 
-                "DataDigger:colors,QueryError".
+       fiRecordCountSelected:READ-ONLY IN FRAME FRAME-V        = TRUE
+       fiRecordCountSelected:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,RecordCount:Selected".
 
 ASSIGN 
-       fiQueryInfo:READ-ONLY IN FRAME FRAME-Y        = TRUE
-       fiQueryInfo:PRIVATE-DATA IN FRAME FRAME-Y     = 
-                "DataDigger:colors,QueryInfo".
+       tgUseSystemColors:PRIVATE-DATA IN FRAME FRAME-V     = 
+                "DataDigger:Colors,DataRow:UseSystem".
 
 /* SETTINGS FOR FRAME FRAME-Z
    NOT-VISIBLE                                                          */
@@ -707,169 +603,62 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-T
-&Scoped-define SELF-NAME btnEvenBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEvenBg C-Win
-ON CHOOSE OF btnEvenBg IN FRAME FRAME-T /* BG */
-OR MOUSE-MENU-CLICK OF fiEvenRow
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiEvenRow:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiEvenRow:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnEvenFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEvenFg C-Win
-ON CHOOSE OF btnEvenFg IN FRAME FRAME-T /* FG */
+&Scoped-define FRAME-NAME FRAME-V
+&Scoped-define SELF-NAME btnEven
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEven C-Win
+ON CHOOSE OF btnEven IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiEvenRow
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiEvenRow:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiEvenRow:fgcolor = iColorNr.
-
+  RUN setColor(fiEvenRow:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-V
-&Scoped-define SELF-NAME btnfiCustomFormatBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomFormatBg C-Win
-ON CHOOSE OF btnfiCustomFormatBg IN FRAME FRAME-V /* BG */
-OR MOUSE-MENU-CLICK OF fiCustomFormat
+&Scoped-define FRAME-NAME FRAME-T
+&Scoped-define SELF-NAME btnFavouriteTable
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavouriteTable C-Win
+ON CHOOSE OF btnFavouriteTable IN FRAME FRAME-T /* Set */
+OR MOUSE-SELECT-CLICK OF fiFavouriteTable
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiCustomFormat:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiCustomFormat:bgcolor = iColorNr.
-
+  RUN setColor(fiFavouriteTable:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btnfiCustomFormatFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomFormatFg C-Win
-ON CHOOSE OF btnfiCustomFormatFg IN FRAME FRAME-V /* FG */
+&Scoped-define SELF-NAME btnfiCustomFormat
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomFormat C-Win
+ON CHOOSE OF btnfiCustomFormat IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiCustomFormat
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiCustomFormat:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiCustomFormat:fgcolor = iColorNr.
+  RUN setColor(fiCustomFormat:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btnfiCustomOrderBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomOrderBg C-Win
-ON CHOOSE OF btnfiCustomOrderBg IN FRAME FRAME-V /* BG */
-OR MOUSE-MENU-CLICK OF fiCustomOrder
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiCustomOrder:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiCustomOrder:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnfiCustomOrderFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomOrderFg C-Win
-ON CHOOSE OF btnfiCustomOrderFg IN FRAME FRAME-V /* FG */
+&Scoped-define SELF-NAME btnfiCustomOrder
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnfiCustomOrder C-Win
+ON CHOOSE OF btnfiCustomOrder IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiCustomOrder
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiCustomOrder:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiCustomOrder:fgcolor = iColorNr.
+  RUN setColor(fiCustomOrder:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-T
-&Scoped-define SELF-NAME btnFieldFilterBG
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFieldFilterBG C-Win
-ON CHOOSE OF btnFieldFilterBG IN FRAME FRAME-T /* BG */
-OR MOUSE-MENU-CLICK OF fiEvenRow
+&Scoped-define SELF-NAME btnFieldFilter
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFieldFilter C-Win
+ON CHOOSE OF btnFieldFilter IN FRAME FRAME-T /* Set */
+OR MOUSE-SELECT-CLICK OF fiFieldFilter
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiFieldFilter:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiFieldFilter:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnFieldFilterFG
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFieldFilterFG C-Win
-ON CHOOSE OF btnFieldFilterFG IN FRAME FRAME-T /* FG */
-OR MOUSE-SELECT-CLICK OF fiEvenRow
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiFieldFilter:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiFieldFilter:fgcolor = iColorNr.
-
+  RUN setColor(fiFieldFilter:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -882,16 +671,7 @@ END.
 ON CHOOSE OF btnFilterBox IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiFilterBox
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiFilterBox:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiFilterBox:bgcolor = iColorNr.
-
+  RUN setColor(fiFilterBox:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -922,22 +702,26 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-W
+&Scoped-define FRAME-NAME FRAME-T
 &Scoped-define SELF-NAME btnIndexInactive
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnIndexInactive C-Win
-ON CHOOSE OF btnIndexInactive IN FRAME FRAME-W /* Set */
+ON CHOOSE OF btnIndexInactive IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiIndexInactive
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
+  RUN setColor(fiIndexInactive:HANDLE).
+END.
 
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiIndexInactive:fgcolor
-     , OUTPUT iColorNr
-     ).
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
-  IF iColorNr <> -1 THEN
-    fiIndexInactive:fgcolor = iColorNr.
 
+&Scoped-define FRAME-NAME FRAME-V
+&Scoped-define SELF-NAME btnOdd
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnOdd C-Win
+ON CHOOSE OF btnOdd IN FRAME FRAME-V /* Set */
+OR MOUSE-SELECT-CLICK OF fiOddRow
+DO:
+  RUN setColor(fiOddRow:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -945,169 +729,37 @@ END.
 
 
 &Scoped-define FRAME-NAME FRAME-T
-&Scoped-define SELF-NAME btnOddBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnOddBg C-Win
-ON CHOOSE OF btnOddBg IN FRAME FRAME-T /* BG */
-OR MOUSE-MENU-CLICK OF fiOddRow
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiOddRow:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiOddRow:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnOddFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnOddFg C-Win
-ON CHOOSE OF btnOddFg IN FRAME FRAME-T /* FG */
-OR MOUSE-SELECT-CLICK OF fiOddRow
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiOddRow:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiOddRow:fgcolor = iColorNr.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME FRAME-W
 &Scoped-define SELF-NAME btnPrimIndex
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnPrimIndex C-Win
-ON CHOOSE OF btnPrimIndex IN FRAME FRAME-W /* Set */
+ON CHOOSE OF btnPrimIndex IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiPrimIndex
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiPrimIndex:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiPrimIndex:bgcolor = iColorNr.
-
+  RUN setColor(fiPrimIndex:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-Y
-&Scoped-define SELF-NAME btnQueryCounter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryCounter C-Win
-ON CHOOSE OF btnQueryCounter IN FRAME FRAME-Y /* Set */
-OR MOUSE-SELECT-CLICK OF fiQueryCounter
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiQueryCounter:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiQueryCounter:fgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnQueryErrorBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryErrorBg C-Win
-ON CHOOSE OF btnQueryErrorBg IN FRAME FRAME-Y /* BG */
-OR MOUSE-MENU-CLICK OF fiQueryError
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiQueryError:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiQueryError:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnQueryErrorFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryErrorFg C-Win
-ON CHOOSE OF btnQueryErrorFg IN FRAME FRAME-Y /* FG */
+&Scoped-define FRAME-NAME FRAME-V
+&Scoped-define SELF-NAME btnQueryError
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryError C-Win
+ON CHOOSE OF btnQueryError IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiQueryError
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiQueryError:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiQueryError:fgcolor = iColorNr.
+  RUN setColor(fiQueryError:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME btnQueryInfo
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryInfo C-Win
-ON CHOOSE OF btnQueryInfo IN FRAME FRAME-Y /* Set */
-OR MOUSE-SELECT-CLICK OF fiQueryInfo
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiQueryInfo:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiQueryInfo:fgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME FRAME-AF
 &Scoped-define SELF-NAME btnRecordCountComplete
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnRecordCountComplete C-Win
-ON CHOOSE OF btnRecordCountComplete IN FRAME FRAME-AF /* Set */
+ON CHOOSE OF btnRecordCountComplete IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountComplete
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiRecordCountComplete:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiRecordCountComplete:fgcolor = iColorNr.
-
+  RUN setColor(fiRecordCountComplete:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1116,19 +768,10 @@ END.
 
 &Scoped-define SELF-NAME btnRecordCountIncomplete
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnRecordCountIncomplete C-Win
-ON CHOOSE OF btnRecordCountIncomplete IN FRAME FRAME-AF /* Set */
+ON CHOOSE OF btnRecordCountIncomplete IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountIncomplete
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiRecordCountIncomplete:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiRecordCountIncomplete:fgcolor = iColorNr.
-
+  RUN setColor(fiRecordCountIncomplete:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1137,61 +780,23 @@ END.
 
 &Scoped-define SELF-NAME btnRecordCountSelected
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnRecordCountSelected C-Win
-ON CHOOSE OF btnRecordCountSelected IN FRAME FRAME-AF /* Set */
+ON CHOOSE OF btnRecordCountSelected IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountSelected
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiRecordCountSelected:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiRecordCountSelected:fgcolor = iColorNr.
-
+  RUN setColor(fiRecordCountSelected:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME FRAME-V
-&Scoped-define SELF-NAME btnWarningBoxBg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnWarningBoxBg C-Win
-ON CHOOSE OF btnWarningBoxBg IN FRAME FRAME-V /* BG */
-OR MOUSE-MENU-CLICK OF fiWarningBox
-DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiWarningBox:bgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiWarningBox:bgcolor = iColorNr.
-
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnWarningBoxFg
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnWarningBoxFg C-Win
-ON CHOOSE OF btnWarningBoxFg IN FRAME FRAME-V /* FG */
+&Scoped-define FRAME-NAME FRAME-T
+&Scoped-define SELF-NAME btnWarningBox
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnWarningBox C-Win
+ON CHOOSE OF btnWarningBox IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiWarningBox
 DO:
-  DEFINE VARIABLE iColorNr AS INTEGER NO-UNDO.
-
-  RUN value(getProgramDir() + 'dChooseColor.w')
-     ( INPUT fiWarningBox:fgcolor
-     , OUTPUT iColorNr
-     ).
-
-  IF iColorNr <> -1 THEN
-    fiWarningBox:fgcolor = iColorNr.
+  RUN setColor(fiWarningBox:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1233,17 +838,30 @@ END.
 
 
 &Scoped-define FRAME-NAME FRAME-T
-&Scoped-define SELF-NAME tgUseSystemColors
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgUseSystemColors C-Win
-ON VALUE-CHANGED OF tgUseSystemColors IN FRAME FRAME-T /* Use System Colors */
+&Scoped-define SELF-NAME tgHighlightFavouriteTables
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgHighlightFavouriteTables C-Win
+ON VALUE-CHANGED OF tgHighlightFavouriteTables IN FRAME FRAME-T /* Highlight Favourite tables */
 DO:
 
-  fiOddRow :sensitive = NOT SELF:checked.
-  fiEvenRow:sensitive = NOT SELF:checked.
-  btnOddFg :sensitive = NOT SELF:checked.
-  btnOddBg :sensitive = NOT SELF:checked.
-  btnEvenFg:sensitive = NOT SELF:checked.
-  btnEvenBg:sensitive = NOT SELF:checked.
+  fiFavouriteTable :SENSITIVE = SELF:CHECKED.
+  btnFavouriteTable:SENSITIVE = SELF:CHECKED.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME FRAME-V
+&Scoped-define SELF-NAME tgUseSystemColors
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgUseSystemColors C-Win
+ON VALUE-CHANGED OF tgUseSystemColors IN FRAME FRAME-V /* Use System Colors */
+DO:
+
+  fiOddRow :SENSITIVE = NOT SELF:CHECKED.
+  fiEvenRow:SENSITIVE = NOT SELF:CHECKED.
+  btnOdd   :SENSITIVE = NOT SELF:CHECKED.
+  btnEven  :SENSITIVE = NOT SELF:CHECKED.
 
 END.
 
@@ -1335,38 +953,69 @@ PROCEDURE enable_UI :
   ENABLE RECT-19 rsColumnLabelTemplate fiExample 
       WITH FRAME FRAME-Z IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-Z}
-  DISPLAY tgUseSystemColors fiOddRow fiEvenRow fiFieldFilter 
+  DISPLAY tgHighlightFavouriteTables fiFavouriteTable fiFieldFilter 
+          fiCustomOrder fiCustomFormat fiWarningBox fiIndexInactive fiPrimIndex 
       WITH FRAME FRAME-T IN WINDOW C-Win.
-  ENABLE RECT-14 tgUseSystemColors fiOddRow btnOddFg btnOddBg fiEvenRow 
-         btnEvenFg btnEvenBg fiFieldFilter btnFieldFilterFG btnFieldFilterBG 
+  ENABLE RECT-14 tgHighlightFavouriteTables fiFavouriteTable btnFavouriteTable 
+         fiFieldFilter btnFieldFilter fiCustomOrder btnfiCustomOrder 
+         fiCustomFormat btnfiCustomFormat fiWarningBox btnWarningBox 
+         fiIndexInactive btnIndexInactive fiPrimIndex btnPrimIndex 
       WITH FRAME FRAME-T IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-T}
-  DISPLAY fiQueryCounter fiQueryInfo fiQueryError 
-      WITH FRAME FRAME-Y IN WINDOW C-Win.
-  ENABLE RECT-16 fiQueryCounter btnQueryCounter fiQueryInfo btnQueryInfo 
-         fiQueryError btnQueryErrorFg btnQueryErrorBg 
-      WITH FRAME FRAME-Y IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-Y}
-  DISPLAY fiFilterBox fiCustomOrder fiCustomFormat fiWarningBox 
+  DISPLAY tgUseSystemColors fiOddRow fiEvenRow fiFilterBox fiQueryError 
+          fiRecordCountComplete fiRecordCountIncomplete fiRecordCountSelected 
       WITH FRAME FRAME-V IN WINDOW C-Win.
-  ENABLE RECT-17 fiFilterBox btnFilterBox fiCustomOrder btnfiCustomOrderFg 
-         btnfiCustomOrderBg fiCustomFormat btnfiCustomFormatFg 
-         btnfiCustomFormatBg fiWarningBox btnWarningBoxFg btnWarningBoxBg 
+  ENABLE RECT-17 tgUseSystemColors fiOddRow btnOdd fiEvenRow btnEven 
+         fiFilterBox btnFilterBox fiQueryError btnQueryError 
+         fiRecordCountComplete btnRecordCountComplete fiRecordCountIncomplete 
+         btnRecordCountIncomplete fiRecordCountSelected btnRecordCountSelected 
       WITH FRAME FRAME-V IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-V}
-  DISPLAY fiIndexInactive fiPrimIndex 
-      WITH FRAME FRAME-W IN WINDOW C-Win.
-  ENABLE RECT-15 fiIndexInactive btnIndexInactive fiPrimIndex btnPrimIndex 
-      WITH FRAME FRAME-W IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-W}
-  DISPLAY fiRecordCountComplete fiRecordCountIncomplete fiRecordCountSelected 
-      WITH FRAME FRAME-AF IN WINDOW C-Win.
-  ENABLE RECT-18 fiRecordCountComplete btnRecordCountComplete 
-         fiRecordCountIncomplete btnRecordCountIncomplete fiRecordCountSelected 
-         btnRecordCountSelected 
-      WITH FRAME FRAME-AF IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-AF}
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setColor C-Win 
+PROCEDURE setColor :
+/* Set color for a field, assign colors to widget
+  */
+  DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
+
+  DEFINE VARIABLE iBG  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iFG  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iSep AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lOk  AS LOGICAL NO-UNDO.
+  
+  iBg = phWidget:BGCOLOR.
+  iFg = phWidget:FGCOLOR.
+
+  RUN adecomm/_chscolr.p (  "Choose color for " + phWidget:SCREEN-VALUE
+                          , ""
+                          , FALSE
+                          , ?
+                          , ?
+                          , ?
+                          , INPUT-OUTPUT iBG
+                          , INPUT-OUTPUT iFG
+                          , INPUT-OUTPUT iSep
+                          , OUTPUT lOk
+                          ).
+  IF lOk THEN ASSIGN phWidget:FGCOLOR = iFg phWidget:BGCOLOR = iBg.
+  /*
+    ipTitle        - Title for the dialog
+    cipMessage     - Message to write at bottom of screen
+    lipSeparator   - Indicates if separator colors need to display for browse widgets
+    iipDfltBgColor - color number to use as default background
+    iipDfltFgColor - color number to use as default foreground
+    iipDfltSpColor - color number to use as default separator color
+    iiopBgColor    - background color number
+    iiopFgColor    - foreground color number
+    iiopSpColor    - separator color number
+    lOk     - FALSE if cancelled dialog box.
+  */  
+
+END PROCEDURE. /* setColor */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

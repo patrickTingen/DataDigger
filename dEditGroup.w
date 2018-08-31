@@ -312,11 +312,6 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  /* Create initial set */
-  FOR EACH ttTable:
-    ttTable.lFavouriteOrg = ttTable.lFavourite.
-  END.
-
   /* Set databases */
   cbDatabase:LIST-ITEMS = ',' + getDatabaseList().
   cbDatabase:SCREEN-VALUE = getRegistry('DataDigger','Database') NO-ERROR.

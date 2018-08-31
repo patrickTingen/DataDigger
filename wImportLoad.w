@@ -662,7 +662,7 @@ PROCEDURE initializeObject :
   IF giDataErrorColor[1] = ? THEN giDataErrorColor[1] = 14.
   IF giDataErrorColor[2] = ? THEN giDataErrorColor[2] = 12.
 
-  IF getRegistry("DataDigger:colors","DataRow:UseSystem") = "YES" THEN
+  IF getRegistry("DataDigger:Colors","DataRow:UseSystem") = "YES" THEN
   ASSIGN
     giDataOddRowColor[1]  = 1
     giDataOddRowColor[2]  = 24

@@ -59,11 +59,11 @@ DEFINE TEMP-TABLE ttTable NO-UNDO RCODE-INFORMATION
   FIELD lFrozen       AS LOGICAL   LABEL ""
   FIELD iNumQueries   AS INTEGER   LABEL "#"         FORMAT "zzzzz"
   FIELD tLastUsed     AS DATETIME  LABEL "Last Used" FORMAT "99/99/9999 HH:MM:SS"
-  FIELD lFavourite    AS LOGICAL   LABEL ""
   FIELD lCached       AS LOGICAL   LABEL "" /* for preCaching */
   FIELD iFileNumber   AS INTEGER   LABEL "_File-Number"
   FIELD cCategory     AS CHARACTER LABEL "Category"
-  FIELD lFavouriteOrg AS LOGICAL   LABEL "" /* for edit groups */
+  FIELD lFavourite    AS LOGICAL   LABEL "" /* favourite table */
+  FIELD cFavourites   AS CHARACTER LABEL "" /* favourite groups */
   INDEX idxPrim IS PRIMARY cDatabase cTableName
   INDEX idxSec cTableName
   .

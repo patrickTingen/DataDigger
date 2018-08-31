@@ -8,6 +8,18 @@
 
 DataDigger version 24 - dd MMM 2018 
 
+BetaDigger 20180830
+- Solved: Several errors with favourite
+- Change: Restructured appearance-tab in settings screen
+- Change: Reverted to default Progress program for setting font
+- Change: Reverted to default Progress program for setting color
+- Change: Generate-Assign can now use a buffer name
+- Change: Removed unused settings from settings screen
+- New   : Colors can now be set for both FG and BG
+- New   : Last used page in settings is restored on startup
+- New   : Favourite/table view is restored on startup
+
+BetaDigger 20180824
 - Solved: Update cannot be set in DataDigger ini #37 (movedoa)
 - Solved: Check for PingBack is wrong #33 (movedoa)
 - Solved: Small layout errors on settings screen #35 (movedoa)

@@ -2280,7 +2280,7 @@ PROCEDURE getTableStats :
     DO:
       FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
 
       IF AVAILABLE ttTable THEN
       DO:
@@ -2294,25 +2294,23 @@ PROCEDURE getTableStats :
     DO:
       FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
 
       IF AVAILABLE ttTable THEN
-      DO:
         ttTable.tLastUsed = DATETIME(ENTRY(2,cLine,'=')) NO-ERROR.
-      END.
+
     END. /* lastUsed */
 
     ELSE
-    IF cLine MATCHES "*:Favourite=*" THEN
+    IF cLine MATCHES "*:Favourites=*" THEN
     DO:
       FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
 
       IF AVAILABLE ttTable THEN
-      DO:
-        ttTable.lFavourite = TRUE NO-ERROR.
-      END.
+        ttTable.cFavourites = ENTRY(2,cLine,'=') NO-ERROR.
+
     END. /* favourite */
 
   END. /* repeat */
@@ -2748,43 +2746,27 @@ PROCEDURE saveConfigFileSorted :
 
   {&timerStart}
 
+  /* Clean up rubbish settings data */
+  FOR EACH bfConfig
+    WHERE bfConfig.cSetting = '' OR bfConfig.cSetting = ?
+       OR bfConfig.cValue   = '' OR bfConfig.cValue   = ?:
+    DELETE bfConfig.
+  END.
+
   cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ).
   OUTPUT TO VALUE(cUserConfigFile).
 
   FOR EACH bfConfig
-    WHERE bfConfig.cSection BEGINS "DataDigger"
-      AND bfConfig.lUser    = TRUE
-      AND bfConfig.cSetting <> ''
-      AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection BY bfConfig.cSetting:
+    WHERE bfConfig.lUser = TRUE
+    BREAK BY (bfConfig.cSection BEGINS "DataDigger") DESCENDING
+          BY bfConfig.cSection
+          BY bfConfig.cSetting:
 
     bfConfig.lDirty = FALSE.
-
-    IF FIRST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
-
+    
+    IF FIRST-OF(bfConfig.cSection) THEN PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
     PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-
-    IF LAST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SKIP(1).
-  END.
-
-  FOR EACH bfConfig
-    WHERE NOT bfConfig.cSection BEGINS "DataDigger"
-      AND bfConfig.lUser    = TRUE
-      AND bfConfig.cSetting <> ''
-      AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection BY bfConfig.cSetting:
-
-    bfConfig.lDirty = FALSE.
-
-    IF FIRST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
-
-    PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-
-    IF LAST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SKIP(1).
+    IF LAST-OF(bfConfig.cSection) THEN PUT UNFORMATTED SKIP(1).
   END.
 
   OUTPUT CLOSE.
@@ -3555,28 +3537,33 @@ FUNCTION getColor RETURNS INTEGER
   {&timerStart}
 
   /* Get the setting for this color name */
-  iColor = INTEGER(getRegistry('DataDigger:colors', pcName)) NO-ERROR.
+  iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
 
   /* Default colors if it is unknown */
   IF iColor = ? THEN
   DO:
     CASE pcName:
       WHEN 'CustomFormat:fg'           THEN iColor = 12. /* red       */
+      WHEN 'CustomFormat:bg'           THEN iColor =  ?. /* default   */
       WHEN 'CustomOrder:fg'            THEN iColor = 12. /* red       */
+      WHEN 'CustomOrder:bg'            THEN iColor =  ?. /* default   */
       WHEN 'DataRow:even:bg'           THEN iColor =  8. /* lightgray */
       WHEN 'DataRow:even:fg'           THEN iColor =  0. /* black     */
       WHEN 'DataRow:odd:bg'            THEN iColor = 15. /* white     */
       WHEN 'DataRow:odd:fg'            THEN iColor =  0. /* black     */
       WHEN 'FilterBox:bg'              THEN iColor = 12. /* red       */
       WHEN 'IndexInactive:fg'          THEN iColor = 12. /* red       */
+      WHEN 'IndexInactive:bg'          THEN iColor =  ?. /* default   */
+      WHEN 'PrimIndex:fg'              THEN iColor =  ?. /* default   */
       WHEN 'PrimIndex:bg'              THEN iColor =  8. /* lightgray */
-      WHEN 'QueryCounter:fg'           THEN iColor =  7. /* darkgray  */
       WHEN 'QueryError:bg'             THEN iColor = 12. /* red       */
       WHEN 'QueryError:fg'             THEN iColor = 14. /* yellow    */
-      WHEN 'QueryInfo:fg'              THEN iColor =  7. /* darkgray  */
       WHEN 'RecordCount:Complete:fg'   THEN iColor =  2. /* green     */
+      WHEN 'RecordCount:Complete:bg'   THEN iColor =  ?. /* none      */
       WHEN 'RecordCount:Incomplete:fg' THEN iColor = 12. /* red       */
-      WHEN 'RecordCount:Selected:fg'   THEN iColor =  7. /* darkgray */
+      WHEN 'RecordCount:Incomplete:bg' THEN iColor =  ?. /* none      */
+      WHEN 'RecordCount:Selected:fg'   THEN iColor =  7. /* darkgray  */
+      WHEN 'RecordCount:Selected:bg'   THEN iColor =  ?. /* none      */
       WHEN 'WarningBox:bg'             THEN iColor = 14. /* yellow    */
       WHEN 'WarningBox:fg'             THEN iColor = 12. /* red       */
       WHEN 'FieldFilter:bg'            THEN iColor = 14. /* yellow    */
@@ -3584,7 +3571,7 @@ FUNCTION getColor RETURNS INTEGER
     END CASE.
 
     /* Save it, so the next time it comes from the settings */
-    IF iColor <> ? THEN setRegistry('DataDigger:colors', pcName, STRING(iColor)).
+    IF iColor <> ? THEN setRegistry('DataDigger:Colors', pcName, STRING(iColor)).
   END.
 
   {&timerStop}
@@ -4905,7 +4892,7 @@ FUNCTION setRegistry RETURNS CHARACTER
       bfConfig.cSetting = pcKey.
   END.
   
-  IF pcValue = ? THEN
+  IF pcValue = ? OR TRIM(pcValue) = '' THEN
     DELETE bfConfig.
   ELSE
     ASSIGN
@@ -4922,3 +4909,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

@@ -50,10 +50,10 @@ CREATE WIDGET-POOL.
 &Scoped-define FRAME-NAME frMain
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS RECT-6 edDefinition cbIndent tgSelectedOnly ~
-tgLowerCase tgIncludeDb btnCopy 
+&Scoped-Define ENABLED-OBJECTS RECT-6 RECT-5 edDefinition cbIndent ~
+tgSelectedOnly tgLowerCase tgIncludeDb rsBufferName fiBuffer btnCopy 
 &Scoped-Define DISPLAYED-OBJECTS edDefinition cbIndent tgSelectedOnly ~
-tgLowerCase tgIncludeDb 
+tgLowerCase tgIncludeDb rsBufferName fiBuffer 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -71,7 +71,7 @@ DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnCopy 
      LABEL "&Copy to clipboard" 
-     SIZE-PIXELS 180 BY 24.
+     SIZE-PIXELS 185 BY 24.
 
 DEFINE VARIABLE cbIndent AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS COMBO-BOX INNER-LINES 5
@@ -87,9 +87,28 @@ DEFINE VARIABLE edDefinition AS CHARACTER
      SIZE-PIXELS 700 BY 340
      FONT 0 NO-UNDO.
 
+DEFINE VARIABLE fiBuffer AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN NATIVE 
+     SIZE-PIXELS 135 BY 21 NO-UNDO.
+
+DEFINE VARIABLE rsBufferName AS INTEGER 
+     VIEW-AS RADIO-SET VERTICAL
+     RADIO-BUTTONS 
+          "Use table name as-is", 1,
+"bCustomer", 2,
+"bfCustomer", 3,
+"bufCustomer", 4,
+"b-customer", 5,
+"Other", 99
+     SIZE-PIXELS 166 BY 115 TOOLTIP "specify buffer name for the table" NO-UNDO.
+
+DEFINE RECTANGLE RECT-5
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 180 BY 160.
+
 DEFINE RECTANGLE RECT-6
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 130.
+     SIZE-PIXELS 185 BY 110.
 
 DEFINE VARIABLE tgIncludeDb AS LOGICAL INITIAL no 
      LABEL "Include &DB Name" 
@@ -112,17 +131,22 @@ DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no
 DEFINE FRAME frMain
      edDefinition AT Y 5 X 205 NO-LABEL WIDGET-ID 2
      cbIndent AT Y 17 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     tgSelectedOnly AT Y 55 X 25 WIDGET-ID 8
-     tgLowerCase AT Y 80 X 25 WIDGET-ID 84
-     tgIncludeDb AT Y 105 X 25 WIDGET-ID 86
+     tgSelectedOnly AT Y 49 X 25 WIDGET-ID 8
+     tgLowerCase AT Y 69 X 25 WIDGET-ID 84
+     tgIncludeDb AT Y 89 X 25 WIDGET-ID 86
+     rsBufferName AT Y 145 X 24 NO-LABEL WIDGET-ID 62
+     fiBuffer AT Y 260 X 30 COLON-ALIGNED NO-LABEL WIDGET-ID 56
      btnCopy AT Y 320 X 15 WIDGET-ID 90
+     "Buffer name" VIEW-AS TEXT
+          SIZE-PIXELS 75 BY 13 AT Y 123 X 25 WIDGET-ID 70
      "Indent:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 20 AT Y 18 X 25 WIDGET-ID 68
      RECT-6 AT Y 5 X 15 WIDGET-ID 82
+     RECT-5 AT Y 130 X 15 WIDGET-ID 58
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 182 BY 16.81 WIDGET-ID 100.
+         SIZE 183.4 BY 16.81 WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -236,6 +260,30 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME fiBuffer
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiBuffer C-Win
+ON VALUE-CHANGED OF fiBuffer IN FRAME frMain
+DO:
+  RUN generateCode.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME rsBufferName
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL rsBufferName C-Win
+ON VALUE-CHANGED OF rsBufferName IN FRAME frMain
+DO:
+  fiBuffer:SENSITIVE = (SELF:SCREEN-VALUE = '99').
+  fiBuffer:MOVE-TO-TOP().
+  RUN generateCode.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME tgSelectedOnly
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelectedOnly C-Win
 ON VALUE-CHANGED OF tgSelectedOnly IN FRAME frMain /* Selected fields only */
@@ -319,9 +367,10 @@ PROCEDURE enable_UI :
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   DISPLAY edDefinition cbIndent tgSelectedOnly tgLowerCase tgIncludeDb 
+          rsBufferName fiBuffer 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE RECT-6 edDefinition cbIndent tgSelectedOnly tgLowerCase tgIncludeDb 
-         btnCopy 
+  ENABLE RECT-6 RECT-5 edDefinition cbIndent tgSelectedOnly tgLowerCase 
+         tgIncludeDb rsBufferName fiBuffer btnCopy 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -352,15 +401,17 @@ END PROCEDURE. /* fillTT */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateCode C-Win 
 PROCEDURE generateCode :
-DEFINE VARIABLE cText     AS LONGCHAR  NO-UNDO.
+/* generate the code
+*/  
+  DEFINE VARIABLE cText     AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cIndent   AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iMaxName  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cTable    AS CHARACTER NO-UNDO.
   
   DEFINE BUFFER bField FOR ttField.
 
   DO WITH FRAME frMain:
-    
-    ASSIGN cbIndent tgLowerCase tgSelectedOnly tgIncludeDb.
+    ASSIGN cbIndent tgLowerCase tgSelectedOnly tgIncludeDb rsBufferName fiBuffer.
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -369,7 +420,19 @@ DEFINE VARIABLE cText     AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cText = SUBSTITUTE('/* Assign &1.&2 ~n */~n', pcDatabase, pcTable ).
+    CASE rsBufferName:
+      WHEN  1 THEN cTable = pcTable.
+      WHEN  2 THEN cTable = SUBSTITUTE('b&1&2'  , CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
+      WHEN  3 THEN cTable = SUBSTITUTE('bf&1&2' , CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
+      WHEN  4 THEN cTable = SUBSTITUTE('buf&1&2', CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
+      WHEN  5 THEN cTable = SUBSTITUTE('b-&1&2' , LOWER(pcTable)).
+      WHEN 99 THEN cTable = (IF fiBuffer <> '' THEN fiBuffer ELSE pcTable).
+    END CASE.
+
+    /* Prefix with db name */
+    IF tgIncludeDb THEN cTable = pcDatabase + '.' + cTable.
+
+    cText = SUBSTITUTE('/* Assign &1 ~n */~n', cTable ).
     cText = cText + (IF tgLowerCase:CHECKED THEN 'assign' ELSE 'ASSIGN').
             
     /* Get max lengths */
@@ -386,11 +449,10 @@ DEFINE VARIABLE cText     AS LONGCHAR  NO-UNDO.
         AND bField.cFieldName <> 'ROWID'
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
 
-      cText = SUBSTITUTE('&1~n&2&3&4.&5 = '
+      cText = SUBSTITUTE('&1~n&2&3.&4 = '
                         , cText 
                         , cIndent
-                        , (IF tgIncludeDb THEN pcDatabase + '.' ELSE '')
-                        , pcTable
+                        , cTable
                         , STRING(bField.cFieldName, FILL('X',iMaxName))
                         ).
     END. 
@@ -434,14 +496,20 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateAssign', 'SelectedOnly')  = ? THEN setRegistry('DataDigger:GenerateAssign', 'SelectedOnly','no').
     IF getRegistry('DataDigger:GenerateAssign', 'LowerCase')     = ? THEN setRegistry('DataDigger:GenerateAssign', 'LowerCase','no').
     IF getRegistry('DataDigger:GenerateAssign', 'IncludeDbName') = ? THEN setRegistry('DataDigger:GenerateAssign', 'IncludeDbName','no').
+    IF getRegistry('DataDigger:GenerateAssign', 'BufferName')    = ? THEN setRegistry('DataDigger:GenerateAssign', 'BufferName','0').
 
     /* Get user settings */
     cbIndent:SCREEN-VALUE     = getRegistry('DataDigger:GenerateAssign', 'Indent').
     tgSelectedOnly:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'SelectedOnly')).
     tgLowerCase:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'LowerCase')).
     tgIncludeDb:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateAssign', 'IncludeDbName')).
+    rsBufferName:SCREEN-VALUE = getRegistry('DataDigger:GenerateAssign', 'BufferName').
+    
+    IF getRegistry('DataDigger:GenerateAssign', 'BufferNameCustom') <> ? THEN 
+      fiBuffer:SCREEN-VALUE   = getRegistry('DataDigger:GenerateAssign', 'BufferNameCustom').
 
     APPLY 'VALUE-CHANGED' TO cbIndent.
+    APPLY 'VALUE-CHANGED' TO rsBufferName.
     
     /* Restore window size */
     iSetting = INTEGER(getRegistry('DataDigger:GenerateAssign', 'Window:width' )) NO-ERROR.
@@ -467,15 +535,20 @@ PROCEDURE saveSettings :
     /* Window size (don't save x,y pos because you might place it on a second monitor and 
      * later try to restore it when your second monitor is gone) 
      */
-    setRegistry('DataDigger:GenerateAssign', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).
-    setRegistry('DataDigger:GenerateAssign', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ).
+    setRegistry('DataDigger:GenerateAssign', 'Window:width'    , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).
+    setRegistry('DataDigger:GenerateAssign', 'Window:height'   , STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ).
+                                                               
+    /* User settings */                                        
+    setRegistry('DataDigger:GenerateAssign', 'Indent'          , cbIndent:SCREEN-VALUE          ).
+    setRegistry('DataDigger:GenerateAssign', 'SelectedOnly'    , STRING(tgSelectedOnly:CHECKED )).
+    setRegistry('DataDigger:GenerateAssign', 'LowerCase'       , STRING(tgLowerCase:CHECKED    )).
+    setRegistry('DataDigger:GenerateAssign', 'IncludeDbName'   , STRING(tgIncludeDb:CHECKED    )).
+    setRegistry('DataDigger:GenerateAssign', 'BufferName'      , rsBufferName:SCREEN-VALUE      ).
 
-    /* User settings */
-    setRegistry('DataDigger:GenerateAssign', 'Indent'       , STRING(cbIndent:SCREEN-VALUE  )).
-    setRegistry('DataDigger:GenerateAssign', 'SelectedOnly' , STRING(tgSelectedOnly:CHECKED )).
-    setRegistry('DataDigger:GenerateAssign', 'LowerCase'    , STRING(tgLowerCase:CHECKED    )).
-    setRegistry('DataDigger:GenerateAssign', 'IncludeDbName', STRING(tgIncludeDb:CHECKED    )).
-
+    IF fiBuffer:SCREEN-VALUE <> '' THEN 
+      setRegistry('DataDigger:GenerateAssign', 'BufferNameCustom', fiBuffer:SCREEN-VALUE ).
+    ELSE
+      setRegistry('DataDigger:GenerateAssign', 'BufferNameCustom', ? ).
   END.
 
 END PROCEDURE. /* saveSettings */
@@ -507,3 +580,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

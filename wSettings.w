@@ -482,7 +482,15 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   giWinY = ACTIVE-WINDOW:Y.
 
   RUN initializeObject. /* Collect frames and set values from ini */
-  APPLY 'entry' TO btPage1.
+
+  giCurrentPage = INTEGER(getRegistry('DataDigger','SettingsTab')) NO-ERROR.
+  IF giCurrentPage = ? OR giCurrentPage = 0 THEN giCurrentPage = 1.
+  CASE giCurrentPage:
+    WHEN 1 THEN APPLY 'entry' TO btPage1.
+    WHEN 2 THEN APPLY 'entry' TO btPage2.
+    WHEN 3 THEN APPLY 'entry' TO btPage3.
+  END CASE.
+
   VIEW wSettings.
 
   RUN showScrollBars(FRAME {&frame-name}:handle, NO, NO).
@@ -769,7 +777,7 @@ PROCEDURE loadSettings :
 
         IF hWidget:TYPE = 'BUTTON' THEN
         DO:
-          IF cSection = 'DataDigger:fonts' THEN
+          IF cSection = 'DataDigger:Fonts' THEN
             hWidget:FONT = INTEGER(cValue) NO-ERROR.
         END.
 
@@ -783,7 +791,7 @@ PROCEDURE loadSettings :
 
         ELSE
         IF hWidget:TYPE = 'FILL-IN'
-          AND cSection = 'DataDigger:colors' THEN
+          AND cSection = 'DataDigger:Colors' THEN
         DO:
           /* Try to get :FG */
           iColor = getColor(cSetting + ':FG' ).
@@ -842,7 +850,7 @@ PROCEDURE saveSettings :
 
         IF hWidget:TYPE = 'BUTTON' THEN
         DO:
-          IF cSection = 'DataDigger:fonts' THEN
+          IF cSection = 'DataDigger:Fonts' THEN
             setRegistry(cSection, cSetting, STRING(hWidget:FONT)).
         END.
 
@@ -854,7 +862,7 @@ PROCEDURE saveSettings :
 
         ELSE
         IF hWidget:TYPE = 'FILL-IN'
-          AND cSection = 'DataDigger:colors' THEN
+          AND cSection = 'DataDigger:Colors' THEN
         DO:
           setRegistry(cSection, cSetting + ':FG', STRING(hWidget:FGCOLOR)).
           setRegistry(cSection, cSetting + ':BG', STRING(hWidget:BGCOLOR)).
@@ -887,8 +895,10 @@ PROCEDURE setPage :
     ASSIGN giLastActivePage = piPageNr
            giCurrentPage = piPageNr.
 
+  setRegistry('DataDigger','SettingsTab',STRING(giCurrentPage)).
+
   DO iPage = 1 TO NUM-ENTRIES(gcPageButtons):
-    hButton = WIDGET-HANDLE( ENTRY(iPage,gcPageButtons) ).
+    hButton = HANDLE( ENTRY(iPage,gcPageButtons) ).
 
     /* Normal sizes */
     ASSIGN
@@ -964,3 +974,4 @@ END PROCEDURE. /* showFrames */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
