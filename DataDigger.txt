@@ -6,50 +6,15 @@
 
 =====================================================================================
 
-DataDigger version 24 - dd MMM 2018 
+DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
-BetaDigger 20180830
-- Solved: Several errors with favourite
-- Change: Restructured appearance-tab in settings screen
-- Change: Reverted to default Progress program for setting font
-- Change: Reverted to default Progress program for setting color
-- Change: Generate-Assign can now use a buffer name
-- Change: Removed unused settings from settings screen
-- New   : Colors can now be set for both FG and BG
-- New   : Last used page in settings is restored on startup
-- New   : Favourite/table view is restored on startup
+BetaDigger 20180904
+- Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
+- Solved: OK button on settings screen fails if you have no backup folder (Mike Derrick)
+- Solved: Wrong tooltips in table filter screen (Jeroen Beugels)
+- Solved: Changing tables slow (Jeroen Beugels)
 
-BetaDigger 20180824
-- Solved: Update cannot be set in DataDigger ini #37 (movedoa)
-- Solved: Check for PingBack is wrong #33 (movedoa)
-- Solved: Small layout errors on settings screen #35 (movedoa)
-- Solved: Saving settings takes relatively long 
-- Solved: Strange characters on the about-screen
-- Solved: Editing favourites selects too many tables
-- Solved: Favourites icon below table browse sometimes disabled
-- Solved: Saving fonts did not survive a restart #38 (Dubravko Labaš)
-
-- Change: Option to not cache the settings removed #32 (movedoa)
-- Change: Usage info is saved to settings but never used.
-- Change: Cleaned up images folder
-- Change: Favourites view now also respects database filter
-
-- New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
-- New   : Use CTRL-DOWN / CTRL-UP to expand query editor
-- New   : Option to use multiple favourites groups
-
-BetaDigger 20180713
-- New   : Option to use other folder as workfolder (movedoa)
-- Change: Label <PROGDIR> changed to <WORKDIR>
-
-BetaDigger 20180712
-- Solved: CTRL-C does not work
-- Solved: Settings not saved in settings screen
-- Change: Shortcut for query history changed to CTRL-SHIFT-P
-- Change: DataDigger phone home now via is.gd instead of goo.gl
-- Change: Shortcut for query history changed to CTRL-SHIFT-P
-
-BetaDigger 20180627
+Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
 - Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschend?rfer)
@@ -80,6 +45,15 @@ BetaDigger 20180627
 - Solved: Hiding 'Delete record' question prevents deletion of records (Hans Kaman)
 - Solved: Recid does not show in large databases (Ren? Postma)
 - Solved: Last field in update was not assigned (Steven Peeters)
+- Solved: Update cannot be set in DataDigger ini #37 (movedoa)
+- Solved: Check for PingBack is wrong #33 (movedoa)
+- Solved: Small layout errors on settings screen #35 (movedoa)
+- Solved: Saving settings takes relatively long 
+- Solved: Strange characters on the about-screen
+- Solved: Editing favourites selects too many tables
+- Solved: Favourites icon below table browse sometimes disabled
+- Solved: CTRL-C does not work
+- Solved: Settings not saved in settings screen
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
@@ -96,6 +70,14 @@ BetaDigger 20180627
 - Change: Option menu is now (an optional) sidebar
 - Change: Shortcut keys in option menu changed
 - Change: DataDigger phone home now via is.gd instead of goo.gl
+- Change: Option to not cache the settings removed #32 (movedoa)
+- Change: Usage info is saved to settings but never used.
+- Change: Cleaned up images folder
+- Change: Favourites view now also respects database filter
+- Change: Label <PROGDIR> changed to <WORKDIR>
+- Change: Shortcut for query history changed to CTRL-SHIFT-P
+- Change: DataDigger phone home now via is.gd instead of goo.gl
+- Change: Shortcut for query history changed to CTRL-SHIFT-P
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 - New   : Option to generate an include file with tt definitions
@@ -105,6 +87,11 @@ BetaDigger 20180627
 - New   : Option to reset answers to DataDigger questions
 - New   : Option to reset to factory settings
 - New   : Option to generate assign statement
+- New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
+- New   : Use CTRL-DOWN / CTRL-UP to expand query editor
+- New   : Option to use multiple favourites groups
+- New   : Option to use other folder as workfolder (movedoa)
+
 
 =====================================================================================
 

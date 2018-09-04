@@ -69,6 +69,13 @@ DEFINE TEMP-TABLE ttItem NO-UNDO RCODE-INFORMATION
   INDEX iPrim IS PRIMARY cItem
   .
 
+DEFINE TEMP-TABLE ttColumnHandle NO-UNDO RCODE-INFORMATION
+  FIELD hBrowse AS HANDLE
+  FIELD hColumn AS HANDLE
+  FIELD cColumn AS CHARACTER
+  INDEX iPrim IS PRIMARY hBrowse
+  .
+
 /* Local Variable Definitions --- */
 DEFINE VARIABLE ghFirstColumn              AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
@@ -78,10 +85,6 @@ DEFINE VARIABLE gcFieldFilterHandles       AS CHARACTER   NO-UNDO. /* To save Ha
 DEFINE VARIABLE gcFieldFilterList          AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumnNames    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumns        AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcFieldBrowseColumnHandles AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcFieldBrowseColumnNames   AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcTableBrowseColumnHandles AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcIndexBrowseColumnHandles AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcQueryEditorState         AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE ghDataBrowse               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghDataBuffer               AS HANDLE      NO-UNDO.
@@ -117,6 +120,21 @@ DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to overrid
 
 DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
 DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
+
+/* Vars to keep the values for the colors */
+DEFINE VARIABLE giColorFieldFilterFG    AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorFieldFilterBG    AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorPrimIndexFG      AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorPrimIndexBG      AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorCustomFormatFG   AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorCustomFormatBG   AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorCustomOrderFG    AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorCustomOrderBG    AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorIndexInactivFG   AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorIndexInactiveBG  AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorFavouriteTableFG AS INTEGER NO-UNDO.
+DEFINE VARIABLE giColorFavouriteTableBG AS INTEGER NO-UNDO.
+DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 
 /* Procedure used in update check */
 PROCEDURE URLDownloadToFileA EXTERNAL "URLMON.DLL" :
@@ -183,14 +201,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnFavourite fiTableFilter ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnAddFavGroup ~
-fiTableDesc btnWhere cbFavouriteGroup ficWhere btnQueries btnView btnTools ~
-btnTabTables btnClear btnClearFieldFilter btnClearTableFilter btnClipboard ~
-btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter ~
-btnTabFavourites btnTabFields btnTabIndexes btnNextQuery btnPrevQuery ~
-btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
+btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
+btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
+btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -943,8 +962,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -955,13 +974,13 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
+     btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
@@ -1983,41 +2002,36 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
 ON ROW-DISPLAY OF brFields IN FRAME frMain
 DO:
-  DEFINE VARIABLE hField AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iField AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
+  DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Columns: &1", gcFieldBrowseColumnNames)).
   PUBLISH "debugInfo" (3, SUBSTITUTE("Filter : &1", gcFieldFilterList)).
-
-  DO iField = 1 TO NUM-ENTRIES(gcFieldBrowseColumnHandles):
-    cField = ENTRY(iField, gcFieldBrowseColumnNames).
-    hField = HANDLE(ENTRY(iField,gcFieldBrowseColumnHandles)).
+  
+  FOR EACH bColumnHandle WHERE bColumnHandle.hBrowse = brFields:HANDLE:
 
     /* Set colors if field is matched on FieldFilter */
     IF CAN-DO(gcFieldFilterList,ttField.cFieldName) THEN
     DO:
-      hField:FGCOLOR = getColor("FieldFilter:fg").
-      hField:BGCOLOR = getColor("FieldFilter:bg").
+      bColumnHandle.hColumn:FGCOLOR = giColorFieldFilterFG.
+      bColumnHandle.hColumn:BGCOLOR = giColorFieldFilterBG.
     END.
 
     ELSE
     DO:
       /* Set color if field is part of primary index */
-      hField:FGCOLOR = (IF ttField.lPrimary = TRUE THEN getColor('PrimIndex:fg') ELSE ?). /* none */
-      hField:BGCOLOR = (IF ttField.lPrimary = TRUE THEN getColor('PrimIndex:bg') ELSE ?). /* gray */
+      bColumnHandle.hColumn:FGCOLOR = (IF ttField.lPrimary = TRUE THEN giColorPrimIndexFG ELSE ?). /* none */
+      bColumnHandle.hColumn:BGCOLOR = (IF ttField.lPrimary = TRUE THEN giColorPrimIndexBG ELSE ?). /* gray */
 
       /* Set color if format is non-default */
-      CASE cField:
+      CASE bColumnHandle.cColumn:
         WHEN "cFormat" THEN 
           ASSIGN 
-            hField:FGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN getColor("CustomFormat:fg") ELSE ?)
-            hField:BGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN getColor("CustomFormat:bg") ELSE ?).
+            bColumnHandle.hColumn:FGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN giColorCustomFormatFG ELSE ?)
+            bColumnHandle.hColumn:BGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN giColorCustomFormatBG ELSE ?).
 
         WHEN "iOrder"  THEN 
           ASSIGN 
-            hField:FGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN getColor("CustomOrder:fg") ELSE ?)
-            hField:BGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN getColor("CustomOrder:bg") ELSE ?).
+            bColumnHandle.hColumn:FGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN giColorCustomOrderFG ELSE ?)
+            bColumnHandle.hColumn:BGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN giColorCustomOrderBG ELSE ?).
 
       END CASE.
     END.
@@ -2234,16 +2248,13 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
 ON ROW-DISPLAY OF brIndexes IN FRAME frMain
 DO:
-  DEFINE VARIABLE hField AS HANDLE  NO-UNDO.
-  DEFINE VARIABLE iField AS INTEGER NO-UNDO.
+  DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
-  DO iField = 1 TO NUM-ENTRIES(gcIndexBrowseColumnHandles):
-    hField = HANDLE(ENTRY(iField,gcIndexBrowseColumnHandles)).
-
-    /* Set color if index is not active */
-    hField:FGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN getColor('IndexInactive:fg') ELSE ?). /* red */
-    hField:BGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN getColor('IndexInactive:bg') ELSE ?). /* red */
+  FOR EACH bColumnHandle WHERE bColumnHandle.hBrowse = brIndexes:HANDLE:
+    bColumnHandle.hColumn:FGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactivFG  ELSE ?). /* red */  
+    bColumnHandle.hColumn:BGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactiveBG ELSE ?). /* red */  
   END.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2378,36 +2389,21 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON ROW-DISPLAY OF brTables IN FRAME frMain
 DO:
-  DEFINE VARIABLE hField     AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iField     AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iFG        AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iBG        AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE lUseColors AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lFavourite AS LOGICAL   NO-UNDO.
+
+  DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
   IF NOT glShowFavourites THEN
   DO:
-    lUseColors = LOGICAL(getRegistry('DataDigger:Colors','FavouriteTable:HiLite')).
-    iFG        = INTEGER(getRegistry('DataDigger:Colors','FavouriteTable:FG')).
-    iBG        = INTEGER(getRegistry('DataDigger:Colors','FavouriteTable:BG')).
     lFavourite = CAN-DO(ttTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE).
 
-    PUBLISH "debugInfo" (3, SUBSTITUTE("Table columns:&1  Hilite:&2  Color:&3/&4"
-                                       , gcTableBrowseColumnHandles
-                                       , lUseColors
-                                       , iFG
-                                       , iBG
-                                       )).
-
-    IF lUseColors THEN
-    DO iField = 1 TO NUM-ENTRIES(gcTableBrowseColumnHandles):
-      hField = HANDLE(ENTRY(iField,gcTableBrowseColumnHandles)).
-
-      hField:FGCOLOR = (IF lFavourite THEN iFG ELSE ?).
-      hField:BGCOLOR = (IF lFavourite THEN iBG ELSE ?).
+    IF glUseColorsFavouriteTable THEN
+    FOR EACH bColumnHandle WHERE bColumnHandle.hBrowse = brTables:HANDLE:
+      bColumnHandle.hColumn:FGCOLOR = (IF lFavourite THEN giColorFavouriteTableFG ELSE ?).
+      bColumnHandle.hColumn:BGCOLOR = (IF lFavourite THEN giColorFavouriteTableBG ELSE ?).
     END.
-  END.
 
+  END.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2469,7 +2465,7 @@ DO:
   END.
 
   /* Switch on/off UI */
-  btnFavourite:SENSITIVE = lTableFound.
+  btnFavourite:SENSITIVE = (glShowFavourites OR lTableFound).
   btnClearDataFilter:SENSITIVE IN FRAME frData = lTableFound.
   btnDataSort:SENSITIVE IN FRAME frData = lTableFound.
   btnNextQuery:SENSITIVE = lTableFound.
@@ -5331,6 +5327,7 @@ PROCEDURE collectFieldInfo PRIVATE :
  */
   DEFINE INPUT PARAMETER pcTableName AS CHARACTER NO-UNDO.
   DEFINE BUFFER bTable FOR ttTable.
+  {&timerStart}
 
   /* Collect fields from target table */
   RUN getFields( INPUT gcCurrentDatabase
@@ -5343,6 +5340,8 @@ PROCEDURE collectFieldInfo PRIVATE :
       AND bTable.cTableName = pcTableName.
 
   ASSIGN bTable.lCached = TRUE.
+
+  {&timerStop}
 
 END PROCEDURE. /* collectFieldInfo */
 
@@ -6594,6 +6593,7 @@ PROCEDURE disconnectDatabase :
     setUpdatePanel(?). /* Refresh sensitivity of buttons if needed */
   END.
 
+  RUN reopenTableBrowse(?).
   APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
   RUN filterTables.
 
@@ -6783,10 +6783,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit btnFavourite fiTableFilter cbDatabaseFilter tgSelAll 
+  ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode btnAddFavGroup fiTableDesc 
-         btnWhere cbFavouriteGroup ficWhere btnQueries btnView btnTools 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
          btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
          btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
          btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
@@ -7933,6 +7933,37 @@ END PROCEDURE. /* incQueriesServed */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initColors C-Win 
+PROCEDURE initColors :
+/* Set color nrs in vars so we don"t have to call the function 
+   * inside the ROW-DISPLAY trigger
+  */
+
+  /* Table browse */
+  glUseColorsFavouriteTable = LOGICAL(getRegistry("DataDigger:Colors","FavouriteTable:HiLite")).
+  giColorFavouriteTableFG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:FG")).
+  giColorFavouriteTableBG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:BG")).
+
+  /* Colors for fields browse */  
+  giColorFieldFilterFG  = getColor("FieldFilter:fg").
+  giColorFieldFilterBG  = getColor("FieldFilter:bg").
+  giColorPrimIndexFG    = getColor("PrimIndex:fg").
+  giColorPrimIndexBG    = getColor("PrimIndex:bg").
+  giColorCustomFormatFG = getColor("CustomFormat:fg").
+  giColorCustomFormatBG = getColor("CustomFormat:bg").
+  giColorCustomOrderFG  = getColor("CustomOrder:fg").
+  giColorCustomOrderBG  = getColor("CustomOrder:bg").
+
+  /* Index browse */
+  giColorIndexInactivFG  = getColor("IndexInactive:fg").
+  giColorIndexInactiveBG = getColor("IndexInactive:bg").
+
+
+END PROCEDURE. /* initColors */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeFilters C-Win 
 PROCEDURE initializeFilters :
 /* Create filter widgets
@@ -8030,9 +8061,10 @@ PROCEDURE initializeObjects :
   DEFINE VARIABLE iSetting   AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iValue     AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iField     AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE hColumn    AS HANDLE    NO-UNDO.
   DEFINE VARIABLE iStackSize AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cGroup     AS CHARACTER NO-UNDO.
+
+  DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
   {&timerStart}
 
@@ -8063,6 +8095,9 @@ PROCEDURE initializeObjects :
   /* Maximum number OF history ON data filters */
   giMaxFilterHistory = INTEGER(getRegistry("DataDigger", "MaxFilterHistory")).
   IF giMaxFilterHistory = ? THEN giMaxFilterHistory = 10.
+
+  /* Set color nrs in vars */
+  RUN initColors.
 
   /* IF the stack space is 128 or less, limit nr OF columns
    * TO prevent the sessiON from crashing. As a rough guide
@@ -8121,64 +8156,86 @@ PROCEDURE initializeObjects :
     /* Handle to the browse with fields of a file */
     ghFieldBrowse = brFields:HANDLE IN FRAME {&FRAME-NAME}.
 
-    /* restore width of table browser columns */
+    /* Save handles in tt for the row-display */
+    EMPTY TEMP-TABLE bColumnHandle.
+
+    /* TABLES
+    */
     DO iField = 1 TO brTables:NUM-COLUMNS:
-      hColumn = brTables:GET-BROWSE-COLUMN(iField):HANDLE.
+
+      /* Save handles in tt for the row-display */
+      CREATE bColumnHandle.
+      ASSIGN 
+        bColumnHandle.hBrowse = brTables:HANDLE
+        bColumnHandle.hColumn = brTables:GET-BROWSE-COLUMN(iField):HANDLE
+        bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
+        .
 
       /* Get the width from registry */
-      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", hColumn:NAME))) NO-ERROR.
+      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", bColumnHandle.hColumn:NAME))) NO-ERROR.
       IF iValue = ? THEN
       DO:
-        CASE hColumn:NAME:
+        CASE bColumnHandle.hColumn:NAME:
           WHEN "cTableName"  THEN iValue = 120.
           WHEN "cDatabase"   THEN iValue =  60.
           WHEN "iNumQueries" THEN iValue =  28.
           WHEN "tLastUsed"   THEN iValue = 103.
         END CASE.
       END.
-      IF iValue <> ? THEN hColumn:WIDTH-PIXELS = iValue.
+      IF iValue <> ? THEN bColumnHandle.hColumn:WIDTH-PIXELS = iValue.
 
-      ON "end-resize" OF hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-TABLES}).
+      ON "end-resize" OF bColumnHandle.hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-TABLES}).
     END.
 
-    /* restore width of index browser columns */
+
+    /* INDEXES
+    */
     DO iField = 1 TO brIndexes:NUM-COLUMNS:
-      hColumn = brIndexes:GET-BROWSE-COLUMN(iField):HANDLE.
+
+      /* Save handles in tt for the row-display */
+      CREATE bColumnHandle.
+      ASSIGN 
+        bColumnHandle.hBrowse = brIndexes:HANDLE
+        bColumnHandle.hColumn = brIndexes:GET-BROWSE-COLUMN(iField):HANDLE
+        bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
+        .
 
       /* Get the width from registry */
-      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", hColumn:NAME))) NO-ERROR.
+      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", bColumnHandle.hColumn:NAME))) NO-ERROR.
       IF iValue = ? THEN
       DO:
-        CASE hColumn:NAME:
+        CASE bColumnHandle.hColumn:NAME:
           WHEN "cIndexName"   THEN iValue = 100.
           WHEN "cIndexFlags"  THEN iValue =  70.
           WHEN "cIndexFields" THEN iValue = 314.
         END CASE.
       END.
-      IF iValue <> ? THEN hColumn:WIDTH-PIXELS = iValue.
+      IF iValue <> ? THEN bColumnHandle.hColumn:WIDTH-PIXELS = iValue.
 
-      ON "end-resize" OF hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-INDEXES}).
+      ON "end-resize" OF bColumnHandle.hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-INDEXES}).
     END.
 
-    /* Build a list OF all columns in the fieldbrowse.
-     * We use this TO hi-light fields that are in the prim index.
-     */
-    gcFieldBrowseColumnHandles = "".
-    gcFieldBrowseColumnNames   = "".
 
+    /* FIELDS
+    */
     DO iField = 1 TO brFields:NUM-COLUMNS:
-      hColumn = brFields:GET-BROWSE-COLUMN(iField):HANDLE.
-      gcFieldBrowseColumnHandles = gcFieldBrowseColumnHandles + "," + STRING(hColumn).
-      gcFieldBrowseColumnNames = gcFieldBrowseColumnNames + "," + hColumn:NAME.
+
+      /* Save handles in tt for the row-display */
+      CREATE bColumnHandle.
+      ASSIGN 
+        bColumnHandle.hBrowse = brFields:HANDLE
+        bColumnHandle.hColumn = brFields:GET-BROWSE-COLUMN(iField):HANDLE
+        bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
+        .
 
       /* Hide the cFormatOrg column */
-      IF hColumn:NAME = "cFormatOrg" THEN hColumn:VISIBLE = FALSE.
+      IF bColumnHandle.hColumn:NAME = "cFormatOrg" THEN bColumnHandle.hColumn:VISIBLE = FALSE.
 
       /* Get the width from registry */
-      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", hColumn:NAME))) NO-ERROR.
+      iValue = INTEGER(getRegistry("DataDigger", SUBSTITUTE("ColumnWidth:&1", bColumnHandle.hColumn:NAME))) NO-ERROR.
       IF iValue = ? THEN
       DO:
-        CASE hColumn:NAME:
+        CASE bColumnHandle.hColumn:NAME:
           WHEN "lShow"      THEN iValue =  15.
           WHEN "iOrder"     THEN iValue =  35.
           WHEN "cFieldName" THEN iValue = 150.
@@ -8187,28 +8244,10 @@ PROCEDURE initializeObjects :
           WHEN "cLabel"     THEN iValue = 117.
         END CASE.
       END.
-      IF iValue <> ? THEN hColumn:WIDTH-PIXELS = iValue.
+      IF iValue <> ? THEN bColumnHandle.hColumn:WIDTH-PIXELS = iValue.
 
-      ON "end-resize" OF hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-FIELDS}).
+      ON "end-resize" OF bColumnHandle.hColumn PERSISTENT RUN resizeFilters IN THIS-PROCEDURE (INPUT {&PAGE-FIELDS}).
     END.
-    gcFieldBrowseColumnHandles = TRIM(gcFieldBrowseColumnHandles,",").
-    gcFieldBrowseColumnNames = TRIM(gcFieldBrowseColumnNames,",").
-
-    /* Handles to the columns in brIndexes */
-    gcIndexBrowseColumnHandles = "".       
-    DO iField = 1 TO brIndexes:NUM-COLUMNS:
-      hColumn = brIndexes:GET-BROWSE-COLUMN(iField):HANDLE.
-      gcIndexBrowseColumnHandles = gcIndexBrowseColumnHandles + "," + STRING(hColumn).
-    END.
-    gcIndexBrowseColumnHandles = TRIM(gcIndexBrowseColumnHandles,",").
-
-    /* Handles to the columns in brTables */
-    gcTableBrowseColumnHandles = ''.
-    DO iField = 1 TO brTables:NUM-COLUMNS:
-      hColumn = brTables:GET-BROWSE-COLUMN(iField):HANDLE.
-      gcTableBrowseColumnHandles = gcTableBrowseColumnHandles + "," + STRING(hColumn).
-    END.
-    gcTableBrowseColumnHandles = TRIM(gcTableBrowseColumnHandles,",").
 
     /* Get tables */
     RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
@@ -10769,7 +10808,9 @@ PROCEDURE setFavourite :
   /* Find table and set/unset as fav */
   FIND bTable
     WHERE bTable.cDatabase  = pcDatabase
-      AND bTable.cTableName = pcTable.
+      AND bTable.cTableName = pcTable NO-ERROR.
+  
+  IF NOT AVAILABLE bTable THEN RETURN. 
 
   /* Toggle fav status */
   IF plFavourite = ? THEN plFavourite = NOT CAN-DO(bTable.cFavourites, pcGroupName).
@@ -11148,6 +11189,8 @@ PROCEDURE setTableContext :
   DEFINE VARIABLE cQuery     AS CHARACTER NO-UNDO.
   DEFINE VARIABLE hEditor    AS HANDLE    NO-UNDO.
 
+  {&timerStart}
+
   DO WITH FRAME {&frame-name}:
 
     IF pcTable = "" THEN RETURN.
@@ -11222,6 +11265,9 @@ PROCEDURE setTableContext :
 
     setWindowFreeze(NO).
   END.
+
+  {&timerStop}
+
 END PROCEDURE. /* setTableContext */
 
 /* _UIB-CODE-BLOCK-END */

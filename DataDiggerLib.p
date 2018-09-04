@@ -144,6 +144,11 @@ DEFINE TEMP-TABLE ttWidget NO-UNDO RCODE-INFORMATION
   FIELD iWidth    AS INTEGER
   INDEX iPrim AS PRIMARY hWidget.
 
+DEFINE TEMP-TABLE ttColor NO-UNDO RCODE-INFORMATION
+  FIELD cName  AS CHARACTER
+  FIELD iColor AS INTEGER
+  INDEX iPrim AS PRIMARY cName. 
+
 /* If you have trouble with the cache, disable it in the settings screen */
 DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
@@ -657,7 +662,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 36
+         HEIGHT             = 34.38
          WIDTH              = 53.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -776,8 +781,9 @@ PROCEDURE checkBackupFolder :
       setRegistry("DataDigger:Backup","BackupOnUpdate", "NO").
       setRegistry("DataDigger:Backup","BackupOnDelete", "NO").    
     END.
-    
   END.    
+  ELSE
+    plFolderOk = TRUE.
 
 END PROCEDURE. /* checkBackupFolder */
 
@@ -1454,6 +1460,7 @@ PROCEDURE getDumpFileName :
   DEFINE VARIABLE cDumpDir      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBackupDir    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer       AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cUserId       AS CHARACTER   NO-UNDO.
 
   /* Checks */
   IF LOOKUP(pcAction, "Dump,Create,Update,Delete") = 0 THEN
@@ -1505,6 +1512,11 @@ PROCEDURE getDumpFileName :
     cDumpName = pcTable.
   IF cDumpName = ? THEN cDumpName = pcTable.
 
+  /* If you have no db connected, userid gives back unknown value
+   * which misbehaves in a replace statement */
+  cUserId = USERID(LDBNAME(1)).
+  IF cUserId = ? THEN cUserId = ''.
+  
   PUBLISH "debugInfo" (3, SUBSTITUTE("DumpDir  : &1", cDumpDir)).
   PUBLISH "debugInfo" (3, SUBSTITUTE("BackupDir: &1", cBackupDir)).
   PUBLISH "debugInfo" (3, SUBSTITUTE("LastDir  : &1", cLastDir)).
@@ -1518,7 +1530,7 @@ PROCEDURE getDumpFileName :
   pcFileName = REPLACE(pcFileName,"<WORKDIR>"  , getWorkFolder()             ).
 
   pcFileName = REPLACE(pcFileName,"<ACTION>"   , pcAction                    ).
-  pcFileName = REPLACE(pcFileName,"<USERID>"   , USERID(LDBNAME(1))          ).
+  pcFileName = REPLACE(pcFileName,"<USERID>"   , cUserId                     ).
   pcFileName = REPLACE(pcFileName,"<DB>"       , pcDatabase                  ).
   pcFileName = REPLACE(pcFileName,"<TABLE>"    , pcTable                     ).
   pcFileName = REPLACE(pcFileName,"<DUMPNAME>" , cDumpName                   ).
@@ -3533,49 +3545,56 @@ FUNCTION getColor RETURNS INTEGER
   ( pcName AS CHARACTER ) :
   /* Return the color number for a color name
    */
-  DEFINE VARIABLE iColor AS INTEGER NO-UNDO.
+  DEFINE BUFFER bColor FOR ttColor.
+
   {&timerStart}
 
+  FIND bColor WHERE bColor.cName = pcName NO-ERROR.
+  IF AVAILABLE bColor THEN RETURN bColor.iColor.
+
+  CREATE bColor.
+  ASSIGN bColor.cName = pcName.
+
   /* Get the setting for this color name */
-  iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
+  bColor.iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
 
   /* Default colors if it is unknown */
   IF iColor = ? THEN
   DO:
     CASE pcName:
-      WHEN 'CustomFormat:fg'           THEN iColor = 12. /* red       */
-      WHEN 'CustomFormat:bg'           THEN iColor =  ?. /* default   */
-      WHEN 'CustomOrder:fg'            THEN iColor = 12. /* red       */
-      WHEN 'CustomOrder:bg'            THEN iColor =  ?. /* default   */
-      WHEN 'DataRow:even:bg'           THEN iColor =  8. /* lightgray */
-      WHEN 'DataRow:even:fg'           THEN iColor =  0. /* black     */
-      WHEN 'DataRow:odd:bg'            THEN iColor = 15. /* white     */
-      WHEN 'DataRow:odd:fg'            THEN iColor =  0. /* black     */
-      WHEN 'FilterBox:bg'              THEN iColor = 12. /* red       */
-      WHEN 'IndexInactive:fg'          THEN iColor = 12. /* red       */
-      WHEN 'IndexInactive:bg'          THEN iColor =  ?. /* default   */
-      WHEN 'PrimIndex:fg'              THEN iColor =  ?. /* default   */
-      WHEN 'PrimIndex:bg'              THEN iColor =  8. /* lightgray */
-      WHEN 'QueryError:bg'             THEN iColor = 12. /* red       */
-      WHEN 'QueryError:fg'             THEN iColor = 14. /* yellow    */
-      WHEN 'RecordCount:Complete:fg'   THEN iColor =  2. /* green     */
-      WHEN 'RecordCount:Complete:bg'   THEN iColor =  ?. /* none      */
-      WHEN 'RecordCount:Incomplete:fg' THEN iColor = 12. /* red       */
-      WHEN 'RecordCount:Incomplete:bg' THEN iColor =  ?. /* none      */
-      WHEN 'RecordCount:Selected:fg'   THEN iColor =  7. /* darkgray  */
-      WHEN 'RecordCount:Selected:bg'   THEN iColor =  ?. /* none      */
-      WHEN 'WarningBox:bg'             THEN iColor = 14. /* yellow    */
-      WHEN 'WarningBox:fg'             THEN iColor = 12. /* red       */
-      WHEN 'FieldFilter:bg'            THEN iColor = 14. /* yellow    */
-      WHEN 'FieldFilter:fg'            THEN iColor =  9. /* blue      */
+      WHEN 'CustomFormat:fg'           THEN bColor.iColor = 12. /* red       */
+      WHEN 'CustomFormat:bg'           THEN bColor.iColor =  ?. /* default   */
+      WHEN 'CustomOrder:fg'            THEN bColor.iColor = 12. /* red       */
+      WHEN 'CustomOrder:bg'            THEN bColor.iColor =  ?. /* default   */
+      WHEN 'DataRow:even:bg'           THEN bColor.iColor =  8. /* lightgray */
+      WHEN 'DataRow:even:fg'           THEN bColor.iColor =  0. /* black     */
+      WHEN 'DataRow:odd:bg'            THEN bColor.iColor = 15. /* white     */
+      WHEN 'DataRow:odd:fg'            THEN bColor.iColor =  0. /* black     */
+      WHEN 'FilterBox:bg'              THEN bColor.iColor = 12. /* red       */
+      WHEN 'IndexInactive:fg'          THEN bColor.iColor = 12. /* red       */
+      WHEN 'IndexInactive:bg'          THEN bColor.iColor =  ?. /* default   */
+      WHEN 'PrimIndex:fg'              THEN bColor.iColor =  ?. /* default   */
+      WHEN 'PrimIndex:bg'              THEN bColor.iColor =  8. /* lightgray */
+      WHEN 'QueryError:bg'             THEN bColor.iColor = 12. /* red       */
+      WHEN 'QueryError:fg'             THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'RecordCount:Complete:fg'   THEN bColor.iColor =  2. /* green     */
+      WHEN 'RecordCount:Complete:bg'   THEN bColor.iColor =  ?. /* none      */
+      WHEN 'RecordCount:Incomplete:fg' THEN bColor.iColor = 12. /* red       */
+      WHEN 'RecordCount:Incomplete:bg' THEN bColor.iColor =  ?. /* none      */
+      WHEN 'RecordCount:Selected:fg'   THEN bColor.iColor =  7. /* darkgray  */
+      WHEN 'RecordCount:Selected:bg'   THEN bColor.iColor =  ?. /* none      */
+      WHEN 'WarningBox:bg'             THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'WarningBox:fg'             THEN bColor.iColor = 12. /* red       */
+      WHEN 'FieldFilter:bg'            THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'FieldFilter:fg'            THEN bColor.iColor =  9. /* blue      */
     END CASE.
 
     /* Save it, so the next time it comes from the settings */
-    IF iColor <> ? THEN setRegistry('DataDigger:Colors', pcName, STRING(iColor)).
+    IF bColor.iColor <> ? THEN setRegistry('DataDigger:Colors', pcName, STRING(bColor.iColor)).
   END.
 
   {&timerStop}
-  RETURN iColor.   /* Function return value. */
+  RETURN bColor.iColor.   /* Function return value. */
 
 END FUNCTION. /* getColor */
 

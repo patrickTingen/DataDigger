@@ -52,8 +52,10 @@
 &Scoped-define INTERNAL-TABLES ttTable
 
 /* Definitions for BROWSE brTables                                      */
-&Scoped-define FIELDS-IN-QUERY-brTables ttTable.lFavourite ttTable.cTableName ttTable.cDatabase   
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables   
+&Scoped-define FIELDS-IN-QUERY-brTables ttTable.lFavourite ttTable.cTableName ttTable.cDatabase /*   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables ttTable.lFavourite */   
+&Scoped-define ENABLED-TABLES-IN-QUERY-brTables ttTable
+&Scoped-define FIRST-ENABLED-TABLE-IN-QUERY-brTables ttTable
 &Scoped-define SELF-NAME brTables
 &Scoped-define QUERY-STRING-brTables FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE)
 &Scoped-define OPEN-QUERY-brTables OPEN QUERY {&SELF-NAME}   FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE).
@@ -120,7 +122,8 @@ DEFINE BROWSE brTables
   QUERY brTables DISPLAY
       ttTable.lFavourite    COLUMN-LABEL "" VIEW-AS TOGGLE-BOX
 ttTable.cTableName    COLUMN-LABEL "Table"
-ttTable.cDatabase     COLUMN-LABEL "DB"
+ttTable.cDatabase     COLUMN-LABEL "DB"  
+        
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
     WITH NO-ROW-MARKERS SEPARATORS SIZE 62 BY 12.14 FIT-LAST-COLUMN.
@@ -232,6 +235,48 @@ OR 'RETURN' OF brTables
 DO:
   ttTable.lFavourite = NOT ttTable.lFavourite.
   BROWSE brTables:REFRESH().
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables Dialog-Frame
+ON MOUSE-SELECT-CLICK OF brTables IN FRAME Dialog-Frame
+DO:
+  /* Alternative way for toggling the selection box
+   * If we just enable it, focus comes solely on the 
+   * toggle box when we jump from filterbox to browse
+   */
+  DEFINE VARIABLE iMouseX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMouseY AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iRow    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE hBrowse AS HANDLE  NO-UNDO.
+
+  DO WITH FRAME {&FRAME-NAME}:
+    hBrowse = BROWSE brTables:HANDLE.
+    RUN getMouseXY(INPUT hBrowse:FRAME, OUTPUT iMouseX, OUTPUT iMouseY).
+
+    IF    iMouseY > hBrowse:Y
+      AND iMouseY < hBrowse:Y + hBrowse:HEIGHT-PIXELS
+      AND iMouseX > hBrowse:X 
+      AND iMouseX < (hBrowse:X + hBrowse:GET-BROWSE-COLUMN(2):X) THEN
+    DO:
+      iRow = TRUNCATE((iMouseY - 32) / (hBrowse:ROW-HEIGHT-PIXELS + 4),0).
+
+      IF hBrowse:NUM-ITERATIONS > 0 AND iRow > hBrowse:NUM-ITERATIONS THEN RETURN.
+      IF iRow < 1 THEN RETURN.
+
+      /* Get the record in the buffer */
+      IF hBrowse:QUERY:NUM-RESULTS > 0 THEN
+      DO:
+        hBrowse:SELECT-ROW(iRow).
+        hBrowse:FETCH-SELECTED-ROW(1).
+        APPLY 'default-action' TO hBrowse.
+      END.
+    END.
+  END.
+  
 END.
 
 /* _UIB-CODE-BLOCK-END */
