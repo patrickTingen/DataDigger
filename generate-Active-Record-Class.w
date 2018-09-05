@@ -501,7 +501,7 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('/*          This .i file was generated with the DataDigger              */ ~n' )
+            + SUBSTITUTE('/*          This .cls file was generated with the DataDigger            */ ~n' )
             + SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
             .
             

@@ -496,7 +496,7 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateAssign', 'SelectedOnly')  = ? THEN setRegistry('DataDigger:GenerateAssign', 'SelectedOnly','no').
     IF getRegistry('DataDigger:GenerateAssign', 'LowerCase')     = ? THEN setRegistry('DataDigger:GenerateAssign', 'LowerCase','no').
     IF getRegistry('DataDigger:GenerateAssign', 'IncludeDbName') = ? THEN setRegistry('DataDigger:GenerateAssign', 'IncludeDbName','no').
-    IF getRegistry('DataDigger:GenerateAssign', 'BufferName')    = ? THEN setRegistry('DataDigger:GenerateAssign', 'BufferName','0').
+    IF getRegistry('DataDigger:GenerateAssign', 'BufferName')    = ? THEN setRegistry('DataDigger:GenerateAssign', 'BufferName','1').
 
     /* Get user settings */
     cbIndent:SCREEN-VALUE     = getRegistry('DataDigger:GenerateAssign', 'Indent').

@@ -8,6 +8,10 @@
 
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
+- Solved: Compile error in v11.7 in DataDiggerLib.p (Curtis Schroer)
+- Solved: Generate Active Class says .i instead of .cls (Arno vd Ende)
+- Solved: Generate Assign statement gives warning on first use (Arno vd Ende)
+
 BetaDigger 20180904
 - Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
 - Solved: OK button on settings screen fails if you have no backup folder (Mike Derrick)
