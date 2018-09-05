@@ -3559,7 +3559,7 @@ FUNCTION getColor RETURNS INTEGER
   bColor.iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
 
   /* Default colors if it is unknown */
-  IF iColor = ? THEN
+  IF bColor.iColor = ? THEN
   DO:
     CASE pcName:
       WHEN 'CustomFormat:fg'           THEN bColor.iColor = 12. /* red       */
@@ -4928,4 +4928,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-
