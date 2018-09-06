@@ -118,7 +118,7 @@ DEFINE VARIABLE tgDisableTriggers AS LOGICAL INITIAL no
      SIZE-PIXELS 160 BY 17 TOOLTIP "disable load triggers" NO-UNDO.
 
 DEFINE VARIABLE tgIncludeDb AS LOGICAL INITIAL no 
-     LABEL "Include &DB Name"
+     LABEL "Include &DB Name" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 165 BY 17 TOOLTIP "include DB name in the code" NO-UNDO.
 
@@ -265,10 +265,12 @@ DO:
   DEFINE VARIABLE cFileName AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cText     AS LONGCHAR   NO-UNDO. 
   
-  cFileName = TRIM(STRING('tt' + LC(pcTable), 'xx!x(20)')) + '.i'.
+  cFileName = SUBSTITUTE('&1-&2.p'
+                        , rsDumpLoad:SCREEN-VALUE
+                        , pcTable ).
 
   SYSTEM-DIALOG GET-FILE cFilename
-    FILTERS ".i Include file (*.i)" "*.i",
+    FILTERS ".p Procedure (*.p)" "*.p",
             "Any File (*.*)" "*.*"
     INITIAL-FILTER 1
     ASK-OVERWRITE
@@ -311,7 +313,7 @@ END.
 &Scoped-define SELF-NAME tgDelete
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgDelete C-Win
 ON VALUE-CHANGED OF tgDelete IN FRAME frMain /* Delete record */
-, cbIndent, tgLowerCase, tgDelete, tgLoadInChunks, tgDisableTriggers
+, cbIndent, tgLowerCase, tgDelete, tgLoadInChunks, tgDisableTriggers, tgIncludeDb
 DO:
   RUN generateCode.
 END.
@@ -432,7 +434,7 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   
   DO WITH FRAME frMain:
     
-    ASSIGN rsDumpLoad cbIndent tgLowerCase tgDelete tgLoadInChunks tgDisableTriggers.
+    ASSIGN rsDumpLoad cbIndent tgLowerCase tgDelete tgLoadInChunks tgDisableTriggers tgIncludeDb.
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -441,16 +443,16 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
+    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------   ~n' )
             + SUBSTITUTE('    File        : &1-&2.p ~n', rsDumpLoad, pcTable )
             + SUBSTITUTE('    Description : &1 program for &2.&3 ~n', rsDumpLoad, pcDatabase, pcTable )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('    History: ~n' )
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
             + SUBSTITUTE(' ~n' )
+            + SUBSTITUTE('  ----------------------------------------------------------------------   ~n' )
+            + SUBSTITUTE('            This file was generated with the DataDigger                    ~n' )
             + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('/*          This file was generated with the DataDigger                 */ ~n' )
-            + SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
             .
             
     CASE rsDumpLoad:
@@ -458,11 +460,11 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
       DO:
         cMask = '~nOUTPUT TO <folder><table>.<ext>.'
               + '~n'
-              + '~nFOR EACH <db>.<table> ' + TRIM(STRING(tgDelete,'EXCLUSIVE-LOCK/NO-LOCK')) + ':'
-              + '~n<indent>EXPORT <db>.<table>.'
+              + '~nFOR EACH <db><table> ' + TRIM(STRING(tgDelete,'EXCLUSIVE-LOCK/NO-LOCK')) + ':'
+              + '~n<indent>EXPORT <db><table>.'
               .
         IF tgDelete THEN
-          cMask = cMask + '~n<indent>DELETE <db>.<table>.'.
+          cMask = cMask + '~n<indent>DELETE <db><table> VALIDATE(YES,"").'.
 
         cMask = cMask + '~nEND.'
               + '~n '
@@ -471,20 +473,42 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
 
       WHEN 'load' THEN
       DO:
+        cMask = ( IF tgLoadInChunks 
+                    THEN '~nDEFINE VARIABLE <var> AS INTEGER NO-UNDO.~n'
+                    ELSE '')
+              + ( IF tgDisableTriggers 
+                    THEN '~nDISABLE TRIGGERS FOR LOAD OF <db><table>.~n'
+                    ELSE '')
+              + '~nINPUT FROM <folder><table>.<ext>.'
+              + '~n'
+              + '~nREPEAT:'
+              + ( IF tgLoadInChunks 
+                    THEN '~n<indent>DO <var> = 1 TO 1000 TRANSACTION:'
+                       + '~n<indent><indent>CREATE <db><table>.'
+                       + '~n<indent><indent>IMPORT <db><table>.'
+                       + '~n<indent>END.'
+                    ELSE '~n<indent><indent>CREATE <db><table>.'
+                       + '~n<indent><indent>IMPORT <db><table>.')
+              + '~nEND.'
+              + '~n'
+              + '~nINPUT CLOSE.'
+              .
       END.
 
     END CASE.
 
     cText = cHeader + (IF tgLowerCase THEN LC(cMask) ELSE CAPS(cMask)).
 
-    cText = REPLACE(cText,'<folder>', 'c:\temp\').
+    cText = REPLACE(cText,'<folder>', SESSION:TEMP-DIRECTORY).
     cText = REPLACE(cText,'<ext>'   , 'd').
     IF tgIncludeDb 
       THEN cText = REPLACE(cText,'<db>', pcDatabase + '.').
       ELSE cText = REPLACE(cText,'<db>', '').
+
     cText = REPLACE(cText,'<table>' , pcTable).
     cText = REPLACE(cText,'<indent>', cIndent).
- 
+    cText = REPLACE(cText,'<var>'   , 'i').
+
     edDefinition:SCREEN-VALUE = cText.
   END.
   
@@ -604,3 +628,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

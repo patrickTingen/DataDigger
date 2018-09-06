@@ -52,10 +52,10 @@ CREATE WIDGET-POOL.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-2 RECT-3 RECT-4 RECT-5 edDefinition ~
 tgSelectedOnly tgLowerCase cbIndent tgSerial rsSerial fiReplace tgFormat ~
-tgLabel rsPrefix fiPrefix rsIndex btnSave 
+tgLabel rsPrefix fiPrefix tgCamelCasing rsIndex btnSave 
 &Scoped-Define DISPLAYED-OBJECTS edDefinition tgSelectedOnly tgLowerCase ~
 cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel rsPrefix fiPrefix ~
-rsIndex 
+tgCamelCasing rsIndex 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -65,6 +65,13 @@ rsIndex
 
 
 /* ************************  Function Prototypes ********************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getCasedString C-Win 
+FUNCTION getCasedString RETURNS CHARACTER
+  ( pcName AS CHARACTER ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFormatString C-Win 
 FUNCTION getFormatString RETURNS CHARACTER
@@ -142,7 +149,7 @@ DEFINE VARIABLE cbIndent AS CHARACTER FORMAT "X(256)":U
 
 DEFINE VARIABLE edDefinition AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL LARGE
-     SIZE-PIXELS 710 BY 505
+     SIZE-PIXELS 710 BY 506
      FONT 0 NO-UNDO.
 
 DEFINE VARIABLE fiPrefix AS CHARACTER FORMAT "X(256)":U 
@@ -159,7 +166,7 @@ DEFINE VARIABLE rsIndex AS INTEGER
           "N&one", 0,
 "&Primary", 1,
 "&All", 2
-     SIZE-PIXELS 95 BY 55 NO-UNDO.
+     SIZE-PIXELS 95 BY 52 NO-UNDO.
 
 DEFINE VARIABLE rsPrefix AS INTEGER 
      VIEW-AS RADIO-SET VERTICAL
@@ -168,7 +175,7 @@ DEFINE VARIABLE rsPrefix AS INTEGER
 "Hungarian-&1", 1,
 "Hungarian-&2", 2,
 "&Fixed", 3
-     SIZE-PIXELS 120 BY 80 TOOLTIP "specify field prefix" NO-UNDO.
+     SIZE-PIXELS 120 BY 68 TOOLTIP "specify field prefix" NO-UNDO.
 
 DEFINE VARIABLE rsSerial AS INTEGER 
      VIEW-AS RADIO-SET VERTICAL
@@ -184,15 +191,20 @@ DEFINE RECTANGLE RECT-2
 
 DEFINE RECTANGLE RECT-3
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 160 BY 73.
+     SIZE-PIXELS 160 BY 70.
 
 DEFINE RECTANGLE RECT-4
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 160 BY 100.
+     SIZE-PIXELS 160 BY 114.
 
 DEFINE RECTANGLE RECT-5
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
      SIZE-PIXELS 160 BY 78.
+
+DEFINE VARIABLE tgCamelCasing AS LOGICAL INITIAL no 
+     LABEL "&Use CamelCasing" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 140 BY 17 TOOLTIP "concatenate parts that are separated with dashes and underscores" NO-UNDO.
 
 DEFINE VARIABLE tgFormat AS LOGICAL INITIAL no 
      LABEL "&Format" 
@@ -223,35 +235,36 @@ DEFINE VARIABLE tgSerial AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 185 NO-LABEL WIDGET-ID 2
+     edDefinition AT Y 4 X 185 NO-LABEL WIDGET-ID 2
      tgSelectedOnly AT Y 10 X 15 WIDGET-ID 8
      tgLowerCase AT Y 30 X 15 WIDGET-ID 22
      cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     tgSerial AT Y 90 X 25 WIDGET-ID 66
-     rsSerial AT Y 110 X 30 NO-LABEL WIDGET-ID 62
-     fiReplace AT Y 146 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
-     tgFormat AT Y 210 X 30 WIDGET-ID 10
-     tgLabel AT Y 230 X 30 WIDGET-ID 12
-     rsPrefix AT Y 290 X 30 NO-LABEL WIDGET-ID 28
-     fiPrefix AT Y 350 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 34
-     rsIndex AT Y 410 X 30 NO-LABEL WIDGET-ID 42
-     btnSave AT Y 485 X 15 WIDGET-ID 36
+     tgSerial AT Y 86 X 25 WIDGET-ID 66
+     rsSerial AT Y 106 X 30 NO-LABEL WIDGET-ID 62
+     fiReplace AT Y 142 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
+     tgFormat AT Y 205 X 30 WIDGET-ID 10
+     tgLabel AT Y 225 X 30 WIDGET-ID 12
+     rsPrefix AT Y 278 X 30 NO-LABEL WIDGET-ID 28
+     fiPrefix AT Y 329 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 34
+     tgCamelCasing AT Y 358 X 30 WIDGET-ID 70
+     rsIndex AT Y 413 X 30 NO-LABEL WIDGET-ID 42
+     btnSave AT Y 487 X 15 WIDGET-ID 36
      "Indent:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
-     "Field Options" VIEW-AS TEXT
-          SIZE-PIXELS 90 BY 13 AT Y 185 X 25 WIDGET-ID 26
-     "Indexes" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 390 X 25 WIDGET-ID 40
      "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 270 X 25 WIDGET-ID 48
-     RECT-2 AT Y 192 X 15 WIDGET-ID 24
-     RECT-3 AT Y 397 X 15 WIDGET-ID 38
-     RECT-4 AT Y 275 X 15 WIDGET-ID 46
-     RECT-5 AT Y 97 X 15 WIDGET-ID 58
+          SIZE-PIXELS 75 BY 13 AT Y 261 X 25 WIDGET-ID 48
+     "Indexes" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 394 X 25 WIDGET-ID 40
+     "Field Options" VIEW-AS TEXT
+          SIZE-PIXELS 90 BY 13 AT Y 180 X 25 WIDGET-ID 26
+     RECT-2 AT Y 187 X 15 WIDGET-ID 24
+     RECT-3 AT Y 400 X 15 WIDGET-ID 38
+     RECT-4 AT Y 266 X 15 WIDGET-ID 46
+     RECT-5 AT Y 93 X 15 WIDGET-ID 58
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 180 BY 24.67 WIDGET-ID 100.
+         SIZE 180 BY 24.62 WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -271,7 +284,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "Generate TempTable Include"
-         HEIGHT             = 24.76
+         HEIGHT             = 24.67
          WIDTH              = 180
          MAX-HEIGHT         = 40
          MAX-WIDTH          = 320
@@ -392,7 +405,7 @@ DO:
   
   fiPrefix:VISIBLE = (SELF:SCREEN-VALUE = '3').
   fiPrefix:MOVE-TO-TOP().
-  RUN generateInclude.
+  RUN generateCode.
   
 END.
 
@@ -406,7 +419,7 @@ ON VALUE-CHANGED OF rsSerial IN FRAME frMain
 DO:
   fiReplace:SENSITIVE = (SELF:SCREEN-VALUE = '2').
   fiReplace:MOVE-TO-TOP().
-  RUN generateInclude.
+  RUN generateCode.
   
 END.
 
@@ -417,9 +430,9 @@ END.
 &Scoped-define SELF-NAME tgSelectedOnly
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelectedOnly C-Win
 ON VALUE-CHANGED OF tgSelectedOnly IN FRAME frMain /* Selected fields only */
-, tgLowerCase, cbIndent, tgFormat, tgLabel, fiPrefix, rsIndex, fiReplace
+, tgLowerCase, cbIndent, fiReplace, tgFormat, tgLabel, fiPrefix, tgCamelCasing, rsIndex
 DO:
-  RUN generateInclude.
+  RUN generateCode.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -432,7 +445,7 @@ ON VALUE-CHANGED OF tgSerial IN FRAME frMain /* Serialization */
 DO:
   rsSerial :SENSITIVE = SELF:CHECKED.
   fiReplace:SENSITIVE = (SELF:CHECKED AND rsSerial:SCREEN-VALUE = '2').
-  RUN generateInclude.
+  RUN generateCode.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -508,11 +521,11 @@ PROCEDURE enable_UI :
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   DISPLAY edDefinition tgSelectedOnly tgLowerCase cbIndent tgSerial rsSerial 
-          fiReplace tgFormat tgLabel rsPrefix fiPrefix rsIndex 
+          fiReplace tgFormat tgLabel rsPrefix fiPrefix tgCamelCasing rsIndex 
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE RECT-2 RECT-3 RECT-4 RECT-5 edDefinition tgSelectedOnly tgLowerCase 
          cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel rsPrefix 
-         fiPrefix rsIndex btnSave 
+         fiPrefix tgCamelCasing rsIndex btnSave 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -541,9 +554,11 @@ END PROCEDURE. /* fillTT */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateInclude C-Win 
-PROCEDURE generateInclude :
-DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateCode C-Win 
+PROCEDURE generateCode :
+/* Generate the code for the include
+*/
+  DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cPrefix       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cName         AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cMask         AS CHARACTER NO-UNDO.
@@ -563,7 +578,13 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   
   DO WITH FRAME frMain:
     
-    ASSIGN rsPrefix rsIndex cbIndent.
+    ASSIGN 
+      tgSelectedOnly tgLowerCase cbIndent
+      tgSerial rsSerial fiReplace
+      tgFormat tgLabel
+      rsPrefix fiPrefix 
+      rsIndex  .
+
     cTable = TRIM(STRING('tt' + LC(pcTable), 'xx!x(20)')).
     
     CASE cbIndent:
@@ -573,24 +594,25 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('    File        : &1 ~n', cTable )
+    cHeader = SUBSTITUTE('/*---------------------------------------------------------------------- ~n' )
+            + SUBSTITUTE('    File        : &1.i ~n', cTable )
             + SUBSTITUTE('    Description : TT definition for &1.&2 ~n', pcDatabase, pcTable )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('    History: ~n' )
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
             + SUBSTITUTE(' ~n' )
+            + SUBSTITUTE('  ---------------------------------------------------------------------- ~n' )
+            + SUBSTITUTE('            This file was generated with the DataDigger                  ~n' )
             + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
-            + SUBSTITUTE('/*          This .i file was generated with the DataDigger              */ ~n' )
-            + SUBSTITUTE('/*----------------------------------------------------------------------*/ ~n' )
             .
             
-    cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO RCODE-INFORMATION'.
+    cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO&3&4 RCODE-INFORMATION'.
     IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
-    cText = SUBSTITUTE(cMask, cHeader, cTable).
-    cText = SUBSTITUTE('&1 &2'
-                      , cText
-                      , getSerialString(pcTable, LENGTH(cTable))
+    cText = SUBSTITUTE(cMask
+                      , cHeader
+                      , cTable
+                      , (IF tgSerial THEN ' ' ELSE '')
+                      , TRIM(getSerialString(pcTable, LENGTH(cTable)))
                       ).
     
     FOR EACH bField
@@ -708,6 +730,7 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateTT', 'AddLabel')      = ? THEN setRegistry('DataDigger:GenerateTT', 'AddLabel','no').
     IF getRegistry('DataDigger:GenerateTT', 'AddPrefix')     = ? THEN setRegistry('DataDigger:GenerateTT', 'AddPrefix','0').
     IF getRegistry('DataDigger:GenerateTT', 'FixedPrefix')   = ? THEN setRegistry('DataDigger:GenerateTT', 'FixedPrefix','').
+    IF getRegistry('DataDigger:GenerateTT', 'CamelCasing')   = ? THEN setRegistry('DataDigger:GenerateTT', 'CamelCasing','no' ).
     IF getRegistry('DataDigger:GenerateTT', 'Indexes')       = ? THEN setRegistry('DataDigger:GenerateTT', 'Indexes','0').
 
     /* Get user settings */
@@ -717,10 +740,14 @@ PROCEDURE initObject :
     tgSerial:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateTT', 'Serialize')).
     rsSerial:SCREEN-VALUE  = getRegistry('DataDigger:GenerateTT', 'Serialization').
     fiReplace:SCREEN-VALUE = getRegistry('DataDigger:GenerateTT', 'SerialReplace').
+    IF fiReplace:SCREEN-VALUE = ? OR fiReplace:SCREEN-VALUE = '?' THEN fiReplace:SCREEN-VALUE = ''.
     tgFormat:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateTT', 'AddFormat')).
     tgLabel:CHECKED        = LOGICAL(getRegistry('DataDigger:GenerateTT', 'AddLabel')).
     rsPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateTT', 'AddPrefix').
     fiPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateTT', 'FixedPrefix').
+    IF fiPrefix:SCREEN-VALUE = ? OR fiPrefix:SCREEN-VALUE = '?' THEN fiPrefix:SCREEN-VALUE = ''.
+
+    tgCamelCasing:CHECKED  = LOGICAL(getRegistry('DataDigger:GenerateTT', 'CamelCasing')).
     rsIndex:SCREEN-VALUE   = getRegistry('DataDigger:GenerateTT', 'Indexes').
     APPLY 'VALUE-CHANGED' TO tgSerial.
     APPLY 'VALUE-CHANGED' TO rsSerial.
@@ -753,7 +780,6 @@ PROCEDURE saveSettings :
     setRegistry('DataDigger:GenerateTT', 'Window:width' , STRING({&WINDOW-NAME}:WIDTH-PIXELS) ).
     setRegistry('DataDigger:GenerateTT', 'Window:height', STRING({&WINDOW-NAME}:HEIGHT-PIXELS) ).
 
-
     /* User settings */
     setRegistry('DataDigger:GenerateTT', 'SelectedOnly' , STRING(tgSelectedOnly:CHECKED) ).
     setRegistry('DataDigger:GenerateTT', 'UseLowerCase' , STRING(tgLowerCase:CHECKED   ) ).
@@ -765,7 +791,9 @@ PROCEDURE saveSettings :
     setRegistry('DataDigger:GenerateTT', 'AddLabel'     , STRING(tgLabel:CHECKED       ) ).
     setRegistry('DataDigger:GenerateTT', 'AddPrefix'    , rsPrefix:SCREEN-VALUE          ).
     setRegistry('DataDigger:GenerateTT', 'FixedPrefix'  , fiPrefix:SCREEN-VALUE          ).
+    setRegistry('DataDigger:GenerateTT', 'CamelCasing'  , STRING(tgCamelCasing:CHECKED ) ).
     setRegistry('DataDigger:GenerateTT', 'Indexes'      , rsIndex:SCREEN-VALUE           ).
+
   END.
 
 END PROCEDURE. /* saveSettings */
@@ -799,6 +827,27 @@ END PROCEDURE. /* windowResized */
 &ANALYZE-RESUME
 
 /* ************************  Function Implementations ***************** */
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getCasedString C-Win 
+FUNCTION getCasedString RETURNS CHARACTER
+  ( pcName AS CHARACTER ):
+
+  DEFINE VARIABLE i     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cName AS CHARACTER   NO-UNDO.
+
+  pcName = REPLACE(pcName,'-',CHR(1)).
+  pcName = REPLACE(pcName,'_',CHR(1)).
+
+  DO i = 1 TO NUM-ENTRIES(pcName,CHR(1)):
+   cName = cName + CAPS(SUBSTRING(ENTRY(i,pcName,CHR(1)),1,1)) + LC(SUBSTRING(ENTRY(i,pcName,CHR(1)),2)).
+  END.
+
+  RETURN cName.
+
+END FUNCTION. /* getCasedString */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFormatString C-Win 
 FUNCTION getFormatString RETURNS CHARACTER
@@ -905,6 +954,9 @@ FUNCTION getNameString RETURNS CHARACTER
     END CASE.
 
     cReturnValue = pcFieldName.
+
+    IF tgCamelCasing:CHECKED THEN cReturnValue = getCasedString(cReturnValue).
+
     IF rsPrefix > 0 THEN OVERLAY(cReturnValue,1,1) = CAPS(SUBSTRING(cReturnValue,1,1)).
     cReturnValue = cPrefix + cReturnValue.
 
@@ -928,7 +980,6 @@ FUNCTION getSerialString RETURNS CHARACTER
   DEFINE VARIABLE cSerialName  AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cReturnValue AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cMask        AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE i            AS INTEGER   NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
     ASSIGN rsSerial fiReplace.
@@ -937,10 +988,7 @@ FUNCTION getSerialString RETURNS CHARACTER
 
     CASE rsSerial:
       WHEN 0 THEN cSerialName = pcName.
-      WHEN 1 THEN 
-        DO i = 1 TO NUM-ENTRIES(pcName,'-'):
-          cSerialName = cSerialName + CAPS(SUBSTRING(ENTRY(i,pcName,'-'),1,1)) + LC(SUBSTRING(ENTRY(i,pcName,'-'),2)).
-        END.
+      WHEN 1 THEN cSerialName = getCasedString(pcName).
       WHEN 2 THEN cSerialName = REPLACE(pcName,'-',fiReplace:SCREEN-VALUE).
     END CASE.
 
@@ -988,3 +1036,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
