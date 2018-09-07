@@ -15,6 +15,7 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Generate dump/load: saving file saves as .i (Rob Willoughby)
 - Solved: Generate dump/load: load procedure resulted in no code
 - Solved: Generate routines: syntax error in header
+- Solved: Switching between favourites/tables gives empty fields browse (Mike Raschendorfer)
 
 BetaDigger 20180904
 - Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
@@ -25,9 +26,9 @@ BetaDigger 20180904
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
-- Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschend?rfer)
+- Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendorfer)
 - Solved: Extra filter refused to hide normal tables (Edwin Schutten)
-- Solved: Query fails when search condition contains pipe symbol (Mike Raschend?rfer)
+- Solved: Query fails when search condition contains pipe symbol (Mike Raschendorfer)
 - Solved: Even when set to manual update check updates, remote version was fetched (Germ Rekker)
 - Solved: Table browse shows normal tables when disabled in filter #8 (Edwin Schutten)
 - Solved: Backups not saved with default myDataDigger code #11
@@ -155,7 +156,7 @@ DataDigger version 21 - 8 nov 2016 (US Election Day Edition)
 
 - Solved: Nr of selected rows not cleared on table change (Mike Derrick)
 - Solved: Error when using fields that end in 'by' in the where-box (Andrew Fornek)
-- Solved: Error when started with relative path (Mike Raschend?rfer)
+- Solved: Error when started with relative path (Mike Raschendorfer)
 - Solved: Settings screen still refered to OEHive (Marius Fiere)
 - Solved: Error when started without timer OCX (Annamarie Fortgens)
 - Solved: When large font is used, feedback text in lower right corner is truncated
@@ -223,12 +224,12 @@ DataDigger version 20 - 29 september 2016 (Coffee Version)
 - Change: Navigate query buttons re-introduced (Rob Willoughby)
 - Change: Removed auto-refresh widgets
 - Change: INI file is sorted when saved (Jeroen Beugels)
-- Change: Query is not opened when WHERE-phrase contains an error (Mike Raschend?rfer)
+- Change: Query is not opened when WHERE-phrase contains an error (Mike Raschendorfer)
 - Change: Changed the tool menu, some buttons moved to this menu
 - Change: Digger now always starts with Fieldbrowse
 - Change: Shortcuts for dumping and loading changed to CTRL-S and CTRL-L
 - Change: Open procedure editor shortcut changed from CTRL-SHIFT-E to SHIFT-F3
-- Change: DELETE triggers are enabled by default (Mike Raschend?rfer)
+- Change: DELETE triggers are enabled by default (Mike Raschendorfer)
 - Change: Auto-update function removed since it was not working consistently
 - Change: View record also shows RECID and ROWID values
 - Change: Removed Filter buttons on fields- index- and data browse (Jeroen Commandeur)
