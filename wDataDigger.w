@@ -11146,6 +11146,7 @@ PROCEDURE setTable :
         /* Set db and file name */
         cbDatabaseFilter:SCREEN-VALUE = ''.
         fiTableFilter:SCREEN-VALUE = cTable.
+        FilterModified(fiTableFilter:HANDLE,YES).
         RUN reopenTableBrowse(?).
 
         IF brTables:QUERY:NUM-RESULTS <> 0 THEN
@@ -11161,6 +11162,7 @@ PROCEDURE setTable :
       DO:
         RUN setTableContext(INPUT gcCurrentTable ).
         RUN reopenDataBrowse.
+        RUN setTimer('timedTableChange',0). 
       END.
       ELSE
       DO:
