@@ -16,6 +16,7 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Generate dump/load: load procedure resulted in no code
 - Solved: Generate routines: syntax error in header
 - Solved: Switching between favourites/tables gives empty fields browse (Mike Raschendorfer)
+- Solved: Starting DD with table name on clipboard did not open query (Jeroen Beugels)
 
 BetaDigger 20180904
 - Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
