@@ -77,6 +77,7 @@ DEFINE TEMP-TABLE ttColumnHandle NO-UNDO RCODE-INFORMATION
   .
 
 /* Local Variable Definitions --- */
+DEFINE VARIABLE glReadOnlyDigger           AS LOGICAL     NO-UNDO. /* org value of plReadOnlyDigger */
 DEFINE VARIABLE ghFirstColumn              AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
 DEFINE VARIABLE gcCurrentTable             AS CHARACTER   NO-UNDO.
@@ -201,15 +202,14 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnFavourite fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
-btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
-btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
-btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnAddFavGroup ~
+fiTableDesc cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools ~
+btnTabTables btnClear btnClearFieldFilter btnClearTableFilter btnClipboard ~
+btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter ~
+btnTabFavourites btnTabFields btnTabIndexes btnNextQuery btnPrevQuery ~
+btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -962,8 +962,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiTableFilter AT Y 3 X 56 NO-LABEL
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -974,13 +974,13 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
@@ -1640,7 +1640,12 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON F10 OF C-Win /* DataDigger */
 ANYWHERE DO:
-  plReadOnlyDigger = TRUE.
+
+  IF glReadOnlyDigger <> plReadOnlyDigger THEN
+    glReadOnlyDigger = plReadOnlyDigger.
+  ELSE 
+    glReadOnlyDigger = TRUE.
+
   RUN setWindowTitle.
 END.
 
@@ -1814,7 +1819,7 @@ DO:
 
   /* Otherwise it is probably an .xml file */
   RUN VALUE(getProgramDir() + 'wImportCheck.w')
-    ( INPUT plReadOnlyDigger
+    ( INPUT glReadOnlyDigger
     , INPUT cDroppedFiles
     , INPUT gcCurrentDatabase
     , INPUT gcCurrentTable
@@ -4087,6 +4092,7 @@ END.
 SESSION:DEBUG-ALERT = YES.
 
 /* ***************************  Main Block  *************************** */
+glReadOnlyDigger = plReadOnlyDigger.
 RUN startDiggerLib.
 
 /* More than one DataDigger window can be open. The
@@ -4298,10 +4304,10 @@ PROCEDURE btnAddChoose :
   PUBLISH "setUsage" ("AddRecord").
 
   /* In read-only mode, return */
-  IF plReadOnlyDigger THEN RETURN.
+  IF glReadOnlyDigger THEN RETURN.
 
   RUN VALUE(getProgramDir() + 'wEdit.w')
-    ( INPUT plReadOnlyDigger
+    ( INPUT glReadOnlyDigger
     , INPUT 'Add'
     , INPUT ghDataBrowse
     , INPUT gcCurrentDatabase
@@ -4451,7 +4457,7 @@ PROCEDURE btnCloneChoose :
   DEFINE VARIABLE rNewRecord      AS ROWID   NO-UNDO.
 
   /* In read-only mode, return */
-  IF plReadOnlyDigger THEN RETURN.
+  IF glReadOnlyDigger THEN RETURN.
 
   /* If no data then go back */
   IF ghDataBrowse:QUERY:NUM-RESULTS = 0
@@ -4471,7 +4477,7 @@ PROCEDURE btnCloneChoose :
   END.
 
   RUN VALUE(getProgramDir() + 'wEdit.w')
-    ( INPUT plReadOnlyDigger
+    ( INPUT glReadOnlyDigger
     , INPUT 'Clone'
     , INPUT ghDataBrowse
     , INPUT gcCurrentDatabase
@@ -4541,7 +4547,7 @@ PROCEDURE btnDataDiggerChoose :
   setRegistry("DataDigger", "Window:x", STRING(c-win:X + 20) ).
   setRegistry("DataDigger", "Window:y", STRING(c-win:Y + 20) ).
 
-  RUN VALUE(getProgramDir() + 'wDataDigger.w') PERSISTENT (INPUT plReadOnlyDigger) .
+  RUN VALUE(getProgramDir() + 'wDataDigger.w') PERSISTENT (INPUT glReadOnlyDigger) .
 
 END PROCEDURE. /* btnDataDiggerChoose */
 
@@ -4580,7 +4586,7 @@ PROCEDURE btnDeleteChoose :
   DEFINE VARIABLE lEnableTriggers AS LOGICAL NO-UNDO.
 
   /* In read-only mode, return */
-  IF plReadOnlyDigger THEN RETURN.
+  IF glReadOnlyDigger THEN RETURN.
 
   /* If nothing selected, go back */
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0
@@ -4769,7 +4775,7 @@ PROCEDURE btnEditChoose :
   ELSE 
   DO:
     RUN VALUE(getProgramDir() + 'wEdit.w')
-      ( INPUT plReadOnlyDigger
+      ( INPUT glReadOnlyDigger
       , INPUT 'Edit'
       , INPUT ghDataBrowse
       , INPUT gcCurrentDatabase
@@ -4794,7 +4800,7 @@ PROCEDURE btnEditorChoose :
 */
 
   /* Return if progress version is runtime or in read-only mode */
-  IF PROGRESS = "Run-time" OR plReadOnlyDigger THEN RETURN.
+  IF PROGRESS = "Run-time" OR glReadOnlyDigger THEN RETURN.
 
   PUBLISH "setUsage" ("Editor"). /* user behaviour */
   RUN _edit.p.
@@ -4826,7 +4832,7 @@ PROCEDURE btnLoadChoose :
   PUBLISH "setUsage" ("LoadData").
 
   RUN VALUE(getProgramDir() + 'wImportSel.w')
-    ( INPUT plReadOnlyDigger
+    ( INPUT glReadOnlyDigger
     , INPUT gcCurrentDatabase
     , INPUT gcCurrentTable
     , INPUT TABLE ttField  /* do not use by-reference */
@@ -6828,10 +6834,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
+  ENABLE rctQuery rctEdit btnFavourite fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
+         brTables brFields brIndexes tgDebugMode btnAddFavGroup fiTableDesc 
+         cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools 
          btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
          btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
          btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
@@ -8189,8 +8195,8 @@ PROCEDURE initializeObjects :
     /* Load images for buttONs */
     DO WITH FRAME frSettings:
 
-      /* Disable these WHEN plReadOnlyDigger */
-      IF plReadOnlyDigger THEN
+      /* Disable these WHEN glReadOnlyDigger */
+      IF glReadOnlyDigger THEN
         ASSIGN
           btnDict       :SENSITIVE = FALSE
           btnDataAdmin  :SENSITIVE = FALSE
@@ -11658,7 +11664,7 @@ PROCEDURE setWindowTitle :
   cTitle = TRIM(cTitle,'- ').
   
   /* Add warning for read-only mode */
-  IF plReadOnlyDigger THEN cTitle = cTitle + " ** READ-ONLY **".
+  IF glReadOnlyDigger THEN cTitle = cTitle + " ** READ-ONLY **".
 
   /* Add warning for debug-mode */
   IF glDebugMode THEN cTitle = cTitle + " ** DEBUG MODE **".
@@ -12419,7 +12425,7 @@ PROCEDURE startSession :
     RUN showHelp('StackSize', STRING(iStackSize)).
 
   /* If we are a READ-ONLY digger, show a warning */
-  IF plReadOnlyDigger THEN
+  IF glReadOnlyDigger THEN
     RUN showHelp("ReadOnlyDigger", "").
 
   /* The user could be:
@@ -12487,7 +12493,7 @@ PROCEDURE startTool :
   IF NUM-DBS = 0 THEN RETURN.
 
   /* Don't allow in read only mode */
-  IF plReadOnlyDigger THEN RETURN.
+  IF glReadOnlyDigger THEN RETURN.
 
   CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
 
@@ -13225,13 +13231,13 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
                    AND ghDataBrowse:QUERY:NUM-RESULTS > 0).
 
     ASSIGN
-      btnAdd:SENSITIVE    = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
-      btnClone:SENSITIVE  = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS < 2 AND NOT plReadOnlyDigger
+      btnAdd:SENSITIVE    = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT glReadOnlyDigger
+      btnClone:SENSITIVE  = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS < 2 AND NOT glReadOnlyDigger
       btnEdit:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
-      btnDelete:SENSITIVE = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT plReadOnlyDigger
+      btnDelete:SENSITIVE = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT glReadOnlyDigger
       btnView:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
       btnDump:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-ITERATIONS > 0
-      btnLoad:SENSITIVE   = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT plReadOnlyDigger
+      btnLoad:SENSITIVE   = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT glReadOnlyDigger
       .
 
     /* Hide these when no data browse */
@@ -13290,3 +13296,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

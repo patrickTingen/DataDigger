@@ -24,6 +24,7 @@ BetaDigger 20180913
 - Solved: Changing tables shows fields/indexes while reading table info (Jeroen Beugels)
 - Solved: Events from DD show up in DWP Debugger (Jeroen Beugels)
 - Change: Beta version of DD always checks on new beta version
+- New   : F10 can toggle readonly mode back to updatemode (Johan Geerts) 
 
 BetaDigger 20180904
 - Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
