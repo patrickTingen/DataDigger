@@ -20,12 +20,16 @@
 /* Parameters Definitions --- */
 
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT-OUTPUT PARAMETER pcGroup AS CHARACTER.
   DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTable.
-  DEFINE OUTPUT PARAMETER plOk AS LOGICAL NO-UNDO.
+  DEFINE INPUT PARAMETER pcGroupList AS CHARACTER NO-UNDO.
+  DEFINE OUTPUT PARAMETER plOk       AS LOGICAL NO-UNDO.
 &ELSE
 
-  DEFINE VARIABLE hLib AS HANDLE  NO-UNDO.
-  DEFINE VARIABLE plOk AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE pcGroup     AS CHARACTER NO-UNDO INITIAL 'myFavourites'.
+  DEFINE VARIABLE pcGroupList AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hLib        AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE plOk        AS LOGICAL   NO-UNDO.
   
   RUN datadiggerlib.p PERSISTENT SET hLib.
   THIS-PROCEDURE:ADD-SUPER-PROCEDURE(hLib,SEARCH-TARGET).
@@ -52,10 +56,8 @@
 &Scoped-define INTERNAL-TABLES ttTable
 
 /* Definitions for BROWSE brTables                                      */
-&Scoped-define FIELDS-IN-QUERY-brTables ttTable.lFavourite ttTable.cTableName ttTable.cDatabase /*   
-&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables ttTable.lFavourite */   
-&Scoped-define ENABLED-TABLES-IN-QUERY-brTables ttTable
-&Scoped-define FIRST-ENABLED-TABLE-IN-QUERY-brTables ttTable
+&Scoped-define FIELDS-IN-QUERY-brTables ttTable.lFavourite ttTable.cTableName ttTable.cDatabase   
+&Scoped-define ENABLED-FIELDS-IN-QUERY-brTables   
 &Scoped-define SELF-NAME brTables
 &Scoped-define QUERY-STRING-brTables FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE)
 &Scoped-define OPEN-QUERY-brTables OPEN QUERY {&SELF-NAME}   FOR EACH ttTable     WHERE ttTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'       AND (cbDatabase:SCREEN-VALUE = ? OR ttTable.cDatabase = cbDatabase:SCREEN-VALUE)       AND (ttTable.lShowInList = TRUE OR ttTable.lFavourite = TRUE).
@@ -68,9 +70,9 @@
     ~{&OPEN-QUERY-brTables}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS fiTableFilter cbDatabase brTables ~
-btnSelectAll btnDeselectAll Btn_OK 
-&Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabase 
+&Scoped-Define ENABLED-OBJECTS BtnCancel btnDelete btnEdit fiGroupname ~
+fiTableFilter cbDatabase brTables btnSelectAll btnDeselectAll Btn_OK 
+&Scoped-Define DISPLAYED-OBJECTS fiGroupname fiTableFilter cbDatabase 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -85,10 +87,23 @@ btnSelectAll btnDeselectAll Btn_OK
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
+DEFINE BUTTON BtnCancel AUTO-END-KEY DEFAULT 
+     LABEL "Cancel" 
+     SIZE-PIXELS 75 BY 24
+     BGCOLOR 8 .
+
+DEFINE BUTTON btnDelete  NO-FOCUS FLAT-BUTTON
+     LABEL "del" 
+     SIZE-PIXELS 20 BY 21 TOOLTIP "delete this group".
+
 DEFINE BUTTON btnDeselectAll 
      LABEL "&Deselect all" 
      SIZE-PIXELS 75 BY 24 TOOLTIP "deselect all tables currently in the browse"
      BGCOLOR 8 .
+
+DEFINE BUTTON btnEdit  NO-FOCUS FLAT-BUTTON
+     LABEL "edit" 
+     SIZE-PIXELS 20 BY 21 TOOLTIP "edit the name of the group".
 
 DEFINE BUTTON btnSelectAll 
      LABEL "Select &all" 
@@ -104,7 +119,11 @@ DEFINE VARIABLE cbDatabase AS CHARACTER FORMAT "X(256)":U
      VIEW-AS COMBO-BOX INNER-LINES 5
      LIST-ITEMS "Item 1" 
      DROP-DOWN-LIST
-     SIZE 25 BY 1 NO-UNDO.
+     SIZE-PIXELS 125 BY 21 NO-UNDO.
+
+DEFINE VARIABLE fiGroupname AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
+     SIZE-PIXELS 290 BY 21 NO-UNDO.
 
 DEFINE VARIABLE fiTableFilter AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS FILL-IN 
@@ -122,26 +141,32 @@ DEFINE BROWSE brTables
   QUERY brTables DISPLAY
       ttTable.lFavourite    COLUMN-LABEL "" VIEW-AS TOGGLE-BOX
 ttTable.cTableName    COLUMN-LABEL "Table"
-ttTable.cDatabase     COLUMN-LABEL "DB"  
-        
+ttTable.cDatabase     COLUMN-LABEL "DB"
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-    WITH NO-ROW-MARKERS SEPARATORS SIZE 62 BY 12.14 FIT-LAST-COLUMN.
+    WITH NO-ROW-MARKERS SEPARATORS
+          &IF '{&WINDOW-SYSTEM}' = 'TTY':U &THEN SIZE 62 BY 12
+          &ELSE SIZE-PIXELS 310 BY 255 &ENDIF FIT-LAST-COLUMN.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiTableFilter AT Y 6 X 7 NO-LABEL WIDGET-ID 2
-     cbDatabase AT ROW 1.29 COL 37.4 COLON-ALIGNED NO-LABEL WIDGET-ID 10
-     brTables AT ROW 2.48 COL 2.4 WIDGET-ID 200
-     btnSelectAll AT Y 71 X 332 WIDGET-ID 6
-     btnDeselectAll AT Y 106 X 332 WIDGET-ID 8
-     Btn_OK AT Y 261 X 332
+     BtnCancel AT Y 270 X 330 WIDGET-ID 12
+     btnDelete AT Y 5 X 385 WIDGET-ID 18
+     btnEdit AT Y 5 X 295 WIDGET-ID 16
+     fiGroupname AT Y 5 X 5 NO-LABEL WIDGET-ID 14
+     fiTableFilter AT Y 47 X 5 NO-LABEL WIDGET-ID 2
+     cbDatabase AT Y 47 X 180 COLON-ALIGNED NO-LABEL WIDGET-ID 10
+     brTables AT Y 70 X 5 WIDGET-ID 200
+     btnSelectAll AT Y 137 X 330 WIDGET-ID 6
+     btnDeselectAll AT Y 172 X 330 WIDGET-ID 8
+     Btn_OK AT Y 300 X 330
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 425 BY 328
-         TITLE "Edit favourites group" WIDGET-ID 100.
+         SIZE-PIXELS 424 BY 366
+         TITLE "Edit favourites group"
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -165,6 +190,11 @@ DEFINE FRAME Dialog-Frame
 ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
+
+/* SETTINGS FOR FILL-IN fiGroupname IN FRAME Dialog-Frame
+   ALIGN-L                                                              */
+ASSIGN 
+       fiGroupname:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiTableFilter IN FRAME Dialog-Frame
    ALIGN-L                                                              */
@@ -207,8 +237,19 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
 ON GO OF FRAME Dialog-Frame /* Edit favourites group */
 DO:
+  DEFINE VARIABLE lMerge  AS LOGICAL NO-UNDO.
+
+  IF pcGroup <> fiGroupname:SCREEN-VALUE 
+    AND CAN-DO(pcGroupList, fiGroupname:SCREEN-VALUE) THEN
+  DO:
+    MESSAGE 'There is another group with this name. Do you want to merge the groups?'
+      VIEW-AS ALERT-BOX INFO BUTTONS YES-NO-CANCEL UPDATE lMerge.
+
+    IF lMerge <> YES THEN RETURN NO-APPLY.
+  END.
 
   plOk = TRUE.
+  pcGroup = fiGroupname:SCREEN-VALUE.
 
 END.
 
@@ -262,7 +303,7 @@ DO:
       AND iMouseX > hBrowse:X 
       AND iMouseX < (hBrowse:X + hBrowse:GET-BROWSE-COLUMN(2):X) THEN
     DO:
-      iRow = TRUNCATE((iMouseY - 32) / (hBrowse:ROW-HEIGHT-PIXELS + 4),0).
+      iRow = TRUNCATE((iMouseY - brTables:Y) / (hBrowse:ROW-HEIGHT-PIXELS + 4),0).
 
       IF hBrowse:NUM-ITERATIONS > 0 AND iRow > hBrowse:NUM-ITERATIONS THEN RETURN.
       IF iRow < 1 THEN RETURN.
@@ -293,12 +334,50 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME btnDelete
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDelete Dialog-Frame
+ON CHOOSE OF btnDelete IN FRAME Dialog-Frame /* del */
+DO:
+  DEFINE VARIABLE lDelete AS LOGICAL NO-UNDO.
+  DEFINE BUFFER bTable FOR ttTable.
+
+  MESSAGE 'Are you sure you want to delete this group?'
+    VIEW-AS ALERT-BOX INFO BUTTONS YES-NO-CANCEL UPDATE lDelete.
+
+  IF lDelete THEN
+  DO:
+    FOR EACH bTable WHERE (bTable.lShowInList = TRUE OR bTable.lFavourite = TRUE):
+      bTable.lFavourite = NO.
+    END. 
+
+    APPLY 'go' TO FRAME {&FRAME-NAME}.
+  END.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME btnDeselectAll
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDeselectAll Dialog-Frame
 ON CHOOSE OF btnDeselectAll IN FRAME Dialog-Frame /* Deselect all */
 OR 'CTRL-D' OF brTables
 DO:
-  RUN selectTables(NO).
+  RUN selectTables(fiTableFilter:SCREEN-VALUE, NO).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME btnEdit
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEdit Dialog-Frame
+ON CHOOSE OF btnEdit IN FRAME Dialog-Frame /* edit */
+OR mouse-select-click OF fiGroupname
+DO:
+  fiGroupname:PRIVATE-DATA = fiGroupname:SCREEN-VALUE.
+  fiGroupname:READ-ONLY = FALSE.
+  APPLY 'ENTRY' TO fiGroupname.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -310,7 +389,21 @@ END.
 ON CHOOSE OF btnSelectAll IN FRAME Dialog-Frame /* Select all */
 OR 'CTRL-A' OF brTables
 DO:
-  RUN selectTables(YES).
+  RUN selectTables(fiTableFilter:SCREEN-VALUE, YES).
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME fiGroupname
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiGroupname Dialog-Frame
+ON RETURN OF fiGroupname IN FRAME Dialog-Frame /* Group */
+DO:
+  SELF:CLEAR-SELECTION(). 
+  fiGroupname:READ-ONLY = TRUE.
+  APPLY 'entry' TO fiTableFilter.
+  RETURN NO-APPLY.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -361,8 +454,12 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   cbDatabase:LIST-ITEMS = ',' + getDatabaseList().
   cbDatabase:SCREEN-VALUE = getRegistry('DataDigger','Database') NO-ERROR.
 
+  btnEdit:LOAD-IMAGE(getImagePath('edit.gif')).
+  btnDelete:LOAD-IMAGE(getImagePath('delete.gif')).
+  fiGroupName = pcGroup.
+
   RUN enable_UI.
-  WAIT-FOR GO OF FRAME {&FRAME-NAME}.
+  WAIT-FOR GO OF FRAME {&FRAME-NAME} FOCUS fiTableFilter.
 
 END.
 RUN disable_UI.
@@ -401,9 +498,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiTableFilter cbDatabase 
+  DISPLAY fiGroupname fiTableFilter cbDatabase 
       WITH FRAME Dialog-Frame.
-  ENABLE fiTableFilter cbDatabase brTables btnSelectAll btnDeselectAll Btn_OK 
+  ENABLE BtnCancel btnDelete btnEdit fiGroupname fiTableFilter cbDatabase 
+         brTables btnSelectAll btnDeselectAll Btn_OK 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -430,11 +528,12 @@ END PROCEDURE.
 PROCEDURE selectTables :
 /* Select all or none of the tables
 */
-  DEFINE INPUT PARAMETER plSelect AS LOGICAL NO-UNDO.
+  DEFINE INPUT PARAMETER pcFilter   AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER plSelect   AS LOGICAL   NO-UNDO.
 
-  DEFINE BUFFER bTable FOR ttTable.
   DEFINE VARIABLE rTable     AS ROWID   NO-UNDO.
   DEFINE VARIABLE iBrowseRow AS INTEGER NO-UNDO.
+  DEFINE BUFFER bTable FOR ttTable.
   
   DO WITH FRAME {&FRAME-NAME}:
     
@@ -448,7 +547,7 @@ PROCEDURE selectTables :
     END.
 
     FOR EACH bTable 
-      WHERE bTable.cTableName MATCHES '*' + fiTableFilter:SCREEN-VALUE + '*'
+      WHERE bTable.cTableName MATCHES '*' + pcFilter + '*'
         AND (cbDatabase:SCREEN-VALUE = ? OR bTable.cDatabase = cbDatabase:SCREEN-VALUE)
         AND (bTable.lShowInList = TRUE OR bTable.lFavourite = TRUE):
 

@@ -8,6 +8,7 @@
 
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
+BetaDigger 20180913
 - Solved: Compile error in v11.7 in DataDiggerLib.p (Curtis Schroer)
 - Solved: Generate Active Class says .i instead of .cls (Arno vd Ende)
 - Solved: Generate Assign statement gives warning on first use (Arno vd Ende)
@@ -17,6 +18,12 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Generate routines: syntax error in header
 - Solved: Switching between favourites/tables gives empty fields browse (Mike Raschendorfer)
 - Solved: Starting DD with table name on clipboard did not open query (Jeroen Beugels)
+- Solved: Color 24,25,26 were changed during startup (Didier Dujardin)
+- Solved: Favourite group could not be renamed or deleted (Mike Raschendorfer)
+- Solved: Favourites screen could not be escaped if run from DWP (Jeroen Beugels)
+- Solved: Changing tables shows fields/indexes while reading table info (Jeroen Beugels)
+- Solved: Events from DD show up in DWP Debugger (Jeroen Beugels)
+- Change: Beta version of DD always checks on new beta version
 
 BetaDigger 20180904
 - Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)

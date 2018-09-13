@@ -354,11 +354,7 @@ PROCEDURE initializeObject :
   IF getRegistry("DataDigger", "StartDebugger") = ? THEN setRegistry("DataDigger", "StartDebugger", "no" ).
   IF getRegistry("DataDigger", "WorkFolder")    = ? THEN setRegistry("DataDigger", "WorkFolder"   , " " ).
 
-  /* Start debugger if needed */
-  IF LOGICAL(getRegistry('DataDigger', 'StartDebugger')) = TRUE THEN 
-    RUN VALUE(gcProgramDir + "wDebugger.w") PERSISTENT.
-
-  PUBLISH "timerCommand" ("start", "Startup").
+  PUBLISH "DD:Timer" ("start", "Startup").
 
 END PROCEDURE. /* initializeObject */
 
@@ -882,4 +878,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

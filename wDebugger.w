@@ -291,27 +291,27 @@ ON CHOOSE OF btnTimers IN FRAME DEFAULT-FRAME /* Timers */
 DO:
   DEFINE BUFFER bfTimer FOR ttTimer.
 
-  PUBLISH "debugInfo"(1, SUBSTITUTE("&1 &2 &3 &4"
-                                      , STRING("Timer"  ,"x(30)")
+  RUN debugInfo (1, SUBSTITUTE("&1 &2 &3 &4"
+                                      , STRING("Timer"  ,"x(40)")
                                       , STRING("    Num","x(8)")
                                       , STRING("    Avg","x(8)")
                                       , STRING("  Total","x(8)")
                                       )
                         ).
-  PUBLISH "debugInfo"(1, SUBSTITUTE("&1 &2 &3 &4"
-                                      , STRING(FILL("-",30),"x(30)")
+  RUN debugInfo (1, SUBSTITUTE("&1 &2 &3 &4"
+                                      , STRING(FILL("-",30),"x(40)")
                                       , STRING(FILL("-", 8),"x(8)")
                                       , STRING(FILL("-", 8),"x(8)")
                                       , STRING(FILL("-", 8),"x(8)")
                                       )
                         ).
   FOR EACH bfTimer:
-    PUBLISH "debugInfo"(1, SUBSTITUTE("&1 &2 &3 &4"
-                                        , STRING(bfTimer.cTimerId,"x(30)")
-                                        , STRING(bfTimer.iNumStarts,">>>>>>>9")
-                                        , STRING(INTEGER(bfTimer.tTotalTime / bfTimer.iNumStarts),">>>>>>>9")
-                                        , STRING(bfTimer.tTotalTime,">>>>>>>9")
-                                        )
+    RUN debugInfo (1, SUBSTITUTE("&1 &2 &3 &4"
+                                      , STRING(bfTimer.cTimerId,"x(40)")
+                                      , STRING(bfTimer.iNumStarts,">>>>>>>9")
+                                      , STRING(INTEGER(bfTimer.tTotalTime / bfTimer.iNumStarts),">>>>>>>9")
+                                      , STRING(bfTimer.tTotalTime,">>>>>>>9")
+                                      )
                           ).
   END. /* case picCommand: */
 
@@ -843,15 +843,15 @@ PROCEDURE subscribeEvents :
 
   IF plUpdate THEN
   DO:
-    SUBSCRIBE TO "debugInfo"    ANYWHERE RUN-PROCEDURE "debugInfo".
-    SUBSCRIBE TO "query"        ANYWHERE RUN-PROCEDURE "debugInfo".
-    SUBSCRIBE TO "timerCommand" ANYWHERE RUN-PROCEDURE "timerCommand".
+    SUBSCRIBE TO "debugInfo" ANYWHERE RUN-PROCEDURE "debugInfo".
+    SUBSCRIBE TO "query"     ANYWHERE RUN-PROCEDURE "debugInfo".
+    SUBSCRIBE TO "DD:Timer"  ANYWHERE RUN-PROCEDURE "TimerCommand".
   END.
   ELSE 
   DO:
-    UNSUBSCRIBE TO "debugInfo"    .
-    UNSUBSCRIBE TO "query"        .
-    UNSUBSCRIBE TO "timerCommand" .
+    UNSUBSCRIBE TO "debugInfo".
+    UNSUBSCRIBE TO "query".
+    UNSUBSCRIBE TO "DD:Timer".
   END.
 
 END PROCEDURE. /* subscribeEvents */
@@ -859,14 +859,10 @@ END PROCEDURE. /* subscribeEvents */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timerCommand C-Win 
-PROCEDURE timerCommand :
-/*------------------------------------------------------------------------------
-  Purpose:
-  Parameters:  <none>
-  Notes:
-------------------------------------------------------------------------------*/
-
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE TimerCommand C-Win 
+PROCEDURE TimerCommand :
+/* Save debug info to temp-table
+*/
   DEFINE INPUT PARAMETER picCommand AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER picTimerId AS CHARACTER NO-UNDO.
 
@@ -905,7 +901,7 @@ PROCEDURE timerCommand :
     END. /* stop */
   END CASE. /* case picCommand: */
 
-END PROCEDURE.
+END PROCEDURE. /* TimerCommand */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -952,4 +948,3 @@ END FUNCTION. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

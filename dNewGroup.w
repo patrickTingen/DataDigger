@@ -85,7 +85,7 @@ DEFINE FRAME Dialog-Frame
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 405 BY 168
-         TITLE "New Favourites Group"
+         TITLE "Favourites Group Name"
          DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
 
 
@@ -123,7 +123,7 @@ ASSIGN
 
 &Scoped-define SELF-NAME Dialog-Frame
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON GO OF FRAME Dialog-Frame /* New Favourites Group */
+ON GO OF FRAME Dialog-Frame /* Favourites Group Name */
 DO:
   IF NOT btn_ok:SENSITIVE THEN RETURN NO-APPLY.
 
@@ -147,7 +147,7 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
-ON WINDOW-CLOSE OF FRAME Dialog-Frame /* New Favourites Group */
+ON WINDOW-CLOSE OF FRAME Dialog-Frame /* Favourites Group Name */
 DO:
   APPLY "END-ERROR":U TO SELF.
 END.

@@ -855,7 +855,7 @@ DEFINE VARIABLE cbAndOr AS CHARACTER FORMAT "X(256)":U
 
 DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 1050
-     VIEW-AS COMBO-BOX INNER-LINES 10
+     VIEW-AS COMBO-BOX SORT INNER-LINES 10
      DROP-DOWN-LIST
      SIZE-PIXELS 186 BY 21 TOOLTIP "field used in the expression"
      FONT 2 NO-UNDO.
@@ -977,8 +977,8 @@ DEFINE FRAME frMain
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
@@ -1018,17 +1018,46 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1066,46 +1095,17 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -2083,7 +2083,7 @@ DO:
 
   FINALLY:
     SET-SIZE(lp) = 0.
-    {&timerStop}
+    {&timerStop2}
   END FINALLY.
 
 END. /* scroll-notify */
@@ -2443,7 +2443,10 @@ DO:
     fiTableDesc:SCREEN-VALUE = hBuffer::cTableDesc.
     fiTableDesc:TOOLTIP      = hBuffer::cTableDesc.
 
-    RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE CAN-DO(hBuffer::cFavourites,cbFavouriteGroup:SCREEN-VALUE)).
+    IF glShowFavourites THEN 
+      btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
+    ELSE
+      RUN showFavouriteIcon(CAN-DO(hBuffer::cFavourites,cbFavouriteGroup:SCREEN-VALUE)).
 
     PUBLISH "debugInfo" (2,SUBSTITUTE("Select table &1.&2", gcCurrentDatabase, gcCurrentTable)).
   END.
@@ -2461,7 +2464,10 @@ DO:
     fiTableDesc:SCREEN-VALUE = "".
     fiTableDesc:TOOLTIP      = ''.
 
-    RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE FALSE).
+    IF glShowFavourites THEN 
+      btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
+    ELSE
+      RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE FALSE).
   END.
 
   /* Switch on/off UI */
@@ -4915,6 +4921,8 @@ PROCEDURE btnSettingsChoose :
     setWindowFreeze(YES).
 
     RUN clearRegistryCache.
+    RUN clearColorCache.
+    RUN clearFontCache.
     RUN initializeObjects.
 
     gcCurrentTable = ?.
@@ -6392,8 +6400,8 @@ PROCEDURE dataScrollNotify :
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   setWindowFreeze(NO).
 
-  {&timerStop}
   RETURN NO-APPLY.
+  {&timerStop}
 
 END PROCEDURE.  /* dataScrollNotify */
 
@@ -6735,8 +6743,9 @@ END PROCEDURE. /* dumpDefinitions */
 PROCEDURE editFavourites :
 /* Edit favourites group
 */
+  DEFINE VARIABLE lOk      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE cGroup   AS CHARACTER NO-UNDO CASE-SENSITIVE.
   DEFINE BUFFER bTable FOR ttTable.
-  DEFINE VARIABLE lOk AS LOGICAL NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
     /* Keep old values */
@@ -6744,25 +6753,58 @@ PROCEDURE editFavourites :
       bTable.lFavourite = CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE).
     END.
   
+    cGroup = cbFavouriteGroup:SCREEN-VALUE.
     RUN VALUE(getProgramDir() + 'dEditGroup.w')
-      ( INPUT-OUTPUT TABLE ttTable, OUTPUT lOk).
-  
-    SESSION:SET-WAIT-STATE('general').
+      ( INPUT-OUTPUT cGroup
+      , INPUT-OUTPUT TABLE ttTable
+      , INPUT cbFavouriteGroup:LIST-ITEMS
+      , OUTPUT lOk
+      ).
   
     IF lOk THEN
-    DO WITH FRAME {&FRAME-NAME}:
-      FOR EACH bTable WHERE bTable.lFavourite <> CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE):
-  
-        RUN setFavourite( bTable.cDatabase
-                        , bTable.cTableName
-                        , cbFavouriteGroup:SCREEN-VALUE
-                        , bTable.lFavourite
-                        ).
-      END.
-      RUN reopenTableBrowse(?).
-    END.
+    DO:
+      SESSION:SET-WAIT-STATE('general').
 
-    SESSION:SET-WAIT-STATE('').
+      FOR EACH bTable:
+         
+        /* Changed fav status */
+        IF bTable.lFavourite <> CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE) THEN 
+          RUN setFavourite( bTable.cDatabase
+                          , bTable.cTableName
+                          , cbFavouriteGroup:SCREEN-VALUE
+                          , bTable.lFavourite
+                          ).
+
+        /* Changed name */
+        IF bTable.lFavourite AND cbFavouriteGroup:SCREEN-VALUE <> cGroup THEN
+        DO:
+          /* Remove from old group */
+          RUN setFavourite( bTable.cDatabase
+                          , bTable.cTableName
+                          , cbFavouriteGroup:SCREEN-VALUE
+                          , NO
+                          ).
+
+          /* Add to new group */
+          RUN setFavourite( bTable.cDatabase
+                          , bTable.cTableName
+                          , cGroup
+                          , YES
+                          ).
+        END.
+      END.
+
+      IF NOT CAN-FIND(FIRST bTable WHERE CAN-DO(bTable.cFavourites, cGroup)) THEN
+        RUN showHelp('FavouriteGroupEmpty','').
+
+      /* Repopulate fav combo */
+      EMPTY TEMP-TABLE ttFavGroup.
+      RUN getFavourites. 
+      cbFavouriteGroup:SCREEN-VALUE = cGroup NO-ERROR.
+
+      RUN reopenTableBrowse(?).
+      SESSION:SET-WAIT-STATE('').
+    END. /* lOk */
   END. 
 
 END PROCEDURE. /* editFavourites */
@@ -8126,7 +8168,7 @@ PROCEDURE initializeObjects :
     IF getRegistry("DataDigger:Colors","DataRow:UseSystem") = "YES" THEN
       ASSIGN
         giDataOddRowColor[1]  = 1
-        giDataOddRowColor[2]  = 24 /* ButtonFace, often defined as off-white */
+        giDataOddRowColor[2]  = COLOR-TABLE:NUM-ENTRIES - 1 /* ButtonFace, often defined as off-white */
         giDataEvenRowColor[1] = 1
         giDataEvenRowColor[2] = 15 /* white */
         .
@@ -8687,15 +8729,13 @@ PROCEDURE initializeVisuals :
   DEFINE VARIABLE iColor        AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iRgbValue     AS INTEGER   NO-UNDO.
 
-  /* Make the color table large enough TO hold at least 25 fonts
-   * Entries 0-23 are for the user and entry 24 will be used for
-   * the color defined by "ButtonFace" ON the local system. We will
-   * use this color if the user sets "use system colors"
-   * Entry 25/26 are for dark mode
+  /* Expand the color table with 1 to hold a color for "ButtonFace" 
+   * which is used if the user sets "use system colors" for row coloring
    */
-  IF COLOR-TABLE:NUM-ENTRIES < 27 THEN COLOR-TABLE:NUM-ENTRIES = 27.
+  COLOR-TABLE:NUM-ENTRIES = MINIMUM(255,COLOR-TABLE:NUM-ENTRIES + 1).
+
+  /* Make all colors dynamic so the user can change them */
   DO iColor = 0 TO COLOR-TABLE:NUM-ENTRIES - 1:
-    /* Make all colors dynamic so the user can change them */
     COLOR-TABLE:SET-DYNAMIC(iColor, TRUE).
 
     /* And get the last saved value from the INI file */
@@ -8708,13 +8748,15 @@ PROCEDURE initializeVisuals :
     END.
   END.
 
-  /* Get the RGB value for "ButtonFace" and set color 24 */
+  /* Get the RGB value for "ButtonFace" */
   RUN GetSysColor(15, OUTPUT iRgbValue).
-  COLOR-TABLE:SET-RGB-VALUE(24, iRgbValue).
+  COLOR-TABLE:SET-RGB-VALUE(COLOR-TABLE:NUM-ENTRIES - 1, iRgbValue).
 
   /* Set colors for dark mode */
+  /* Not yet in DD24
   COLOR-TABLE:SET-RGB-VALUE(25, RGB-VALUE(70,70,70)). /* dark gray */
   COLOR-TABLE:SET-RGB-VALUE(26, RGB-VALUE(90,90,90)). /* even darker gray */
+  */
 
   /* Set icon */
   C-Win:LOAD-ICON(getImagePath("DataDigger.ico")).
@@ -11105,7 +11147,7 @@ PROCEDURE setTable :
   DEFINE INPUT PARAMETER pcSelectedText AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cTable AS CHARACTER NO-UNDO.
 
-  PUBLISH "timerCommand" ("start", "setTable").
+  PUBLISH "DD:Timer" ("start", "setTable").
 
   IF pcSelectedText = ? THEN
   DO:
@@ -11180,7 +11222,7 @@ PROCEDURE setTable :
     END.
   END. /* has value */
 
-  PUBLISH "timerCommand" ("stop", "setTable").
+  PUBLISH "DD:Timer" ("stop", "setTable").
 
 END PROCEDURE. /* setTable */
 
@@ -11204,9 +11246,16 @@ PROCEDURE setTableContext :
     IF pcTable = "" THEN RETURN.
     setWindowFreeze(YES).
 
+    /* Empty field and index browse. Changing tables takes a bit of time and in the meantime the fields
+     * and indexes of the previous table should not remain visible (BEUG) */
+    EMPTY TEMP-TABLE ttField.
+    EMPTY TEMP-TABLE ttColumn.
+    EMPTY TEMP-TABLE ttIndex.
+    RUN reopenFieldBrowse(?,?).
+    RUN reopenIndexBrowse(?,?).
+
     /* If table has changed adjust the screen */
-    IF pcTable <> gcCurrentTable THEN
-      RUN setCurrentTable( pcTable ).
+    RUN setCurrentTable( pcTable ).
 
     /* Delete filters */
     IF VALID-HANDLE(ghDataBrowse) THEN RUN deleteDataFilters(ghDataBrowse).
@@ -11243,7 +11292,7 @@ PROCEDURE setTableContext :
     IF getSelectedFields() = '' THEN tgSelAll:CHECKED = FALSE.
 
     /* Get a list of all fields (extents NOT expanded) */
-    FOR EACH ttField BY ttField.cFieldName BY ttField.iExtent:
+    FOR EACH ttField:
       cFieldList = cFieldList + ',' + ttField.cFullname.
     END.
 
@@ -11343,7 +11392,9 @@ PROCEDURE setTableView :
     /* What view are we in? */
     glShowFavourites = plFavouritesView.
   
-    IF glShowFavourites THEN RUN showFavouriteIcon(TRUE).
+    IF glShowFavourites THEN 
+      btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
+
     btnFavourite:TOOLTIP = STRING(glShowFavourites,'edit this group/toggle as favourite').
   
     /* If we switch manually to Fav-view for the first time... */
@@ -12305,16 +12356,18 @@ END PROCEDURE. /* startGenerateProc */
 PROCEDURE startSession :
 /* Show a welcome message to the user.
    */
-  DEFINE VARIABLE cBuild      AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hWindow     AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iStackSize  AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iVersion    AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE lNewBuild   AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lNewUser    AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lNewVersion AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lUpgraded   AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE lOpenBlog   AS LOGICAL   NO-UNDO.
-  DEFINE VARIABLE iChannel    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cBuild         AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hWindow        AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iStackSize     AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iVersion       AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lNewBuild      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lNewUser       AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lNewVersion    AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lUpgraded      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE lOpenBlog      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE iChannel       AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cRemoteVersion AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cRemoteBuildNr AS CHARACTER NO-UNDO.
 
   /* Set debug flag */
   setDebugMode(LOGICAL(getRegistry('DataDigger:debugger','DebugMode'))).
@@ -12394,7 +12447,13 @@ PROCEDURE startSession :
     */
     IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE THEN
       RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).
-
+    
+    /* If you are using a build that is newer than the production version, 
+     * you are in the beta program. Then automatically check for beta changes 
+     */
+    RUN getVersionInfo.p(INPUT 'master', OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
+    IF '{build.i}' > cRemoteBuildNr THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
+    
     /* Check for new versions on GitHub */
     iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
     IF iChannel <> {&CHECK-MANUAL} THEN
@@ -13188,8 +13247,9 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
   /* Kill scrollbars */
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
 
-  {&timerStop}
   RETURN TRUE.
+
+  {&timerStop}
 END FUNCTION. /* setUpdatePanel */
 
 /* _UIB-CODE-BLOCK-END */
@@ -13230,4 +13290,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
