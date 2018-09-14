@@ -31,7 +31,8 @@
  * get analytics for the is.gd link by adding a - (minus) to it
 */
 &GLOBAL-DEFINE PINGBACKURL https://is.gd/DataDigger
-&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/DataDigger-
+&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger
+/* https://is.gd/DataDigger- */
 
 /* Table scan is not available for pre-v11 */
 &IF PROVERSION >= '11' &THEN
