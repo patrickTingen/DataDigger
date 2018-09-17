@@ -9,7 +9,7 @@
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
 - Solved: Focus on wrong window after update with multiple Diggers (Dirk Vreken)
-
+- Solved: Character extent fields generate error when editing (Dirk Vreken)
 
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)

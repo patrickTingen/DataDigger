@@ -1390,11 +1390,12 @@ END PROCEDURE. /* increaseValue */
 PROCEDURE initializeObject :
 /* Setup
   */
-  DEFINE VARIABLE cExtFormat      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iDefaultFont    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cExtFormat      AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cSetting        AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE iMaxFieldLength AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iValue          AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iDefaultFont    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iMaxLength      AS INTEGER   NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -1442,7 +1443,6 @@ PROCEDURE initializeObject :
   FOR EACH bColumn:
     bColumn.cFilterValue = ''.    /* cFilterValue is now the list of currently used values */
     bColumn.lShow        = FALSE. /* lShow now means: "Change this field" */
-    iMaxFieldLength      = MAXIMUM(iMaxFieldLength,LENGTH(bColumn.cFullName)).
   END.
 
   /* Add leading zeros to full name for extents */
@@ -1450,37 +1450,44 @@ PROCEDURE initializeObject :
     /* Create a format for extents with proper nr of digits */
     cExtFormat = FILL('9', LENGTH(STRING(bField.iExtent))).
     FOR EACH bColumn WHERE bColumn.cFieldName = bField.cFieldname:
-       bColumn.cFullName  = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
+      bColumn.cFullName = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
+      iMaxFieldLength   = MAXIMUM(iMaxFieldLength,FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bColumn.cFullName,iDefaultFont)).
     END.
   END.    
 
   /* Collect data for all fields
    * And if we only have 1 value for all selected records, let's show that
    */
-  #Column:
-  FOR EACH bColumn:
-    FIND bField WHERE bField.cFieldname = bColumn.cFieldName NO-ERROR.
-    IF NOT AVAILABLE bField THEN NEXT #Column.
+  FOR EACH bField:
+    
+    /* Set max length for chars */
+    IF bField.cDatatype = 'character' THEN iMaxLength = 1.
+        
+    FOR EACH bColumn WHERE bColumn.cFieldname = bField.cFieldname:
+    
+      IF CAN-DO('Clone,Edit',picMode) THEN
+        RUN getDataValues(pihBrowse,bColumn.cFullName, bColumn.iExtent).
 
-    IF CAN-DO('Clone,Edit',picMode) THEN
-      RUN getDataValues(pihBrowse,bColumn.cFullName, bColumn.iExtent).
-
-    FIND ttData WHERE ttData.cFieldName = bColumn.cFullName NO-ERROR.
-    IF AVAILABLE ttData THEN
-    DO:
-      ASSIGN
-        bColumn.cOldValue = ttData.cValue /* so we can revert to the old value */
-        bColumn.cNewValue = ttData.cValue
-        bColumn.lShow     = TRUE.
-
-      /* If the data is longer than the format allows, adjust format */
+      FIND ttData WHERE ttData.cFieldName = bColumn.cFullName NO-ERROR.
+      IF AVAILABLE ttData THEN
+      DO:
+        ASSIGN
+          bColumn.cOldValue = ttData.cValue /* so we can revert to the old value */
+          bColumn.cNewValue = ttData.cValue
+          bColumn.lShow     = TRUE.
+      END.
+      
       IF bField.cDatatype = 'character' THEN
-        bField.cFormat = SUBSTITUTE('x(&1)', MAXIMUM( LENGTH(STRING(bColumn.cNewValue,bField.cFormat))
-                                                     , LENGTH(bColumn.cNewValue)
-                                                     ) * 2).
+      DO:
+        iMaxLength = MAXIMUM(iMaxLength, LENGTH(STRING(bColumn.cNewValue,bField.cFormat)), LENGTH(bColumn.cNewValue)).
+      END.
     END.
+    
+    /* If the data is longer than the format allows, adjust format up to a max of 10k */
+    IF bField.cDatatype = 'character' THEN
+      bField.cFormat = SUBSTITUTE('x(&1)', MINIMUM(iMaxLength * 2,10000)).
   END.
-
+   
   /* When editing records, keep a copy of the original data */
   IF picMode = 'Edit' THEN
     RUN getOriginalData(picDatabase, picTableName, pihBrowse).
@@ -1496,7 +1503,7 @@ PROCEDURE initializeObject :
     tgWriteTrigger:CHECKED = LOGICAL(cSetting).
 
     /* Adjust column width to fit precisely */
-    brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):WIDTH-CHARS = iMaxFieldLength + 2.
+    brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):WIDTH-PIXELS = iMaxFieldLength + 5.
 
     /* Window position and size */
     /* Set title of the window */
@@ -1732,3 +1739,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
