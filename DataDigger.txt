@@ -8,29 +8,8 @@
 
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
-BetaDigger 20180913
-- Solved: Compile error in v11.7 in DataDiggerLib.p (Curtis Schroer)
-- Solved: Generate Active Class says .i instead of .cls (Arno vd Ende)
-- Solved: Generate Assign statement gives warning on first use (Arno vd Ende)
-- Solved: Generate dump/load: toggle for db name not working (Rob Willoughby)
-- Solved: Generate dump/load: saving file saves as .i (Rob Willoughby)
-- Solved: Generate dump/load: load procedure resulted in no code
-- Solved: Generate routines: syntax error in header
-- Solved: Switching between favourites/tables gives empty fields browse (Mike Raschendorfer)
-- Solved: Starting DD with table name on clipboard did not open query (Jeroen Beugels)
-- Solved: Color 24,25,26 were changed during startup (Didier Dujardin)
-- Solved: Favourite group could not be renamed or deleted (Mike Raschendorfer)
-- Solved: Favourites screen could not be escaped if run from DWP (Jeroen Beugels)
-- Solved: Changing tables shows fields/indexes while reading table info (Jeroen Beugels)
-- Solved: Events from DD show up in DWP Debugger (Jeroen Beugels)
-- Change: Beta version of DD always checks on new beta version
-- New   : F10 can toggle readonly mode back to updatemode (Johan Geerts) 
+- Solved: Focus on wrong window after update with multiple Diggers (Dirk Vreken)
 
-BetaDigger 20180904
-- Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
-- Solved: OK button on settings screen fails if you have no backup folder (Mike Derrick)
-- Solved: Wrong tooltips in table filter screen (Jeroen Beugels)
-- Solved: Changing tables slow (Jeroen Beugels)
 
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
@@ -72,6 +51,25 @@ Fixes from previous betas:
 - Solved: Favourites icon below table browse sometimes disabled
 - Solved: CTRL-C does not work
 - Solved: Settings not saved in settings screen
+- Solved: Toggle box not sensitive in edit favourites screen (Mike Derrick)
+- Solved: OK button on settings screen fails if you have no backup folder (Mike Derrick)
+- Solved: Wrong tooltips in table filter screen (Jeroen Beugels)
+- Solved: Changing tables slow (Jeroen Beugels)
+- Solved: Compile error in v11.7 in DataDiggerLib.p (Curtis Schroer)
+- Solved: Generate Active Class says .i instead of .cls (Arno vd Ende)
+- Solved: Generate Assign statement gives warning on first use (Arno vd Ende)
+- Solved: Generate dump/load: toggle for db name not working (Rob Willoughby)
+- Solved: Generate dump/load: saving file saves as .i (Rob Willoughby)
+- Solved: Generate dump/load: load procedure resulted in no code
+- Solved: Generate routines: syntax error in header
+- Solved: Switching between favourites/tables gives empty fields browse (Mike Raschendorfer)
+- Solved: Starting DD with table name on clipboard did not open query (Jeroen Beugels)
+- Solved: Color 24,25,26 were changed during startup (Didier Dujardin)
+- Solved: Favourite group could not be renamed or deleted (Mike Raschendorfer)
+- Solved: Favourites screen could not be escaped if run from DWP (Jeroen Beugels)
+- Solved: Changing tables shows fields/indexes while reading table info (Jeroen Beugels)
+- Solved: Events from DD show up in DWP Debugger (Jeroen Beugels)
+- Change: Beta version of DD always checks on new beta version
 
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
@@ -109,6 +107,7 @@ Fixes from previous betas:
 - New   : Use CTRL-DOWN / CTRL-UP to expand query editor
 - New   : Option to use multiple favourites groups
 - New   : Option to use other folder as workfolder (movedoa)
+- New   : F10 can toggle readonly mode back to updatemode (Johan Geerts) 
 
 
 =====================================================================================
