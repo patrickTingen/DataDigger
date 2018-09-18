@@ -22,6 +22,7 @@ DEFINE VARIABLE cLocalBuildNr  AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteVersion AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteBuildNr AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE lAutoCheck     AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE lVisit         AS LOGICAL     NO-UNDO INITIAL TRUE.
 
 /* Might be spaces in the include file */
 cLocalVersion = TRIM('{version.i}').
@@ -58,8 +59,8 @@ IF cRemoteBuildNr <> ? THEN setRegistry('DataDigger:Update', 'RemoteBuildNr', cR
 IF cRemoteVersion > cLocalVersion
   AND (plManualCheck = TRUE OR piChannel <> {&CHECK-MANUAL}) THEN
 DO:
-  MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
+  MESSAGE 'A new version is available on the DataDigger website~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
+  IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
 END.
 
 ELSE
@@ -67,8 +68,8 @@ ELSE
 IF cRemoteBuildNr > cLocalBuildNr
   AND (plManualCheck = TRUE OR piChannel <> {&CHECK-MANUAL}) THEN
 DO:
-  MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
+  MESSAGE 'A new BETA version is available on the DataDigger website~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
+  IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
 END.
 
 ELSE
