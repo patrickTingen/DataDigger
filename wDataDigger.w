@@ -10630,7 +10630,7 @@ PROCEDURE saveWindow :
  */
  
   /* Don't save when minimized */
-  IF c-win:WINDOW-STATE = 2 THEN
+  IF c-win:WINDOW-STATE = 3 THEN
   DO:
     /* Upper left corner of window */
     setRegistry("DataDigger", "Window:x", STRING(c-win:X) ).
@@ -13313,4 +13313,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
