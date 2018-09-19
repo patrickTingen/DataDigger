@@ -114,7 +114,7 @@ Fixes from previous betas:
 - New   : Option to generate assign statement
 - New   : Option 'ShowHints=yes|no' in DataDigger.ini to hide all hints #36 (movedoa)
 - New   : Use CTRL-DOWN / CTRL-UP to expand query editor
-- New   : Option to use multiple favourites groups
+- New   : Option to use multiple favourites groups (Didier Dujardin)
 - New   : Option to use other folder as workfolder (movedoa)
 - New   : F10 can toggle readonly mode back to updatemode (Johan Geerts) 
 
