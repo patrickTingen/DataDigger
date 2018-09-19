@@ -14,6 +14,7 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Change: Don't save window position when minimized/maximized (Johan Geerts)
 - Solved: Long labels not fully shown in field browse (Johan Geerts)
 - Solved: Columns in edit window too small
+- Solved: Table browse moves selected table to top of browse (Mike Derrick)
 
 
 Fixes from previous betas:
