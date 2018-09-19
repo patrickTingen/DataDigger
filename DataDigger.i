@@ -96,7 +96,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO RCODE-INFORMATION
   FIELD cInitial      AS CHARACTER                   LABEL "Initial"                     /* initial value from dict   */
   FIELD cFormat       AS CHARACTER                   LABEL "Format"    FORMAT "X(80)"    /* user defined format       */
   FIELD cFormatOrg    AS CHARACTER                   LABEL "Format"                      /* original format           */
-  FIELD cLabel        AS CHARACTER                   LABEL "Label"     FORMAT "X(24)"
+  FIELD cLabel        AS CHARACTER                   LABEL "Label"     FORMAT "X(50)"
   FIELD iOrderOrg     AS DECIMAL                                                         /* original order            */
   FIELD iExtent       AS INTEGER                     LABEL "Extent"    FORMAT ">>>>9"
   FIELD lPrimary      AS LOGICAL                     LABEL "Prim"                        /* part of prim index?       */
@@ -146,7 +146,7 @@ DEFINE TEMP-TABLE ttColumn NO-UNDO RCODE-INFORMATION
   FIELD cOldValue     AS CHARACTER          LABEL "Old value" FORMAT "X(256)" /* for wEdit */
   FIELD lShow         AS LOGICAL                                              /* for wEdit */
   FIELD iOrder        AS DECIMAL            LABEL "Order"     FORMAT ">>>>>9" /* user defined order        */
-  FIELD cLabel        AS CHARACTER          LABEL "Label"     FORMAT "X(24)"
+  FIELD cLabel        AS CHARACTER          LABEL "Label"     FORMAT "X(50)"
   FIELD iColumnNr     AS INTEGER            /* order in the databrowse */
   FIELD hColumn       AS HANDLE             /* handle to the column in the databrowse */
   FIELD hFilter       AS HANDLE             /* handle to the filter on top of the databrowse */

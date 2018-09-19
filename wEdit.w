@@ -1392,7 +1392,8 @@ PROCEDURE initializeObject :
   */
   DEFINE VARIABLE cExtFormat      AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cSetting        AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iMaxNameLength  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iMaxLabelLength AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iValue          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iDefaultFont    AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iMaxLength      AS INTEGER   NO-UNDO.
@@ -1446,12 +1447,17 @@ PROCEDURE initializeObject :
   END.
 
   /* Add leading zeros to full name for extents */
-  FOR EACH bField WHERE bField.iExtent >= 10:
-    /* Create a format for extents with proper nr of digits */
-    cExtFormat = FILL('9', LENGTH(STRING(bField.iExtent))).
+  FOR EACH bField:
+    iMaxLabelLength = MAXIMUM(iMaxLabelLength, FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bField.cLabel,iDefaultFont)).
+
+    IF bField.iExtent > 0 THEN
+      cExtFormat = FILL('9', LENGTH(STRING(bField.iExtent))).
+
     FOR EACH bColumn WHERE bColumn.cFieldName = bField.cFieldname:
-      bColumn.cFullName = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
-      iMaxFieldLength   = MAXIMUM(iMaxFieldLength,FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bColumn.cFullName,iDefaultFont)).
+      IF bField.iExtent > 0 THEN
+        bColumn.cFullName = SUBSTITUTE('&1[&2]', bField.cFieldName, STRING(bColumn.iExtent, cExtFormat)).
+
+      iMaxNameLength = MAXIMUM(iMaxNameLength,FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bColumn.cFullName,iDefaultFont)).
     END.
   END.    
 
@@ -1502,8 +1508,9 @@ PROCEDURE initializeObject :
     IF cSetting = ? THEN cSetting = "yes".
     tgWriteTrigger:CHECKED = LOGICAL(cSetting).
 
-    /* Adjust column width to fit precisely */
-    brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):WIDTH-PIXELS = iMaxFieldLength + 5.
+    /* Adjust column widths */
+    brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):WIDTH-PIXELS = iMaxNameLength + 5.
+    brRecord:GET-BROWSE-COLUMN( {&field-cLabel} ):WIDTH-PIXELS = iMaxLabelLength + 5.
 
     /* Window position and size */
     /* Set title of the window */

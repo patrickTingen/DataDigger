@@ -12,6 +12,8 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Character extent fields generate error when editing (Dirk Vreken)
 - Change: On new version, user has option to not go to DD website (Johan Geerts)
 - Change: Don't save window position when minimized/maximized (Johan Geerts)
+- Solved: Long labels not fully shown in field browse (Johan Geerts)
+- Solved: Columns in edit window too small
 
 
 Fixes from previous betas:
