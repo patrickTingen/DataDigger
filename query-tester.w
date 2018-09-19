@@ -265,7 +265,10 @@ DO:
 
   CLOSE QUERY q1.
   OPEN QUERY q1 FOR EACH ttTestQuery.
-  ASSIGN ed-qry:SCREEN-VALUE = "".
+  ASSIGN 
+    ed-qry:SCREEN-VALUE = ""
+    resultset:SCREEN-VALUE = "".
+
   RUN enableButtons IN THIS-PROCEDURE.
 END.
 
@@ -823,6 +826,10 @@ PROCEDURE test-query PRIVATE :
   DEFINE VARIABLE liSeconds     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE liWord        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lOk           AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE liNumResults  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE lStop         AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE liDelayStart  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE liDelayTime   AS INTEGER     NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -958,14 +965,25 @@ PROCEDURE test-query PRIVATE :
 
       ETIME(TRUE).
       hQry:GET-FIRST.
+      liNumResults = 0.
+      lStop = ?.
 
+      #QueryLoop:
       DO WHILE NOT hQry:QUERY-OFF-END:
+        liNumResults = liNumResults + 1.
         hQry:GET-NEXT.
+
+        IF ETIME > 5000 AND lStop = ? THEN
+        DO:
+          liDelayStart = ETIME.
+          MESSAGE 'This is taking quite some time, do you want to stop the query?' VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE lStop.
+          IF lStop THEN LEAVE #QueryLoop.
+          liDelayTime = ETIME - liDelayStart.
+        END.
       END.
 
       ASSIGN
-        liSeconds = ETIME(FALSE)
-        .
+        liSeconds = ETIME(FALSE) - liDelayTime.
 
       RUN scanVST IN THIS-PROCEDURE (FALSE). /* the data coming from this query, assuming there were no other activities on the table */
     END.
@@ -982,13 +1000,15 @@ PROCEDURE test-query PRIVATE :
                                             (IF NUM-ENTRIES(hQry:INDEX-INFORMATION) > 1 THEN "es" ELSE ""),
                                             hQry:INDEX-INFORMATION(liWord)
                                            )
-        NO-ERROR.
+        NO-ERROR. 
     END.
 
     IF iplPerfromQuery THEN
     DO:
       ASSIGN
-        resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("~nNumber of results reported by the query is &1 in &2 seconds.~n",hQry:NUM-RESULTS,TRIM(STRING(liSeconds / 1000,">>,>>9.9")))
+        resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("~nNumber of results reported by the query is &1 in &2 seconds.~n"
+                                                                    , liNumResults
+                                                                    , TRIM(STRING(liSeconds / 1000,">>,>>9.99")))
       NO-ERROR.
 
       DO liWord = 1 TO liNumWords:

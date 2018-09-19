@@ -202,7 +202,7 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnFavourite fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
 btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnAddFavGroup ~
 fiTableDesc cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools ~
@@ -962,8 +962,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiTableFilter AT Y 3 X 56 NO-LABEL
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -978,8 +978,8 @@ DEFINE FRAME frMain
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnWhere AT Y 265 X 683 WIDGET-ID 236
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -2321,6 +2321,16 @@ DO:
   
   RUN toggleFavourite.
 
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+ON F5 OF brTables IN FRAME frMain
+DO:
+  RUN reopenTableBrowse(?).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -6846,7 +6856,7 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
+  ENABLE rctQuery rctEdit btnFavourite fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          brTables brFields brIndexes tgDebugMode btnAddFavGroup fiTableDesc 
          cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools 
@@ -10165,6 +10175,7 @@ PROCEDURE reopenFieldBrowse :
     IF NOT hQuery:QUERY-OFF-END
       AND CAN-FIND(ttField WHERE ROWID(ttField) = rCurrentRecord) THEN
     DO:
+      brFields:SET-REPOSITIONED-ROW(1,'CONDITIONAL').
       hQuery:REPOSITION-TO-ROWID(rCurrentRecord) NO-ERROR.
       brFields:SELECT-FOCUSED-ROW().
     END.

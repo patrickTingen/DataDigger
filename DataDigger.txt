@@ -15,7 +15,10 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Long labels not fully shown in field browse (Johan Geerts)
 - Solved: Columns in edit window too small
 - Solved: Table browse moves selected table to top of browse (Mike Derrick)
-
+- Solved: Field browse moves selected field to top after sort (Dirk Vreken)
+- Solved: Empty query saved in query list (Arno van der Ende)
+- Solved: Query tester does not show nr of results (Dirk Vreken)
+- Change: Query tester protects against long running queries
 
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
@@ -62,8 +65,8 @@ Fixes from previous betas:
 - Solved: Wrong tooltips in table filter screen (Jeroen Beugels)
 - Solved: Changing tables slow (Jeroen Beugels)
 - Solved: Compile error in v11.7 in DataDiggerLib.p (Curtis Schroer)
-- Solved: Generate Active Class says .i instead of .cls (Arno vd Ende)
-- Solved: Generate Assign statement gives warning on first use (Arno vd Ende)
+- Solved: Generate Active Class says .i instead of .cls (Arno van der Ende)
+- Solved: Generate Assign statement gives warning on first use (Arno van der Ende)
 - Solved: Generate dump/load: toggle for db name not working (Rob Willoughby)
 - Solved: Generate dump/load: saving file saves as .i (Rob Willoughby)
 - Solved: Generate dump/load: load procedure resulted in no code

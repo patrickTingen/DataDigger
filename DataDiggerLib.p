@@ -2859,7 +2859,7 @@ PROCEDURE saveQuery :
   cQuery = pcQuery.
   cQuery = REPLACE(cQuery,'~n',CHR(1)).
   cQuery = REPLACE(cQuery,{&QUERYSEP},CHR(1)).
-  IF cQuery = '' THEN cQuery = '<empty>'.
+  IF cQuery = '' THEN RETURN. 
 
   /* Get the table with queries again, because they might be
    * changed if the user has more than one window open.
@@ -4979,3 +4979,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+
