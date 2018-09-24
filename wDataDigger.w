@@ -204,12 +204,13 @@ END PROCEDURE. /* URLDownloadToFileA */
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnAddFavGroup ~
-fiTableDesc cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools ~
-btnTabTables btnClear btnClearFieldFilter btnClearTableFilter btnClipboard ~
-btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset btnTableFilter ~
-btnTabFavourites btnTabFields btnTabIndexes btnNextQuery btnPrevQuery ~
-btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
+btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
+btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
+btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -974,11 +975,11 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
@@ -1717,6 +1718,7 @@ ANYWHERE DO:
 
   &IF DEFINED (UIB_is_running) &THEN
 
+  /* Show position of focussed widget */
   DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
   DEFINE VARIABLE iTargetX AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iTargetY AS INTEGER   NO-UNDO.
@@ -1724,19 +1726,18 @@ ANYWHERE DO:
 
   hWidget = FOCUS.
   REPEAT:
-    IF NOT VALID-HANDLE(hWidget) OR hWidget:TYPE = "WINDOW" THEN LEAVE.
+    IF NOT VALID-HANDLE(hWidget) OR hWidget:TYPE = 'window' THEN LEAVE.
 
     IF hWidget:X <> ? THEN iTargetX = iTargetX + hWidget:X.
     IF hWidget:Y <> ? THEN iTargetY = iTargetY + hWidget:Y.
 
-    cWidgets = SUBSTITUTE("&1 &2: pos: &3,&4 (&5 x &6) hlp:&7 ~n&8"
+    cWidgets = SUBSTITUTE("&1 &2: pos: &3,&4 (&5 x &6)~n&7"
                          , hWidget:TYPE
                          , hWidget:NAME
                          , hWidget:X
                          , hWidget:Y
                          , hWidget:WIDTH-PIXELS
                          , hWidget:HEIGHT-PIXELS
-                         , (IF CAN-QUERY(hWidget,'CONTEXT-HELP-ID') THEN STRING(hWidget:CONTEXT-HELP-ID) ELSE '')
                          , cWidgets
                          ).
 
@@ -1744,7 +1745,7 @@ ANYWHERE DO:
   END.
 
   MESSAGE
-    cWidgets SKIP(0) 'Final pos:' iTargetX ',' iTargetY
+    cWidgets SKIP(0) 'Final widget position:' iTargetX ',' iTargetY
     VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE ' Debug info '.
 
   &ENDIF
@@ -6858,8 +6859,8 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode btnAddFavGroup fiTableDesc 
-         cbFavouriteGroup ficWhere btnWhere btnQueries btnView btnTools 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
          btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
          btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
          btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
@@ -10644,21 +10645,20 @@ PROCEDURE saveWindow :
 /* Save size and position of the window.
  */
  
-  /* Don't save when minimized */
-  IF c-win:WINDOW-STATE = 3 THEN
+  IF c-win:WINDOW-STATE = 3 THEN /* normal state */
   DO:
     /* Upper left corner of window */
     setRegistry("DataDigger", "Window:x", STRING(c-win:X) ).
     setRegistry("DataDigger", "Window:y", STRING(c-win:Y) ).
+  END.
   
-    /* Width and height */
-    setRegistry("DataDigger", "Window:height", STRING(c-win:HEIGHT-PIXELS) ).
-    setRegistry("DataDigger", "Window:width", STRING(c-win:WIDTH-PIXELS) ).
-  
-    /* Position of the resize bar */
-    DO WITH FRAME frMain:
-      setRegistry("DataDigger", "ResizeBar:Y", STRING(btnResizeVer:Y) ).
-    END.
+  /* Width and height */
+  setRegistry("DataDigger", "Window:height", STRING(c-win:HEIGHT-PIXELS) ).
+  setRegistry("DataDigger", "Window:width", STRING(c-win:WIDTH-PIXELS) ).
+
+  /* Position of the resize bar */
+  DO WITH FRAME frMain:
+    setRegistry("DataDigger", "ResizeBar:Y", STRING(btnResizeVer:Y) ).
   END.
 
 END PROCEDURE. /* saveWindow */
@@ -12469,24 +12469,22 @@ PROCEDURE startSession :
   IF lNewUser THEN RUN showTour.
   ELSE IF lUpgraded THEN RUN showNewFeatures.
 
-  /* Start up the page on WordPress.com for this build */
-  IF lNewVersion OR lNewBuild THEN
+  /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
+   * version on GitHub. This to track the use of DataDigger.
+   * Interested yourself? Check https://is.gd/DataDigger- to see statistics
+  */
+  IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE 
+    AND getRegistry('DataDigger:Update','LastPingBack') <> ISO-DATE(TODAY) THEN
   DO:
-    lOpenBlog = LOGICAL(getRegistry('DataDigger','OpenBlogOnNewVersion')).
-    IF lOpenBlog = ? OR lOpenBlog = TRUE THEN
-      OS-COMMAND NO-WAIT START VALUE("http://datadigger.wordpress.com/{&build}").
+    RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).
+    setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)).
   END.
-
-  /* PhoneHome / Check for new version only once a day */
-  IF getRegistry('DataDigger:Update','LastUpdateCheck') <> ISO-DATE(TODAY) THEN
+  
+  /* Check for new version only once a day */
+  iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
+  IF iChannel <> {&CHECK-MANUAL}
+    AND getRegistry('DataDigger:Update','LastUpdateCheck') <> ISO-DATE(TODAY) THEN
   DO:
-    /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
-     * version on GitHub. This to track the use of DataDigger.
-     * Interested yourself? Check https://is.gd/DataDigger- to see statistics
-    */
-    IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE THEN
-      RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).
-    
     /* If you are using a build that is newer than the production version, 
      * you are in the beta program. Then automatically check for beta changes 
      */
@@ -12494,18 +12492,21 @@ PROCEDURE startSession :
     IF '{build.i}' > cRemoteBuildNr THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
     
     /* Check for new versions on GitHub */
-    iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
-    IF iChannel <> {&CHECK-MANUAL} THEN
-      RUN checkVersion.p(INPUT iChannel, INPUT FALSE). /* no manual check */
+    RUN checkVersion.p(INPUT iChannel, INPUT FALSE). 
 
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
   END.
   
-  IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' THEN
+  IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' 
+  OR getRegistry('DataDigger:Update','RemoteVersion') > '{version.i}' THEN
   DO WITH FRAME frMain:
-    fiFeedback:SCREEN-VALUE = 'New version available'.
-    fiFeedback:PRIVATE-DATA = 'https://github.com/patrickTingen/DataDigger/releases'.
-    fiFeedback:FGCOLOR = 12.
+    fiFeedback:SCREEN-VALUE = '  New version available, click for info'.
+    fiFeedback:TOOLTIP = 'click to open GitHub page'.
+    fiFeedback:PRIVATE-DATA = getRegistry('DataDigger:Update', 'NewVersionURL').
+    fiFeedback:BGCOLOR = 14.
+    fiFeedback:FGCOLOR = 4.
+    fiFeedback:FONT = 6.    
+    RUN endResize.
   END.
 
 END PROCEDURE. /* startSession */
@@ -12923,6 +12924,8 @@ FUNCTION getFieldList RETURNS CHARACTER
   DEFINE BUFFER ttField FOR ttField.
   DEFINE QUERY qField FOR ttField.
 
+  {&timerStart}
+  
   iMaxFields = INTEGER(getRegistry('DataDigger','MaxColumns')) NO-ERROR.
   IF iMaxFields = ? THEN iMaxFields = 500.
 
@@ -12943,6 +12946,8 @@ FUNCTION getFieldList RETURNS CHARACTER
   cFieldList = LEFT-TRIM(cFieldList, ",").
 
   RETURN cFieldList.
+  
+  {&timerStop}
 END FUNCTION. /* getFieldList */
 
 /* _UIB-CODE-BLOCK-END */

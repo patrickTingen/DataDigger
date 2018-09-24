@@ -1,11 +1,11 @@
 /*------------------------------------------------------------------------
 
   Name : checkVersion.p
-  Desc : Check if there is a new version on GitHub
+  Desc : Check if there is a new version 
 
   Notes:
     The version nr is increased when it is ready for production, the
-    build nr is increaded when something is ready for beta testing.
+    build nr is increased when something is ready for beta testing.
 
   Parameters:
     piChannel     : 0=no check, 1=check stable, 2=check beta
@@ -21,7 +21,7 @@ DEFINE VARIABLE cLocalVersion  AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cLocalBuildNr  AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteVersion AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteBuildNr AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE lAutoCheck     AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE cNewVersionUrl AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE lVisit         AS LOGICAL     NO-UNDO INITIAL TRUE.
 
 /* Might be spaces in the include file */
@@ -45,34 +45,53 @@ DO:
   RETURN.
 END.
 
-/* If remote build is different than local, but we have already noticed this before, 
- * then do not report new version, unless this is a manual check
+/* Save remote version / build */
+setRegistry('DataDigger:Update', 'RemoteBuildNr', cRemoteBuildNr).
+setRegistry('DataDigger:Update', 'RemoteVersion', cRemoteVersion).
+
+/* If you are using a build that is newer than the production version, it means you are running a beta version.
+ * Then force the update channel to 'beta'
  */
-IF NOT plManualCheck
-  AND cRemoteBuildNr <> ?
-  AND cRemoteBuildNr = getRegistry('DataDigger:Update', 'RemoteBuildNr') THEN RETURN.
+IF (piChannel = {&CHECK-MANUAL} OR piChannel = {&CHECK-STABLE})
+  AND '{build.i}' > cRemoteBuildNr THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
 
-/* Save remote build */
-IF cRemoteBuildNr <> ? THEN setRegistry('DataDigger:Update', 'RemoteBuildNr', cRemoteBuildNr).
-
-/* New version available */
-IF cRemoteVersion > cLocalVersion
-  AND (plManualCheck = TRUE OR piChannel <> {&CHECK-MANUAL}) THEN
+/* New version? */
+IF cRemoteVersion > cLocalVersion THEN
 DO:
-  MESSAGE 'A new version is available on the DataDigger website~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
-  IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
+  cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/latest'.
+  
+  IF plManualCheck THEN
+  DO:
+    MESSAGE 'A new version is available on the DataDigger website~n~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
+    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE(cNewVersionUrl).
+  END.
+  ELSE 
+    setRegistry('DataDigger:Update', 'NewVersionURL', cNewVersionUrl).
+
 END.
 
 ELSE
-/* New BETA version available */
-IF cRemoteBuildNr > cLocalBuildNr
-  AND (plManualCheck = TRUE OR piChannel <> {&CHECK-MANUAL}) THEN
+/* New BETA? */
+IF cRemoteBuildNr > cLocalBuildNr THEN
 DO:
-  MESSAGE 'A new BETA version is available on the DataDigger website~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
-  IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
+  cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/'.
+  
+  IF plManualCheck THEN
+  DO:
+    MESSAGE 'A new BETA version is available on the DataDigger website~n~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
+    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE(cNewVersionUrl).
+  END.
+  ELSE 
+    setRegistry('DataDigger:Update', 'NewVersionURL', cNewVersionUrl).
+
 END.
 
 ELSE
-/* In case of a manual check, report what is found */
-IF plManualCheck THEN
-  MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+/* Up to date */
+DO:
+  IF plManualCheck THEN
+    MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+  ELSE 
+    setRegistry('DataDigger:Update', 'NewVersionURL', '').
+END.
+

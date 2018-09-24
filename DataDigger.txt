@@ -19,6 +19,7 @@ DataDigger version 24 - dd MMM 2018 (Pure Gold)
 - Solved: Empty query saved in query list (Arno van der Ende)
 - Solved: Query tester does not show nr of results (Dirk Vreken)
 - Change: Query tester protects against long running queries
+- Change: First start with new version does not open DataDigger blog
 
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)

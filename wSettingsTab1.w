@@ -48,11 +48,11 @@ DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnPingBack 
      LABEL "More info" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "click for more info on pingback".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "click for more info on pingback".
 
 DEFINE BUTTON btnPingBackStats 
      LABEL "Statistics" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "Show statistics".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "Show statistics".
 
 DEFINE VARIABLE tgPingback AS LOGICAL INITIAL no 
      LABEL "Allow &pingback" 
@@ -61,7 +61,7 @@ DEFINE VARIABLE tgPingback AS LOGICAL INITIAL no
 
 DEFINE BUTTON btnClearCache 
      LABEL "Clear Cache" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "clear all objects from the cache".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "clear all objects from the cache".
 
 DEFINE VARIABLE fiPreCacheInterval AS INTEGER FORMAT ">>>,>>9":U INITIAL 0 
      LABEL "Interval" 
@@ -163,11 +163,11 @@ DEFINE VARIABLE tgShowHints AS LOGICAL INITIAL yes
 
 DEFINE BUTTON btnFactoryReset 
      LABEL "Go back to factory settings" 
-     SIZE-PIXELS 345 BY 24 TOOLTIP "delete all settings and start again".
+     SIZE-PIXELS 345 BY 26 TOOLTIP "delete all settings and start again".
 
 DEFINE BUTTON btnResetQuestions 
      LABEL "Reset all 'Do not ask again' questions" 
-     SIZE-PIXELS 345 BY 24 TOOLTIP "choose this if you want to restore questions".
+     SIZE-PIXELS 345 BY 26 TOOLTIP "choose this if you want to restore questions".
 
 DEFINE RECTANGLE RECT-20
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
@@ -175,7 +175,7 @@ DEFINE RECTANGLE RECT-20
 
 DEFINE BUTTON btnCheckNow 
      LABEL "Check Now" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "check on the latest version of DataDigger".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "check on the latest version of DataDigger".
 
 DEFINE VARIABLE cbUpdateChannel AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0 
      LABEL "Check" 
@@ -307,7 +307,7 @@ DEFINE FRAME frUpdate
      fiCurrentBuild AT Y 23 X 235 COLON-ALIGNED WIDGET-ID 186
      fiCurrentVersion AT Y 25 X 85 COLON-ALIGNED WIDGET-ID 188
      btnCheckNow AT Y 50 X 235 WIDGET-ID 180
-     cbUpdateChannel AT Y 52 X 85 COLON-ALIGNED WIDGET-ID 200
+     cbUpdateChannel AT Y 51 X 85 COLON-ALIGNED WIDGET-ID 200
      "Check for updates" VIEW-AS TEXT
           SIZE-PIXELS 110 BY 17 AT Y 2 X 15 WIDGET-ID 184
      RECT-19 AT Y 11 X 5 WIDGET-ID 176
