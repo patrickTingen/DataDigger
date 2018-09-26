@@ -2094,8 +2094,12 @@ DO:
 
   SET-SIZE(lp) = 0.
 
-  /* scroll-notify detects a mouse action in the scrollbar area of a browse. */
-  RUN resizeFilters(INPUT giCurrentPage).
+  /* Redraw filters on fields browse and table browse
+   * - table and favs is the same browse
+   * - index browse cannot scroll horizontally
+   */
+  RUN resizeFilters(INPUT {&PAGE-TABLES}).
+  RUN resizeFilters(INPUT {&PAGE-FIELDS}).
 
   FINALLY:
     SET-SIZE(lp) = 0.
@@ -5688,25 +5692,25 @@ PROCEDURE convertSettings :
     WHEN 19 THEN
     DO:
       /* Obsolete files */
-      OS-DELETE getNewVersion.p.
-      OS-DELETE getNewVersion.r.
-      OS-DELETE frLoadMapping.w.
-      OS-DELETE frLoadMapping.r.
-      OS-DELETE DataDigger.chm.
-      OS-DELETE image/default_ReleaseNotes.gif.
-      OS-DELETE image/default_FilterCombo.gif.
-      OS-DELETE image/default_FilterComboRed.gif.
-      OS-DELETE image/default_Star.gif.
-      OS-DELETE image/default_Tables.gif.
-      OS-DELETE image/default_PrevQuery.gif.
-      OS-DELETE image/default_NextQuery.gif.
-      OS-DELETE image/default_ViewAsList.gif.
-      OS-DELETE image/default_Pinned.gif.
-      OS-DELETE image/default_Unpinned.gif.
-      OS-DELETE image/default_Undock.gif.
-      OS-DELETE image/default_Dock.gif.
-      OS-DELETE image/default_Tab_Favorites_Active.gif.
-      OS-DELETE image/default_Tab_Favorites_Inactive.gif.
+      OS-DELETE VALUE(SEARCH("getNewVersion.p")).
+      OS-DELETE VALUE(SEARCH("getNewVersion.r")).
+      OS-DELETE VALUE(SEARCH("frLoadMapping.w")).
+      OS-DELETE VALUE(SEARCH("frLoadMapping.r")).
+      OS-DELETE VALUE(SEARCH("DataDigger.chm")).
+      OS-DELETE VALUE(SEARCH("image/default_ReleaseNotes.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_FilterCombo.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_FilterComboRed.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Star.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tables.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_PrevQuery.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_NextQuery.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_ViewAsList.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Pinned.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Unpinned.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Undock.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Dock.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Favorites_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Favorites_Inactive.gif")).
 
       /* Erase widths of table browse */
       setRegistry('DataDigger','ColumnWidth:cTableName',?).
@@ -5736,7 +5740,7 @@ PROCEDURE convertSettings :
 
     WHEN 20 THEN
     DO:
-      OS-DELETE wEdit.wrx.
+      OS-DELETE VALUE(SEARCH("wEdit.wrx")).
     END. /* 20 */
 
     WHEN 21 THEN
@@ -5746,28 +5750,12 @@ PROCEDURE convertSettings :
 
     WHEN 22 THEN
     DO:
-      OS-DELETE dAbout.w.
-      OS-DELETE dAbout.r.
-      OS-DELETE image/default_Tab_About_Active.gif.
-      OS-DELETE image/default_Tab_About_Inactive.gif.
-      OS-DELETE image/default_Tab_Changes_Active.gif.
-      OS-DELETE image/default_Tab_Changes_Inactive.gif.
-
-      /* A typo in DD19 prevented these from deletion */
-      OS-DELETE image/default_ReleaseNotes.gif.
-      OS-DELETE image/default_FilterCombo.gif.
-      OS-DELETE image/default_FilterComboRed.gif.
-      OS-DELETE image/default_Star.gif.
-      OS-DELETE image/default_Tables.gif.
-      OS-DELETE image/default_PrevQuery.gif.
-      OS-DELETE image/default_NextQuery.gif.
-      OS-DELETE image/default_ViewAsList.gif.
-      OS-DELETE image/default_Pinned.gif.
-      OS-DELETE image/default_Unpinned.gif.
-      OS-DELETE image/default_Undock.gif.
-      OS-DELETE image/default_Dock.gif.
-      OS-DELETE image/default_Tab_Favorites_Active.gif.
-      OS-DELETE image/default_Tab_Favorites_Inactive.gif.
+      OS-DELETE VALUE(SEARCH("dAbout.w")).
+      OS-DELETE VALUE(SEARCH("dAbout.r")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_About_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_About_Inactive.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Changes_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Changes_Inactive.gif")).
     END. /* 22 */
 
     WHEN 23 THEN
@@ -5792,26 +5780,61 @@ PROCEDURE convertSettings :
       setRegistry("DataDigger", "ColumnWidth:iNumQueries", ?).
 
       /* dHint.w is not used */
-      OS-DELETE dHint.w.
-      OS-DELETE dHint.r.
+      OS-DELETE VALUE(SEARCH("dHint.w")).
+      OS-DELETE VALUE(SEARCH("dHint.r")).
+
+      /* A typo in previous versions prevented these from deletion */
+      /* DD19 */
+      OS-DELETE VALUE(SEARCH("getNewVersion.p")).
+      OS-DELETE VALUE(SEARCH("getNewVersion.r")).
+      OS-DELETE VALUE(SEARCH("frLoadMapping.w")).
+      OS-DELETE VALUE(SEARCH("frLoadMapping.r")).
+      OS-DELETE VALUE(SEARCH("DataDigger.chm")).
+      OS-DELETE VALUE(SEARCH("image/default_ReleaseNotes.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_FilterCombo.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_FilterComboRed.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Star.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tables.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_PrevQuery.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_NextQuery.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_ViewAsList.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Pinned.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Unpinned.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Undock.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Dock.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Favorites_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Favorites_Inactive.gif")).
+
+      /* DD20 */
+      OS-DELETE VALUE(SEARCH("wEdit.wrx")).
+
+      /* DD22 */
+      OS-DELETE VALUE(SEARCH("dAbout.w")).
+      OS-DELETE VALUE(SEARCH("dAbout.r")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_About_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_About_Inactive.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Changes_Active.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Tab_Changes_Inactive.gif")).
 
       /* Obsolete stuff */
-      OS-DELETE wAbout.wrx.
-      OS-DELETE dChooseFont.w.  /* replaced with adecomm/_chsfont.p */
-      OS-DELETE dChooseColor.w. /* replaced with adecomm/_chscolr.p */
-      OS-DELETE image/default_AboutTitle.gif.
-      OS-DELETE image/default_AboutTitle2.gif.
-      OS-DELETE image/default_AboutTitle3.gif.
-      OS-DELETE image/default_Paddle.gif.
-      OS-DELETE image/default_Download.gif.
-      OS-DELETE image/default_Download_ins.gif.
-      OS-DELETE image/default_Upload.gif.
-      OS-DELETE image/default_ResizeHor.gif.
-      OS-DELETE image/default_Ok.gif.
-      OS-DELETE image/default_Back.gif.
-      OS-DELETE image/default_Compare.gif.
-      OS-DELETE image/default_DataDigger16x16.gif.
-      OS-DELETE image/default_Forward.gif.
+      OS-DELETE VALUE(SEARCH("image/default_ViewAsEditor.gif.jpg")). /* actually still from DD19 */
+      OS-DELETE VALUE(SEARCH("DataDiggerAbout.txt")).
+      OS-DELETE VALUE(SEARCH("wAbout.wrx")).
+      OS-DELETE VALUE(SEARCH("dChooseFont.w")).  /* replaced with adecomm/_chsfont.p */
+      OS-DELETE VALUE(SEARCH("dChooseColor.w")). /* replaced with adecomm/_chscolr.p */
+      OS-DELETE VALUE(SEARCH("image/default_AboutTitle.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_AboutTitle2.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_AboutTitle3.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Paddle.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Download.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Download_ins.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Upload.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_ResizeHor.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Ok.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Back.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Compare.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_DataDigger16x16.gif")).
+      OS-DELETE VALUE(SEARCH("image/default_Forward.gif")).
 
       /* Setting '<PROGDIR>' renamed to '<WORKDIR>' */
       cValue = getRegistry("DataDigger:Backup", "BackupDir").
@@ -12155,24 +12178,23 @@ PROCEDURE showTour :
    */
   hintBlock:
   DO WITH FRAME frMain:
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nWelcome to 'DataDigger in 1 minute'").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n       Welcome to ~n~n'DataDigger in 30 seconds'").
     IF glHintCancelled THEN LEAVE hintBlock.
 
     /* Select a table and show data */
     RUN setPage({&PAGE-TABLES}).
     RUN setTableView(NO,YES).
 
-    RUN showHint(brTables:HANDLE     , {&ARROW-LEFT-UP}   , "~nHere are all tables of the currently connected databases").
-    RUN showHint(fiTableFilter:HANDLE, {&ARROW-LEFT-UP}   , "~nType in (a part of) the table name to filter the browse").
-    RUN showHint(btnFavourite:HANDLE , {&ARROW-LEFT-DOWN} , "~nMark tables as favourite").
-    RUN showHint(ficWhere:HANDLE,      {&ARROW-RIGHT-UP}  , "~nYour custom query goes here ...").
-    RUN showHint(btnViewData:HANDLE  , {&ARROW-RIGHT-DOWN}, "~nPress enter or click this button to show the data").
+    /* nr of tips */
+    &SCOPED-DEFINE t 10
 
-    /* Filter fields */
-    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(1), {&ARROW-LEFT-UP}, "~nHide fields by deselecting them here").
-    RUN showHint(BROWSE brFields:GET-BROWSE-COLUMN(5), {&ARROW-RIGHT-UP}, "~nClick on the format to change it on the fly").
-    RUN showHint(btnReset:HANDLE                     , {&ARROW-RIGHT-UP}, "~nRe-arrange fields with the buttons in this panel").
+    RUN showHint(brTables:HANDLE       , {&ARROW-LEFT-UP}  , "1/{&t}~n~nHere are all tables of the currently connected databases").
+    RUN showHint(fiTableFilter:HANDLE  , {&ARROW-LEFT-UP}  , "2/{&t}~n~nType in (a part of) the table name to filter the browse").
+    RUN showHint(btnFavourite:HANDLE   , {&ARROW-LEFT-DOWN}, "3/{&t}~n~nMark tables as favourite").
+    RUN showHint(BROWSE brFields:HANDLE, {&ARROW-RIGHT-UP} , "4/{&t}~n~nHide fields by unchecking the toggle or click on the format to change it on the fly (just your session, not the db)").
 
+    RUN showHint(ficWhere:HANDLE,        {&ARROW-RIGHT-UP} , "5/{&t}~n~nYour custom query goes here ...").
+    
     /* Let the hint frame point to the 2nd visible filter instead of the 1st */
     #Column:
     FOR EACH bColumn:
@@ -12180,40 +12202,32 @@ PROCEDURE showTour :
       iColumn = iColumn + 1.
       IF iColumn > 1 THEN
       DO:
-        RUN showHint(bColumn.hFilter, {&ARROW-LEFT-UP}, "~nFilter data by filling in the filter boxes. Your filters are saved for re-use").
+        RUN showHint(bColumn.hFilter, {&ARROW-LEFT-DOWN}, "6/{&t}~n~nFilter data by filling in the filter boxes. Your filters are saved for re-use").
         LEAVE #Column.
       END.
     END.
 
     /* Confess the lie */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nOk, I lied :)~nIt's more than 1 minute, but you're almost done!").
-
-    /* Resize bar */
-    RUN showHint(btnResizeVer:HANDLE, {&ARROW-RIGHT-UP}, "~nDrag this bar up and down to change the size of the upper browse.").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nOk, I lied :)~n~nIt's more than 30 seconds, but you're almost done!").
 
     iColumn = 0.
     #Column:
     FOR EACH bColumn:
       IF NOT bColumn.hColumn:VISIBLE THEN NEXT #Column.
       iColumn = iColumn + 1.
-      IF iColumn = 1 THEN DO:
-        RUN showHint(bColumn.hColumn,   {&ARROW-LEFT-DOWN}, "~nClick on a column header to sort on that column. Again to change the sort").
-        RUN showHint(btnDataSort:HANDLE IN FRAME frData,{&ARROW-LEFT-UP}, "~nUse CONTROL + CLICK or this button to add up to 9 sort levels").
-      END.
+      IF iColumn = 1 THEN 
+        RUN showHint(btnDataSort:HANDLE IN FRAME frData,{&ARROW-LEFT-UP}, "7/{&t}~n~n(Control) Click on column headers or this button to add up to 9 sort levels").
       ELSE
       IF iColumn = 2 THEN
-        RUN showHint(bColumn.hColumn, {&ARROW-LEFT-DOWN}, "~nGrab the side of a column to resize it.").
+        RUN showHint(bColumn.hColumn, {&ARROW-LEFT-DOWN}, "8/{&t}~n~nGrab the side of a column to resize it.").
       ELSE
         LEAVE #Column.
     END.
 
-    RUN showHint(btnQueries:HANDLE, {&ARROW-RIGHT-UP}, "~nQueries are saved here for re-use (hint: try PGUP / PGDN in the query box)").
+    RUN showHint(btnQueries:HANDLE, {&ARROW-RIGHT-UP}, "9/{&t}~n~nQueries are saved here for re-use (hint: try PGUP / PGDN in the query box)").
 
     /* Manipulate data */
-    RUN showHint(btnEdit:HANDLE   , {&ARROW-LEFT-DOWN}, "~nAdd, update, clone, delete, dump records easily using these buttons").
-
-    /* Extra options */
-    RUN showHint(btnTools:HANDLE  , {&ARROW-LEFT-UP}, "~nOk, last tip. Use this for settings and extra tools").
+    RUN showHint(btnEdit:HANDLE   , {&ARROW-LEFT-DOWN}, "10/{&t}~n~nEdit records easily via these buttons or a double click / right click on the data browse").
 
     /* Done! */
     RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
@@ -12505,7 +12519,6 @@ PROCEDURE startSession :
     fiFeedback:PRIVATE-DATA = getRegistry('DataDigger:Update', 'NewVersionURL').
     fiFeedback:BGCOLOR = 14.
     fiFeedback:FGCOLOR = 4.
-    fiFeedback:FONT = 6.    
     RUN endResize.
   END.
 
@@ -13334,4 +13347,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

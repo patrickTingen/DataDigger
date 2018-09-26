@@ -8,6 +8,14 @@
 
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
+Beta 20180925
+- Solved: DD folder contains obsolete files that survived previous versions
+- Solved: Query tester window a bit too small
+- Solved: Filter buttons on field browse did not move while scrolling
+- Solved: Intro for new users too long
+- Solved: Upgrade-available-message too wide for frame
+- Solved: Cannot start DataDigger without databases (Landry Dubus)
+
 Beta 20180924
 - Solved: Focus on wrong window after update with multiple Diggers (Dirk Vreken)
 - Solved: Character extent fields generate error when editing (Dirk Vreken)

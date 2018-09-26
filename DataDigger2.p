@@ -225,6 +225,35 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
+&IF DEFINED(EXCLUDE-createDummyDb) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createDummyDb Procedure 
+PROCEDURE createDummyDb :
+/* Create an empty dummy db
+*/
+  DEFINE OUTPUT PARAMETER pcDummyDir AS CHARACTER NO-UNDO.
+
+  DEFINE VARIABLE cDatabase AS CHARACTER NO-UNDO.
+
+  REPEAT:
+    pcDummyDir = SESSION:TEMP-DIR + 'DataDigger_' + STRING(ETIME).
+    FILE-INFORMATION:FILE-NAME = pcDummyDir.
+    IF FILE-INFORMATION:FULL-PATHNAME = ? THEN LEAVE.
+  END.
+
+  OS-CREATE-DIR VALUE(pcDummyDir).
+  cDatabase = pcDummyDir + '\Empty.db'.
+  CREATE DATABASE cDatabase FROM "EMPTY" REPLACE NO-ERROR.
+
+  IF NOT ERROR-STATUS:ERROR THEN CONNECT VALUE(cDatabase) -1.
+
+END PROCEDURE. /* createDummyDb */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-DataDigger) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDigger Procedure 
@@ -371,6 +400,7 @@ PROCEDURE recompileDataDigger :
   */
   DEFINE VARIABLE cSetting   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lRecompile AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE cDummyDir  AS CHARACTER   NO-UNDO.
 
   /* You can specify in the settings that you do not want to compile
    * This can be useful when you use DD in multiple environments
@@ -393,7 +423,28 @@ PROCEDURE recompileDataDigger :
       STOP.
     END.
 
+    /* If no databases connected, then create an empty db 
+     * so getVersion.p can be compiled */
+    IF NUM-DBS = 0 THEN 
+    DO:
+      RUN createDummyDb(OUTPUT cDummyDir).
+      
+      IF NUM-DBS = 0 THEN 
+      DO:
+        MESSAGE "Cannot create dummy database in folder" cDummyDir SKIP 
+                "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFO BUTTONS OK.
+        OS-COMMAND NO-WAIT START 'https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
+        STOP.
+      END.
+    END.
+
     RUN recompileSelf.
+
+    IF cDummyDir <> '' THEN 
+    DO:
+      DISCONNECT "Empty" NO-ERROR.
+      OS-DELETE VALUE(cDummyDir) RECURSIVE.
+    END.
 
     /* Force a restart of the library */
     RUN startDiggerLib(INPUT lRecompile).
@@ -878,3 +929,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+
