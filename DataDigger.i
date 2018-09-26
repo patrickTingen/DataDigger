@@ -96,14 +96,13 @@ DEFINE TEMP-TABLE ttField NO-UNDO RCODE-INFORMATION
   FIELD cInitial      AS CHARACTER                   LABEL "Initial"                     /* initial value from dict   */
   FIELD cFormat       AS CHARACTER                   LABEL "Format"    FORMAT "X(80)"    /* user defined format       */
   FIELD cFormatOrg    AS CHARACTER                   LABEL "Format"                      /* original format           */
+  FIELD iWidth        AS INTEGER                     LABEL "Width"                       /* SQL width                 */
   FIELD cLabel        AS CHARACTER                   LABEL "Label"     FORMAT "X(50)"
   FIELD iOrderOrg     AS DECIMAL                                                         /* original order            */
   FIELD iExtent       AS INTEGER                     LABEL "Extent"    FORMAT ">>>>9"
   FIELD lPrimary      AS LOGICAL                     LABEL "Prim"                        /* part of prim index?       */
   FIELD lMandatory    AS LOGICAL                     LABEL "Man"                         /* mandatory?                */
   FIELD lUniqueIdx    AS LOGICAL                     LABEL "Uni"                         /* part of unique index?     */
-
-  /* New fields as per v19 */
   FIELD cColLabel     AS CHARACTER                   LABEL "Column Label" FORMAT "x(24)"
   FIELD iDecimals     AS INTEGER                     LABEL "Decimals"     FORMAT ">>9"
   FIELD iFieldRpos    AS INTEGER                     LABEL "R-pos"        FORMAT ">>>>9"
@@ -114,7 +113,6 @@ DEFINE TEMP-TABLE ttField NO-UNDO RCODE-INFORMATION
   FIELD cViewAs       AS CHARACTER                   LABEL "View-As"      FORMAT "x(40)"
 
   /* These fields must be moved to ttColumn */
-/*  FIELD lDataField    AS LOGICAL                                                         /* show in data browse */ */
   FIELD cFilterValue  AS CHARACTER
   FIELD cNewValue     AS CHARACTER                   LABEL "New value" FORMAT "x(256)"
   FIELD cOldValue     AS CHARACTER                   LABEL "Old value" FORMAT "x(256)"
@@ -140,7 +138,6 @@ DEFINE TEMP-TABLE ttColumn NO-UNDO RCODE-INFORMATION
   FIELD iExtent       AS INTEGER            LABEL "Extent"    FORMAT ">>>>9"
 
   FIELD cFullName     AS CHARACTER          LABEL "Name"      FORMAT "X(40)"    /* fieldname incl extent     */
-/*  FIELD lDataField    AS LOGICAL            /* show in data browse */ */
   FIELD cFilterValue  AS CHARACTER          /* for setting shadow color */
   FIELD cNewValue     AS CHARACTER          LABEL "New value" FORMAT "X(256)" /* for wEdit */
   FIELD cOldValue     AS CHARACTER          LABEL "Old value" FORMAT "X(256)" /* for wEdit */

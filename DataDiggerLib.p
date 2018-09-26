@@ -1800,6 +1800,7 @@ PROCEDURE getFields :
       bField.cInitial      = hBufferField:BUFFER-FIELD('_initial'):BUFFER-VALUE
       bField.cFormat       = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE
       bField.cFormatOrg    = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE
+      bField.iWidth        = hBufferField:BUFFER-FIELD('_width'):BUFFER-VALUE
       bField.cLabel        = hBufferField:BUFFER-FIELD('_label'):BUFFER-VALUE
       bField.lPrimary      = CAN-DO(cPrimIndexFields, bField.cFieldName)
       bField.iExtent       = hBufferField:BUFFER-FIELD('_Extent'):BUFFER-VALUE
@@ -4980,4 +4981,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

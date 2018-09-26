@@ -8,6 +8,10 @@
 
 DataDigger version 24 - dd MMM 2018 (Pure Gold)
 
+Beta
+- Solved: On compile error, DataDigger.log cannot be found (Johan Geerts)
+- Solved: Editing character field with unknown value gives error (Johan Geerts)
+
 Beta 20180925
 - Solved: DD folder contains obsolete files that survived previous versions
 - Solved: Query tester window a bit too small
@@ -15,20 +19,6 @@ Beta 20180925
 - Solved: Intro for new users too long
 - Solved: Upgrade-available-message too wide for frame
 - Solved: Cannot start DataDigger without databases (Landry Dubus)
-
-Beta 20180924
-- Solved: Focus on wrong window after update with multiple Diggers (Dirk Vreken)
-- Solved: Character extent fields generate error when editing (Dirk Vreken)
-- Change: On new version, user has option to not go to DD website (Johan Geerts)
-- Change: Don't save window position when minimized/maximized (Johan Geerts)
-- Solved: Long labels not fully shown in field browse (Johan Geerts)
-- Solved: Columns in edit window too small
-- Solved: Table browse moves selected table to top of browse (Mike Derrick)
-- Solved: Field browse moves selected field to top after sort (Dirk Vreken)
-- Solved: Empty query saved in query list (Arno van der Ende)
-- Solved: Query tester does not show nr of results (Dirk Vreken)
-- Change: Query tester protects against long running queries
-- Change: First start with new version does not open DataDigger blog
 
 Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
@@ -88,8 +78,16 @@ Fixes from previous betas:
 - Solved: Favourites screen could not be escaped if run from DWP (Jeroen Beugels)
 - Solved: Changing tables shows fields/indexes while reading table info (Jeroen Beugels)
 - Solved: Events from DD show up in DWP Debugger (Jeroen Beugels)
-- Change: Beta version of DD always checks on new beta version
+- Solved: Focus on wrong window after update with multiple Diggers (Dirk Vreken)
+- Solved: Character extent fields generate error when editing (Dirk Vreken)
+- Solved: Long labels not fully shown in field browse (Johan Geerts)
+- Solved: Columns in edit window too small
+- Solved: Table browse moves selected table to top of browse (Mike Derrick)
+- Solved: Field browse moves selected field to top after sort (Dirk Vreken)
+- Solved: Empty query saved in query list (Arno van der Ende)
+- Solved: Query tester does not show nr of results (Dirk Vreken)
 
+- Change: Beta version of DD always checks on new beta version
 - Change: Setting for 'Show Column For Recid/Rowid' removed
 - Change: Layout fixes for larger fonts on settings screen
 - Change: Export to csv now uses field names instead of labels #13
@@ -113,6 +111,10 @@ Fixes from previous betas:
 - Change: Shortcut for query history changed to CTRL-SHIFT-P
 - Change: DataDigger phone home now via is.gd instead of goo.gl
 - Change: Shortcut for query history changed to CTRL-SHIFT-P
+- Change: On new version, user has option to not go to DD website (Johan Geerts)
+- Change: Don't save window position when minimized/maximized (Johan Geerts)
+- Change: Query tester protects against long running queries
+- Change: First start with new version does not open DataDigger blog
 
 - New   : Option to set table name as first element in window title #26 (Johan Geerts)
 - New   : Option to generate an include file with tt definitions

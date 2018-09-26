@@ -476,6 +476,7 @@ PROCEDURE recompileSelf :
   DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cWorkfolder        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cLogFile           AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
@@ -528,7 +529,8 @@ PROCEDURE recompileSelf :
   SESSION:SET-WAIT-STATE("general").
 
   /* Open log */
-  OUTPUT TO VALUE(gcProgramDir + "DataDigger.log").
+  cLogFile = gcProgramDir + "DataDigger.log".
+  OUTPUT TO VALUE(cLogFile).
   PUT UNFORMATTED "DataDigger recompile as of " STRING(NOW,"99-99-9999 HH:MM:SS").
 
   FILE-INFO:FILE-NAME = "prowin32.exe".
@@ -664,7 +666,7 @@ PROCEDURE recompileSelf :
   DO:
     MESSAGE "An error occurred while recompiling. ~n~nPlease check 'DataDigger.log' in the DataDigger directory."
       VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-    OS-COMMAND NO-WAIT START "datadigger.log".
+    OS-COMMAND NO-WAIT START VALUE(cLogFile).
   END.
 
   /* Clean up */
