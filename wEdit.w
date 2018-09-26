@@ -1485,21 +1485,15 @@ PROCEDURE initializeObject :
       
       IF bField.cDatatype = 'character' THEN
       DO:
-/*         iMaxLength = MAXIMUM(iMaxLength, LENGTH(STRING(bColumn.cNewValue,bField.cFormat)), LENGTH(bColumn.cNewValue)). */
         iFieldLength = INTEGER(TRIM(bField.cFormat,'X()')) NO-ERROR.
         IF iFieldLength = ? THEN iFieldLength = MAXIMUM(8,bField.iWidth).
-
         iMaxLength = MAXIMUM(iMaxLength, iFieldLength).
       END.
     END.
     
     /* If the data is longer than the format allows, adjust format up to a max of 10k */
     IF bField.cDatatype = 'character' THEN
-    DO:
-      MESSAGE bField.cFieldname iMaxLength
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
       bField.cFormat = SUBSTITUTE('x(&1)', MINIMUM(iMaxLength * 2,10000)).
-    END.
   END.
    
   /* When editing records, keep a copy of the original data */
@@ -1754,4 +1748,3 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
