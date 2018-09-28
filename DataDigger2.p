@@ -231,20 +231,17 @@ END.
 PROCEDURE createDummyDb :
 /* Create an empty dummy db
 */
-  DEFINE OUTPUT PARAMETER pcDummyDir AS CHARACTER NO-UNDO.
-
+  DEFINE OUTPUT PARAMETER pcDummyDb AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cDatabase AS CHARACTER NO-UNDO.
 
   REPEAT:
-    pcDummyDir = SESSION:TEMP-DIR + 'DataDigger_' + STRING(ETIME).
-    FILE-INFORMATION:FILE-NAME = pcDummyDir.
+    pcDummyDb = "DD_" + STRING(ETIME).
+    cDatabase = SESSION:TEMP-DIR + pcDummyDb + ".db".
+    FILE-INFORMATION:FILE-NAME = cDatabase.
     IF FILE-INFORMATION:FULL-PATHNAME = ? THEN LEAVE.
   END.
 
-  OS-CREATE-DIR VALUE(pcDummyDir).
-  cDatabase = pcDummyDir + '\Empty.db'.
   CREATE DATABASE cDatabase FROM "EMPTY" REPLACE NO-ERROR.
-
   IF NOT ERROR-STATUS:ERROR THEN CONNECT VALUE(cDatabase) -1.
 
 END PROCEDURE. /* createDummyDb */
@@ -266,6 +263,29 @@ PROCEDURE DataDigger :
   IF giNumDiggers = 0 THEN APPLY 'close' TO THIS-PROCEDURE.
 
 END PROCEDURE. /* DataDigger */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-deleteDummyDb) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteDummyDb Procedure 
+PROCEDURE deleteDummyDb :
+/* Create the empty dummy db
+*/
+  DEFINE INPUT PARAMETER pcDummyDb AS CHARACTER NO-UNDO.
+
+  DISCONNECT VALUE(pcDummyDb) NO-ERROR.
+
+  OS-DELETE VALUE(SESSION:TEMP-DIR + pcDummyDb + ".lg").
+  OS-DELETE VALUE(SESSION:TEMP-DIR + pcDummyDb + ".b1").
+  OS-DELETE VALUE(SESSION:TEMP-DIR + pcDummyDb + ".d1").
+  OS-DELETE VALUE(SESSION:TEMP-DIR + pcDummyDb + ".db").
+  OS-DELETE VALUE(SESSION:TEMP-DIR + pcDummyDb + ".st").
+
+END PROCEDURE. /* deleteDummyDb */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -400,7 +420,7 @@ PROCEDURE recompileDataDigger :
   */
   DEFINE VARIABLE cSetting   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lRecompile AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE cDummyDir  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDummyDb   AS CHARACTER   NO-UNDO.
 
   /* You can specify in the settings that you do not want to compile
    * This can be useful when you use DD in multiple environments
@@ -427,11 +447,11 @@ PROCEDURE recompileDataDigger :
      * so getVersion.p can be compiled */
     IF NUM-DBS = 0 THEN 
     DO:
-      RUN createDummyDb(OUTPUT cDummyDir).
+      RUN createDummyDb(OUTPUT cDummyDb).
       
       IF NUM-DBS = 0 THEN 
       DO:
-        MESSAGE "Cannot create dummy database in folder" cDummyDir SKIP 
+        MESSAGE "Cannot create dummy database in folder" cDummyDb SKIP 
                 "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFO BUTTONS OK.
         OS-COMMAND NO-WAIT START 'https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
         STOP.
@@ -440,11 +460,8 @@ PROCEDURE recompileDataDigger :
 
     RUN recompileSelf.
 
-    IF cDummyDir <> '' THEN 
-    DO:
-      DISCONNECT "Empty" NO-ERROR.
-      OS-DELETE VALUE(cDummyDir) RECURSIVE.
-    END.
+    IF cDummyDb <> '' THEN 
+      RUN deleteDummyDb(cDummyDb).
 
     /* Force a restart of the library */
     RUN startDiggerLib(INPUT lRecompile).

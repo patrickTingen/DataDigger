@@ -12419,7 +12419,6 @@ PROCEDURE startSession :
   DEFINE VARIABLE lUpgraded      AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lOpenBlog      AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE iChannel       AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cRemoteVersion AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cRemoteBuildNr AS CHARACTER NO-UNDO.
 
   /* Set debug flag */
@@ -12502,7 +12501,7 @@ PROCEDURE startSession :
     /* If you are using a build that is newer than the production version, 
      * you are in the beta program. Then automatically check for beta changes 
      */
-    RUN getVersionInfo.p(INPUT 'master', OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
+    RUN getVersionInfo.p(INPUT 'master', OUTPUT cRemoteBuildNr).
     IF '{build.i}' > cRemoteBuildNr THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
     
     /* Check for new versions on GitHub */
@@ -12511,8 +12510,7 @@ PROCEDURE startSession :
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
   END.
   
-  IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' 
-  OR getRegistry('DataDigger:Update','RemoteVersion') > '{version.i}' THEN
+  IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' THEN
   DO WITH FRAME frMain:
     fiFeedback:SCREEN-VALUE = '  New version available, click for info'.
     fiFeedback:TOOLTIP = 'click to open GitHub page'.
