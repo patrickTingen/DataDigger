@@ -1,25 +1,31 @@
 # DataDigger
+
 A dynamic, open source dataviewer for your Progress / OpenEdge databases
 
-## History
-In 2008 I needed a tool like this and ended up with DataHack
-made by Richard Tardivon. Soon I started fiddling with the
-program and after a few months I decided to fork it under the
-name of DataDigger. Build 13 of 13 jan 2010 was the first that
-appeared on the OpenEdge Hive. Starting with v19 the home of 
-the DataDigger is at GitHub
+## Getting started
 
-## References
+- Download DataDigger and extract it its own folder. 
+- Add your own database connections to DataDigger.pf 
+- Start DataDigger.p 
+
+Note that DataDigger recognises db’s that are connected at startup.
+You can define extra database connections inside DataDigger or connect them on the fly.
+
 - For general info consult the [DataDigger blog](<https://datadigger.wordpress.com>)
 - Download [stable](<https://github.com/patrickTingen/DataDigger/archive/master.zip>) or [develop](<https://github.com/patrickTingen/DataDigger/archive/develop.zip>) version
-- All versions can be fount at the [Releases page](<https://github.com/patrickTingen/DataDigger/releases/latest>)
+- All versions can be found at the [Releases page](<https://github.com/patrickTingen/DataDigger/releases/latest>)
 - Technical info is in the [wiki](<https://github.com/patrickTingen/DataDigger/wiki>)
-- Suggestions and bugreports via the [issue tracker](<https://github.com/patrickTingen/DataDigger/issues>) or via [mail](mailto:patrick@tingen.net)
+- Send your suggestions and bugreports via the [issue tracker](<https://github.com/patrickTingen/DataDigger/issues>) or via [mail](mailto:patrick@tingen.net)
 - DataDigger is published under the [GPL v3.0](<https://github.com/patrickTingen/DataDigger/blob/master/LICENSE>) license
 
 Special thanks to the members of the DataDigger testing team!
 
+## History
+
+In 2008 I needed a tool like this and ended up with DataHack made by Richard Tardivon. Soon I  started fiddling with the program and after a few months I decided to fork it under the name of DataDigger. Build 13 of 13 jan 2010 was the first that appeared on the OpenEdge Hive. Starting with v19 the home of the DataDigger is at GitHub.
+
 ## Version history:
+
 - DataDigger 24 -  1 oct 2018 (Pure Gold)
 - DataDigger 23 - 15 apr 2017 (Easter Egg Edition)
 - DataDigger 22 - 20 feb 2017 (Titanium)

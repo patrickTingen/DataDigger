@@ -6,21 +6,8 @@
 
 =====================================================================================
 
-DataDigger version 24 - dd MMM 2018 (Pure Gold)
+DataDigger version 24 - 26 sep 2018 (Pure Gold)
 
-Beta
-- Solved: On compile error, DataDigger.log cannot be found (Johan Geerts)
-- Solved: Editing character field with unknown value gives error (Johan Geerts)
-
-Beta 20180925
-- Solved: DD folder contains obsolete files that survived previous versions
-- Solved: Query tester window a bit too small
-- Solved: Filter buttons on field browse did not move while scrolling
-- Solved: Intro for new users too long
-- Solved: Upgrade-available-message too wide for frame
-- Solved: Cannot start DataDigger without databases (Landry Dubus)
-
-Fixes from previous betas:
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
 - Solved: Setting for 'Show Column For Recid/Rowid' was ignored (Mike Raschendorfer)
@@ -86,6 +73,14 @@ Fixes from previous betas:
 - Solved: Field browse moves selected field to top after sort (Dirk Vreken)
 - Solved: Empty query saved in query list (Arno van der Ende)
 - Solved: Query tester does not show nr of results (Dirk Vreken)
+- Solved: DD folder contains obsolete files that survived previous versions
+- Solved: Query tester window a bit too small
+- Solved: Filter buttons on field browse did not move while scrolling
+- Solved: Intro for new users too long
+- Solved: Upgrade-available-message too wide for frame
+- Solved: Cannot start DataDigger without databases (Landry Dubus)
+- Solved: On compile error, DataDigger.log cannot be found (Johan Geerts)
+- Solved: Editing character field with unknown value gives error (Johan Geerts)
 
 - Change: Beta version of DD always checks on new beta version
 - Change: Setting for 'Show Column For Recid/Rowid' removed
