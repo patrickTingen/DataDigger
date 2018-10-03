@@ -202,13 +202,13 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter btnFavourite ~
-cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnAddFavGroup btnWhere btnQueries btnView ~
-btnTools btnTabTables btnClear btnClearFieldFilter btnClearTableFilter ~
-btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset ~
-btnTableFilter btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+&Scoped-Define ENABLED-OBJECTS btnClearTableFilter btnTableFilter rctQuery ~
+rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll ~
+fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables ~
+brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere ~
+btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
 btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
 fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
@@ -453,7 +453,7 @@ DEFINE BUTTON btnClearIndexFilter
 DEFINE BUTTON btnClearTableFilter  NO-FOCUS FLAT-BUTTON
      LABEL "C" 
      CONTEXT-HELP-ID 950
-     SIZE-PIXELS 20 BY 21 TOOLTIP "clear all filters #(SHIFT-DEL)".
+     SIZE-PIXELS 20 BY 19 TOOLTIP "clear all filters #(SHIFT-DEL)".
 
 DEFINE BUTTON btnClipboard  NO-FOCUS FLAT-BUTTON
      LABEL "Cp" 
@@ -537,7 +537,7 @@ DEFINE BUTTON btnTabIndexes  NO-FOCUS FLAT-BUTTON
 DEFINE BUTTON btnTableFilter  NO-FOCUS FLAT-BUTTON
      LABEL "Y" 
      CONTEXT-HELP-ID 950
-     SIZE-PIXELS 20 BY 21 TOOLTIP "press arrow-down for extra filter options #(CTRL-DOWN)".
+     SIZE-PIXELS 20 BY 19 TOOLTIP "press arrow-down for extra filter options #(CTRL-DOWN)".
 
 DEFINE BUTTON btnTabTables  NO-FOCUS FLAT-BUTTON
      LABEL "Tbl" 
@@ -963,6 +963,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
+     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableFilter AT Y 3 X 56 NO-LABEL
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
@@ -987,14 +989,12 @@ DEFINE FRAME frMain
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
      btnClear AT Y 265 X 725 WIDGET-ID 30
      btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
-     btnClearTableFilter AT Y 4 X 237 WIDGET-ID 222
      btnClipboard AT Y 265 X 765 WIDGET-ID 178
      btnMoveBottom AT Y 143 X 790 WIDGET-ID 200
      btnMoveDown AT Y 121 X 790 WIDGET-ID 194
      btnMoveTop AT Y 55 X 790 WIDGET-ID 198
      btnMoveUp AT Y 77 X 790 WIDGET-ID 192
      btnReset AT Y 99 X 790 WIDGET-ID 196
-     btnTableFilter AT Y 4 X 257 WIDGET-ID 38
      btnViewData AT Y 265 X 705
      btnTabFavourites AT Y 122 X 33 WIDGET-ID 302
      btnTabFields AT Y 45 X 303 WIDGET-ID 156
@@ -1019,46 +1019,17 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1096,17 +1067,46 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 0 X 2 WIDGET-ID 296
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -6060,6 +6060,14 @@ PROCEDURE createMenuTableBrowse :
     END.
     INPUT CLOSE.
 
+    /* Generate via template only when the template generator is present.
+     * will be in DD25, but some people just can't wait :) */
+    IF SEARCH('wTemplate.w') <> ? THEN
+    DO:
+      hMenuItem = createMenuItem(hSubMenu,"Item","generate via template").
+      ON "CHOOSE" OF hMenuItem PERSISTENT RUN startGenerateProc IN THIS-PROCEDURE ('wTemplate.w').
+    END.
+
     /* Set/unset as favourite */
     hMenuItem = createMenuItem(hMenu,"Item","Set / Unset as Favourite").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN toggleFavourite IN THIS-PROCEDURE.
@@ -6880,13 +6888,13 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnAddFavGroup btnWhere btnQueries btnView btnTools 
-         btnTabTables btnClear btnClearFieldFilter btnClearTableFilter 
-         btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
-         btnTableFilter btnTabFavourites btnTabFields btnTabIndexes 
+  ENABLE btnClearTableFilter btnTableFilter rctQuery rctEdit fiTableFilter 
+         btnFavourite cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter 
+         fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes 
+         tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnAddFavGroup 
+         btnWhere btnQueries btnView btnTools btnTabTables btnClear 
+         btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
+         btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
          btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
@@ -6988,7 +6996,7 @@ PROCEDURE endResize :
       rcTableFilter:X = rctQuery:X + 20
       rcTableFilter:Y = rctQuery:Y + 24
       rcTableFilter:WIDTH-PIXELS = 245
-      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y - 2
+      rcTableFilter:HEIGHT-PIXELS = btnResizeVer:Y - rcTableFilter:Y - 2 + 2
 
       brTables:X = rcTableFilter:X + 3
       brTables:Y = rcTableFilter:Y + 3
@@ -13345,3 +13353,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

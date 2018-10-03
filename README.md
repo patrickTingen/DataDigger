@@ -26,7 +26,7 @@ In 2008 I needed a tool like this and ended up with DataHack made by Richard Tar
 
 ## Version history:
 
-- DataDigger 24 -  1 oct 2018 (Pure Gold)
+- DataDigger 24 -  3 oct 2018 (Pure Gold)
 - DataDigger 23 - 15 apr 2017 (Easter Egg Edition)
 - DataDigger 22 - 20 feb 2017 (Titanium)
 - DataDigger 21 -  8 nov 2016 (US Election Day Edition)

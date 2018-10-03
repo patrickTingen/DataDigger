@@ -5,13 +5,14 @@
   WARNING: This .txt file is for documentation purposes.
            It will be overwritten with each new version of DataDigger.
 
-           Create your own custom procedure by copying this program to
+  More information on the DataDigger wiki on customization
+  Check https://github.com/patrickTingen/DataDigger/wiki
+  
+  tl;dr:   Create your own custom procedure by copying this program to
            "myDataDigger.p". It will then be compiled and started when DD
-           starts. In future versions of the DataDigger, myDataDigger.p
-           will not be overwritten.
-           
+           starts. The file 'myDataDigger.p' (extension ".P") will never be
+           part of the distribution, so your version will not be overwritten.
            Using QAD? Look for #QAD tags in this file.
-           
 
   HISTORY: DD18: customFilter added.
            DD18: customDump moved here instead of having its own .p

@@ -6,7 +6,7 @@
 
 =====================================================================================
 
-DataDigger version 24 - 26 sep 2018 (Pure Gold)
+DataDigger version 24 - 3 oct 2018 (Pure Gold)
 
 - Solved: Auto-connect list gives error on duplicate tables (Peter Frederick)
 - Solved: Double-click on hidden field does not show the field
@@ -81,6 +81,7 @@ DataDigger version 24 - 26 sep 2018 (Pure Gold)
 - Solved: Cannot start DataDigger without databases (Landry Dubus)
 - Solved: On compile error, DataDigger.log cannot be found (Johan Geerts)
 - Solved: Editing character field with unknown value gives error (Johan Geerts)
+- Solved: Small layout issues with red filter lines
 
 - Change: Beta version of DD always checks on new beta version
 - Change: Setting for 'Show Column For Recid/Rowid' removed
@@ -124,6 +125,7 @@ DataDigger version 24 - 26 sep 2018 (Pure Gold)
 - New   : Option to use multiple favourites groups (Didier Dujardin)
 - New   : Option to use other folder as workfolder (movedoa)
 - New   : F10 can toggle readonly mode back to updatemode (Johan Geerts) 
+- New   : Added foundation for template-based file generation (Jeroen Beugels)
 
 
 =====================================================================================
