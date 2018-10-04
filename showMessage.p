@@ -1,66 +1,67 @@
 /*------------------------------------------------------------------------
-  Name         : showMessage.p
-  Description  : Show a user defined message in a new window.
-  ---------------------------------------------------------------------- 
-  16-09-2012 pti Created
+
+  File : ShowMessage.p
+  Desc : Show a user defined message in a new window.
+
   ----------------------------------------------------------------------*/
+DEFINE INPUT  PARAMETER pcTitle   AS CHARACTER NO-UNDO.
+DEFINE INPUT  PARAMETER pcMessage AS CHARACTER NO-UNDO.
+DEFINE OUTPUT PARAMETER phWindow  AS HANDLE NO-UNDO.
 
-define input parameter pcTitle as character.
-define input parameter pcMessage as character.
-define output parameter phWindow as handle.
+DEFINE VARIABLE cMessage   AS CHARACTER   NO-UNDO FORMAT "x(256)".
+DEFINE VARIABLE iFont      AS INTEGER     NO-UNDO.
+DEFINE VARIABLE iWidth     AS INTEGER     NO-UNDO.
+DEFINE VARIABLE winMessage AS HANDLE      NO-UNDO.
 
-define variable cMessage   as character   no-undo format "x(256)".
-define variable iFont      as integer     no-undo.
-define variable iWidth     as integer     no-undo.
-define variable winMessage as handle      no-undo.
-
-define frame infoFrame
-cMessage view-as fill-in size 1 by 1 at row 1.5 col 1.5 no-label
-with 1 down no-box overlay side-labels three-d at col 1 row 1 size-pixels 50 by 40.
+DEFINE FRAME infoFrame
+cMessage VIEW-AS FILL-IN SIZE 1 BY 1 AT ROW 1.5 COLUMN 1.5 NO-LABEL
+WITH 1 DOWN NO-BOX OVERLAY SIDE-LABELS THREE-D AT COLUMN 1 ROW 1 SIZE-PIXELS 50 BY 40.
 
 /* *************************  Create Window  ************************** */
-create window winMessage assign
-     title         = pcTitle
-     width-pixels  = 260
-     height-pixels = 40
-     status-area   = no
-     message-area  = no
-     min-button    = no
-     max-button    = no
-     sensitive     = yes.
+CREATE WINDOW winMessage ASSIGN
+  TITLE         = pcTitle
+  WIDTH-PIXELS  = 260
+  HEIGHT-PIXELS = 40
+  STATUS-AREA   = NO
+  MESSAGE-AREA  = NO
+  MIN-BUTTON    = NO
+  MAX-BUTTON    = NO
+  SENSITIVE     = YES.
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-assign current-window                = winMessage.
-     this-procedure:current-window = winMessage.
-     default-window = winMessage.
+ASSIGN
+  CURRENT-WINDOW              = winMessage.
+  THIS-PROCEDURE:CURRENT-WINDOW = winMessage.
+  default-window = winMessage.
 
 /* Find a decent font */
-do iFont = 0 to font-table:num-entries - 1:
-  if    font-table:get-text-width-pixels('DataDigger',iFont) = 54
-    and font-table:get-text-height-pixels(iFont) = 13 then
-  do:
-    frame infoFrame:font = iFont.
-    leave.
-  end.
-end. 
+#FindFont:
+DO iFont = 0 TO FONT-TABLE:NUM-ENTRIES - 1:
+  IF    FONT-TABLE:GET-TEXT-WIDTH-PIXELS('DataDigger',iFont) = 54
+    AND FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(iFont) = 13 THEN
+  DO:
+    FRAME infoFrame:font = iFont.
+    LEAVE #FindFont.
+  END.
+END.
 
 /* How wide should the text be? */
-iWidth = font-table:get-text-width-pixels(pcMessage,iFont) + cMessage:x + 30.
-iWidth = maximum(iWidth,150).
+iWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(pcMessage,iFont) + cMessage:x + 30.
+iWidth = MAXIMUM(iWidth,150).
 
-winMessage:width-pixels = iWidth .
+winMessage:WIDTH-PIXELS = iWidth .
 cMessage:width-pixels = iWidth - 10.
 cMessage:screen-value = pcMessage.
-frame infoFrame:width-pixels = iWidth.
+FRAME infoFrame:width-pixels = iWidth.
 
 /* Center the window */
-winMessage:x = (session:work-area-width-pixels - winMessage:width-pixels) / 2.
-winMessage:y = (session:work-area-height-pixels - winMessage:height-pixels) / 2.
+winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS - winMessage:WIDTH-PIXELS) / 2.
+winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
 
 /* Showtime! */
-view frame infoFrame in window winMessage.
-view winMessage.
+VIEW FRAME infoFrame IN WINDOW winMessage.
+VIEW winMessage.
 
-process events.
+PROCESS EVENTS.
 
-phWindow = winMessage:handle.
+phWindow = winMessage:HANDLE.

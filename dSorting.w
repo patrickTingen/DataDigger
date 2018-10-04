@@ -2,28 +2,18 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME frSorting
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS frSorting 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS frSorting
 /*------------------------------------------------------------------------
 
-  File: 
+  Name: dSorting.w
+  Desc: Let user maintain data sort
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
 
 /* ***************************  Definitions  ************************** */
-{ datadigger.i }
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
 DEFINE INPUT PARAMETER TABLE FOR ttColumn.
@@ -37,7 +27,7 @@ DEFINE VARIABLE ghDescending AS HANDLE EXTENT 9 NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -48,12 +38,12 @@ DEFINE VARIABLE ghDescending AS HANDLE EXTENT 9 NO-UNDO.
 &Scoped-define FRAME-NAME frSorting
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnOk Btn_Cancel btnClearAll cbSortField-1 
+&Scoped-Define ENABLED-OBJECTS btnOk Btn_Cancel btnClearAll cbSortField-1
 &Scoped-Define DISPLAYED-OBJECTS tgDescending-1 cbSortField-2 ~
 tgDescending-2 cbSortField-3 tgDescending-3 cbSortField-4 tgDescending-4 ~
 cbSortField-5 tgDescending-5 cbSortField-6 tgDescending-6 cbSortField-7 ~
 tgDescending-7 cbSortField-8 tgDescending-8 cbSortField-9 tgDescending-9 ~
-cbSortField-1 
+cbSortField-1
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -68,125 +58,125 @@ cbSortField-1
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnClearAll 
-     LABEL "&Clear All" 
+DEFINE BUTTON btnClearAll
+     LABEL "&Clear All"
      SIZE-PIXELS 75 BY 24 TOOLTIP "clear all sorting".
 
-DEFINE BUTTON btnOk 
-     LABEL "OK" 
+DEFINE BUTTON btnOk
+     LABEL "OK"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
-     LABEL "Cancel" 
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY
+     LABEL "Cancel"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE cbSortField-1 AS CHARACTER 
-     LABEL "First sort on" 
+DEFINE VARIABLE cbSortField-1 AS CHARACTER
+     LABEL "First sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-2 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-2 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-3 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-3 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-4 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-4 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-5 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-5 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-6 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-6 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-7 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-7 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-8 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-8 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE cbSortField-9 AS CHARACTER 
-     LABEL "Then sort on" 
+DEFINE VARIABLE cbSortField-9 AS CHARACTER
+     LABEL "Then sort on"
      VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "Item 1" 
+     LIST-ITEMS "Item 1"
      DROP-DOWN AUTO-COMPLETION UNIQUE-MATCH
      SIZE-PIXELS 160 BY 21 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-1 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-1 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-2 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-2 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-3 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-3 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-4 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-4 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-5 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-5 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-6 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-6 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-7 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-7 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-8 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-8 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
-DEFINE VARIABLE tgDescending-9 AS LOGICAL INITIAL no 
-     LABEL "&Descending" 
+DEFINE VARIABLE tgDescending-9 AS LOGICAL INITIAL NO
+     LABEL "&Descending"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 95 BY 17 NO-UNDO.
 
@@ -217,9 +207,9 @@ DEFINE FRAME frSorting
      cbSortField-1 AT Y 10 X 80 COLON-ALIGNED WIDGET-ID 2
      "ALT-S also opens this screen" VIEW-AS TEXT
           SIZE-PIXELS 205 BY 18 AT Y 247 X 155 WIDGET-ID 112
-          FGCOLOR 7 
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+          FGCOLOR 7
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+         SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 504 BY 300
          TITLE "Set Sorting"
          DEFAULT-BUTTON btnOk CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
@@ -242,7 +232,7 @@ DEFINE FRAME frSorting
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX frSorting
    FRAME-NAME                                                           */
-ASSIGN 
+ASSIGN
        FRAME frSorting:SCROLLABLE       = FALSE
        FRAME frSorting:HIDDEN           = TRUE.
 
@@ -283,7 +273,7 @@ ASSIGN
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -351,12 +341,12 @@ DO:
 
   iSelf = INTEGER(ENTRY(2,SELF:NAME,'-')).
 
-  IF ghSortField[iSelf]:SCREEN-VALUE = ? THEN 
+  IF ghSortField[iSelf]:SCREEN-VALUE = ? THEN
   DO:
     RUN btnOkChoose(OUTPUT lContinue).
     IF lContinue THEN APPLY 'GO' TO FRAME {&FRAME-NAME}.
   END.
-  ELSE 
+  ELSE
     IF iSelf < 9 THEN APPLY 'entry' TO ghSortField[iSelf + 1].
 END.
 
@@ -373,7 +363,7 @@ DO:
 
   iSelf = INTEGER(ENTRY(2,SELF:NAME,'-')).
 
-  IF SELF:SCREEN-VALUE = ? THEN 
+  IF SELF:SCREEN-VALUE = ? THEN
   DO:
     ghDescending[iSelf]:CHECKED = FALSE.
     ghDescending[iSelf]:SENSITIVE = NO.
@@ -400,13 +390,13 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK frSorting 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK frSorting
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
-IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ?
+IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT EQ ?
 THEN FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
 
 
@@ -432,10 +422,10 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOkChoose frSorting 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOkChoose frSorting
 PROCEDURE btnOkChoose :
 /* Accept sort and go back
- */  
+ */
   DEFINE OUTPUT PARAMETER plContinue AS LOGICAL NO-UNDO.
 
   DEFINE VARIABLE i AS INTEGER NO-UNDO.
@@ -449,15 +439,15 @@ PROCEDURE btnOkChoose :
   DO i = 1 TO 9:
     IF LOOKUP(ghSortField[i]:SCREEN-VALUE, ghSortField[i]:LIST-ITEMS) = 0 THEN
     DO:
-      MESSAGE 'Sorting' i 'does not seem to be a valid field name' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      MESSAGE 'Sorting' i 'does not seem to be a valid field name' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
       APPLY 'entry' TO ghSortField[i].
       RETURN NO-APPLY.
     END.
 
-    IF ghSortField[i]:SCREEN-VALUE <> ? THEN 
+    IF ghSortField[i]:SCREEN-VALUE <> ? THEN
     DO:
       CREATE bfQuerySort.
-      ASSIGN 
+      ASSIGN
         bfQuerySort.iGroup     = 2
         bfQuerySort.iSortNr    = i
         bfQuerySort.cSortField = ghSortField[i]:SCREEN-VALUE
@@ -470,7 +460,7 @@ PROCEDURE btnOkChoose :
   END.
 
   plSortChanged = TRUE.
-  plContinue = TRUE. 
+  plContinue = TRUE.
 
 END PROCEDURE.
 
@@ -483,7 +473,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -502,16 +492,16 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY tgDescending-1 cbSortField-2 tgDescending-2 cbSortField-3 
-          tgDescending-3 cbSortField-4 tgDescending-4 cbSortField-5 
-          tgDescending-5 cbSortField-6 tgDescending-6 cbSortField-7 
-          tgDescending-7 cbSortField-8 tgDescending-8 cbSortField-9 
-          tgDescending-9 cbSortField-1 
+  DISPLAY tgDescending-1 cbSortField-2 tgDescending-2 cbSortField-3
+          tgDescending-3 cbSortField-4 tgDescending-4 cbSortField-5
+          tgDescending-5 cbSortField-6 tgDescending-6 cbSortField-7
+          tgDescending-7 cbSortField-8 tgDescending-8 cbSortField-9
+          tgDescending-9 cbSortField-1
       WITH FRAME frSorting.
-  ENABLE btnOk Btn_Cancel btnClearAll cbSortField-1 
+  ENABLE btnOk Btn_Cancel btnClearAll cbSortField-1
       WITH FRAME frSorting.
   VIEW FRAME frSorting.
   {&OPEN-BROWSERS-IN-QUERY-frSorting}
@@ -520,59 +510,58 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject frSorting 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject frSorting
 PROCEDURE initializeObject :
 /*
  * Prepare widgets
  */
- /*
- DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
+/*
+DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
   FIELD iGroup     AS INTEGER /* 1:query, 2:browse */
   FIELD iSortNr    AS INTEGER
   FIELD cSortField AS CHARACTER
   FIELD lAscending AS LOGICAL
   INDEX iPrim IS PRIMARY iGroup iSortNr
  */
- DEFINE VARIABLE cFields   AS CHARACTER NO-UNDO.
- DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
+DEFINE VARIABLE cFields   AS CHARACTER NO-UNDO.
+DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
 
- FOR EACH ttColumn BY ttColumn.cFieldName:
-   cFields = cFields + ',' + ttColumn.cFullName.
- END.
+FOR EACH ttColumn BY ttColumn.cFieldName:
+  cFields = cFields + ',' + ttColumn.cFullName.
+END.
 
- DO WITH FRAME {&FRAME-NAME}:
-   /* Grab handles of the fields for easier handling */
-   ghSortField[1] = cbSortField-1:HANDLE. ghDescending[1] = tgDescending-1:HANDLE.
-   ghSortField[2] = cbSortField-2:HANDLE. ghDescending[2] = tgDescending-2:HANDLE.
-   ghSortField[3] = cbSortField-3:HANDLE. ghDescending[3] = tgDescending-3:HANDLE.
-   ghSortField[4] = cbSortField-4:HANDLE. ghDescending[4] = tgDescending-4:HANDLE.
-   ghSortField[5] = cbSortField-5:HANDLE. ghDescending[5] = tgDescending-5:HANDLE.
-   ghSortField[6] = cbSortField-6:HANDLE. ghDescending[6] = tgDescending-6:HANDLE.
-   ghSortField[7] = cbSortField-7:HANDLE. ghDescending[7] = tgDescending-7:HANDLE.
-   ghSortField[8] = cbSortField-8:HANDLE. ghDescending[8] = tgDescending-8:HANDLE.
-   ghSortField[9] = cbSortField-9:HANDLE. ghDescending[9] = tgDescending-9:HANDLE.
+DO WITH FRAME {&FRAME-NAME}:
+  /* Grab handles of the fields for easier handling */
+  ghSortField[1] = cbSortField-1:HANDLE. ghDescending[1] = tgDescending-1:HANDLE.
+  ghSortField[2] = cbSortField-2:HANDLE. ghDescending[2] = tgDescending-2:HANDLE.
+  ghSortField[3] = cbSortField-3:HANDLE. ghDescending[3] = tgDescending-3:HANDLE.
+  ghSortField[4] = cbSortField-4:HANDLE. ghDescending[4] = tgDescending-4:HANDLE.
+  ghSortField[5] = cbSortField-5:HANDLE. ghDescending[5] = tgDescending-5:HANDLE.
+  ghSortField[6] = cbSortField-6:HANDLE. ghDescending[6] = tgDescending-6:HANDLE.
+  ghSortField[7] = cbSortField-7:HANDLE. ghDescending[7] = tgDescending-7:HANDLE.
+  ghSortField[8] = cbSortField-8:HANDLE. ghDescending[8] = tgDescending-8:HANDLE.
+  ghSortField[9] = cbSortField-9:HANDLE. ghDescending[9] = tgDescending-9:HANDLE.
 
-   /* Make a list of all fields */
-   DO i = 1 TO 9:
-     ghSortField[i]:LIST-ITEMS = cFields.
-     ghSortField[i]:SCREEN-VALUE = ?.
+  /* Make a list of all fields */
+  DO i = 1 TO 9:
+    ghSortField[i]:LIST-ITEMS = cFields.
+    ghSortField[i]:SCREEN-VALUE = ?.
+  END.
+
+  /* fill combos with current sort */
+  FOR EACH ttQuerySort WHERE ttQuerySort.iGroup = 2 BY ttQuerySort.iSortNr:
+    ghSortField[ttQuerySort.iSortNr]:SCREEN-VALUE = ttQuerySort.cSortField.
+    ghDescending[ttQuerySort.iSortNr]:CHECKED = NOT ttQuerySort.lAscending.
+  END.
+
+  /* Set correct state */
+  DO i = 1 TO 9:
+    APPLY 'value-changed' TO ghSortField[i].
    END.
 
-   /* fill combos with current sort */
-   FOR EACH ttQuerySort WHERE ttQuerySort.iGroup = 2 BY ttQuerySort.iSortNr:
-     ghSortField[ttQuerySort.iSortNr]:SCREEN-VALUE = ttQuerySort.cSortField.
-     ghDescending[ttQuerySort.iSortNr]:CHECKED = NOT ttQuerySort.lAscending.
-   END.
-
-   /* Set correct state */
-   DO i = 1 TO 9:
-     APPLY 'value-changed' TO ghSortField[i].
-   END.
-
- END.
+END.
 
 END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

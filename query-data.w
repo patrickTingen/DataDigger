@@ -1,32 +1,16 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win
 /*------------------------------------------------------------------------
 
-  File: query-data.w
-
-  Description: view op de data uit query-tester.w
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
+  Name: query-data.w
+  Desc: View on the data from query-tester.w
 
   Author: M.C. Fiere (fiere1@zonnet.nl)
-
-  Created: 
-
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
+/*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -45,13 +29,13 @@ CREATE WIDGET-POOL.
 &ENDIF
 
 /* DataDigger */
-{ Datadigger.i }
+{ DataDigger.i }
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -62,8 +46,8 @@ CREATE WIDGET-POOL.
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS EDITOR-1 
-&Scoped-Define DISPLAYED-OBJECTS EDITOR-1 
+&Scoped-Define ENABLED-OBJECTS edQuery
+&Scoped-Define DISPLAYED-OBJECTS edQuery
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -84,7 +68,7 @@ DEFINE MENU MENU-BAR-C-Win MENUBAR
 
 
 /* Definitions of the field level widgets                               */
-DEFINE VARIABLE EDITOR-1 AS CHARACTER 
+DEFINE VARIABLE edQuery AS CHARACTER
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
      SIZE 94 BY 20.71
      BGCOLOR 15  NO-UNDO.
@@ -93,9 +77,9 @@ DEFINE VARIABLE EDITOR-1 AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     EDITOR-1 AT ROW 1 COL 1 NO-LABEL
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+     edQuery AT ROW 1 COL 1 NO-LABEL
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT COL 1 ROW 1
          SIZE 94.6 BY 20.91.
 
@@ -123,15 +107,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH          = 320
          VIRTUAL-HEIGHT     = 320
          VIRTUAL-WIDTH      = 320
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 
 ASSIGN {&WINDOW-NAME}:MENUBAR    = MENU MENU-BAR-C-Win:HANDLE.
@@ -147,16 +131,16 @@ ASSIGN {&WINDOW-NAME}:MENUBAR    = MENU MENU-BAR-C-Win:HANDLE.
   VISIBLE,,RUN-PERSISTENT                                               */
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
-ASSIGN 
-       EDITOR-1:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+ASSIGN
+       edQuery:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = no.
+THEN C-Win:HIDDEN = NO.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -201,19 +185,19 @@ DO:
 
     IF iNewFrameWidth  GT FRAME {&FRAME-NAME}:WIDTH-PIXELS
     THEN ASSIGN FRAME {&FRAME-NAME}:WIDTH-PIXELS = iNewFrameWidth.
-                
+
     IF iNewFrameHeight GT FRAME {&FRAME-NAME}:HEIGHT-PIXELS
     THEN ASSIGN FRAME {&FRAME-NAME}:HEIGHT-PIXELS = iNewFrameHeight.
 
     ASSIGN
 
-      EDITOR-1:X                = 1
-      EDITOR-1:Y                = 1
-      EDITOR-1:WIDTH-PIXELS     = iNewFrameWidth  - EDITOR-1:X - 2
-      EDITOR-1:HEIGHT-PIXELS    = iNewFrameHeight - 2
+      edQuery:X                = 1
+      edQuery:Y                = 1
+      edQuery:WIDTH-PIXELS     = iNewFrameWidth  - edQuery:X - 2
+      edQuery:HEIGHT-PIXELS    = iNewFrameHeight - 2
       .
   END.
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -233,18 +217,18 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
@@ -258,8 +242,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN enable_UI.
 
   /* Datadigger */
-  frame {&frame-name}:font = getFont("Default").
-  EDITOR-1:font = getFont("Fixed").
+  FRAME {&frame-name}:font = getFont("Default").
+  edQuery:font = getFont("Fixed").
 
   RUN initialize-window.
 
@@ -281,7 +265,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -302,12 +286,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY EDITOR-1 
+  DISPLAY edQuery
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE EDITOR-1 
+  ENABLE edQuery
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -316,57 +300,48 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initialize-window C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initialize-window C-Win
 PROCEDURE initialize-window :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
-ASSIGN 
+ASSIGN
   {&WINDOW-NAME}:TITLE = pcTitle
-   EDITOR-1:SCREEN-VALUE IN FRAME {&FRAME-NAME} = pcDataString.
+   edQuery:SCREEN-VALUE IN FRAME {&FRAME-NAME} = pcDataString.
 
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE killquerywindow C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE killquerywindow C-Win
 PROCEDURE killquerywindow :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Close it
+  */
   APPLY "close":U TO THIS-PROCEDURE.
-
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE print-editor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE print-editor C-Win
 PROCEDURE print-editor :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-DEFINE VARIABLE liLine AS INTEGER NO-UNDO.
-DEFINE VARIABLE liNumLines AS INTEGER NO-UNDO.
+/* Output to printer
+  */
+  DEFINE VARIABLE liLine AS INTEGER NO-UNDO.
+  DEFINE VARIABLE liNumLines AS INTEGER NO-UNDO.
 
-DO WITH FRAME {&FRAME-NAME}:
-  ASSIGN liNumLines = NUM-ENTRIES(pcDataString,"~n").
-  OUTPUT TO PRINTER PAGED.
-  DO liLine = 1 TO liNumLines:
-  PUT UNFORMATTED ENTRY(liLine,pcDataString,"~n") SKIP.  
+  DO WITH FRAME {&FRAME-NAME}:
+    ASSIGN liNumLines = NUM-ENTRIES(pcDataString,"~n").
+    OUTPUT TO PRINTER PAGED.
+    DO liLine = 1 TO liNumLines:
+    PUT UNFORMATTED ENTRY(liLine,pcDataString,"~n") SKIP.
+    END.
+    OUTPUT CLOSE.
   END.
-  OUTPUT CLOSE.
-END.
-
-
 
 END PROCEDURE.
 

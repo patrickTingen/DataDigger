@@ -5,25 +5,67 @@
   WARNING: This .txt file is for documentation purposes.
            It will be overwritten with each new version of DataDigger.
 
-           Create your own custom procedure by copying this program to
+  More information on the DataDigger wiki on customization
+  Check https://github.com/patrickTingen/DataDigger/wiki
+  
+  tl;dr:   Create your own custom procedure by copying this program to
            "myDataDigger.p". It will then be compiled and started when DD
-           starts. In future versions of the DataDigger, myDataDigger.p
-           will not be overwritten.
+           starts. The file 'myDataDigger.p' (extension ".P") will never be
+           part of the distribution, so your version will not be overwritten.
+           Using QAD? Look for #QAD tags in this file.
 
   HISTORY: DD18: customFilter added.
            DD18: customDump moved here instead of having its own .p
            DD20: customShowField added
            DD21: customSaveFilterValue / customGetFilterValue added, customFilter removed
+           DD24: added support for events 'query' and 'datadigger'
 
  *************************************************************************/
 
 /* All functions of DataDigger, see DataDiggerLib for a full list */
 {datadigger.i}
 
-/* [QAD]
+/* #QAD
+/* You might like to set global_domain based on (for example) database name */
 define new global shared variable global_domain as character.
 */
 
+/* #QAD users might use this function to determine the 
+ *       domain-field in a table 
+ */ 
+FUNCTION getDomainFieldName RETURNS CHARACTER
+  ( pcDatabase AS CHARACTER
+  , pcTable    AS CHARACTER ):
+
+  DEFINE VARIABLE cDomainFieldName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hBuffer          AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hBufferField     AS HANDLE    NO-UNDO.
+
+  /*
+  ** SDBNAME wille return a different name 
+  ** if pcDatabase is a non Progress database like MSS [dataserver]
+  */
+  IF SDBNAME(pcDatabase) <> pcDatabase THEN RETURN "".
+
+  /* Determine the name of the domain field, based on the table */
+  IF (INDEX(pcTable, "_") > 0) THEN
+    cDomainFieldName = SUBSTRING(pcTable, 1, R-INDEX(pcTable, "_")) + "domain".
+  ELSE
+    cDomainFieldName = pcTable + "_domain".
+
+  /* Now see if the field really exists */
+  CREATE BUFFER hBuffer FOR TABLE SUBSTITUTE("&1.&2",pcDatabase,pcTable) NO-ERROR.
+  IF VALID-HANDLE(hBuffer) THEN 
+    hBufferField = hBuffer:BUFFER-FIELD(cDomainFieldName) NO-ERROR.
+  IF NOT VALID-HANDLE(hBufferField) THEN cDomainFieldName = "".
+  DELETE OBJECT hBuffer NO-ERROR.
+
+  RETURN cDomainFieldName.
+
+END FUNCTION. /* getDomainFieldName */
+
+
+/*
 PROCEDURE customShowField:
   /*
    * Name: customShowField
@@ -41,15 +83,24 @@ PROCEDURE customShowField:
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO INITIAL TRUE.
+  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
 
-  /* Example, hide the cust-num field except on the customer table
+  /* Example 1: hide the cust-num field except on the customer table
   IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
   */
 
+  /* Example 2: hide the default RECID and ROWID field
+  IF pcField = 'RECID' OR pcField = 'ROWID' THEN plShow = FALSE.
+  */
+
+  /* Example 3: By default, do not show extra #QAD fields */
+  /* IF pcField MATCHES '*__*' THEN plShow = FALSE. */
+
 END PROCEDURE. /* customShowField */
+*/
 
 
+/*
 PROCEDURE customFormat:
   /*
    * Name: customFormat
@@ -73,9 +124,16 @@ PROCEDURE customFormat:
   /* IF pcDataType = "DECIMAL"                                     */
   /*  AND NOT pcFormat BEGINS "-" THEN pcFormat = "-" + pcFormat.  */
 
+  /* Example code: Use at least 3 decimals for price field */
+  /* IF pcDataType = 'DECIMAL'                                       */
+  /*  AND pcField = 'Price'                                          */
+  /*  AND pcFormat MATCHES '*~~.99' THEN pcFormat = pcFormat + '9'.  */
+
 END PROCEDURE. /* customFormat */
+*/
 
 
+/*
 PROCEDURE CustomDump:
   /*
    * Name: customDump.p
@@ -123,14 +181,14 @@ PROCEDURE CustomDump:
   DEFINE INPUT  PARAMETER pcFilename    AS CHARACTER NO-UNDO.
 
   DEFINE OUTPUT PARAMETER pcMessage     AS CHARACTER NO-UNDO.
-  DEFINE OUTPUT PARAMETER plDefaultDump AS LOGICAL   NO-UNDO.
-  DEFINE OUTPUT PARAMETER plContinue    AS LOGICAL   NO-UNDO.
+  DEFINE OUTPUT PARAMETER plDefaultDump AS LOGICAL   NO-UNDO INITIAL TRUE.
+  DEFINE OUTPUT PARAMETER plContinue    AS LOGICAL   NO-UNDO INITIAL TRUE.
 
   /* Example code: ask if user is really sure to delete */
   /*   IF pcAction = 'Delete' THEN                                                              */
   /*   DO:                                                                                      */
   /*     MESSAGE 'Are you really really really sure you want to delete these precious records?' */
-  /*       VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE plContinue.                             */
+  /*       VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE plContinue.                      */
   /*   END.                                                                                     */
   /*                                                                                            */
   /*   ELSE                                                                                     */
@@ -149,8 +207,10 @@ PROCEDURE CustomDump:
   /*   END.                                                                                     */
 
 END PROCEDURE. /* CustomDump */
+*/
 
 
+/*
 PROCEDURE customQuery:
   /*
    * Name: customQuery.p
@@ -175,8 +235,36 @@ PROCEDURE customQuery:
   /*  pcQuery = DYNAMIC-FUNCTION("getQuery", pcDatabase, pcTable, 1).  */
 
 END PROCEDURE. /* customQuery */
+*/
 
 
+/*
+PROCEDURE DataDigger:
+  /*
+   * Name: DataDigger
+   * Desc: Called on open and close of a DataDigger window.
+   * 
+   * When DD is started and closed, this event is published 
+   * with piNumber = 1 for opening and -1 for closing. 
+   */
+  DEFINE INPUT PARAMETER piNumber AS INTEGER.
+
+  /* Example code: quit DD when a certain .txt file is found
+   *
+     
+  /* Check if we are allowed to start */
+  IF piNumber = 1 
+    AND SEARCH('db-maintenance.txt') <> ? THEN 
+  DO:
+    MESSAGE 'Sorry, db is in maintenance, please try again later' VIEW-AS ALERT-BOX.
+    QUIT.
+  END.  
+  */
+END PROCEDURE. /* DataDigger */
+*/
+
+
+/*
 PROCEDURE customGetFilterValue:
   /*
    * Name: customGetFilterValue
@@ -193,8 +281,10 @@ PROCEDURE customGetFilterValue:
   /* IF pcField MATCHES "*_domain" THEN pcFilterValue = global_domain. */
 
 END PROCEDURE. /* customGetFilterValue */
+*/
 
 
+/*
 PROCEDURE customSaveFilterValue:
   /*
    * Name: customSaveFilterValue
@@ -206,7 +296,45 @@ PROCEDURE customSaveFilterValue:
   DEFINE INPUT PARAMETER pcField       AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER pcFilterValue AS CHARACTER NO-UNDO.
 
-  /* Example code: save value of a particular field                    */
+  /* Example code: save value of a particular field 
+   * #QAD users could use this to catch filtering on global_domain
+   *       and then later adding it to the query.
+   */
   /* IF pcField MATCHES "*_domain" THEN global_domain = pcFilterValue. */
 
 END PROCEDURE. /* customSaveFilterValue */
+*/
+
+
+/*
+PROCEDURE queryOpen:
+  /* 
+   * Name: queryOpen
+   * Desc: Receive the full query that is executed
+   */
+  DEFINE INPUT PARAMETER pcQuery AS CHARACTER NO-UNDO. 
+  
+  /* DEFINE VARIABLE iWord  AS INTEGER   NO-UNDO.                     */
+  /* DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.                     */
+  /*                                                                  */
+  /* /* Remove double spaces */                                       */
+  /* DO WHILE REPLACE(pcQuery,'  ', ' ') <> pcQuery:                  */
+  /*   pcQuery = REPLACE(pcQuery,'  ', ' ').                          */
+  /* END.                                                             */
+  /*                                                                  */
+  /* /* Parse the query word by word and look for the domain field    */
+  /*  * If the domain field is used in an equality match, filter out  */
+  /*  * the value and save that as the new global_domain              */
+  /*  */                                                              */
+  /* DO iWord = 1 TO NUM-ENTRIES(pcQuery,' ') - 2:                    */
+  /*   IF ENTRY(iWord,pcQuery,' ') MATCHES '*_domain'                 */
+  /*     AND ENTRY(iWord + 1,pcQuery,' ') = '=' THEN                  */
+  /*   DO:                                                            */
+  /*     cValue = ENTRY(iWord + 2,pcQuery,' ').                       */
+  /*     cValue = TRIM(cValue,'()"~'').                               */
+  /*     IF cValue > '' THEN global_domain = cValue.                  */
+  /*   END.                                                           */
+  /* END.                                                             */
+  
+END PROCEDURE. /* queryOpen */
+*/

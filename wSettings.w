@@ -4,29 +4,12 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wSettings 
 /*------------------------------------------------------------------------
 
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+        Name: wSettings.w
+        Desc: Container window for settings tabs
 
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
+/*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -34,37 +17,28 @@ CREATE WIDGET-POOL.
 
 { DataDigger.i }
 
-/* Parameters Definitions ---                                           */
-&if '{&file-name}' matches '*.ab' &then 
-  define variable pcSettingsFile as character   no-undo.
-  define variable plSuccess      as logical     no-undo.
-  pcSettingsFile = 'd:\Data\DropBox\DataDigger\DataDigger-nljrpti.ini'.
-&else 
-  define input  parameter pcSettingsFile as character   no-undo.
-  define output parameter plSuccess      as logical     no-undo.
-&endif.
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT  PARAMETER pcSettingsFile AS CHARACTER   NO-UNDO.
+  DEFINE OUTPUT PARAMETER plSuccess      AS LOGICAL     NO-UNDO.
+&ELSE
+  DEFINE VARIABLE pcSettingsFile AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE plSuccess      AS LOGICAL     NO-UNDO.
+&ENDIF
 
 /* Local Variable Definitions ---                                       */
 
-define variable gcPageButtons    as character no-undo. 
-define variable giLastActivePage as integer   no-undo. 
-define variable giWinX           as integer   no-undo. 
-define variable giWinY           as integer   no-undo. 
+DEFINE VARIABLE gcPageButtons    AS CHARACTER NO-UNDO.
+DEFINE VARIABLE giLastActivePage AS INTEGER   NO-UNDO.
+DEFINE VARIABLE giWinX           AS INTEGER   NO-UNDO.
+DEFINE VARIABLE giWinY           AS INTEGER   NO-UNDO.
+DEFINE VARIABLE giCurrentPage    AS INTEGER   NO-UNDO.
 
-define temp-table ttFrame no-undo rcode-info
-  field cFrame   as character
-  field hFrame   as handle 
-  field iOrder   as integer
-  field cTags    as character
+DEFINE TEMP-TABLE ttFrame NO-UNDO RCODE-INFORMATION
+  FIELD cFrame   AS CHARACTER
+  FIELD hFrame   AS HANDLE
+  FIELD iOrder   AS INTEGER
+  FIELD cTags    AS CHARACTER
 .
-
-/* Windows API entry point */
-procedure ShowScrollBar external "user32.dll":
-    define input  parameter hwnd        as long.
-    define input  parameter fnBar       as long.
-    define input  parameter fShow       as long.
-    define return parameter ReturnValue as long.
-end procedure.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -156,7 +130,7 @@ DEFINE FRAME DEFAULT-FRAME
      btPage3 AT Y 174 X 20 WIDGET-ID 10
      BtnCancel-2 AT Y 470 X 575 WIDGET-ID 98
      BtnOK AT Y 470 X 660 WIDGET-ID 94
-     "CTRL-ALT-S also opens this window" VIEW-AS TEXT
+     "CTRL-SHIFT-S also opens this window" VIEW-AS TEXT
           SIZE-PIXELS 240 BY 20 AT Y 475 X 15 WIDGET-ID 100
           FGCOLOR 7 
      rcSettings AT Y 60 X 150 WIDGET-ID 92
@@ -169,7 +143,7 @@ DEFINE FRAME DEFAULT-FRAME
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 154 Y 65
+         AT X 155 Y 65
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
          TITLE "" WIDGET-ID 200.
 
@@ -191,7 +165,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wSettings ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger Settings"
-         HEIGHT-P           = 510
+         HEIGHT-P           = 504
          WIDTH-P            = 769
          MAX-HEIGHT-P       = 562
          MAX-WIDTH-P        = 769
@@ -245,6 +219,48 @@ THEN wSettings:HIDDEN = yes.
 
 &Scoped-define SELF-NAME wSettings
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-DOWN OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'fiSearch' THEN
+      APPLY 'entry' TO btPage1.
+    ELSE
+    CASE giCurrentPage:
+      WHEN 1 THEN APPLY 'entry' TO btPage2.
+      WHEN 2 THEN APPLY 'entry' TO btPage3.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
+ON CTRL-PAGE-UP OF wSettings /* DataDigger Settings */
+ANYWHERE DO:
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    IF FOCUS:NAME = 'btPage1' THEN
+      APPLY 'entry' TO fiSearch.
+    ELSE
+    CASE giCurrentPage:
+      WHEN 2 THEN APPLY 'entry' TO btPage1.
+      WHEN 3 THEN APPLY 'entry' TO btPage2.
+    END CASE.
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
 ON END-ERROR OF wSettings /* DataDigger Settings */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE DO:
   /* This case occurs when the user presses the "Esc" key.
@@ -259,7 +275,7 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wSettings wSettings
 ON WINDOW-CLOSE OF wSettings /* DataDigger Settings */
-or "LEAVE" of wSettings
+OR "LEAVE" OF wSettings
 DO:
   /* This event will close the window and terminate the procedure.  */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
@@ -275,10 +291,16 @@ END.
 ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
 OR GO OF wSettings ANYWHERE
 DO:
+  DEFINE VARIABLE lOk AS LOGICAL NO-UNDO.
+  
   SESSION:SET-WAIT-STATE("general").
   RUN saveSettings.
+  RUN flushRegistry.
   SESSION:SET-WAIT-STATE("").
 
+  RUN checkBackupFolder(OUTPUT lOk).
+  IF NOT lOk THEN RETURN NO-APPLY. 
+  
   RUN saveConfigFileSorted.
 
   plSuccess = TRUE.
@@ -294,7 +316,7 @@ END.
 ON CHOOSE OF btnRawEdit IN FRAME DEFAULT-FRAME /* Raw Edit */
 DO:
   /* Start default editor for ini file */
-  os-command no-wait start value( pcSettingsFile ).
+  OS-COMMAND NO-WAIT START VALUE( pcSettingsFile ).
 
 END.
 
@@ -307,8 +329,8 @@ END.
 ON CHOOSE OF btnSettings IN FRAME DEFAULT-FRAME
 DO:
   fiSearch:screen-value = ''.
-  apply 'entry' to btPage1.
-  apply 'choose' to btPage1.
+  APPLY 'entry' TO btPage1.
+  APPLY 'choose' TO btPage1.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -321,13 +343,13 @@ ON CURSOR-DOWN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
 , fiSearch ,btPage2
 DO:
 
-  case self:name:
-    when 'fiSearch' then apply 'entry' to btPage1.
-    when 'btPage1'  then apply 'entry' to btPage2.
-    when 'btPage2'  then apply 'entry' to btPage3.
-  end case.
+  CASE SELF:name:
+    WHEN 'fiSearch' THEN APPLY 'entry' TO btPage1.
+    WHEN 'btPage1'  THEN APPLY 'entry' TO btPage2.
+    WHEN 'btPage2'  THEN APPLY 'entry' TO btPage3.
+  END CASE.
 
-  return no-apply.
+  RETURN NO-APPLY.
 
 END.
 
@@ -340,13 +362,13 @@ ON CURSOR-UP OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
 ,btPage2, btPage3
 DO:
 
-  case self:name:
-    when 'btPage1' then apply 'entry' to fiSearch.
-    when 'btPage2' then apply 'entry' to btPage1.
-    when 'btPage3' then apply 'entry' to btPage2.
-  end case.
+  CASE SELF:name:
+    WHEN 'btPage1' THEN APPLY 'entry' TO fiSearch.
+    WHEN 'btPage2' THEN APPLY 'entry' TO btPage1.
+    WHEN 'btPage3' THEN APPLY 'entry' TO btPage2.
+  END CASE.
 
-  return no-apply.
+  RETURN NO-APPLY.
 
 END.
 
@@ -364,8 +386,8 @@ DO:
   RUN SetScrollPos ( INPUT FRAME frSettings:HWND
                    , INPUT 1 /* Indicates this function should operate on the vertical scrollbar attached to the frame */
                    , INPUT 1 /* Scrollbar row position */
-                   , INPUT 1 /* Causes the scrollbar to be re-drawn to reflect the changed position */ 
-                   ). 
+                   , INPUT 1 /* Causes the scrollbar to be re-drawn to reflect the changed position */
+                   ).
   RUN PostMessageA( INPUT FRAME frSettings:HWND
                   , INPUT 277
                   , INPUT 4 + 65536 * 1
@@ -373,14 +395,14 @@ DO:
                   ).
 END.
 
-PROCEDURE SetScrollPos EXTERNAL "USER32.DLL": 
-  DEFINE INPUT PARAMETER pHwnd   AS LONG  NO-UNDO. 
-  DEFINE INPUT PARAMETER pNBar   AS SHORT NO-UNDO. 
-  DEFINE INPUT PARAMETER pNPos   AS SHORT NO-UNDO. 
-  DEFINE INPUT PARAMETER pRedraw AS SHORT NO-UNDO. 
+PROCEDURE SetScrollPos EXTERNAL "USER32.DLL":
+  DEFINE INPUT PARAMETER pHwnd   AS LONG  NO-UNDO.
+  DEFINE INPUT PARAMETER pNBar   AS SHORT NO-UNDO.
+  DEFINE INPUT PARAMETER pNPos   AS SHORT NO-UNDO.
+  DEFINE INPUT PARAMETER pRedraw AS SHORT NO-UNDO.
 END PROCEDURE.
 
-PROCEDURE PostMessageA EXTERNAL "USER32.DLL": 
+PROCEDURE PostMessageA EXTERNAL "USER32.DLL":
   DEFINE INPUT  PARAMETER pHwnd    AS LONG NO-UNDO.
   DEFINE INPUT  PARAMETER pMsg     AS LONG NO-UNDO.
   DEFINE INPUT  PARAMETER pWparam  AS LONG NO-UNDO.
@@ -391,28 +413,15 @@ END PROCEDURE.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btPage1 wSettings
-ON RETURN OF btPage1 IN FRAME DEFAULT-FRAME /* Behavior */
-,btPage2, btPage3
-DO:
-
-  .apply 'entry' to frame frSettings.
-  
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define SELF-NAME fiSearch
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiSearch wSettings
 ON ENTRY OF fiSearch IN FRAME DEFAULT-FRAME
 DO:
-  if self:screen-value <> '' then
-  do:
-    run setPage(0).
-    run showFrames(self:screen-value).
-  end.
+  IF SELF:screen-value <> '' THEN
+  DO:
+    RUN setPage(0).
+    RUN showFrames(SELF:screen-value).
+  END.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -421,17 +430,17 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiSearch wSettings
 ON VALUE-CHANGED OF fiSearch IN FRAME DEFAULT-FRAME
-or 'return' of fiSearch
+OR 'return' OF fiSearch
 DO:
-  if self:screen-value <> '' then
-  do:
-    run setPage(0).
-    run showFrames(self:screen-value).
-  end.
-  else
-  do:
-    run setPage(giLastActivePage).
-  end.
+  IF SELF:screen-value <> '' THEN
+  DO:
+    RUN setPage(0).
+    RUN showFrames(SELF:screen-value).
+  END.
+  ELSE
+  DO:
+    RUN setPage(giLastActivePage).
+  END.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -446,16 +455,22 @@ END.
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
 PAUSE 0 BEFORE-HIDE.
+
+/* For debugging in the UIB */
+&IF DEFINED(UIB_IS_RUNNING) <> 0 &THEN
+  pcSettingsFile = 'd:\Data\DropBox\DataDigger\DataDigger-nljrpti.ini'.
+  RUN startDiggerLib.p.
+&ENDIF
 
 /* Now enable the interface and wait for the exit condition.            */
 /* (NOTE: handle ERROR and END-KEY so cleanup code will always fire.    */
@@ -463,17 +478,25 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  giWinX = active-window:x.
-  giWinY = active-window:y.
+  giWinX = ACTIVE-WINDOW:X.
+  giWinY = ACTIVE-WINDOW:Y.
 
-  run initializeObject. /* Collect frames and set values from ini */
-  apply 'entry' to btPage1.
-  view wSettings.
+  RUN initializeObject. /* Collect frames and set values from ini */
 
-  run showScrollBars(frame {&frame-name}:handle, no, no).
-  
-  wSettings:x = giWinX + 50.
-  wSettings:y = giWinY + 50.
+  giCurrentPage = INTEGER(getRegistry('DataDigger','SettingsTab')) NO-ERROR.
+  IF giCurrentPage = ? OR giCurrentPage = 0 THEN giCurrentPage = 1.
+  CASE giCurrentPage:
+    WHEN 1 THEN APPLY 'entry' TO btPage1.
+    WHEN 2 THEN APPLY 'entry' TO btPage2.
+    WHEN 3 THEN APPLY 'entry' TO btPage3.
+  END CASE.
+
+  VIEW wSettings.
+
+  RUN showScrollBars(FRAME {&frame-name}:handle, NO, NO).
+
+  wSettings:X = giWinX + 50.
+  wSettings:Y = giWinY + 50.
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
     WAIT-FOR CLOSE OF THIS-PROCEDURE.
@@ -487,43 +510,39 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFrames wSettings 
 PROCEDURE collectFrames :
-/*------------------------------------------------------------------------
-  Name         : collectFrames
-  Description  : Collect all frames that have been instantiated
-  ----------------------------------------------------------------------*/
-  
-  define input parameter phParent as handle no-undo. 
+/* Collect all frames that have been instantiated
+  */
+  DEFINE INPUT PARAMETER phParent AS HANDLE NO-UNDO.
 
-  define variable hWidget as handle no-undo. 
-  define buffer ttFrame for ttFrame. 
-  
-  if not can-query(phParent,'first-child') then return. 
+  DEFINE VARIABLE hWidget AS HANDLE NO-UNDO.
+  DEFINE BUFFER bFrame FOR ttFrame.
 
-  hWidget = phParent:first-child.
+  IF NOT CAN-QUERY(phParent,'first-child') THEN RETURN.
 
-  do while valid-handle(hWidget):
+  hWidget = phParent:FIRST-CHILD.
+
+  DO WHILE VALID-HANDLE(hWidget):
 
     /* Collect frames at a lower level */
-    run collectFrames(hWidget).
+    RUN collectFrames(hWidget).
 
-    if hWidget:type = 'FRAME' then
-    do:
-
-      create ttFrame.
-      assign ttFrame.hFrame = hWidget
-             ttFrame.cFrame = hWidget:name
-             ttFrame.cTags  = 'page' + hWidget:title
-             ttFrame.iOrder = integer(hWidget:title) * 1000 + hWidget:y 
+    IF hWidget:TYPE = 'FRAME' THEN
+    DO:
+      CREATE bFrame.
+      ASSIGN bFrame.hFrame = hWidget
+             bFrame.cFrame = hWidget:NAME
+             bFrame.cTags  = 'page' + hWidget:TITLE
+             bFrame.iOrder = INTEGER(hWidget:TITLE) * 1000 + hWidget:Y
              .
 
-      hWidget:title = ?.
-      hWidget:box = no.
-    end.
+      hWidget:TITLE = ?.
+      hWidget:BOX = NO.
+    END.
 
-    hWidget = hWidget:next-sibling.
-  end.
+    hWidget = hWidget:NEXT-SIBLING.
+  END.
 
-end procedure. /* collectFrames */
+END PROCEDURE. /* collectFrames */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -571,192 +590,250 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE factoryReset wSettings 
+PROCEDURE factoryReset :
+/* Delete settings file from disk
+*/
+  DEFINE VARIABLE cFolders    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFolderList AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFile       AS CHARACTER EXTENT 3 NO-UNDO.
+  DEFINE VARIABLE lReset      AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE i           AS INTEGER   NO-UNDO.
+
+  /* Get a list of all folders in the DD dir */
+  INPUT FROM OS-DIR(getProgramDir()).
+  REPEAT:
+    IMPORT cFile.
+    IF NOT cFile[3] BEGINS 'D' THEN NEXT.
+    IF cFile[1] BEGINS '.' THEN NEXT.
+    IF cFile[1] = 'image' THEN NEXT.
+    cFolders = cFolders + '~n - delete folder ' + cFile[2].
+    cFolderList = TRIM(SUBSTITUTE('&1~n&2',cFolderList,cFile[2]),'~n').
+  END.
+  INPUT CLOSE. 
+
+  MESSAGE 
+    'This action will:~n'
+    '~n - erase your personal settings;'
+    '~n - delete cached files;'
+    cFolders
+    '~n - restart DataDigger.'
+    '~n~nDo you want to continue?' 
+    VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lReset.
+  IF lReset <> TRUE THEN RETURN. 
+
+  lReset = FALSE.
+  MESSAGE 'Please confirm again to go back to factory settings.~n~nAre you sure?' 
+    VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lReset.
+  IF lReset <> TRUE THEN RETURN. 
+
+  /* Delete personal settings */
+  OS-DELETE VALUE(pcSettingsFile).
+
+  /* Clear caches */
+  RUN clearDiskCache.
+  RUN clearRegistryCache.
+
+  /* Delete non-native folders in DD dir */
+  DO i = 1 TO NUM-ENTRIES(cFolderList,'~n'):
+    OS-DELETE VALUE(ENTRY(i,cFolderList,'~n')) RECURSIVE.
+  END.
+
+  RUN saveConfigFileSorted.
+  setRegistry('DataDigger', 'Version', '{&version}').
+  setRegistry('DataDigger', 'Build', '{&build}').
+  RUN flushRegistry.
+
+  plSuccess = TRUE.
+  APPLY "CLOSE" TO THIS-PROCEDURE.
+
+END PROCEDURE. /* factoryReset */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wSettings 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------
-  Name         : initializeObject
-  Description  : Do initialisation
-  ----------------------------------------------------------------------*/
-  
-  define variable hWidget    as handle      no-undo.
-  define variable cValue     as character   no-undo.
-  define variable iMaxHeight as integer     no-undo.
-  define variable iScreen    as integer     no-undo. 
-  define variable hProg      as handle      no-undo extent 3.
+/* Init global vars and frames
+  */
+  DEFINE VARIABLE hWidget    AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iMaxHeight AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iScreen    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE hProg      AS HANDLE  NO-UNDO EXTENT 3.
 
   /* Load decoration stuff */
-  do with frame {&frame-name}:
+  DO WITH FRAME {&frame-name}:
     btnSettings:load-image(getImagePath('Settings_txt.gif')).
-  end.
+  END.
 
   /* Hide all signs of the existence of the frame that holds the actual setting frames */
-  frame frSettings:title = ?.
-  frame frSettings:box = no.
-  frame {&frame-name}:font = getFont("Default").
+  FRAME frSettings:title = ?.
+  FRAME frSettings:box = NO.
+  FRAME {&frame-name}:font = getFont("Default").
 
   /* Collect the page buttons at the left of the screen */
-  hWidget = frame {&frame-name}:handle:first-child:first-child.
-  do while valid-handle(hWidget):
-    if hWidget:name begins 'btPage' then do:
-      gcPageButtons = trim(gcPageButtons + ',' + string(hWidget),',').
-      hWidget:private-data = hWidget:label. /* save original label */
-    end.
-    hWidget = hWidget:next-sibling.
-  end.
+  hWidget = FRAME {&frame-name}:handle:first-child:first-child.
+  DO WHILE VALID-HANDLE(hWidget):
+    IF hWidget:NAME BEGINS 'btPage' THEN DO:
+      gcPageButtons = TRIM(gcPageButtons + ',' + string(hWidget),',').
+      hWidget:PRIVATE-DATA = hWidget:LABEL. /* save original label */
+    END.
+    
+    hWidget = hWidget:NEXT-SIBLING.
+  END.
 
-  do iScreen = 1 to 3:
-    run value(substitute('&1\wSettingsTab&2.w', getProgramDir(), iScreen)) persistent set hProg[iScreen]
-      ( input frame frSettings:handle 
-      , input rcSettings:handle
+  DO iScreen = 1 TO 3:
+    RUN VALUE(SUBSTITUTE('&1\wSettingsTab&2.w', getProgramDir(), iScreen)) PERSISTENT SET hProg[iScreen]
+      ( INPUT FRAME frSettings:handle
+      , INPUT rcSettings:handle
       ).
-  end.
+  END.
 
   /* Collect all frames in the window */
-  run collectFrames(input frame frSettings:handle).
+  RUN collectFrames(INPUT FRAME frSettings:handle).
 
   /* process the content on the frames */
-  for each ttFrame:
+  FOR EACH ttFrame:
 
-    assign
+    ASSIGN
       iMaxHeight = 0
-      hWidget    = ttFrame.hFrame:first-child:first-child.
+      hWidget    = ttFrame.hFrame:FIRST-CHILD:FIRST-CHILD.
 
     /* Collect all labels on the frame */
-    do while valid-handle(hWidget):
-      iMaxHeight = maximum(iMaxHeight, hWidget:y + hWidget:height-pixels).
-      if can-set(hWidget,'font') then hWidget:font = getFont('DEFAULT').
-      hWidget = hWidget:next-sibling.
-    end. 
+    DO WHILE VALID-HANDLE(hWidget):
+      iMaxHeight = MAXIMUM(iMaxHeight, hWidget:Y + hWidget:HEIGHT-PIXELS).
+      IF CAN-SET(hWidget,'font') THEN hWidget:FONT = getFont('DEFAULT').
+      
+      IF hWidget:TYPE = 'literal' THEN
+        hWidget:WIDTH-PIXELS = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(hWidget:SCREEN-VALUE,hWidget:FONT).
+            
+      hWidget = hWidget:NEXT-SIBLING.
+    END.
 
     /* Adjust height of frame */
-    ttFrame.hFrame:height-pixels         = iMaxHeight + 4.
-    ttFrame.hFrame:virtual-height-pixels = ttFrame.hFrame:height-pixels.
-    ttFrame.hFrame:virtual-width-pixels  = ttFrame.hFrame:width-pixels.
-  end.
+    ttFrame.hFrame:HEIGHT-PIXELS         = iMaxHeight + 4.
+    ttFrame.hFrame:VIRTUAL-HEIGHT-PIXELS = ttFrame.hFrame:height-pixels.
+    ttFrame.hFrame:VIRTUAL-WIDTH-PIXELS  = ttFrame.hFrame:width-pixels.
+  END.
 
-  run enable_UI.
-  run loadSettings.
+  RUN enable_UI.
+  RUN loadSettings.
 
-  do with frame {&frame-name}:
+  DO WITH FRAME {&frame-name}:
     ficSettingsFile:screen-value = pcSettingsFile.
-  end.
+  END.
 
   /* Run local inits */
-  do iScreen = 1 to 3:
-    run localInitialize in hProg[iScreen] no-error.
-  end.
+  DO iScreen = 1 TO 3:
+    RUN localInitialize IN hProg[iScreen] NO-ERROR.
+  END.
 
-end procedure. /* initializeObject */
+  /* Factory reset button in tab 1 */
+  SUBSCRIBE TO 'factoryReset' ANYWHERE.
+
+END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadSettings wSettings 
 PROCEDURE loadSettings :
-/*------------------------------------------------------------------------
-  Name         : loadSettings
-  Description  : Walk the frames and load settings for all widgets
-  ----------------------------------------------------------------------*/
+/* Walk the frames and load settings for all widgets
+  */
+  DEFINE VARIABLE hWidget    AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cValue     AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE lValue     AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE iColor     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cSection   AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cSetting   AS CHARACTER   NO-UNDO.
 
-  define variable hWidget    as handle      no-undo.
-  define variable cValue     as character   no-undo.
-  define variable lValue     as logical     no-undo. 
-  define variable iColor     as integer     no-undo.
-  define variable cSection   as character   no-undo. 
-  define variable cSetting   as character   no-undo. 
-
-  for each ttFrame:
+  FOR EACH ttFrame:
 
     hWidget = ttFrame.hFrame:first-child:first-child.
 
-    do while valid-handle(hWidget):
+    DO WHILE VALID-HANDLE(hWidget):
 
       /* Collect tags */
-      if can-query(hWidget,'label') then
-        ttFrame.cTags = substitute('&1 &2', ttFrame.cTags, hWidget:label).
+      IF CAN-QUERY(hWidget,'label') THEN
+        ttFrame.cTags = SUBSTITUTE('&1 &2', ttFrame.cTags, hWidget:LABEL).
 
-      if can-query(hWidget,'tooltip') then
-        ttFrame.cTags = substitute('&1 &2', ttFrame.cTags, hWidget:tooltip).
+      IF CAN-QUERY(hWidget,'tooltip') THEN
+        ttFrame.cTags = SUBSTITUTE('&1 &2', ttFrame.cTags, hWidget:TOOLTIP).
 
-      if hWidget:type = 'literal' then
-        ttFrame.cTags = substitute('&1 &2', ttFrame.cTags, hWidget:screen-value).
+      IF hWidget:TYPE = 'literal' THEN
+        ttFrame.cTags = SUBSTITUTE('&1 &2', ttFrame.cTags, hWidget:SCREEN-VALUE).
 
-      if can-query(hWidget,'private-data') then
-        ttFrame.cTags = substitute('&1 &2', ttFrame.cTags, entry(num-entries(hWidget:private-data),hWidget:private-data)).
+      IF CAN-QUERY(hWidget,'private-data') THEN
+        ttFrame.cTags = SUBSTITUTE('&1 &2', ttFrame.cTags, ENTRY(NUM-ENTRIES(hWidget:PRIVATE-DATA),hWidget:PRIVATE-DATA)).
 
       /* Get value from INI file and set it in the widget */
-      if hWidget:private-data <> ? 
-        and num-entries(hWidget:private-data) = 2 then
-      do:
-        cSection = entry(1,hWidget:private-data).
-        cSetting = entry(2,hWidget:private-data).
+      IF hWidget:PRIVATE-DATA <> ?
+        AND num-entries(hWidget:PRIVATE-DATA) = 2 THEN
+      DO:
+        cSection = ENTRY(1,hWidget:PRIVATE-DATA).
+        cSetting = ENTRY(2,hWidget:PRIVATE-DATA).
         cValue   = getRegistry(cSection, cSetting).
-        if cValue = ? then cValue = "".
+        IF cValue = ? THEN cValue = "".
 
-        if hWidget:type = 'BUTTON' then 
-        do:
-          if cSection = 'DataDigger:fonts' then 
-            hWidget:font = integer(cValue) no-error.
-        end.
+        IF hWidget:TYPE = 'BUTTON' THEN
+        DO:
+          IF cSection = 'DataDigger:Fonts' THEN
+            hWidget:FONT = INTEGER(cValue) NO-ERROR.
+        END.
 
-        else
-        if hWidget:type = 'TOGGLE-BOX' then 
-        do:
-          lValue = logical(getRegistry(cSection, cSetting)) no-error.
-          if lValue = ? then lValue = false.
-          hWidget:checked = lValue.
-        end.
+        ELSE
+        IF hWidget:TYPE = 'TOGGLE-BOX' THEN
+        DO:
+          lValue = LOGICAL(getRegistry(cSection, cSetting)) NO-ERROR.
+          IF lValue = ? THEN lValue = FALSE.
+          hWidget:CHECKED = lValue.
+        END.
 
-        else 
-        if hWidget:type = 'FILL-IN'
-          and cSection = 'DataDigger:colors' then 
-        do:
+        ELSE
+        IF hWidget:TYPE = 'FILL-IN'
+          AND cSection = 'DataDigger:Colors' THEN
+        DO:
           /* Try to get :FG */
           iColor = getColor(cSetting + ':FG' ).
-          if iColor <> ? then hWidget:fgcolor = iColor no-error.
+          IF iColor <> ? THEN hWidget:FGCOLOR = iColor NO-ERROR.
 
           /* Try to get :BG */
           iColor = getColor(cSetting + ':BG' ).
-          if iColor <> ? then hWidget:bgcolor = iColor no-error.
+          IF iColor <> ? THEN hWidget:BGCOLOR = iColor NO-ERROR.
 
-          hWidget:screen-value = cSetting.
-        end.
+          hWidget:SCREEN-VALUE = cSetting.
+        END.
 
-        else
-          hWidget:screen-value = cValue.
+        ELSE
+          hWidget:SCREEN-VALUE = cValue.
 
         /* For some reason, applying "VALUE-CHANGED" toggles
          * the value of the checkbox, so do it twice :)
          */
-        apply "VALUE-CHANGED" to hWidget.
-        apply "VALUE-CHANGED" to hWidget.
-      end.
+        APPLY "VALUE-CHANGED" TO hWidget.
+        APPLY "VALUE-CHANGED" TO hWidget.
+      END.
 
-      hWidget = hWidget:next-sibling.
-    end. /* f/e ttFrame */
+      hWidget = hWidget:NEXT-SIBLING.
+    END. /* f/e ttFrame */
 
     /* Correct tags, remove strange characters */
-    ttFrame.cTags = replace(ttFrame.cTags,'&','').
-    ttFrame.cTags = replace(ttFrame.cTags,'?','').
-  end.
+    ttFrame.cTags = REPLACE(ttFrame.cTags,'&','').
+    ttFrame.cTags = REPLACE(ttFrame.cTags,'?','').
+  END.
 
-end procedure. /* loadSettings */
+END PROCEDURE. /* loadSettings */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveSettings wSettings 
 PROCEDURE saveSettings :
-/*------------------------------------------------------------------------
-  Name         : saveSettings
-  Description  : Write settings back to the ini file
-  ----------------------------------------------------------------------*/
-
+/* Write settings back to the ini file
+  */
   DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iColor   AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cSection AS CHARACTER NO-UNDO. 
+  DEFINE VARIABLE cSection AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cValue   AS CHARACTER NO-UNDO.
 
   FOR EACH ttFrame:
 
@@ -765,27 +842,27 @@ PROCEDURE saveSettings :
     DO WHILE VALID-HANDLE(hWidget):
 
       /* Get value from INI file and set it in the widget */
-      IF hWidget:PRIVATE-DATA <> ? 
+      IF hWidget:PRIVATE-DATA <> ?
         AND NUM-ENTRIES(hWidget:PRIVATE-DATA) = 2 THEN
       DO:
         cSection = ENTRY(1,hWidget:PRIVATE-DATA).
         cSetting = ENTRY(2,hWidget:PRIVATE-DATA).
 
-        IF hWidget:TYPE = 'BUTTON' THEN 
+        IF hWidget:TYPE = 'BUTTON' THEN
         DO:
-          IF cSection = 'DataDigger:fonts' THEN 
+          IF cSection = 'DataDigger:Fonts' THEN
             setRegistry(cSection, cSetting, STRING(hWidget:FONT)).
         END.
 
-        ELSE 
-        IF hWidget:TYPE = 'TOGGLE-BOX' THEN 
+        ELSE
+        IF hWidget:TYPE = 'TOGGLE-BOX' THEN
         DO:
           setRegistry(cSection, cSetting, STRING(hWidget:CHECKED)).
         END.
 
-        ELSE 
+        ELSE
         IF hWidget:TYPE = 'FILL-IN'
-          AND cSection = 'DataDigger:colors' THEN 
+          AND cSection = 'DataDigger:Colors' THEN
         DO:
           setRegistry(cSection, cSetting + ':FG', STRING(hWidget:FGCOLOR)).
           setRegistry(cSection, cSetting + ':BG', STRING(hWidget:BGCOLOR)).
@@ -806,132 +883,94 @@ END PROCEDURE. /* saveSettings */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wSettings 
 PROCEDURE setPage :
-/*------------------------------------------------------------------------
-  Name         : setPage
-  Description  : Show a page 
-  ----------------------------------------------------------------------*/
-  
-  define input parameter piPageNr as integer no-undo.
+/* Show a page
+  */
+  DEFINE INPUT PARAMETER piPageNr AS INTEGER NO-UNDO.
 
-  define variable hButton as handle  no-undo. 
-  define variable iPage   as integer no-undo. 
+  DEFINE VARIABLE hButton AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iPage   AS INTEGER NO-UNDO.
 
   /* Remember the last active page */
-  if piPageNr <> 0 then giLastActivePage = piPageNr.
+  IF piPageNr <> 0 THEN
+    ASSIGN giLastActivePage = piPageNr
+           giCurrentPage = piPageNr.
 
-  do iPage = 1 to num-entries(gcPageButtons):
-    hButton = widget-handle( entry(iPage,gcPageButtons) ).
+  setRegistry('DataDigger','SettingsTab',STRING(giCurrentPage)).
+
+  DO iPage = 1 TO NUM-ENTRIES(gcPageButtons):
+    hButton = HANDLE( ENTRY(iPage,gcPageButtons) ).
 
     /* Normal sizes */
-    assign 
-      hButton:x = 20
-      hButton:y = 60 + (iPage * 35)
-      hButton:width-pixels = 125
-      hButton:height-pixels = 35
-      hButton:label = hButton:private-data.
+    ASSIGN
+      hButton:X = 20
+      hButton:Y = 60 + (iPage * 35)
+      hButton:WIDTH-PIXELS = 125
+      hButton:HEIGHT-PIXELS = 35
+      hButton:LABEL = hButton:PRIVATE-DATA.
       .
 
     /* Selected button */
-    if iPage = piPageNr then
-    do:
-      assign 
-        hButton:x = hButton:x - 10
-        hButton:y = hButton:y - 5
-        hButton:width-pixels = hButton:width-pixels + 10
-        hButton:height-pixels = hButton:height-pixels + 10
-        hButton:label = caps(hButton:private-data)
+    IF iPage = piPageNr THEN
+    DO:
+      ASSIGN
+        hButton:X = hButton:X - 10
+        hButton:Y = hButton:Y - 5
+        hButton:WIDTH-PIXELS = hButton:WIDTH-PIXELS + 10
+        hButton:HEIGHT-PIXELS = hButton:HEIGHT-PIXELS + 10
+        hButton:LABEL = CAPS(hButton:PRIVATE-DATA)
         .
-      hButton:move-to-top().
+      hButton:MOVE-TO-TOP().
 
-      run showFrames('Page' + string(piPageNr)).
-    end.
-  end.
+      RUN showFrames('Page' + string(piPageNr)).
+    END.
+  END.
 
-end procedure. /* setPage */
+END PROCEDURE. /* setPage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFrames wSettings 
 PROCEDURE showFrames :
-/*------------------------------------------------------------------------
-  Name         : showFrames
-  Description  : Show all subframes containing a certain tag
-  ----------------------------------------------------------------------*/
-  
+/* Show all subframes containing a certain tag
+  */
   DEFINE INPUT PARAMETER pcTag AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE iRow AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iRow AS INTEGER NO-UNDO.
+  DEFINE BUFFER bFrame FOR ttFrame.
 
-  run LockWindow (input wSettings:handle, input yes).
+  RUN LockWindow (INPUT wSettings:HANDLE, INPUT YES).
 
   /* Show the first setting on y=42 */
   iRow = 15.
 
   /* Make the frame large enough to hold all settings */
-  frame frSettings:virtual-height-pixels = 6720.
-  frame frSettings:height-pixels = 390.
+  FRAME frSettings:VIRTUAL-HEIGHT-PIXELS = 6720.
+  FRAME frSettings:HEIGHT-PIXELS = 390.
 
   /* Make frames visible based on whether the tags match */
-  for each ttFrame by ttFrame.iOrder:
+  FOR EACH bFrame {&TABLE-SCAN} BY bFrame.iOrder:
 
-    ttFrame.hFrame:visible = ( ttFrame.cTags matches '*' + pcTag + '*' ).
+    bFrame.hFrame:VISIBLE = (bFrame.cTags MATCHES '*' + pcTag + '*').
 
-    if ttFrame.hFrame:visible then
-      assign
-        ttFrame.hFrame:x = 1
-        ttFrame.hFrame:y = iRow
-        iRow = iRow + ttFrame.hFrame:height-pixels + 2.
-  end.
+    IF bFrame.hFrame:VISIBLE THEN
+      ASSIGN
+        bFrame.hFrame:x = 1
+        bFrame.hFrame:y = iRow
+        iRow = iRow + bFrame.hFrame:HEIGHT-PIXELS + 2.
+  END.
 
-  frame frSettings:width-pixels = rcSettings:width-pixels in frame {&frame-name} - 10.
-  frame frSettings:virtual-height-pixels = maximum(iRow,390).
+  FRAME frSettings:WIDTH-PIXELS = rcSettings:WIDTH-PIXELS IN FRAME {&FRAME-NAME} - 10.
+  FRAME frSettings:VIRTUAL-HEIGHT-PIXELS = MAXIMUM(iRow,390).
 
-  run showScrollBars( frame frSettings:handle
-                    , no
-                    , (frame frSettings:virtual-height > frame frSettings:height) 
+  RUN showScrollBars( FRAME frSettings:HANDLE
+                    , NO
+                    , (FRAME frSettings:VIRTUAL-HEIGHT > FRAME frSettings:HEIGHT)
                     ).
 
-  run LockWindow (input wSettings:handle, input no).
+  RUN LockWindow (INPUT wSettings:HANDLE, INPUT NO).
 
 END PROCEDURE. /* showFrames */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE ShowScrollbars wSettings 
-PROCEDURE ShowScrollbars :
-/*------------------------------------------------------------------------
-  Name         : showScrollbars
-  Description  : Hide or show scrollbars the hard way
-  ----------------------------------------------------------------------*/
-  
-  DEFINE INPUT PARAMETER ip-Frame      AS HANDLE  NO-UNDO.
-  DEFINE INPUT PARAMETER ip-horizontal AS LOGICAL NO-UNDO.
-  DEFINE INPUT PARAMETER ip-vertical   AS LOGICAL NO-UNDO.
-
-  DEFINE VARIABLE iv-retint AS INTEGER NO-UNDO.
-
-  &scoped-define SB_HORZ 0
-  &scoped-define SB_VERT 1
-  &scoped-define SB_BOTH 3
-  &scoped-define SB_THUMBPOSITION 4
-
-  RUN ShowScrollBar ( ip-Frame:HWND,
-                      {&SB_HORZ},
-                      IF ip-horizontal THEN -1 ELSE 0,
-                      OUTPUT iv-retint ).
-       
-  RUN ShowScrollBar ( ip-Frame:HWND, 
-                      {&SB_VERT},
-                      IF ip-vertical  THEN -1 ELSE 0,
-                      OUTPUT iv-retint ).
-  &undefine SB_HORZ
-  &undefine SB_VERT
-  &undefine SB_BOTH
-  &undefine SB_THUMBPOSITION
-    
-END PROCEDURE. /* ShowScrollbars */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

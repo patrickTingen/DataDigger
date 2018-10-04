@@ -1,12 +1,14 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12
 &ANALYZE-RESUME
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Procedure
 /*------------------------------------------------------------------------
-  Name         : DataDigger.p
-  Description  : Launcher for DataDigger.
-  ---------------------------------------------------------------------- 
-  15-10-2009 pti Created
-  ----------------------------------------------------------------------*/
+
+  Name: DataDiggerLib.p
+  Desc: Library for DataDigger functions
+
+------------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.       */
+/*----------------------------------------------------------------------*/
 
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
@@ -17,9 +19,30 @@ PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
   DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
 END PROCEDURE.
 
+/* Detect bitness of running Progress version
+ * See Progress kb #54631
+ */
+&IF PROVERSION <= '8' &THEN  /* OE 10+ */
+  &IF PROVERSION >= '11.3' &THEN   /* PROCESS-ARCHITECTURE function is available */
+    &IF PROCESS-ARCHITECTURE = 32 &THEN /* 32-bit pointers */
+      &GLOBAL-DEFINE POINTERTYPE 'LONG'
+      &GLOBAL-DEFINE POINTERBYTES 4
+    &ELSEIF PROCESS-ARCHITECTURE = 64 &THEN /* 64-bit pointers */
+      &GLOBAL-DEFINE POINTERTYPE 'INT64'
+      &GLOBAL-DEFINE POINTERBYTES 8
+    &ENDIF  /* PROCESS-ARCHITECTURE */
+  &ELSE   /* Can't check architecture pre-11.3 so default to 32-bit */
+    &GLOBAL-DEFINE POINTERTYPE 'LONG'
+    &GLOBAL-DEFINE POINTERBYTES 4
+  &ENDIF  /* PROVERSION > 11.3 */
+&ELSE   /* pre-OE10 always 32-bit on Windows */
+  &GLOBAL-DEFINE POINTERTYPE 'LONG'
+  &GLOBAL-DEFINE POINTERBYTES 4
+&ENDIF  /* PROVERSION < 8 */
+
 PROCEDURE GetKeyboardState EXTERNAL "user32.dll":
-    DEFINE INPUT  PARAMETER KBState AS LONG. /* memptr */ 
-    DEFINE RETURN PARAMETER RetVal  AS LONG. /* bool   */ 
+  DEFINE INPUT  PARAMETER KBState AS {&POINTERTYPE}. /* memptr */
+  DEFINE RETURN PARAMETER RetVal  AS LONG. /* bool   */
 END PROCEDURE.
 
 /* Windows API entry point */
@@ -62,9 +85,9 @@ PROCEDURE GetParent EXTERNAL "user32.dll" :
   DEFINE RETURN PARAMETER hwndParent AS LONG.
 END PROCEDURE.
 
-PROCEDURE GetCursorPos EXTERNAL "user32.dll" : 
-  DEFINE INPUT-OUTPUT PARAMETER lRect AS MEMPTR. 
-END. 
+PROCEDURE GetCursorPos EXTERNAL "user32.dll" :
+  DEFINE INPUT-OUTPUT PARAMETER lRect AS MEMPTR.
+END.
 
 PROCEDURE GetSysColor EXTERNAL "user32.dll":
   DEFINE INPUT PARAMETER nDspElement AS LONG.
@@ -85,11 +108,11 @@ PROCEDURE SetWindowLongA EXTERNAL "user32.dll":
 END.
 
 PROCEDURE SetLayeredWindowAttributes EXTERNAL "user32.dll":
- DEFINE INPUT PARAMETER HWND AS LONG.
- DEFINE INPUT PARAMETER crKey AS LONG.
- DEFINE INPUT PARAMETER bAlpha AS SHORT.
- DEFINE INPUT PARAMETER dwFlagsas AS LONG.
- DEFINE RETURN PARAMETER stat AS SHORT.
+  DEFINE INPUT PARAMETER HWND AS LONG.
+  DEFINE INPUT PARAMETER crKey AS LONG.
+  DEFINE INPUT PARAMETER bAlpha AS SHORT.
+  DEFINE INPUT PARAMETER dwFlagsas AS LONG.
+  DEFINE RETURN PARAMETER stat AS SHORT.
 END.
 
 
@@ -121,10 +144,23 @@ DEFINE TEMP-TABLE ttWidget NO-UNDO RCODE-INFORMATION
   FIELD iWidth    AS INTEGER
   INDEX iPrim AS PRIMARY hWidget.
 
+DEFINE TEMP-TABLE ttColor NO-UNDO RCODE-INFORMATION
+  FIELD cName  AS CHARACTER
+  FIELD iColor AS INTEGER
+  INDEX iPrim AS PRIMARY cName.
+
+DEFINE TEMP-TABLE ttFont NO-UNDO RCODE-INFORMATION
+  FIELD cName  AS CHARACTER
+  FIELD iFont  AS INTEGER
+  INDEX iPrim AS PRIMARY cName.
+
 /* If you have trouble with the cache, disable it in the settings screen */
-DEFINE VARIABLE glCacheSettings  AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
 DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
+
+/* Vars for caching dirnames */
+DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
+DEFINE VARIABLE gcWorkFolder AS CHARACTER NO-UNDO.
 
 /* Locking / unlocking windows */
 &GLOBAL-DEFINE WM_SETREDRAW     11
@@ -136,7 +172,7 @@ DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -153,9 +189,9 @@ DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
 
 &IF DEFINED(EXCLUDE-addConnection) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addConnection Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addConnection Procedure
 FUNCTION addConnection RETURNS LOGICAL
-  ( pcDatabase AS CHARACTER 
+  ( pcDatabase AS CHARACTER
   , pcSection  AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -165,7 +201,7 @@ FUNCTION addConnection RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-formatQueryString) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD formatQueryString Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD formatQueryString Procedure
 FUNCTION formatQueryString RETURNS CHARACTER
   ( INPUT pcQueryString AS CHARACTER
   , INPUT plExpanded    AS LOGICAL )  FORWARD.
@@ -177,7 +213,7 @@ FUNCTION formatQueryString RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getColor) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColor Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColor Procedure
 FUNCTION getColor RETURNS INTEGER
   ( pcName AS CHARACTER )  FORWARD.
 
@@ -188,7 +224,7 @@ FUNCTION getColor RETURNS INTEGER
 
 &IF DEFINED(EXCLUDE-getColumnLabel) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColumnLabel Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColumnLabel Procedure
 FUNCTION getColumnLabel RETURNS CHARACTER
   ( INPUT phFieldBuffer AS HANDLE ) FORWARD.
 
@@ -199,7 +235,7 @@ FUNCTION getColumnLabel RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getColumnWidthList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColumnWidthList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColumnWidthList Procedure
 FUNCTION getColumnWidthList RETURNS CHARACTER
   ( INPUT phBrowse AS HANDLE ) FORWARD.
 
@@ -210,7 +246,7 @@ FUNCTION getColumnWidthList RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getDatabaseList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDatabaseList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDatabaseList Procedure
 FUNCTION getDatabaseList RETURNS CHARACTER FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -220,7 +256,7 @@ FUNCTION getDatabaseList RETURNS CHARACTER FORWARD.
 
 &IF DEFINED(EXCLUDE-getEscapedData) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getEscapedData Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getEscapedData Procedure
 FUNCTION getEscapedData RETURNS CHARACTER
   ( pcTarget AS CHARACTER
   , pcString AS CHARACTER )  FORWARD.
@@ -230,9 +266,22 @@ FUNCTION getEscapedData RETURNS CHARACTER
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getFieldList) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList Procedure
+FUNCTION getFieldList RETURNS CHARACTER
+  ( pcDatabase AS CHARACTER
+  , pcFile     AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getFileCategory) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFileCategory Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFileCategory Procedure
 FUNCTION getFileCategory RETURNS CHARACTER
   ( piFileNumber AS INTEGER
   , pcFileName   AS CHARACTER
@@ -245,9 +294,9 @@ FUNCTION getFileCategory RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getFont) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFont Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFont Procedure
 FUNCTION getFont RETURNS INTEGER
-  ( pcFontName AS CHARACTER )  FORWARD.
+  ( pcName AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -256,7 +305,7 @@ FUNCTION getFont RETURNS INTEGER
 
 &IF DEFINED(EXCLUDE-getImagePath) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getImagePath Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getImagePath Procedure
 FUNCTION getImagePath RETURNS CHARACTER
   ( pcImage AS CHARACTER )  FORWARD.
 
@@ -267,10 +316,10 @@ FUNCTION getImagePath RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getIndexFields) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getIndexFields Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getIndexFields Procedure
 FUNCTION getIndexFields RETURNS CHARACTER
   ( INPUT pcDatabaseName AS CHARACTER
-  , INPUT pcTableName    AS CHARACTER  
+  , INPUT pcTableName    AS CHARACTER
   , INPUT pcFlags        AS CHARACTER
   )  FORWARD.
 
@@ -281,7 +330,7 @@ FUNCTION getIndexFields RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getKeyList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getKeyList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getKeyList Procedure
 FUNCTION getKeyList RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -292,7 +341,7 @@ FUNCTION getKeyList RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getLinkInfo) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getLinkInfo Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getLinkInfo Procedure
 FUNCTION getLinkInfo RETURNS CHARACTER
   ( INPUT pcFieldName AS CHARACTER
   ) FORWARD.
@@ -302,20 +351,9 @@ FUNCTION getLinkInfo RETURNS CHARACTER
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-getMatchesValue) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMatchesValue Procedure 
-FUNCTION getMatchesValue RETURNS CHARACTER
-  ( hFillIn AS HANDLE )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-getMaxLength) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMaxLength Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMaxLength Procedure
 FUNCTION getMaxLength RETURNS INTEGER
   ( cFieldList AS CHARACTER )  FORWARD.
 
@@ -326,7 +364,7 @@ FUNCTION getMaxLength RETURNS INTEGER
 
 &IF DEFINED(EXCLUDE-getOsErrorDesc) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getOsErrorDesc Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getOsErrorDesc Procedure
 FUNCTION getOsErrorDesc RETURNS CHARACTER
   (INPUT piOsError AS INTEGER) FORWARD.
 
@@ -337,7 +375,7 @@ FUNCTION getOsErrorDesc RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getProgramDir) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProgramDir Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProgramDir Procedure
 FUNCTION getProgramDir RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -348,7 +386,7 @@ FUNCTION getProgramDir RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getQuery) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQuery Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQuery Procedure
 FUNCTION getQuery RETURNS CHARACTER
   ( INPUT pcDatabase AS CHARACTER
   , INPUT pcTable    AS CHARACTER
@@ -362,7 +400,7 @@ FUNCTION getQuery RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getReadableQuery) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getReadableQuery Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getReadableQuery Procedure
 FUNCTION getReadableQuery RETURNS CHARACTER
   ( INPUT pcQuery AS CHARACTER ) FORWARD.
 
@@ -373,10 +411,10 @@ FUNCTION getReadableQuery RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry Procedure
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER 
+    , pcKey     AS CHARACTER
     )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -386,7 +424,7 @@ FUNCTION getRegistry RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getStackSize) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getStackSize Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getStackSize Procedure
 FUNCTION getStackSize RETURNS INTEGER() FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -396,7 +434,7 @@ FUNCTION getStackSize RETURNS INTEGER() FORWARD.
 
 &IF DEFINED(EXCLUDE-getTableList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableList Procedure
 FUNCTION getTableList RETURNS CHARACTER
   ( INPUT  pcDatabaseFilter AS CHARACTER
   , INPUT  pcTableFilter    AS CHARACTER
@@ -409,7 +447,7 @@ FUNCTION getTableList RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getUserName) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getUserName Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getUserName Procedure
 FUNCTION getUserName RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -420,7 +458,7 @@ FUNCTION getUserName RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-getWidgetUnderMouse) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWidgetUnderMouse Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWidgetUnderMouse Procedure
 FUNCTION getWidgetUnderMouse RETURNS HANDLE
   ( phFrame AS HANDLE )  FORWARD.
 
@@ -429,9 +467,20 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getWorkFolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWorkFolder Procedure
+FUNCTION getWorkFolder RETURNS CHARACTER
+  ( /* parameter-definitions */ )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getXmlNodeName) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getXmlNodeName Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getXmlNodeName Procedure
 FUNCTION getXmlNodeName RETURNS CHARACTER
   ( pcFieldName AS CHARACTER )  FORWARD.
 
@@ -442,7 +491,7 @@ FUNCTION getXmlNodeName RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-isBrowseChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isBrowseChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isBrowseChanged Procedure
 FUNCTION isBrowseChanged RETURNS LOGICAL
   ( INPUT phBrowse AS HANDLE )  FORWARD.
 
@@ -453,7 +502,7 @@ FUNCTION isBrowseChanged RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isDefaultFontsChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isDefaultFontsChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isDefaultFontsChanged Procedure
 FUNCTION isDefaultFontsChanged RETURNS LOGICAL
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -464,7 +513,7 @@ FUNCTION isDefaultFontsChanged RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isFileLocked) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isFileLocked Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isFileLocked Procedure
 FUNCTION isFileLocked RETURNS LOGICAL
   ( pcFileName AS CHARACTER )  FORWARD.
 
@@ -475,7 +524,7 @@ FUNCTION isFileLocked RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isMouseOver) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isMouseOver Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isMouseOver Procedure
 FUNCTION isMouseOver RETURNS LOGICAL
   ( phWidget AS HANDLE )  FORWARD.
 
@@ -486,7 +535,7 @@ FUNCTION isMouseOver RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isTableFilterUsed) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isTableFilterUsed Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isTableFilterUsed Procedure
 FUNCTION isTableFilterUsed RETURNS LOGICAL
   ( INPUT TABLE ttTableFilter )  FORWARD.
 
@@ -497,7 +546,7 @@ FUNCTION isTableFilterUsed RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isValidCodePage) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isValidCodePage Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isValidCodePage Procedure
 FUNCTION isValidCodePage RETURNS LOGICAL
   (pcCodepage AS CHARACTER) FORWARD.
 
@@ -508,7 +557,7 @@ FUNCTION isValidCodePage RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-isWidgetChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isWidgetChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isWidgetChanged Procedure
 FUNCTION isWidgetChanged RETURNS LOGICAL
   ( INPUT phWidget AS HANDLE )  FORWARD.
 
@@ -519,7 +568,7 @@ FUNCTION isWidgetChanged RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-readFile) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD readFile Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD readFile Procedure
 FUNCTION readFile RETURNS LONGCHAR
   (pcFilename AS CHARACTER) FORWARD.
 
@@ -530,7 +579,7 @@ FUNCTION readFile RETURNS LONGCHAR
 
 &IF DEFINED(EXCLUDE-removeConnection) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD removeConnection Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD removeConnection Procedure
 FUNCTION removeConnection RETURNS LOGICAL
   ( pcDatabase AS CHARACTER )  FORWARD.
 
@@ -541,7 +590,7 @@ FUNCTION removeConnection RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-resolveOsVars) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD resolveOsVars Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD resolveOsVars Procedure
 FUNCTION resolveOsVars RETURNS CHARACTER
   ( pcString AS CHARACTER )  FORWARD.
 
@@ -552,7 +601,7 @@ FUNCTION resolveOsVars RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-resolveSequence) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD resolveSequence Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD resolveSequence Procedure
 FUNCTION resolveSequence RETURNS CHARACTER
   ( pcString AS CHARACTER )  FORWARD.
 
@@ -563,21 +612,10 @@ FUNCTION resolveSequence RETURNS CHARACTER
 
 &IF DEFINED(EXCLUDE-setColumnWidthList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setColumnWidthList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setColumnWidthList Procedure
 FUNCTION setColumnWidthList RETURNS LOGICAL
-  ( INPUT phBrowse    AS HANDLE 
+  ( INPUT phBrowse    AS HANDLE
   , INPUT pcWidthList AS CHARACTER) FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-setFilterFieldColor) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setFilterFieldColor Procedure 
-FUNCTION setFilterFieldColor RETURNS LOGICAL
-  ( phWidget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -586,7 +624,7 @@ FUNCTION setFilterFieldColor RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-setLinkInfo) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setLinkInfo Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setLinkInfo Procedure
 FUNCTION setLinkInfo RETURNS LOGICAL
   ( INPUT pcFieldName AS CHARACTER
   , INPUT pcValue     AS CHARACTER
@@ -599,12 +637,12 @@ FUNCTION setLinkInfo RETURNS LOGICAL
 
 &IF DEFINED(EXCLUDE-setRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure
 FUNCTION setRegistry RETURNS CHARACTER
-    ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER
-    , pcValue   AS CHARACTER
-    )  FORWARD.
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -617,7 +655,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _PROCEDURE-SETTINGS
 /* Settings for THIS-PROCEDURE
    Type: Procedure
-   Allow: 
+   Allow:
    Frames: 0
    Add Fields to: Neither
    Other Settings: CODE-ONLY COMPILE
@@ -627,32 +665,32 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* *************************  Create Window  ************************** */
 
 &ANALYZE-SUSPEND _CREATE-WINDOW
-/* DESIGN Window definition (used by the UIB) 
+/* DESIGN Window definition (used by the UIB)
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 45
-         WIDTH              = 45.4.
+         HEIGHT             = 34.38
+         WIDTH              = 53.4.
 /* END WINDOW DEFINITION */
                                                                         */
 &ANALYZE-RESUME
 
- 
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Procedure 
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Procedure
 
 
 /* ***************************  Main Block  *************************** */
 
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
-  DO:
-    DEFINE VARIABLE cEnvironment AS CHARACTER NO-UNDO.
-    cEnvironment = SUBSTITUTE('DataDigger-&1', getUserName() ).
+ON CLOSE OF THIS-PROCEDURE
+DO:
+  DEFINE VARIABLE cEnvironment AS CHARACTER NO-UNDO.
+  cEnvironment = SUBSTITUTE('DataDigger-&1', getUserName() ).
 
-    UNLOAD 'DataDiggerHelp' NO-ERROR.
-    UNLOAD 'DataDigger'     NO-ERROR.
-    UNLOAD cEnvironment     NO-ERROR.
-  END. /* CLOSE OF THIS-PROCEDURE  */
+  UNLOAD 'DataDiggerHelp' NO-ERROR.
+  UNLOAD 'DataDigger'     NO-ERROR.
+  UNLOAD cEnvironment     NO-ERROR.
+END. /* CLOSE OF THIS-PROCEDURE  */
 
 /* Subscribe to setUsage event to track user behaviour */
 SUBSCRIBE TO "setUsage" ANYWHERE.
@@ -664,7 +702,6 @@ SUBSCRIBE TO "setUsage" ANYWHERE.
  */
 glCacheTableDefs = TRUE.
 glCacheFieldDefs = TRUE.
-glCacheSettings  = TRUE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -674,20 +711,15 @@ glCacheSettings  = TRUE.
 
 &IF DEFINED(EXCLUDE-applyChoose) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyChoose Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyChoose Procedure
 PROCEDURE applyChoose :
-/*------------------------------------------------------------------------
-    Name         : applyChoose
-    Description  : Apply the choose event to a widget. Is used in dynamic
-                   creation of widgets.
-    ----------------------------------------------------------------------
-    16-01-2009 pti Created
-    ----------------------------------------------------------------------*/
+/* Apply the choose event to a dynamically created widget
+   */
   DEFINE INPUT  PARAMETER pihWidget AS HANDLE NO-UNDO.
-  
+
   IF VALID-HANDLE(pihWidget) THEN
   DO:
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Apply CHOOSE to &1 &2", pihWidget:TYPE, pihWidget:NAME)).
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Apply CHOOSE to &1 &2", pihWidget:TYPE, pihWidget:NAME)).
     APPLY 'choose' TO pihWidget.
   END.
 
@@ -700,21 +732,16 @@ END PROCEDURE. /* applyChoose */
 
 &IF DEFINED(EXCLUDE-applyEvent) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyEvent Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE applyEvent Procedure
 PROCEDURE applyEvent :
-/*------------------------------------------------------------------------
-    Name         : applyEvent
-    Description  : Apply an event to a widget. Is used in dynamic
-                   creation of widgets.
-    ----------------------------------------------------------------------
-    16-01-2009 pti Created
-    ----------------------------------------------------------------------*/
+/* Apply an event to a dynamically created widget
+  */
   DEFINE INPUT  PARAMETER pihWidget AS HANDLE NO-UNDO.
   DEFINE INPUT  PARAMETER pcEvent   AS CHARACTER   NO-UNDO.
-  
+
   IF VALID-HANDLE(pihWidget) THEN
   DO:
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Apply &1 to &2 &3", CAPS(pcEvent), pihWidget:TYPE, pihWidget:NAME)).
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Apply &1 to &2 &3", CAPS(pcEvent), pihWidget:TYPE, pihWidget:NAME)).
     APPLY pcEvent TO pihWidget.
   END.
 
@@ -725,15 +752,57 @@ END PROCEDURE. /* applyEvent */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-checkBackupFolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkBackupFolder Procedure
+PROCEDURE checkBackupFolder :
+/* If backup is on, create a folder for it
+  */
+  DEFINE OUTPUT PARAMETER plFolderOk AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE cFolder      AS CHARACTER   NO-UNDO.
+
+  IF LOGICAL(getRegistry("DataDigger:Backup","BackupOnCreate"))
+  OR LOGICAL(getRegistry("DataDigger:Backup","BackupOnDelete"))
+  OR LOGICAL(getRegistry("DataDigger:Backup","BackupOnDelete")) THEN
+  DO:
+    RUN getDumpFileName
+      ( INPUT 'dump' /* action */
+      , INPUT ''     /* database */
+      , INPUT ''     /* table */
+      , INPUT ''     /* extension */
+      , INPUT getRegistry("DataDigger:Backup", "BackupDir") /* template */
+      , OUTPUT cFolder
+      ).
+    RUN createFolder(cFolder).
+
+    /* Now check if folder is actually created */
+    FILE-INFO:FILE-NAME = cFolder.
+    plFolderOk = (FILE-INFO:FULL-PATHNAME <> ?).
+
+    IF NOT plFolderOk THEN
+    DO:
+      RUN showHelp('CannotCreateBackupFolder', cFolder).
+      setRegistry("DataDigger:Backup","BackupOnCreate", "NO").
+      setRegistry("DataDigger:Backup","BackupOnUpdate", "NO").
+      setRegistry("DataDigger:Backup","BackupOnDelete", "NO").
+    END.
+  END.
+  ELSE
+    plFolderOk = TRUE.
+
+END PROCEDURE. /* checkBackupFolder */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-checkDir) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkDir Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkDir Procedure
 PROCEDURE checkDir :
-/*------------------------------------------------------------------------------
-    Purpose:     
-    Parameters:  <none>
-    Notes:       
-  ------------------------------------------------------------------------------*/
+/* Check if a folder exists, is accessible etc
+  */
   DEFINE INPUT  PARAMETER pcFileName AS CHARACTER   NO-UNDO.
   DEFINE OUTPUT PARAMETER pcError    AS CHARACTER   NO-UNDO.
 
@@ -741,7 +810,7 @@ PROCEDURE checkDir :
   DEFINE VARIABLE cDirToCreate AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iDir         AS INTEGER   NO-UNDO.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Check &1", pcFileName)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Check &1", pcFileName)).
 
   /* If no path is given, use startup folder */
   cDumpDir = SUBSTRING(pcFileName, 1, R-INDEX(pcFileName,"\")).
@@ -749,38 +818,38 @@ PROCEDURE checkDir :
 
   /* We cannot use the program dir itself */
   FILE-INFO:FILE-NAME = cDumpDir.
-  IF TRIM(FILE-INFO:FULL-PATHNAME,'\/') = TRIM(getProgramDir(),"/\") THEN 
+  IF TRIM(FILE-INFO:FULL-PATHNAME,'\/') = TRIM(getProgramDir(),"/\") THEN
   DO:
     pcError = getRegistry('DataDigger:help', 'ExportToProgramdir:message').
     RETURN.
   END.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Dir = &1", cDumpDir)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Dir = &1", cDumpDir)).
 
   /* Ask to overwrite if it already exists */
   FILE-INFO:FILE-NAME = pcFileName.
-  IF FILE-INFO:FULL-PATHNAME <> ? THEN 
+  IF FILE-INFO:FULL-PATHNAME <> ? THEN
   DO:
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Already exists as &1 (&2)", FILE-INFO:FULL-PATHNAME, FILE-INFO:FILE-TYPE)).
-    
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Already exists as &1 (&2)", FILE-INFO:FULL-PATHNAME, FILE-INFO:FILE-TYPE)).
+
     IF FILE-INFO:FILE-TYPE MATCHES '*F*' THEN
     DO:
       RUN showHelp('OverwriteDumpFile', pcFileName).
-      IF getRegistry('DataDigger:help', 'OverwriteDumpFile:answer') <> '1' THEN 
+      IF getRegistry('DataDigger:help', 'OverwriteDumpFile:answer') <> '1' THEN
       DO:
         /* Do not remember the answer "No" for this question, otherwise it will be
          * confusing the next time the user encounters this situation
          */
         setRegistry('DataDigger:help', 'OverwriteDumpFile:answer',?).
         pcError = 'Aborted by user.'.
-        RETURN. 
+        RETURN.
       END.
-  
+
       /* Write access to this file? */
-      IF NOT FILE-INFO:FILE-TYPE MATCHES '*W*' THEN 
+      IF NOT FILE-INFO:FILE-TYPE MATCHES '*W*' THEN
       DO:
         pcError = SUBSTITUTE('Cannot overwrite output file "&1"', pcFileName).
-        RETURN. 
+        RETURN.
       END.
     END.
 
@@ -788,8 +857,8 @@ PROCEDURE checkDir :
     IF FILE-INFO:FILE-TYPE MATCHES '*D*' THEN
     DO:
       pcError = SUBSTITUTE('A directory named "&1" exists; cannot create a file with the same name.', pcFileName).
-      RETURN. 
-    END. 
+      RETURN.
+    END.
   END.
 
   /* Check dir */
@@ -798,10 +867,10 @@ PROCEDURE checkDir :
     AND FILE-INFO:FULL-PATHNAME = ? THEN
   DO:
     RUN showHelp('CreateDumpDir', cDumpDir).
-    IF getRegistry('DataDigger:help', 'CreateDumpDir:answer') <> '1' THEN 
+    IF getRegistry('DataDigger:help', 'CreateDumpDir:answer') <> '1' THEN
     DO:
       pcError = 'Aborted by user.'.
-      RETURN. 
+      RETURN.
     END.
   END.
 
@@ -812,51 +881,67 @@ PROCEDURE checkDir :
     /* In which dir do we want to create a subdir? */
     IF iDir = 2 THEN
       FILE-INFO:FILE-NAME = cDirToCreate + '\'.
-    ELSE 
+    ELSE
       FILE-INFO:FILE-NAME = cDirToCreate.
 
     /* Does it even exist? */
     IF FILE-INFO:FULL-PATHNAME = ? THEN
     DO:
       pcError = SUBSTITUTE('Directory "&1" does not exist.', cDirToCreate).
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Error: &1", pcError)).
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Error: &1", pcError)).
       RETURN.
     END.
 
     /* Check if the dir is writable */
     IF FILE-INFO:FILE-TYPE MATCHES '*X*'  /* Happens on CD-ROM drives */
       OR (        FILE-INFO:FILE-TYPE MATCHES '*D*'
-          AND NOT FILE-INFO:FILE-TYPE MATCHES '*W*' ) THEN 
+          AND NOT FILE-INFO:FILE-TYPE MATCHES '*W*' ) THEN
     DO:
       pcError = SUBSTITUTE('No write-access to directory: "&1"', cDirToCreate).
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Error: &1", pcError)).
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Error: &1", pcError)).
       RETURN.
     END.
 
     /* Seems to exist and to be writable. */
-    cDirToCreate = cDirToCreate + '\' + ENTRY(iDir,cDumpDir,'\'). 
+    cDirToCreate = cDirToCreate + '\' + ENTRY(iDir,cDumpDir,'\').
 
     /* If a file already exists with the same name, we cannot create a dir */
     FILE-INFO:FILE-NAME = cDirToCreate.
-    IF FILE-INFO:FILE-TYPE MATCHES '*F*' THEN 
+    IF FILE-INFO:FILE-TYPE MATCHES '*F*' THEN
     DO:
       pcError = SUBSTITUTE('A file named "&1" exists; cannot create a dir with the same name.', cDirToCreate).
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Error: &1", pcError)).
-      RETURN. 
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Error: &1", pcError)).
+      RETURN.
     END.
 
     /* Create the dir. Creating an existing dir gives no error */
-    OS-CREATE-DIR value(cDirToCreate). 
+    OS-CREATE-DIR value(cDirToCreate).
     IF OS-ERROR <> 0 THEN
     DO:
       pcError = getOsErrorDesc(OS-ERROR).
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Error: &1", pcError)).
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Error: &1", pcError)).
       RETURN.
     END. /* error */
 
   END. /* iDir */
-  
+
 END PROCEDURE. /* checkDir */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-clearColorCache) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearColorCache Procedure
+PROCEDURE clearColorCache :
+/* Clear the registry cache
+  */
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing color cache")).
+  EMPTY TEMP-TABLE ttColor.
+
+END PROCEDURE. /* clearColorCache */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -865,24 +950,23 @@ END PROCEDURE. /* checkDir */
 
 &IF DEFINED(EXCLUDE-clearDiskCache) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDiskCache Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDiskCache Procedure
 PROCEDURE clearDiskCache :
-/*------------------------------------------------------------------------
-    Name         : clearDiskCache
-    Description  : Clear the cache files on disk
-    ---------------------------------------------------------------------- 
-    15-11-2013 pti Created
-    ----------------------------------------------------------------------*/
+/* Clear the cache files on disk
+  */
   DEFINE VARIABLE cFile AS CHARACTER NO-UNDO EXTENT 3.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Clearing disk cache")).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing disk cache")).
 
-  INPUT FROM OS-DIR(getProgramdir() + "cache").
+  FILE-INFORMATION:FILE-NAME = getWorkFolder() + "cache".
+  IF FILE-INFORMATION:FULL-PATHNAME = ? THEN RETURN.
+
+  INPUT FROM OS-DIR(FILE-INFORMATION:FULL-PATHNAME).
   REPEAT:
     IMPORT cFile.
     IF cFile[1] MATCHES "*.xml" THEN OS-DELETE VALUE( cFile[2]).
   END.
-  INPUT CLOSE. 
+  INPUT CLOSE.
 
 END PROCEDURE. /* clearDiskCache */
 
@@ -891,18 +975,29 @@ END PROCEDURE. /* clearDiskCache */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-clearFontCache) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearFontCache Procedure
+PROCEDURE clearFontCache :
+/* Clear the font cache
+  */
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing font cache")).
+  EMPTY TEMP-TABLE ttFont.
+
+END PROCEDURE. /* clearFontCache */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-clearMemoryCache) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearMemoryCache Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearMemoryCache Procedure
 PROCEDURE clearMemoryCache :
-/*------------------------------------------------------------------------
-    Name         : clearMemoryCache
-    Description  : Clear the memory cache 
-    ---------------------------------------------------------------------- 
-    15-11-2013 pti Created
-    ----------------------------------------------------------------------*/
-
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Clearing memory cache")).
+/* Clear the memory cache
+  */
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing memory cache")).
   EMPTY TEMP-TABLE ttFieldCache.
 
 END PROCEDURE. /* clearMemoryCache */
@@ -914,16 +1009,11 @@ END PROCEDURE. /* clearMemoryCache */
 
 &IF DEFINED(EXCLUDE-clearRegistryCache) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearRegistryCache Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearRegistryCache Procedure
 PROCEDURE clearRegistryCache :
-/*------------------------------------------------------------------------
-    Name         : clearRegistryCache
-    Description  : Clear the registry cache 
-    ---------------------------------------------------------------------- 
-    23-11-2012 pti Created
-    ----------------------------------------------------------------------*/
-
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Clearing registry cache")).
+/* Clear the registry cache
+  */
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing registry cache")).
   EMPTY TEMP-TABLE ttConfig.
 
 END PROCEDURE. /* clearRegistryCache */
@@ -935,61 +1025,56 @@ END PROCEDURE. /* clearRegistryCache */
 
 &IF DEFINED(EXCLUDE-collectQueryInfo) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectQueryInfo Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectQueryInfo Procedure
 PROCEDURE collectQueryInfo :
-/*------------------------------------------------------------------------
-  Name         : collectQueryInfo
-  Description  : Fill the query temp-table
-  ---------------------------------------------------------------------- 
-  03-11-2009 pti Created
-  ----------------------------------------------------------------------*/
- 
- DEFINE INPUT  PARAMETER pcDatabase     AS CHARACTER   NO-UNDO.
- DEFINE INPUT  PARAMETER pcTable        AS CHARACTER   NO-UNDO.
+/* Fill the query temp-table
+  */
+  DEFINE INPUT  PARAMETER pcDatabase     AS CHARACTER   NO-UNDO.
+  DEFINE INPUT  PARAMETER pcTable        AS CHARACTER   NO-UNDO.
 
- DEFINE VARIABLE iMaxQueryHistory AS INTEGER NO-UNDO. 
- DEFINE VARIABLE iQueryNr         AS INTEGER NO-UNDO. 
- DEFINE VARIABLE iLoop            AS INTEGER NO-UNDO. 
- DEFINE VARIABLE cSetting         AS CHARACTER NO-UNDO. 
+  DEFINE VARIABLE iMaxQueryHistory AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iQueryNr         AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iLoop            AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cSetting         AS CHARACTER NO-UNDO.
 
- DEFINE BUFFER bQuery FOR ttQuery.
- {&timerStart}
- 
- /* Delete all known queries in memory of this table */
- FOR EACH bQuery 
-   WHERE bQuery.cDatabase = pcDatabase
-     AND bQuery.cTable    = pcTable:
-   DELETE bQuery.
- END. 
+  DEFINE BUFFER bQuery FOR ttQuery.
+  {&timerStart}
 
- iMaxQueryHistory = INTEGER(getRegistry("DataDigger", "MaxQueryHistory" )).
- IF iMaxQueryHistory = 0 THEN RETURN. /* no query history wanted */
+  /* Delete all known queries in memory of this table */
+  FOR EACH bQuery
+    WHERE bQuery.cDatabase = pcDatabase
+      AND bQuery.cTable    = pcTable:
+    DELETE bQuery.
+  END.
 
- /* If it is not defined use default setting */
- IF iMaxQueryHistory = ? THEN iMaxQueryHistory = 10. 
+  iMaxQueryHistory = INTEGER(getRegistry("DataDigger", "MaxQueryHistory" )).
+  IF iMaxQueryHistory = 0 THEN RETURN. /* no query history wanted */
 
- collectQueries:
- DO iLoop = 1 TO iMaxQueryHistory:
-   cSetting = getRegistry( SUBSTITUTE("DB:&1", pcDatabase)
-                         , SUBSTITUTE('&1:query:&2', pcTable, iLoop )).
+  /* If it is not defined use default setting */
+  IF iMaxQueryHistory = ? THEN iMaxQueryHistory = 10.
 
-   IF cSetting = '<Empty>' THEN NEXT.
+  collectQueries:
+  DO iLoop = 1 TO iMaxQueryHistory:
+    cSetting = getRegistry( SUBSTITUTE("DB:&1", pcDatabase)
+                          , SUBSTITUTE('&1:query:&2', pcTable, iLoop )).
 
-   IF cSetting <> ? THEN
-   DO:
-     CREATE bQuery.
-     ASSIGN iQueryNr         = iQueryNr + 1
-            bQuery.cDatabase = pcDatabase 
-            bQuery.cTable    = pcTable
-            bQuery.iQueryNr  = iQueryNr
-            bQuery.cQueryTxt = cSetting.
-   END.
-   ELSE 
-     LEAVE collectQueries.
+    IF cSetting = '<Empty>' THEN NEXT collectQueries.
 
- END. /* 1 .. MaxQueryHistory */
- {&timerStop}
+    IF cSetting <> ? THEN
+    DO:
+      CREATE bQuery.
+      ASSIGN
+        iQueryNr         = iQueryNr + 1
+        bQuery.cDatabase = pcDatabase
+        bQuery.cTable    = pcTable
+        bQuery.iQueryNr  = iQueryNr
+        bQuery.cQueryTxt = cSetting.
+    END.
+    ELSE
+      LEAVE collectQueries.
 
+  END. /* 1 .. MaxQueryHistory */
+  {&timerStop}
 END PROCEDURE. /* collectQueryInfo */
 
 /* _UIB-CODE-BLOCK-END */
@@ -999,12 +1084,10 @@ END PROCEDURE. /* collectQueryInfo */
 
 &IF DEFINED(EXCLUDE-correctFilterList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE correctFilterList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE correctFilterList Procedure
 PROCEDURE correctFilterList :
-/*------------------------------------------------------------------------------
-  Move negative entries from positive list to negative
-  ------------------------------------------------------------------------------*/
-  
+/* Move negative entries from positive list to negative
+  */
   DEFINE INPUT-OUTPUT PARAMETER pcPositive AS CHARACTER   NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER pcNegative AS CHARACTER   NO-UNDO.
 
@@ -1018,12 +1101,12 @@ PROCEDURE correctFilterList :
       DO:
         /* Add this word to the negative-list */
         pcNegative = TRIM(pcNegative + ',' + TRIM(ENTRY(iWord,pcPositive),'!'),',').
-    
+
         /* And wipe it from the positive-list */
         ENTRY(iWord,pcPositive) = ''.
       END.
     END.
-    
+
     /* Remove empty elements */
     pcPositive = REPLACE(pcPositive,',,',',').
     pcPositive = TRIM(pcPositive,',').
@@ -1038,10 +1121,10 @@ END PROCEDURE. /* correctFilterList */
 
 &IF DEFINED(EXCLUDE-createFolder) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createFolder Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createFolder Procedure
 PROCEDURE createFolder :
-/* Create a folder structure 
- */
+/* Create a folder structure
+  */
   DEFINE INPUT PARAMETER pcFolder AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE iElement AS INTEGER     NO-UNDO.
@@ -1064,13 +1147,10 @@ END PROCEDURE. /* createFolder */
 
 &IF DEFINED(EXCLUDE-dumpRecord) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpRecord Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpRecord Procedure
 PROCEDURE dumpRecord :
-/*------------------------------------------------------------------------------
-    Purpose:     
-    Parameters:  <none>
-    Notes:       
-  ------------------------------------------------------------------------------*/
+/* Dump the record(s) to disk
+  */
   DEFINE INPUT  PARAMETER pcAction   AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER phSource   AS HANDLE      NO-UNDO.
   DEFINE OUTPUT PARAMETER plContinue AS LOGICAL     NO-UNDO.
@@ -1082,8 +1162,6 @@ PROCEDURE dumpRecord :
   DEFINE VARIABLE cError          AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cMessage        AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iRow            AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cDumpProg       AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lContinue       AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lDefaultDump    AS LOGICAL   NO-UNDO.
 
   IF NOT VALID-HANDLE(phSource) THEN RETURN.
@@ -1092,14 +1170,14 @@ PROCEDURE dumpRecord :
   IF LOOKUP(pcAction,'Dump,Create,Update,Delete') = 0 THEN
   DO:
     MESSAGE 'Unknown action' pcAction VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-    RETURN. 
+    RETURN.
   END.
 
   /* Determine appropriate buffer and populate an intermediate tt
    * with the data to export
    */
   CASE phSource:TYPE:
-    WHEN 'buffer' THEN 
+    WHEN 'buffer' THEN
     DO:
       hBuffer = phSource.
 
@@ -1114,7 +1192,7 @@ PROCEDURE dumpRecord :
       hExportTtBuffer:BUFFER-COPY(hBuffer).
     END.
 
-    WHEN 'browse' THEN 
+    WHEN 'browse' THEN
     DO:
       hBuffer = phSource:QUERY:GET-BUFFER-HANDLE(1).
 
@@ -1134,37 +1212,37 @@ PROCEDURE dumpRecord :
       END.
     END.
 
-    OTHERWISE RETURN. 
+    OTHERWISE RETURN.
   END CASE.
 
-  /* Do we need to dump at all? 
-   * If the setting=NO or if no setting at all, then don't do any checks 
+  /* Do we need to dump at all?
+   * If the setting=NO or if no setting at all, then don't do any checks
    */
-  IF pcAction <> 'Dump' 
+  IF pcAction <> 'Dump'
     AND (   getRegistry('DataDigger:Backup','BackupOn' + pcAction) = ?
-         OR logical(getRegistry('DataDigger:Backup','BackupOn' + pcAction)) = NO
-        ) THEN 
+        OR logical(getRegistry('DataDigger:Backup','BackupOn' + pcAction)) = NO
+        ) THEN
   DO:
     ASSIGN plContinue = YES.
-    RETURN. 
-  END.  
+    RETURN.
+  END.
 
   /* Determine the default name to save to */
   RUN getDumpFileName
     ( INPUT pcAction        /* Dump | Create | Update | Delete */
-    , INPUT hBuffer:DBNAME    
-    , INPUT hBuffer:TABLE     
+    , INPUT hBuffer:DBNAME
+    , INPUT hBuffer:TABLE
     , INPUT "XML"
     , INPUT ""
     , OUTPUT cFileName
     ).
 
   RUN checkDir(INPUT cFileName, OUTPUT cError).
-  IF cError <> "" THEN 
+  IF cError <> "" THEN
   DO:
     MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-    RETURN. 
-  END. 
+    RETURN.
+  END.
 
   /* Fix XML Node Names for fields in the tt */
   RUN setXmlNodeNames(INPUT hExportTt:DEFAULT-BUFFER-HANDLE).
@@ -1174,7 +1252,7 @@ PROCEDURE dumpRecord :
   plContinue = ?. /* To see if it ran or not */
   PUBLISH "customDump"
       ( INPUT pcAction
-      , INPUT hBuffer:DBNAME 
+      , INPUT hBuffer:DBNAME
       , INPUT hBuffer:TABLE
       , INPUT hExportTt
       , INPUT cFileName
@@ -1182,14 +1260,11 @@ PROCEDURE dumpRecord :
       , OUTPUT lDefaultDump
       , OUTPUT plContinue
       ).
-      
+
   IF plContinue <> ? THEN
   DO:
-    IF cMessage <> "" THEN 
-      MESSAGE cMessage VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-
-    IF NOT lDefaultDump OR NOT plContinue THEN
-      RETURN. 
+    IF cMessage <> "" THEN MESSAGE cMessage VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+    IF NOT lDefaultDump OR NOT plContinue THEN RETURN.
   END.
 
   plContinue = hExportTT:WRITE-XML
@@ -1212,21 +1287,13 @@ END PROCEDURE. /* dumpRecord */
 
 &IF DEFINED(EXCLUDE-dynamicDump) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dynamicDump Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dynamicDump Procedure
 PROCEDURE dynamicDump :
-/*------------------------------------------------------------------------
-  Name         : dynamicDump
-  Description  : Dump the data to a file that is similar to those of   
-                 Progress self. Add a checksum and nr of records at the
-                 end of the file. 
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
+/* Dump the data to a file that is similar to those of Progress self.
+  */
   DEFINE INPUT PARAMETER pihBrowse AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER picFile   AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cDataType  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTimeStamp AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer    AS HANDLE      NO-UNDO EXTENT 5.
   DEFINE VARIABLE hColumn    AS HANDLE      NO-UNDO.
@@ -1250,9 +1317,9 @@ PROCEDURE dynamicDump :
   ASSIGN
     iRecords   = 0
     cTimeStamp = STRING(YEAR( TODAY),"9999":u) + "/":u
-               + string(MONTH(TODAY),"99":u  ) + "/":u
-               + string(DAY(  TODAY),"99":u  ) + "-":u
-               + string(TIME,"HH:MM:SS":u).
+              + string(MONTH(TODAY),"99":u  ) + "/":u
+              + string(DAY(  TODAY),"99":u  ) + "-":u
+              + string(TIME,"HH:MM:SS":u).
 
   hQuery:GET-FIRST.
 
@@ -1260,18 +1327,18 @@ PROCEDURE dynamicDump :
   OUTPUT to value(picFile) no-echo no-map.
   EXPORT ?.
   iBack = seek(output) - 1.
-  SEEK OUTPUT TO 0.    
+  SEEK OUTPUT TO 0.
 
   REPEAT WHILE NOT hQuery:QUERY-OFF-END
   ON STOP UNDO, LEAVE:
 
-    ASSIGN 
+    ASSIGN
       iRecords = iRecords + 1
       lFirst   = TRUE
       .
 
     PROCESS EVENTS.
-    
+
     browseColumn:
     DO iColumn = 1 TO pihBrowse:NUM-COLUMNS:
 
@@ -1284,17 +1351,17 @@ PROCEDURE dynamicDump :
       /* Find the buffer the column belongs to */
       SearchLoop:
       DO iBuffer = 1 TO 5:
-        ASSIGN hField = hBuffer[iBuffer]:BUFFER-FIELD(hColumn:NAME) no-error.
-        IF ERROR-STATUS:ERROR = FALSE 
-          AND hField <> ? THEN 
+        ASSIGN hField = hBuffer[iBuffer]:BUFFER-FIELD(hColumn:NAME) NO-ERROR.
+        IF ERROR-STATUS:ERROR = FALSE
+          AND hField <> ? THEN
           LEAVE SearchLoop.
       END.
 
       /* If no column found, something weird happened */
       IF hField = ? THEN NEXT browseColumn.
 
-      IF hField:DATA-TYPE = "recid":u THEN NEXT.
-  
+      IF hField:DATA-TYPE = "recid":u THEN NEXT browseColumn.
+
       IF lFirst THEN
         lFirst = FALSE.
       ELSE
@@ -1302,42 +1369,44 @@ PROCEDURE dynamicDump :
         SEEK OUTPUT TO seek(output) - iBack.
         PUT CONTROL ' ':u.
       END.
-  
+
       IF hField:EXTENT > 1 THEN
       DO iExtent = 1 TO hField:EXTENT:
         IF iExtent > 1 THEN
         DO:
-          SEEK OUTPUT TO seek(output) - iBack.
+          SEEK OUTPUT TO SEEK(OUTPUT) - iBack.
           PUT CONTROL ' ':u.
         END.
-  
+
         EXPORT hField:BUFFER-VALUE(iExtent).
       END.
       ELSE
         EXPORT hField:BUFFER-VALUE.
-    END. 
+    END.
 
     hQuery:GET-NEXT().
   END.
-  
+
+  /* Add a checksum and nr of records at the end of the file.
+  */
   PUT UNFORMATTED ".":u SKIP.
-  iTrailer = seek(output).
-  
+  iTrailer = SEEK(OUTPUT).
+
   PUT UNFORMATTED
-         "PSC":u 
-    SKIP "filename=":u hBuffer[1]:TABLE 
-    SKIP "records=":u  STRING(iRecords,"9999999999999":u) 
-    SKIP "ldbname=":u  hBuffer[1]:DBNAME 
-    SKIP "timestamp=":u cTimeStamp 
-    SKIP "numformat=":u ASC(SESSION:NUMERIC-SEPARATOR) ",":u ASC(SESSION:NUMERIC-DECIMAL-POINT) 
-    SKIP "dateformat=":u SESSION:DATE-FORMAT "-":u SESSION:YEAR-OFFSET 
-    SKIP "map=NO-MAP":u 
-    SKIP "cpstream=":u SESSION:CPSTREAM 
-    SKIP ".":u 
-    SKIP STRING(iTrailer,"9999999999":u) 
+        "PSC":u
+    SKIP "filename=":u hBuffer[1]:TABLE
+    SKIP "records=":u  STRING(iRecords,"9999999999999":u)
+    SKIP "ldbname=":u  hBuffer[1]:DBNAME
+    SKIP "timestamp=":u cTimeStamp
+    SKIP "numformat=":u ASC(SESSION:NUMERIC-SEPARATOR) ",":u ASC(SESSION:NUMERIC-DECIMAL-POINT)
+    SKIP "dateformat=":u SESSION:DATE-FORMAT "-":u SESSION:YEAR-OFFSET
+    SKIP "map=NO-MAP":u
+    SKIP "cpstream=":u SESSION:CPSTREAM
+    SKIP ".":u
+    SKIP STRING(iTrailer,"9999999999":u)
     SKIP.
-  
-  OUTPUT close.
+
+  OUTPUT CLOSE.
 
 END PROCEDURE. /* dynamicDump */
 
@@ -1346,54 +1415,19 @@ END PROCEDURE. /* dynamicDump */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-dynamicLoad) = 0 &THEN
+&IF DEFINED(EXCLUDE-flushRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dynamicLoad Procedure 
-PROCEDURE dynamicLoad :
-/*------------------------------------------------------------------------
-  Name         : dynamicLoad
-  Description  : Load data from a file into a buffer.
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushRegistry Procedure
+PROCEDURE flushRegistry :
+/* Flush all dirty registry settings to disk
+*/
+  {&timerStart}
 
-  DEFINE INPUT  PARAMETER hTable AS HANDLE      NO-UNDO.
-  DEFINE INPUT  PARAMETER cDelim AS CHARACTER   NO-UNDO.
+  IF CAN-FIND(FIRST ttConfig WHERE ttConfig.lUser = TRUE AND ttConfig.lDirty = TRUE) THEN
+    RUN saveConfigFileSorted.
 
-  DEFINE VARIABLE cImport AS CHARACTER   NO-UNDO EXTENT 2800.
-  DEFINE VARIABLE iImp    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iCnt    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iExtnt  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE hFld    AS HANDLE      NO-UNDO.
-
-  IF hTable:TYPE <> "BUFFER" THEN RETURN.
-  
-  REPEAT:
-    ASSIGN cImport = ""
-           iImp = 0.
-
-    IMPORT cImport.
-    hTable:BUFFER-CREATE().
-
-    DO iCnt = 1 TO hTable:NUM-FIELDS:
-      ASSIGN hFld = hTable:BUFFER-FIELD(iCnt).
-
-      IF hFld:EXTENT = 0 THEN 
-      DO:
-        ASSIGN iImp = iImp + 1
-               hFld:BUFFER-VALUE = cImport[iImp].
-      END.
-      ELSE 
-      DO iExtnt = 1 TO hFld:EXTENT:
-        ASSIGN iImp = iImp + 1
-               hFld:BUFFER-VALUE(iExtnt) = cImport[iImp].
-      END.
-    END.
-
-    hTable:BUFFER-VALIDATE().
-  END.
-
-END PROCEDURE. /* dynamicLoad */
+  {&timerStop}
+END PROCEDURE. /* flushRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1402,38 +1436,39 @@ END PROCEDURE. /* dynamicLoad */
 
 &IF DEFINED(EXCLUDE-getColumnSort) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getColumnSort Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getColumnSort Procedure
 PROCEDURE getColumnSort :
-/*------------------------------------------------------------------------
-  Name         : getColumnSort
-  Description  : Return the column nr the browse is sorted on
-  ----------------------------------------------------------------------*/
+/* Return the column nr the browse is sorted on
+  */
   DEFINE INPUT  PARAMETER phBrowse    AS HANDLE      NO-UNDO.
   DEFINE OUTPUT PARAMETER pcColumn    AS CHARACTER   NO-UNDO.
   DEFINE OUTPUT PARAMETER plAscending AS LOGICAL     NO-UNDO.
-  
+
   DEFINE VARIABLE hColumn AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iColumn AS INTEGER     NO-UNDO.
-  
+
   {&timerStart}
 
-  do iColumn = 1 to phBrowse:num-columns:
-    hColumn = phBrowse:get-browse-column(iColumn).
-    IF hColumn:SORT-ASCENDING <> ? THEN DO:
+  #BrowseColumns:
+  DO iColumn = 1 TO phBrowse:NUM-COLUMNS:
+    hColumn = phBrowse:GET-BROWSE-COLUMN(iColumn).
+    IF hColumn:SORT-ASCENDING <> ? THEN
+    DO:
       ASSIGN
         pcColumn    = hColumn:NAME
-        plAscending = hColumn:SORT-ASCENDING.
-      LEAVE.
+        plAscending = hColumn:SORT-ASCENDING
+        .
+      LEAVE #BrowseColumns.
     END.
   END.
 
   IF pcColumn = '' THEN
     ASSIGN
-      pcColumn    = phBrowse:get-browse-column(1):name
+      pcColumn    = phBrowse:GET-BROWSE-COLUMN(1):name
       plAscending = TRUE.
-      
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Sorting &1 on &2", STRING(plAscending,"up/down"), pcColumn)).
-  
+
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Sorting &1 on &2", STRING(plAscending,"up/down"), pcColumn)).
+
   {&timerStop}
 
 END PROCEDURE. /* getColumnSort */
@@ -1445,13 +1480,10 @@ END PROCEDURE. /* getColumnSort */
 
 &IF DEFINED(EXCLUDE-getDumpFileName) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDumpFileName Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDumpFileName Procedure
 PROCEDURE getDumpFileName :
-/*------------------------------------------------------------------------
-  Name         : getDumpFileName
-  Description  : Return a file name based on a template
-  ----------------------------------------------------------------------*/
-  
+/* Return a file name based on a template
+  */
   DEFINE INPUT  PARAMETER pcAction    AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcDatabase  AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcTable     AS CHARACTER   NO-UNDO.
@@ -1463,45 +1495,44 @@ PROCEDURE getDumpFileName :
   DEFINE VARIABLE cDayOfWeek    AS CHARACTER   NO-UNDO EXTENT 7 INITIAL ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].
   DEFINE VARIABLE cDumpName     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDumpDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDumpFile     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBackupDir    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cBackupFile   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBuffer       AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cUserId       AS CHARACTER   NO-UNDO.
 
   /* Checks */
-  IF LOOKUP(pcAction, "Dump,Create,Update,Delete") = 0 THEN 
+  IF LOOKUP(pcAction, "Dump,Create,Update,Delete") = 0 THEN
   DO:
     MESSAGE 'Unknown action' pcAction VIEW-AS ALERT-BOX.
     RETURN.
   END.
 
   /* If not provided, find the template from the settings,
-   * depending on the action we want to perform. 
+   * depending on the action we want to perform.
    */
   IF pcTemplate = ? OR pcTemplate = "" THEN
   DO:
-    IF pcAction = 'Dump' THEN 
+    IF pcAction = 'Dump' THEN
       pcFileName = "<DUMPDIR>" + getRegistry("DumpAndLoad", "DumpFileTemplate").
-    ELSE 
+    ELSE
       pcFileName = "<BACKUPDIR>" + getRegistry("DataDigger:Backup", "BackupFileTemplate").
   END.
-  ELSE 
+  ELSE
     pcFileName = pcTemplate.
 
   IF pcFileName = ? THEN pcFileName = "".
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Dump to: &1", pcFileName)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Dump to: &1", pcFileName)).
 
   /* Dump dir / backup dir / last-used dir from settings */
   cDumpDir = RIGHT-TRIM(getRegistry("DumpAndLoad", "DumpDir"),'/\') + '\'.
-  IF cDumpDir = ? OR cDumpDir = '' THEN cDumpDir = "<PROGDIR>dump\". 
+  IF cDumpDir = ? OR cDumpDir = '' THEN cDumpDir = "<WORKDIR>dump\".
 
   cBackupDir  = RIGHT-TRIM(getRegistry("DataDigger:Backup", "BackupDir"),'/\') + '\'.
-  IF cBackupDir = ? OR cBackupDir = '' THEN cBackupDir = "<PROGDIR>backup\". 
+  IF cBackupDir = ? OR cBackupDir = '' THEN cBackupDir = "<WORKDIR>backup\".
 
   cLastDir = RIGHT-TRIM(getRegistry("DumpAndLoad", "DumpLastFileName"),'/\').
   cLastDir = SUBSTRING(cLastDir,1,R-INDEX(cLastDir,"\")).
-  IF cLastDir = ? THEN cLastDir = "<PROGDIR>dump".
+  IF cLastDir = ? THEN cLastDir = "<WORKDIR>dump".
   cLastDir = RIGHT-TRIM(cLastDir,'\').
 
   /* Find _file for the dump-name */
@@ -1511,26 +1542,32 @@ PROCEDURE getDumpFileName :
     hBuffer:FIND-UNIQUE(SUBSTITUTE('where _file-name = &1 and _File._File-Number < 32768', QUOTER(pcTable)),NO-LOCK).
     IF hBuffer:AVAILABLE THEN
       cDumpName = hBuffer::_dump-name.
-    ELSE 
+    ELSE
       cDumpName = pcTable.
   END.
-  ELSE 
+  ELSE
     cDumpName = pcTable.
   IF cDumpName = ? THEN cDumpName = pcTable.
-  
-  PUBLISH "debugMessage" (3, SUBSTITUTE("DumpDir  : &1", cDumpDir)).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("BackupDir: &1", cBackupDir)).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("LastDir  : &1", cLastDir)).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("DumpName : &1", cDumpName)).
+
+  /* If you have no db connected, userid gives back unknown value
+   * which misbehaves in a replace statement */
+  cUserId = USERID(LDBNAME(1)).
+  IF cUserId = ? THEN cUserId = ''.
+
+  PUBLISH "debugInfo" (3, SUBSTITUTE("DumpDir  : &1", cDumpDir)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("BackupDir: &1", cBackupDir)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("LastDir  : &1", cLastDir)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("DumpName : &1", cDumpName)).
 
   /* Now resolve all tags */
   pcFileName = REPLACE(pcFileName,"<DUMPDIR>"  , cDumpDir                    ).
   pcFileName = REPLACE(pcFileName,"<BACKUPDIR>", cBackupDir                  ).
   pcFileName = REPLACE(pcFileName,"<LASTDIR>"  , cLastDir                    ).
-  pcFileName = REPLACE(pcFileName,"<PROGDIR>"  , getProgramDir()             ).
+  pcFileName = REPLACE(pcFileName,"<PROGDIR>"  , getWorkFolder()             ).
+  pcFileName = REPLACE(pcFileName,"<WORKDIR>"  , getWorkFolder()             ).
 
   pcFileName = REPLACE(pcFileName,"<ACTION>"   , pcAction                    ).
-  pcFileName = REPLACE(pcFileName,"<USERID>"   , USERID(LDBNAME(1))          ).
+  pcFileName = REPLACE(pcFileName,"<USERID>"   , cUserId                     ).
   pcFileName = REPLACE(pcFileName,"<DB>"       , pcDatabase                  ).
   pcFileName = REPLACE(pcFileName,"<TABLE>"    , pcTable                     ).
   pcFileName = REPLACE(pcFileName,"<DUMPNAME>" , cDumpName                   ).
@@ -1551,10 +1588,10 @@ PROCEDURE getDumpFileName :
 
   /* Get rid of annoying slashes */
   pcFileName = TRIM(pcFileName,'/\').
-  
+
   /* Get rid of double slashes (except at the beginning for UNC paths) */
   pcFileName = SUBSTRING(pcFileName,1,1) + REPLACE(SUBSTRING(pcFileName,2),'\\','\').
-  
+
   /* Sequences */
   pcFileName = resolveSequence(pcFileName).
 
@@ -1563,7 +1600,7 @@ PROCEDURE getDumpFileName :
 
   /* Make lower */
   pcFileName = LC(pcFileName).
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Dump to: &1", pcFileName)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Dump to: &1", pcFileName)).
 
 END PROCEDURE. /* getDumpFileName */
 
@@ -1574,26 +1611,18 @@ END PROCEDURE. /* getDumpFileName */
 
 &IF DEFINED(EXCLUDE-getFields) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFields Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFields Procedure
 PROCEDURE getFields :
-/*------------------------------------------------------------------------
-  Name         : getFields
-  Description  : Fill the fields temp-table
-  ---------------------------------------------------------------------- 
-  18-03-2009 pti Created
-  ----------------------------------------------------------------------*/
-  
+/* Fill the fields temp-table
+  */
   DEFINE INPUT  PARAMETER pcDatabase  AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcTableName AS CHARACTER   NO-UNDO.
   DEFINE OUTPUT PARAMETER DATASET FOR dsFields.
 
   DEFINE VARIABLE cCacheFile         AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFieldOrder        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFields            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cPrimIndexFields   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery             AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cTableCacheId      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUniqueIndexFields AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSDBName           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hBufferField       AS HANDLE      NO-UNDO.
@@ -1602,19 +1631,18 @@ PROCEDURE getFields :
   DEFINE VARIABLE iFieldExtent       AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iFieldOrder        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lDataField         AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShowRecidField    AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShowRowidField    AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iDataOrder         AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE i                  AS INTEGER     NO-UNDO.
 
-  DEFINE BUFFER bTable       FOR ttTable. 
-  DEFINE BUFFER bField       FOR ttField. 
-  DEFINE BUFFER bColumn      FOR ttColumn. 
+  DEFINE BUFFER bTable       FOR ttTable.
+  DEFINE BUFFER bField       FOR ttField.
+  DEFINE BUFFER bColumn      FOR ttColumn.
   DEFINE BUFFER bFieldCache  FOR ttFieldCache.
   DEFINE BUFFER bColumnCache FOR ttColumnCache.
   DEFINE BUFFER bTableFilter FOR ttTableFilter.
 
   {&timerStart}
-  
+
   /* Clean up first */
   EMPTY TEMP-TABLE bField.
   EMPTY TEMP-TABLE bColumn.
@@ -1623,46 +1651,53 @@ PROCEDURE getFields :
   ASSIGN cSDBName = SDBNAME(pcDatabase).
 
   /* Return if no db connected */
-  IF NUM-DBS = 0 THEN RETURN. 
+  IF NUM-DBS = 0 THEN RETURN.
 
   /* caching */
   IF glCacheFieldDefs THEN
   DO:
     /* Find the table. Should exist. */
-    FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
-    
+    FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+    IF NOT AVAILABLE bTable THEN RETURN.
+
     /* Verify whether the CRC is still the same. If not, kill the cache */
+    PUBLISH "DD:Timer" ("start", 'getFields - step 1: verify CRC').
     CREATE BUFFER hBufferFile FOR TABLE cSDBName + "._File".
 
     hBufferFile:FIND-UNIQUE(SUBSTITUTE('where _file-name = &1 and _File._File-Number < 32768', QUOTER(pcTableName)),NO-LOCK).
     IF hBufferFile::_crc <> bTable.cCrc THEN
     DO:
       /* It seems that it is not possible to refresh the schema cache of the running
-       * session. You just have to restart your session. 
+       * session. You just have to restart your session.
        */
-      PUBLISH "debugMessage" (1, SUBSTITUTE("File CRC changed, kill cache and build new")).
+      PUBLISH "debugInfo" (1, SUBSTITUTE("File CRC changed, kill cache and build new")).
       FOR EACH bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId:
         DELETE bFieldCache.
       END.
       FOR EACH bColumnCache WHERE bColumnCache.cTableCacheId = bTable.cCacheId:
         DELETE bColumnCache.
       END.
-      
+
       /* Get a fresh list of tables */
       RUN getTables(INPUT TABLE bTableFilter, OUTPUT TABLE bTable).
 
       /* Find the table back. Should exist. */
-      FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
+      FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+      IF NOT AVAILABLE bTable THEN RETURN.
     END.
+    PUBLISH "DD:Timer" ("stop", 'getFields - step 1: verify CRC').
 
     /* First look in the memory-cache */
     IF CAN-FIND(FIRST bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId) THEN
     DO:
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Get from memory-cache")).
+      PUBLISH "DD:Timer" ("start", 'getFields - step 2: check memory cache').
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Get from memory-cache")).
+
       FOR EACH bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId:
         CREATE bField.
         BUFFER-COPY bFieldCache TO bField.
       END.
+
       FOR EACH bColumnCache WHERE bColumnCache.cTableCacheId = bTable.cCacheId:
         CREATE bColumn.
         BUFFER-COPY bColumnCache TO bColumn.
@@ -1671,59 +1706,64 @@ PROCEDURE getFields :
       /* Update with settings from registry */
       RUN updateFields(INPUT pcDatabase, INPUT pcTableName, INPUT-OUTPUT TABLE bField).
 
-      {&timerStop}
-      RETURN. 
+      PUBLISH "DD:Timer" ("stop", 'getFields - step 2: check memory cache').
+      RETURN.
     END.
-  
+
     /* See if disk cache exists */
-    cCacheFile = SUBSTITUTE('&1cache\&2.xml', getProgramDir(), bTable.cCacheId).
-    PUBLISH "debugMessage" (2, SUBSTITUTE("Cachefile: &1", cCacheFile)).
-  
+    cCacheFile = SUBSTITUTE('&1cache\&2.xml', getWorkFolder(), bTable.cCacheId).
+    PUBLISH "debugInfo" (2, SUBSTITUTE("Cachefile: &1", cCacheFile)).
+
     IF SEARCH(cCacheFile) <> ? THEN
     DO:
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Get from disk cache")).
+      PUBLISH "DD:Timer" ("start", 'getFields - step 3: get from disk cache').
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Get from disk cache")).
       DATASET dsFields:READ-XML("file", cCacheFile, "empty", ?, ?, ?, ?).
-  
+
       /* Add to memory cache, so the next time it's even faster */
       IF TEMP-TABLE bField:HAS-RECORDS THEN
       DO:
-        PUBLISH "debugMessage" (3, SUBSTITUTE("Add to first-level cache")).
-        FOR EACH bField:
+        PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache")).
+        FOR EACH bField {&TABLE-SCAN}:
           CREATE bFieldCache.
           BUFFER-COPY bField TO bFieldCache.
         END.
-        FOR EACH bColumn:
+
+        FOR EACH bColumn {&TABLE-SCAN}:
           CREATE bColumnCache.
           BUFFER-COPY bColumn TO bColumnCache.
         END.
       END.
-  
+
       /* Update with settings from registry */
       RUN updateFields(INPUT pcDatabase, INPUT pcTableName, INPUT-OUTPUT TABLE bField).
 
-      {&timerStop}
-      RETURN. 
+      PUBLISH "DD:Timer" ("stop", 'getFields - step 3: get from disk cache').
+      RETURN.
     END.
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Not found in any cache, build tables...")).
+
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Not found in any cache, build tables...")).
   END.
 
   /*
    * If we get here, the table either cannot be found in the cache
    * or caching is disabled. Either way, fill the tt with fields
    */
-  FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName.
+  PUBLISH "DD:Timer" ("start", 'getFields - step 4: build cache').
+  FIND bTable WHERE bTable.cDatabase = pcDatabase AND bTable.cTableName = pcTableName NO-ERROR.
+  IF NOT AVAILABLE bTable THEN RETURN.
 
-  CREATE BUFFER hBufferFile  FOR TABLE cSDBName + "._File".                    
+  CREATE BUFFER hBufferFile  FOR TABLE cSDBName + "._File".
   CREATE BUFFER hBufferField FOR TABLE cSDBName + "._Field".
 
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hBufferFile,hBufferField).
 
   cQuery = SUBSTITUTE("FOR EACH &1._File  WHERE &1._file._file-name = '&2' AND _File._File-Number < 32768 NO-LOCK, " +
-                      "    EACH &1._Field OF &1._File NO-LOCK BY _ORDER" 
-                     , cSDBName
-                     , pcTableName
-                     ).
+                      "    EACH &1._Field OF &1._File NO-LOCK BY _ORDER"
+                    , cSDBName
+                    , pcTableName
+                    ).
 
   hQuery:QUERY-PREPARE(cQuery).
   hQuery:QUERY-OPEN().
@@ -1741,13 +1781,10 @@ PROCEDURE getFields :
   /* If none selected, set mask to 'all' */
   IF cSelectedFields = ? THEN cSelectedFields = '*'.
 
-  /* Get field ordering */
-  cFieldOrder = getRegistry(SUBSTITUTE('DB:&1',pcDatabase), SUBSTITUTE('&1:FieldOrder',pcTableName)).
-              
   REPEAT WHILE NOT hQuery:QUERY-OFF-END:
 
     CREATE bField.
-    ASSIGN 
+    ASSIGN
       iFieldOrder          = iFieldOrder + 1
       bField.cTableCacheId = bTable.cCacheId
       bField.cDatabase     = pcDatabase
@@ -1756,19 +1793,20 @@ PROCEDURE getFields :
 
       bField.lShow         = CAN-DO(cSelectedFields, hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE)
       bField.iOrder        = iFieldOrder
-      bField.iOrderOrg     = iFieldOrder 
+      bField.iOrderOrg     = iFieldOrder
 
-      bField.cFullName     = hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE 
+      bField.cFullName     = hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE
       bField.cDataType     = hBufferField:BUFFER-FIELD('_data-type'):BUFFER-VALUE
-      bField.cInitial      = hBufferField:BUFFER-FIELD('_initial'):BUFFER-VALUE   
-      bField.cFormat       = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE     
-      bField.cFormatOrg    = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE      
+      bField.cInitial      = hBufferField:BUFFER-FIELD('_initial'):BUFFER-VALUE
+      bField.cFormat       = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE
+      bField.cFormatOrg    = hBufferField:BUFFER-FIELD('_format'):BUFFER-VALUE
+      bField.iWidth        = hBufferField:BUFFER-FIELD('_width'):BUFFER-VALUE
       bField.cLabel        = hBufferField:BUFFER-FIELD('_label'):BUFFER-VALUE
       bField.lPrimary      = CAN-DO(cPrimIndexFields, bField.cFieldName)
       bField.iExtent       = hBufferField:BUFFER-FIELD('_Extent'):BUFFER-VALUE
       bField.lMandatory    = hBufferField:BUFFER-FIELD('_mandatory'):BUFFER-VALUE
       bField.lUniqueIdx    = CAN-DO(cUniqueIndexFields,bField.cFieldName)
-      
+
       /* New fields as per v19 */
       bField.cColLabel     = hBufferField:BUFFER-FIELD('_Col-label'):BUFFER-VALUE
       bField.iDecimals     = hBufferField:BUFFER-FIELD('_Decimals'):BUFFER-VALUE
@@ -1793,7 +1831,7 @@ PROCEDURE getFields :
     IF lDataField = TRUE THEN
     DO iFieldExtent = (IF bField.iExtent = 0 THEN 0 ELSE 1) TO bField.iExtent:
 
-      iDataOrder = iDataOrder + 1. 
+      iDataOrder = iDataOrder + 1.
 
       CREATE bColumn.
       ASSIGN
@@ -1807,9 +1845,9 @@ PROCEDURE getFields :
         bColumn.iOrder        = bField.iOrder
         bColumn.cLabel        = bField.cLabel
         .
-      PUBLISH "debugMessage"(3,SUBSTITUTE("Field &1 created", bColumn.cFullName)).
+      PUBLISH "debugInfo"(3,SUBSTITUTE("Field &1 created", bColumn.cFullName)).
     END. /* For each extent nr */
-    
+
     hQuery:GET-NEXT().
   END.
   hQuery:QUERY-CLOSE().
@@ -1821,100 +1859,66 @@ PROCEDURE getFields :
   /* Fieldlist */
   bTable.cFields = SUBSTRING(bTable.cFields,2).
 
-  /* Add a column for the recid */
-  lShowRecidField = LOGICAL(getRegistry ("DataDigger", "AddDataColumnForRecid")).
-  lShowRowidField = LOGICAL(getRegistry ("DataDigger", "AddDataColumnForRowid")).
+  /* Add columns for recid/rowid */
+  DO i = 1 TO 2:
 
-  CREATE bField.
-  ASSIGN 
-    iFieldOrder          = iFieldOrder + 1
-    bField.cTableCacheId = bTable.cCacheId
-    bField.cDatabase     = pcDatabase
-    bField.cTablename    = pcTableName
-    bField.cFieldName    = "RECID"
-                          
-    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRecidField ELSE LOOKUP('RECID',cSelectedFields) > 0)
-    bField.iOrder        = iFieldOrder
-    bField.iOrderOrg     = iFieldOrder
-    bField.cFullName     = 'RECID'
-    bField.cDataType     = 'character'
-    bField.cInitial      = ''
-    bField.cFormat       = 'X(14)'
-    bField.cFormatOrg    = 'X(14)'
-    bField.cLabel        = 'RECID'
-    bField.lPrimary      = NO
-    bField.iExtent       = 0
-    .
-  iDataOrder = iDataOrder + 1. 
-  CREATE bColumn.
-  ASSIGN
-    bColumn.cTableCacheId = bField.cTableCacheId
-    bColumn.cDatabase     = bField.cDatabase
-    bColumn.cTableName    = bField.cTablename
-    bColumn.cFieldName    = bField.cFieldName
-    bColumn.iExtent       = 0
-    bColumn.cFullName     = bField.cFieldName
-    bColumn.iColumnNr     = iDataOrder
-    bColumn.iOrder        = bField.iOrder
-    bColumn.cLabel        = bField.cLabel
-    .
+    CREATE bField.
+    ASSIGN
+      iFieldOrder          = iFieldOrder + 1
+      bField.cTableCacheId = bTable.cCacheId
+      bField.cDatabase     = pcDatabase
+      bField.cTablename    = pcTableName
+      bField.cFieldName    = ENTRY(i,"RECID,ROWID")
+      bField.lShow         = FALSE
+      bField.iOrder        = iFieldOrder
+      bField.iOrderOrg     = iFieldOrder
+      bField.cFieldName    = bField.cFieldName
+      bField.cFullName     = bField.cFieldName
+      bField.cDataType     = 'character'
+      bField.cInitial      = ''
+      bField.cFormat       = ENTRY(i,"X(14),X(30)")
+      bField.cFormatOrg    = bField.cFormat
+      bField.cLabel        = bField.cFieldName
+      bField.lPrimary      = NO
+      bField.iExtent       = 0
+      .
 
-  /* Add a column for the rowid */
-  CREATE bField.
-  ASSIGN 
-    iFieldOrder           = iFieldOrder + 1
-    bField.cTableCacheId = bTable.cCacheId
-    bField.cDatabase     = pcDatabase
-    bField.cTablename    = pcTableName
-    bField.cFieldName    = "ROWID"
-                          
-    bField.lShow         = (IF cSelectedFields = '*' THEN lShowRowidField ELSE LOOKUP('ROWID',cSelectedFields) > 0)
-    bField.iOrder        = iFieldOrder
-    bField.iOrderOrg     = iFieldOrder
-    bField.cFieldName    = 'ROWID'
-    bField.cFullName     = 'ROWID'
-    bField.cDataType     = 'character'
-    bField.cInitial      = ''
-    bField.cFormat       = 'X(30)'
-    bField.cFormatOrg    = 'X(30)'
-    bField.cLabel        = 'ROWID'
-    bField.lPrimary      = NO
-    bField.iExtent       = 0
-    .
-  iDataOrder = iDataOrder + 1. 
-  CREATE bColumn.
-  ASSIGN
-    bColumn.cTableCacheId = bField.cTableCacheId
-    bColumn.cDatabase     = bField.cDatabase
-    bColumn.cTableName    = bField.cTablename
-    bColumn.cFieldName    = bField.cFieldName
-    bColumn.iExtent       = 0
-    bColumn.cFullName     = bField.cFieldName
-    bColumn.iColumnNr     = iDataOrder
-    bColumn.iOrder        = bField.iOrder
-    bColumn.cLabel        = bField.cLabel
-    .
-    
+    iDataOrder = iDataOrder + 1.
+    CREATE bColumn.
+    ASSIGN
+      bColumn.cTableCacheId = bField.cTableCacheId
+      bColumn.cDatabase     = bField.cDatabase
+      bColumn.cTableName    = bField.cTablename
+      bColumn.cFieldName    = bField.cFieldName
+      bColumn.iExtent       = 0
+      bColumn.cFullName     = bField.cFieldName
+      bColumn.iColumnNr     = iDataOrder
+      bColumn.iOrder        = bField.iOrder
+      bColumn.cLabel        = bField.cLabel
+      .
+  END.
+  PUBLISH "DD:Timer" ("stop", 'getFields - step 4: build cache').
+
   /* Update the cache */
   IF glCacheFieldDefs THEN
   DO:
     /* Add to disk cache */
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Add to second-level cache.")).
-    DATASET dsFields:WRITE-XML( "file", cCacheFile, YES, ?, ?, NO, NO). 
-    
+    PUBLISH "DD:Timer" ("start", 'getFields - step 5: save to disk').
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Add to second-level cache.")).
+    DATASET dsFields:WRITE-XML( "file", cCacheFile, YES, ?, ?, NO, NO).
+
     /* Add to memory cache */
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Add to first-level cache.")).
-    FOR EACH bField:
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache.")).
+    FOR EACH bField {&TABLE-SCAN}:
       CREATE bFieldCache.
       BUFFER-COPY bField TO bFieldCache.
     END.
 
-    FOR EACH bColumn:
+    FOR EACH bColumn {&TABLE-SCAN}:
       CREATE bColumnCache.
       BUFFER-COPY bColumn TO bColumnCache.
     END.
-
-    /* Update table cache */
+    PUBLISH "DD:Timer" ("stop", 'getFields - step 5: save to disk').
   END.
 
   /* Update fields with settings from registry */
@@ -1931,34 +1935,27 @@ END PROCEDURE. /* getFields */
 
 &IF DEFINED(EXCLUDE-getMouseXY) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getMouseXY Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getMouseXY Procedure
 PROCEDURE getMouseXY :
-/*------------------------------------------------------------------------
-  Name         : getMouseXY
-  Description  : Get the position of the mouse relative to the frame
-  ----------------------------------------------------------------------
-  14-09-2010 pti Created
-  ----------------------------------------------------------------------*/
-  
+/* Get the position of the mouse relative to the frame
+  */
   DEFINE INPUT  PARAMETER phFrame AS HANDLE      NO-UNDO.
   DEFINE OUTPUT PARAMETER piMouseX AS INTEGER     NO-UNDO.
   DEFINE OUTPUT PARAMETER piMouseY AS INTEGER     NO-UNDO.
 
-  DEFINE VARIABLE lp AS MEMPTR  NO-UNDO. 
-  
-  set-size( lp ) = 16. 
-  
-  RUN GetCursorPos( INPUT-OUTPUT lp). 
-  
+  DEFINE VARIABLE lp AS MEMPTR  NO-UNDO.
+
+  SET-SIZE( LP ) = 16.
+  RUN GetCursorPos( INPUT-OUTPUT lp).
+
   /* Get the location of the mouse relative to the frame */
   RUN ScreenToClient ( INPUT phFrame:HWND, INPUT lp ).
-  
-  piMouseX = GET-LONG( lp, 1 ). 
-  piMouseY = GET-LONG( lp, 5 ). 
-  
-  set-size( lp ) = 0. 
-  
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Mouse X/Y = &1 / &2", piMouseX, piMouseY)).
+
+  piMouseX = GET-LONG( lp, 1 ).
+  piMouseY = GET-LONG( lp, 5 ).
+  SET-SIZE( LP ) = 0.
+
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Mouse X/Y = &1 / &2", piMouseX, piMouseY)).
 
 END PROCEDURE. /* getMouseXY */
 
@@ -1969,19 +1966,29 @@ END PROCEDURE. /* getMouseXY */
 
 &IF DEFINED(EXCLUDE-getQueryTable) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getQueryTable Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getQueryTable Procedure
 PROCEDURE getQueryTable :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Get the ttQuery table
+  * Note: This procedure just returns the table, no further logic needed.
+  */
+  DEFINE OUTPUT PARAMETER table FOR ttQuery.
 
- DEFINE OUTPUT PARAMETER table FOR ttQuery.
-    
- /* This procedure just returns the table, no further logic needed. */
+END PROCEDURE. /* getQueryTable */
 
-END PROCEDURE.
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getRegistryTable) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getRegistryTable Procedure
+PROCEDURE getRegistryTable :
+/* Return complete registry tt
+  */
+  DEFINE OUTPUT PARAMETER TABLE FOR ttConfig.
+
+END PROCEDURE. /* getRegistryTable */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1990,127 +1997,99 @@ END PROCEDURE.
 
 &IF DEFINED(EXCLUDE-getTables) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTables Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTables Procedure
 PROCEDURE getTables :
-/*------------------------------------------------------------------------
-  Name         : getTables
-  Description  : Fill the ttTable temptable with all tables of all 
-                 currently connected databases.
-  ----------------------------------------------------------------------
-  29-10-2009 pti Created
-  06-01-2010 pti Optimized for large / a lot of databases.
-  ----------------------------------------------------------------------*/
-  
+/* Fill ttTable with all currently connected databases.
+  */
   DEFINE INPUT PARAMETER TABLE FOR ttTableFilter.
-  DEFINE OUTPUT PARAMETER TABLE FOR ttTable. 
+  DEFINE OUTPUT PARAMETER TABLE FOR ttTable.
 
   DEFINE VARIABLE cCacheFile      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabaseName   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cIniFile        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLine           AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cQuery          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSection        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hDbBuffer       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hDbStatusBuffer AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFileBuffer     AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFieldBuffer    AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFileQuery      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFieldQuery     AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hQuery          AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hDbQuery        AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
 
   {&timerStart}
 
   EMPTY TEMP-TABLE ttTable.
   CREATE WIDGET-POOL "metaInfo".
-  CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
+  CREATE QUERY hQuery IN WIDGET-POOL "metaInfo".
 
+  #Database:
   DO iDatabase = 1 TO NUM-DBS:
-    /* NelsonAlcala added */
-    IF DBTYPE(iDatabase) <> "PROGRESS" THEN NEXT.
+    IF DBTYPE(iDatabase) <> "PROGRESS" THEN NEXT #Database.
 
-    /* Calculate the name of the cache file */
+    /* Compose name of the cache file. Use date/time of last schema change in the name */
     IF glCacheTableDefs THEN
     DO:
       CREATE BUFFER hDbStatusBuffer FOR TABLE LDBNAME(iDatabase) + "._DbStatus" IN WIDGET-POOL "metaInfo".
       hDbStatusBuffer:FIND-FIRST("",NO-LOCK).
       cCacheFile = SUBSTITUTE("&1cache\db.&2.&3.xml"
-                             , getProgramDir()
-                             , LDBNAME(iDatabase)
-                             , REPLACE(REPLACE(hDbStatusBuffer::_dbstatus-cachestamp," ","_"),":","")
-                             ). 
+                            , getWorkFolder()
+                            , LDBNAME(iDatabase)
+                            , REPLACE(REPLACE(hDbStatusBuffer::_dbstatus-cachestamp," ","_"),":","")
+                            ).
       DELETE OBJECT hDbStatusBuffer.
-    END. 
+    END.
 
     /* If caching enabled and there is a cache file, read it */
-    IF glCacheTableDefs 
+    IF glCacheTableDefs
       AND SEARCH(cCacheFile) <> ? THEN
     DO:
-      PUBLISH "debugMessage" (3, SUBSTITUTE("Get table list from cache file &1", cCacheFile)).
+      PUBLISH "debugInfo" (3, SUBSTITUTE("Get table list from cache file &1", cCacheFile)).
       TEMP-TABLE ttTable:READ-XML("file", cCacheFile, "APPEND", ?, ?, ?, ?).
     END.
 
     /* Otherwise build it */
     ELSE
     DO:
-      /* To get all tables */
-      CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".
-      CREATE BUFFER hFileBuffer  FOR TABLE LDBNAME(iDatabase) + "._file"  IN WIDGET-POOL "metaInfo".
-      CREATE BUFFER hFieldBuffer FOR TABLE LDBNAME(iDatabase) + "._field" IN WIDGET-POOL "metaInfo".
-      CREATE QUERY hFileQuery  IN WIDGET-POOL "metaInfo".
-  
-      hFileQuery:SET-BUFFERS(hDbBuffer, hFileBuffer).
-      hFileQuery:QUERY-PREPARE( "FOR EACH _Db NO-LOCK "
-                              + ",   EACH _File NO-LOCK"
-                              + "   WHERE _File._Db-recid    = RECID(_Db)"
-                              + "     AND _File._File-Number < 32768"
-                              + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"
-                              ).
+      CREATE ALIAS 'dictdb' FOR DATABASE VALUE(LDBNAME(iDatabase)).
+      RUN getSchema.p(INPUT TABLE ttTable BY-REFERENCE).
 
-      /* To get all fields */
-      CREATE QUERY hFieldQuery IN WIDGET-POOL "metaInfo".
-      hFieldQuery:SET-BUFFERS(hFieldBuffer).
-
-      hFileQuery:QUERY-OPEN().
-      REPEAT:
-        hFileQuery:GET-NEXT().
-        IF hFileQuery:QUERY-OFF-END THEN LEAVE.
-
-        CREATE ttTable.
-        ASSIGN 
-          ttTable.cDatabase   = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase))
-          ttTable.cTableName  = hFileBuffer::_file-name
-          ttTable.cTableDesc  = hFileBuffer::_desc
-          ttTable.lHidden     = hFileBuffer::_hidden
-          ttTable.lFrozen     = hFileBuffer::_frozen
-          ttTable.cCrc        = hFileBuffer::_crc
-          ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, hFileBuffer::_file-name, hFileBuffer::_crc)
-          ttTable.iFileNumber = hFileBuffer::_file-number
-          .
-        ASSIGN
-          ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name)
-          .
-
-        /* Build field list */
-        hFieldQuery:QUERY-PREPARE(SUBSTITUTE("FOR EACH _Field NO-LOCK WHERE _Field._File-Recid = &1", hFileBuffer:RECID) ).
-        hFieldQuery:QUERY-OPEN().
-
-        REPEAT:
-          hFieldQuery:GET-NEXT().
-          IF hFieldQuery:QUERY-OFF-END THEN LEAVE.
-          ttTable.cFields = ttTable.cFields + "," + hFieldBuffer::_Field-name.
-        END.
-
-        ttTable.cFields = TRIM(ttTable.cFields, ",").
-        hFieldQuery:QUERY-CLOSE().
-      END.
-
-      hFieldQuery:QUERY-CLOSE().
-      hFileQuery:QUERY-CLOSE().
-      DELETE OBJECT hFieldQuery.
-      DELETE OBJECT hFileQuery.
-      DELETE OBJECT hFieldBuffer.
-      DELETE OBJECT hFileBuffer.
-      DELETE OBJECT hDbBuffer.
+/*      CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".                                                       */
+/*      CREATE BUFFER hFileBuffer  FOR TABLE LDBNAME(iDatabase) + "._file"  IN WIDGET-POOL "metaInfo".                                                       */
+/*      CREATE QUERY hQuery  IN WIDGET-POOL "metaInfo".                                                                                                      */
+/*                                                                                                                                                           */
+/*      hQuery:SET-BUFFERS(hDbBuffer, hFileBuffer).                                                                                                          */
+/*      hQuery:QUERY-PREPARE( "FOR EACH _Db NO-LOCK "                                                                                                        */
+/*                              + "   WHERE _Db._Db-local = TRUE"                                                                                            */
+/*                              + ",   EACH _File NO-LOCK"                                                                                                   */
+/*                              + "   WHERE _File._Db-recid    = RECID(_Db)"                                                                                 */
+/*                              + "     AND _File._File-Number < 32768"                                                                                      */
+/*                              + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"                                                     */
+/*                              + ",   EACH _Field NO-LOCK"                                                                                                  */
+/*                              + "   WHERE _Field._File-recid = RECID(_File)"                                                                               */
+/*                              ).                                                                                                                           */
+/*      hQuery:QUERY-OPEN().                                                                                                                                 */
+/*                                                                                                                                                           */
+/*      #File:                                                                                                                                               */
+/*      REPEAT:                                                                                                                                              */
+/*        hQuery:GET-NEXT().                                                                                                                                 */
+/*        IF hQuery:QUERY-OFF-END THEN LEAVE #File.                                                                                                          */
+/*                                                                                                                                                           */
+/*        CREATE ttTable.                                                                                                                                    */
+/*        ASSIGN                                                                                                                                             */
+/*          ttTable.cDatabase   = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase))                                                 */
+/*          ttTable.cTableName  = hFileBuffer::_file-name                                                                                                    */
+/*          ttTable.cTableDesc  = (IF hFileBuffer::_file-label <> ? AND hFileBuffer::_file-label <> '' THEN hFileBuffer::_file-label ELSE hFileBuffer::_desc)*/
+/*          ttTable.lHidden     = hFileBuffer::_hidden                                                                                                       */
+/*          ttTable.lFrozen     = hFileBuffer::_frozen                                                                                                       */
+/*          ttTable.cCrc        = hFileBuffer::_crc                                                                                                          */
+/*          ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, hFileBuffer::_file-name, hFileBuffer::_crc)                                      */
+/*          ttTable.iFileNumber = hFileBuffer::_file-number                                                                                                  */
+/*          .                                                                                                                                                */
+/*                                                                                                                                                           */
+/*        ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name).                                                         */
+/*        ttTable.cFields = getFieldList(ttTable.cDatabase, ttTable.cTableName).                                                                             */
+/*      END.                                                                                                                                                 */
+/*                                                                                                                                                           */
+/*      hQuery:QUERY-CLOSE().                                                                                                                                */
+/*      DELETE OBJECT hQuery.                                                                                                                                */
+/*      DELETE OBJECT hFileBuffer.                                                                                                                           */
+/*      DELETE OBJECT hDbBuffer.                                                                                                                             */
 
       /* Save cache file for next time */
       IF glCacheTableDefs THEN
@@ -2118,27 +2097,27 @@ PROCEDURE getTables :
         /* Move the tables of the current db to a separate tt so we can dump it. */
         EMPTY TEMP-TABLE ttTableXml.
 
-        CREATE QUERY hFileQuery IN WIDGET-POOL "metaInfo".
+        CREATE QUERY hDbQuery IN WIDGET-POOL "metaInfo".
+        CREATE BUFFER hDbBuffer FOR TABLE LDBNAME(iDatabase) + "._Db" IN WIDGET-POOL "metaInfo".
 
-        CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".
+        hDbQuery:SET-BUFFERS(hDbBuffer).
+        hDbQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK WHERE _Db._Db-local = TRUE").
+        hDbQuery:QUERY-OPEN().
 
-        hFileQuery:SET-BUFFERS(hDbBuffer).
-        hFileQuery:QUERY-PREPARE("FOR EACH _Db NO-LOCK ").
-
-        hFileQuery:QUERY-OPEN().
+        #DB:
         REPEAT:
-           hFileQuery:GET-NEXT().
-           IF hFileQuery:QUERY-OFF-END THEN LEAVE.
+          hDbQuery:GET-NEXT().
+          IF hDbQuery:QUERY-OFF-END THEN LEAVE #DB.
 
-           FOR EACH ttTable 
-              WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
-          CREATE ttTableXml.
-          BUFFER-COPY ttTable TO ttTableXml.
-        END.
+          FOR EACH ttTable
+            WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
+            CREATE ttTableXml.
+            BUFFER-COPY ttTable TO ttTableXml.
+          END.
         END.
 
-        hFileQuery:QUERY-CLOSE().
-        DELETE OBJECT hFileQuery.
+        hDbQuery:QUERY-CLOSE().
+        DELETE OBJECT hDbQuery.
         DELETE OBJECT hDbBuffer.
 
         TEMP-TABLE ttTableXml:WRITE-XML("file", cCacheFile, YES, ?, ?, NO, NO).
@@ -2149,15 +2128,12 @@ PROCEDURE getTables :
 
   DELETE WIDGET-POOL "metaInfo".
 
-/*   /* By default, show all tables */ */
-/*   FOR EACH ttTable:                 */
-/*     ttTable.lShowInList = TRUE.     */
-/*   END.                              */
+  /* Apply filter to collection of tables */
   RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
 
   /* Get table properties from the INI file */
   RUN getTableStats(INPUT-OUTPUT TABLE ttTable).
-  
+
   {&timerStop}
 
 END PROCEDURE. /* getTables */
@@ -2169,16 +2145,13 @@ END PROCEDURE. /* getTables */
 
 &IF DEFINED(EXCLUDE-getTablesFiltered) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTablesFiltered Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTablesFiltered Procedure
 PROCEDURE getTablesFiltered :
-/*
- * Determine whether tables in the ttTable are visible 
- * given a user defined filter
- */
+/* Determine whether tables in the ttTable are visible given a user defined filter
+  */
   {&timerStart}
-
   DEFINE INPUT PARAMETER TABLE FOR ttTableFilter.
-  DEFINE OUTPUT PARAMETER TABLE FOR ttTable. 
+  DEFINE OUTPUT PARAMETER TABLE FOR ttTable.
 
   DEFINE VARIABLE cSearchFld  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cThisField  AS CHARACTER   NO-UNDO.
@@ -2198,12 +2171,11 @@ PROCEDURE getTablesFiltered :
   DEFINE VARIABLE cFieldShow  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldHide  AS CHARACTER   NO-UNDO.
 
-  /* This table **SHOULD** exist 
-   * and have exactly 1 record 
-   */
-  FIND ttTableFilter. 
+  /* This table **SHOULD** exist and have exactly 1 record */
+  FIND ttTableFilter NO-ERROR.
+  IF NOT AVAILABLE ttTableFilter THEN RETURN.
 
-  ASSIGN 
+  ASSIGN
     lNormal    = ttTableFilter.lShowNormal
     lSchema    = ttTableFilter.lShowSchema
     lVst       = ttTableFilter.lShowVst
@@ -2212,11 +2184,11 @@ PROCEDURE getTablesFiltered :
     lHidden    = ttTableFilter.lShowHidden
     lFrozen    = ttTableFilter.lShowFrozen
     cNameShow  = ttTableFilter.cTableNameShow
-    cNameHide  = ttTableFilter.cTableNameHide 
+    cNameHide  = ttTableFilter.cTableNameHide
     cFieldShow = ttTableFilter.cTableFieldShow
     cFieldHide = ttTableFilter.cTableFieldHide
     .
-    
+
   /* Reset the filters to sane values if needed */
   IF cNameShow  = ''  OR cNameShow  = ? THEN cNameShow  = '*'.
   IF cNameHide  = '*' OR cNameHide  = ? THEN cNameHide  = '' .
@@ -2227,86 +2199,89 @@ PROCEDURE getTablesFiltered :
   RUN correctFilterList(INPUT-OUTPUT cNameShow, INPUT-OUTPUT cNameHide).
   RUN correctFilterList(INPUT-OUTPUT cFieldShow, INPUT-OUTPUT cFieldHide).
 
-  tableLoop:
-  FOR EACH ttTable:
+  #Table:
+  FOR EACH ttTable {&TABLE-SCAN}:
     /* Init table to false until proven otherwise */
     ASSIGN ttTable.lShowInList = FALSE.
-    
+
     /* Check against filter-to-hide */
-    IF CAN-DO(cNameHide,ttTable.cTableName) THEN NEXT tableLoop.
-    
+    IF CAN-DO(cNameHide,ttTable.cTableName) THEN NEXT #Table.
+
     /* Check against filter-to-show */
-    IF NOT CAN-DO(cNameShow,ttTable.cTableName) THEN NEXT tableLoop.
-    
+    IF NOT CAN-DO(cNameShow,ttTable.cTableName) THEN NEXT #Table.
+
     /* User tables          : _file-number > 0   AND _file-number < 32000
      * Schema tables        : _file-number > -80 AND _file-number < 0
      * Virtual system tables: _file-number < -16384
      * SQL catalog tables   : _file-name BEGINS "_sys"
      */
-    IF NOT lNormal AND ttTable.cCategory = 'Application' THEN NEXT tableLoop.
-    IF NOT lSchema AND ttTable.cCategory = 'Schema'      THEN NEXT tableLoop.
-    IF NOT lVst    AND ttTable.cCategory = 'VST'         THEN NEXT tableLoop.
-    IF NOT lSql    AND ttTable.cCategory = 'SQL'         THEN NEXT tableLoop.
-    IF NOT lOther  AND ttTable.cCategory = 'Other'       THEN NEXT tableLoop.
+    IF NOT lNormal AND ttTable.cCategory = 'Normal' THEN NEXT #Table.
+    IF NOT lSchema AND ttTable.cCategory = 'Schema' THEN NEXT #Table.
+    IF NOT lVst    AND ttTable.cCategory = 'VST'    THEN NEXT #Table.
+    IF NOT lSql    AND ttTable.cCategory = 'SQL'    THEN NEXT #Table.
+    IF NOT lOther  AND ttTable.cCategory = 'Other'  THEN NEXT #Table.
 
     /* Handling for Hidden and Frozen apply only to user tables otherwise it will be too confusing
-     * because Schema, VST and SQL tables are all by default hidden and frozen. 
+     * because Schema, VST and SQL tables are all by default hidden and frozen.
      */
-    IF NOT lHidden AND ttTable.cCategory = 'Application' AND ttTable.lHidden = TRUE THEN NEXT tableLoop.
-    IF NOT lFrozen AND ttTable.cCategory = 'Application' AND ttTable.lFrozen = TRUE THEN NEXT tableLoop.
-    
+    IF NOT lHidden AND ttTable.cCategory = 'Application' AND ttTable.lHidden = TRUE THEN NEXT #Table.
+    IF NOT lFrozen AND ttTable.cCategory = 'Application' AND ttTable.lFrozen = TRUE THEN NEXT #Table.
+
     /* Fields that must be in the list */
     DO iSearch = 1 TO NUM-ENTRIES(cFieldShow):
       cSearchFld = ENTRY(iSearch,cFieldShow).
-    
+
       /* If no wildcards used, we can simply CAN-DO */
       IF INDEX(cSearchFld,"*") = 0 THEN
       DO:
-        IF NOT CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT tableLoop.
+        IF NOT CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT #Table.
       END.
-      ELSE 
+      ELSE
       DO:
         lFieldFound = FALSE.
+
+        #Field:
         DO iField = 1 TO NUM-ENTRIES(ttTable.cFields):
           cThisField = ENTRY(iField,ttTable.cFields).
-          IF CAN-DO(cSearchFld,cThisField) THEN 
-          DO: 
+          IF CAN-DO(cSearchFld,cThisField) THEN
+          DO:
             lFieldFound = TRUE.
-            LEAVE.
-          END. 
+            LEAVE #Field.
+          END.
         END.
-        IF NOT lFieldFound THEN NEXT tableLoop.
+        IF NOT lFieldFound THEN NEXT #Table.
       END.
-    END.       
-    
+    END.
+
     /* Fields that may not be in the list */
     DO iSearch = 1 TO NUM-ENTRIES(cFieldHide):
       cSearchFld = ENTRY(iSearch,cFieldHide).
-    
+
       /* If no wildcards used, we can simply CAN-DO */
       IF INDEX(cSearchFld,"*") = 0 THEN
       DO:
-        IF CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT tableLoop.
+        IF CAN-DO(ttTable.cFields, cSearchFld) THEN NEXT #Table.
       END.
-      ELSE 
+      ELSE
       DO:
         lRejected = FALSE.
+        #Field:
         DO iField = 1 TO NUM-ENTRIES(ttTable.cFields):
           cThisField = ENTRY(iField,ttTable.cFields).
-          IF CAN-DO(cSearchFld,cThisField) THEN  
-          DO: 
+          IF CAN-DO(cSearchFld,cThisField) THEN
+          DO:
             lRejected = TRUE.
-            LEAVE.
-          END. 
-        END.
-        IF lRejected THEN NEXT tableLoop.
-      END.
-    END.
-    
+            LEAVE #Field.
+          END.
+        END. /* do iField */
+        IF lRejected THEN NEXT #Table.
+      END. /* else */
+    END. /* do iSearch */
+
     /* If we get here, we should add the table */
     ASSIGN ttTable.lShowInList = TRUE.
-  END.
-  
+  END. /* for each ttTable */
+
   {&timerStop}
 END PROCEDURE. /* getTablesWithFields */
 
@@ -2317,60 +2292,59 @@ END PROCEDURE. /* getTablesWithFields */
 
 &IF DEFINED(EXCLUDE-getTableStats) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTableStats Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getTableStats Procedure
 PROCEDURE getTableStats :
-/*------------------------------------------------------------------------
-  Name         : getTableStats
-  Description  : Get table statistics from the INI file
-  ----------------------------------------------------------------------
-  17-09-2012 pti Separated from getTables and getTablesWithField
-  ----------------------------------------------------------------------*/
-  
-  DEFINE INPUT-OUTPUT PARAMETER table FOR ttTable. 
+/* Get table statistics from the INI file
+  */
+  DEFINE INPUT-OUTPUT PARAMETER table FOR ttTable.
 
   DEFINE VARIABLE cIniFile    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cLine       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSection    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDatabase   AS CHARACTER   NO-UNDO.
 
-  /* Read the ini file as plain text and parse the lines. 
-   * 
-   * The normal way would be to do a FOR-EACH on the _file table and 
-   * retrieve the information needed. But if you have a large database 
-   * (or a lot of databases), this becomes VERY slow. Searching the 
+  /* Read the ini file as plain text and parse the lines.
+   *
+   * The normal way would be to do a FOR-EACH on the _file table and
+   * retrieve the information needed. But if you have a large database
+   * (or a lot of databases), this becomes VERY slow. Searching the
    * other way around by parsing the INI is a lot faster.
    */
   {&timerStart}
 
-  cIniFile = substitute('&1DataDigger-&2.ini', getProgramDir(), getUserName() ).
-  INPUT from value(cIniFile).
+  cIniFile = SUBSTITUTE('&1DataDigger-&2.ini', getWorkFolder(), getUserName() ).
+  IF SEARCH(cIniFile) = ? THEN RETURN.
+
+  INPUT FROM VALUE(cIniFile).
+
+  #ReadLine:
   REPEAT:
     /* Sometimes lines get screwed up and are waaaay too long
-     * for the import statement. So just ignore those. 
+     * for the import statement. So just ignore those.
      */
     IMPORT UNFORMATTED cLine NO-ERROR.
-    IF ERROR-STATUS:ERROR THEN NEXT.
+    IF ERROR-STATUS:ERROR THEN NEXT #ReadLine.
 
     /* Find DB sections */
-    IF cLine MATCHES '[DB:*]' THEN 
+    IF cLine MATCHES '[DB:*]' THEN
     DO:
       cSection = TRIM(cLine,'[]').
       cDatabase = ENTRY(2,cSection,":").
-    END. 
+    END.
 
     /* Only process lines of database-sections */
-    IF NOT cSection BEGINS "DB:" THEN NEXT.
+    IF NOT cSection BEGINS "DB:" THEN NEXT #ReadLine.
 
     /* Only process setting lines */
-    IF NOT cLine MATCHES '*:*=*' THEN NEXT.
-    
+    IF NOT cLine MATCHES '*:*=*' THEN NEXT #ReadLine.
+
     /* Filter out some settings */
     IF cLine MATCHES "*:QueriesServed=*" THEN
     DO:
-      FIND FIRST ttTable 
+      FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
-    
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
+
       IF AVAILABLE ttTable THEN
       DO:
         ttTable.iNumQueries = INTEGER(ENTRY(2,cLine,'=')) NO-ERROR.
@@ -2381,31 +2355,29 @@ PROCEDURE getTableStats :
     ELSE
     IF cLine MATCHES "*:LastUsed=*" THEN
     DO:
-      FIND FIRST ttTable 
+      FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
 
       IF AVAILABLE ttTable THEN
-      DO:
         ttTable.tLastUsed = DATETIME(ENTRY(2,cLine,'=')) NO-ERROR.
-      END.
+
     END. /* lastUsed */
 
     ELSE
-    IF cLine MATCHES "*:Favourite=*" THEN
+    IF cLine MATCHES "*:Favourites=*" THEN
     DO:
       FIND FIRST ttTable
         WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = entry(1,cLine,':') NO-ERROR.
+          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
 
       IF AVAILABLE ttTable THEN
-      DO:
-        ttTable.lFavourite = TRUE NO-ERROR.
-      END.
+        ttTable.cFavourites = ENTRY(2,cLine,'=') NO-ERROR.
+
     END. /* favourite */
 
   END. /* repeat */
-  INPUT close. 
+  INPUT CLOSE.
 
   {&timerStop}
 
@@ -2418,11 +2390,10 @@ END PROCEDURE. /* getTableStats */
 
 &IF DEFINED(EXCLUDE-initTableFilter) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initTableFilter Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initTableFilter Procedure
 PROCEDURE initTableFilter :
-/*
- * Set table filter values back to their initial values
- */
+/* Set table filter values back to their initial values
+  */
   DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 
   EMPTY TEMP-TABLE ttTableFilter.
@@ -2439,33 +2410,59 @@ END PROCEDURE. /* initTableFilter */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-loadSettings) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadSettings Procedure
+PROCEDURE loadSettings :
+/* Load settings from ini files
+*/
+  DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
+
+  /* Help file is least important, so read that first */
+  RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini", getProgramDir() ), FALSE).
+
+  /* General DD settings (always in program folder) */
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini", getProgramDir() ), FALSE).
+
+  /* Per-user settings */
+  RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ), TRUE).
+
+  /* When all ini-files have been read, we can determine whether
+   * caching needs to be enabled
+   */
+  lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
+  IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
+
+END PROCEDURE. /* loadSettings */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-lockWindow) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE lockWindow Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE lockWindow Procedure
 PROCEDURE lockWindow :
-/*------------------------------------------------------------------------
-  Name         : lockWindow
-  Description  : Lock / unlock updates that Windows does to windows. 
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
+/* Lock / unlock updates that Windows does to windows.
+  */
   DEFINE INPUT PARAMETER phWindow AS HANDLE  NO-UNDO.
   DEFINE INPUT PARAMETER plLock   AS LOGICAL NO-UNDO.
 
-  DEFINE VARIABLE iRet AS INTEGER NO-UNDO. 
-  DEFINE BUFFER ttWindowLock FOR ttWindowLock. 
+  DEFINE VARIABLE iRet AS INTEGER NO-UNDO.
+  DEFINE BUFFER ttWindowLock FOR ttWindowLock.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Window &1, lock: &2", phWindow:TITLE, STRING(plLock,"ON/OFF"))).
+  {&timerStart}
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Window &1, lock: &2", phWindow:TITLE, STRING(plLock,"ON/OFF"))).
 
   IF NOT VALID-HANDLE(phWindow) THEN RETURN.
-  
+
   /* Find window in our tt of locked windows */
   FIND ttWindowLock WHERE ttWindowLock.hWindow = phWindow NO-ERROR.
   IF NOT AVAILABLE ttWindowLock THEN
   DO:
     /* If we try to unlock a window thats not in the tt, just go back */
-    IF NOT plLock THEN RETURN. 
+    IF NOT plLock THEN RETURN.
 
     /* Otherwise create a tt record for it */
     CREATE ttWindowLock.
@@ -2474,7 +2471,7 @@ PROCEDURE lockWindow :
 
   /* Because commands to lock or unlock may be nested, keep track
    * of the number of locks/unlocks using a semaphore.
-   * 
+   *
    * The order of commands may be:
    * lockWindow(yes). -> actually lock the window
    * lockWindow(yes). -> do nothing
@@ -2485,12 +2482,12 @@ PROCEDURE lockWindow :
    * lockWindow(no).  -> do nothing
    * lockWindow(no).  -> actually unlock the window
    */
-  IF plLock THEN 
+  IF plLock THEN
     ttWindowLock.iLockCounter = ttWindowLock.iLockCounter + 1.
-  ELSE 
+  ELSE
     ttWindowLock.iLockCounter = ttWindowLock.iLockCounter - 1.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Lock counter: &1", ttWindowLock.iLockCounter)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Lock counter: &1", ttWindowLock.iLockCounter)).
 
   /* Now, only lock when the semaphore is increased to 1 */
   IF plLock AND ttWindowLock.iLockCounter = 1 THEN
@@ -2512,7 +2509,7 @@ PROCEDURE lockWindow :
                     , 0
                     , OUTPUT iRet
                     ).
-    
+
     RUN RedrawWindow( phWindow:HWND /* {&window-name}:hwnd */
                     , 0
                     , 0
@@ -2520,9 +2517,11 @@ PROCEDURE lockWindow :
                     , OUTPUT iRet
                     ).
 
-    /* Clean up tt */
-    DELETE ttWindowLock.
-  END. 
+    /* Don't delete, creating records is more expensive than re-use, so just reset */
+    ttWindowLock.iLockCounter = 0.
+  END.
+
+  {&timerStop}
 
 END PROCEDURE. /* lockWindow */
 
@@ -2533,12 +2532,12 @@ END PROCEDURE. /* lockWindow */
 
 &IF DEFINED(EXCLUDE-readConfigFile) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE readConfigFile Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE readConfigFile Procedure
 PROCEDURE readConfigFile :
-/*
- * Read the ini-file and create tt records for it
- */
-  DEFINE INPUT PARAMETER pcConfigFile AS CHARACTER NO-UNDO.
+/* Read the ini-file and create tt records for it
+  */
+  DEFINE INPUT PARAMETER pcConfigFile   AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER plUserSettings AS LOGICAL   NO-UNDO.
 
   DEFINE VARIABLE cFile      AS LONGCHAR    NO-UNDO.
   DEFINE VARIABLE cLine      AS CHARACTER   NO-UNDO.
@@ -2549,8 +2548,9 @@ PROCEDURE readConfigFile :
 
   {&timerStart}
   DEFINE BUFFER bfConfig FOR ttConfig.
-  
+
   /* Read file in 1 pass to memory */
+  IF SEARCH(pcConfigFile) = ? THEN RETURN.
   COPY-LOB FILE pcConfigFile TO cFile NO-CONVERT NO-ERROR.
   IF ERROR-STATUS:ERROR THEN cFile = readFile(pcConfigFile).
 
@@ -2572,7 +2572,7 @@ PROCEDURE readConfigFile :
     END.
 
     /* Ignore weird settings within [DB:xxxx] sections */
-    IF cSection BEGINS 'DB:' 
+    IF cSection BEGINS 'DB:'
       AND NUM-ENTRIES( TRIM(ENTRY(1,cLine,"=")), ':') = 1 THEN NEXT #LineLoop.
 
     /* Config line */
@@ -2590,9 +2590,11 @@ PROCEDURE readConfigFile :
     END.
 
     /* Config line /might/ already exist. This can happen if you have
-     * the same setting in multiple .ini files. 
+     * the same setting in multiple .ini files.
      */
-    ASSIGN bfConfig.cValue = TRIM(SUBSTRING(cLine, INDEX(cLine,"=") + 1)).
+    ASSIGN
+      bfConfig.cValue = TRIM(SUBSTRING(cLine, INDEX(cLine,"=") + 1))
+      bfConfig.lUser  = plUserSettings.
   END.
 
   {&timerStop}
@@ -2603,49 +2605,73 @@ END PROCEDURE. /* readConfigFile */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-resetAnswers) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetAnswers Procedure
+PROCEDURE resetAnswers :
+/* Reset answers to all 'do not ask again' questions
+*/
+  {&timerStart}
+  DEFINE BUFFER bfConfig FOR ttConfig.
+
+  FOR EACH bfConfig
+    WHERE bfConfig.cSection = 'DataDigger:help'
+      AND (bfConfig.cSetting MATCHES '*:hidden' OR bfConfig.cSetting MATCHES '*:answer'):
+    setRegistry(bfConfig.cSection, bfConfig.cSetting, ?).
+  END. /* for each bfConfig */
+
+  RUN flushRegistry.
+
+  {&timerStop}
+
+END PROCEDURE. /* resetAnswers */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-resizeFilterFields) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilterFields Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilterFields Procedure
 PROCEDURE resizeFilterFields :
-/*
- * Generic procedure to redraw the filter fields of the 
- * fields browse and of the index browse. 
- */
+/* Redraw the browse filter fields
+  */
   DEFINE INPUT PARAMETER phLeadButton   AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcFilterFields AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcButtons      AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER phBrowse       AS HANDLE      NO-UNDO.
 
-  DEFINE VARIABLE iField        AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iButton       AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iCurrentPos   AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iRightEdge    AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iWidth        AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE hColumn       AS HANDLE  NO-UNDO. 
-  DEFINE VARIABLE hButton       AS HANDLE  NO-UNDO. 
-  DEFINE VARIABLE hFilterField  AS HANDLE  NO-UNDO. 
-  DEFINE VARIABLE iFilter       AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE lChangeDetected AS LOGICAL NO-UNDO. 
-  
+  DEFINE VARIABLE iField        AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iButton       AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iCurrentPos   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iRightEdge    AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iWidth        AS INTEGER NO-UNDO.
+  DEFINE VARIABLE hColumn       AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE hButton       AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE hFilterField  AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iFilter       AS INTEGER NO-UNDO.
+
+  {&timerStart}
+
   /* Find out if there has been a change in the browse or in one of
    * its columns. If no changes, save a little time by not redrawing
    */
   IF NOT isBrowseChanged(phBrowse) THEN RETURN.
-  
-  {&timerStart}
 
-  PUBLISH "timerCommand" ("start", "resizeFilterFields:makeSmall").
   /* To prevent drawing error, make all fields small */
+  PUBLISH "DD:Timer" ("start", "resizeFilterFields:makeSmall").
   DO iField = 1 TO NUM-ENTRIES(pcFilterFields):
     hFilterField = HANDLE(ENTRY(iField,pcFilterFields)).
     hFilterField:VISIBLE      = NO.
-    hFilterField:X            = phBrowse:X. 
+    hFilterField:X            = phBrowse:X.
     hFilterField:Y            = phBrowse:Y - 23.
     hFilterField:WIDTH-PIXELS = 1.
   END.
-  PUBLISH "timerCommand" ("stop", "resizeFilterFields:makeSmall").
+  PUBLISH "DD:Timer" ("stop", "resizeFilterFields:makeSmall").
 
   /* Start by setting the buttons at the proper place. Do this right to left */
+  PUBLISH "DD:Timer" ("start", "resizeFilterFields:reposition").
   ASSIGN iRightEdge = phBrowse:X + phBrowse:WIDTH-PIXELS.
   DO iButton = NUM-ENTRIES(pcButtons) TO 1 BY -1:
     hButton = HANDLE(ENTRY(iButton,pcButtons)).
@@ -2653,17 +2679,19 @@ PROCEDURE resizeFilterFields :
     hButton:Y = phBrowse:Y - 23. /* filter buttons close to the browse */
     iRightEdge = hButton:X + 0. /* A little margin between buttons */
   END.
+  PUBLISH "DD:Timer" ("stop", "resizeFilterFields:reposition").
 
-  /* The left side of the left button is the maximum point 
+  /* The left side of the left button is the maximum point
    * Fortunately, this value is already in iRightEdge.
-   * Resize and reposition the fields from left to right, 
+   * Resize and reposition the fields from left to right,
    * use the space between browse:x and iRightEdge
    */
 
   /* Take the left side of the first visible column as a starting point. */
+  PUBLISH "DD:Timer" ("start", "resizeFilterFields:firstVisibleColumn").
   firstVisibleColumn:
   DO iField = 1 TO phBrowse:NUM-COLUMNS:
-    hColumn = phBrowse:GET-BROWSE-COLUMN(iField):handle.
+    hColumn = phBrowse:GET-BROWSE-COLUMN(iField):HANDLE.
 
     IF hColumn:X > 0 AND hColumn:VISIBLE THEN
     DO:
@@ -2671,37 +2699,38 @@ PROCEDURE resizeFilterFields :
       LEAVE firstVisibleColumn.
     END.
   END.
+  PUBLISH "DD:Timer" ("stop", "resizeFilterFields:firstVisibleColumn").
 
-  PUBLISH "timerCommand" ("start", "resizeFilterFields:fieldLoop").
-  fieldLoop:
+  PUBLISH "DD:Timer" ("start", "resizeFilterFields:#Field").
+  #Field:
   DO iField = 1 TO phBrowse:NUM-COLUMNS:
 
     hColumn = phBrowse:GET-BROWSE-COLUMN(iField):handle.
-    
+
     /* Some types cannot have a filter */
-    IF hColumn:DATA-TYPE = 'raw' THEN NEXT. 
+    IF hColumn:DATA-TYPE = 'raw' THEN NEXT #Field.
 
     iFilter = iFilter + 1.
-    IF iFilter > num-entries(pcFilterFields) THEN LEAVE fieldLoop.
+    IF iFilter > NUM-ENTRIES(pcFilterFields) THEN LEAVE #Field.
 
     /* Determine the handle of the filterfield */
     hFilterField = HANDLE(ENTRY(iFilter, pcFilterFields)).
 
     /* If the column is hidden, make the filter hidden and go to the next */
-    IF NOT hColumn:VISIBLE THEN 
+    IF NOT hColumn:VISIBLE THEN
     DO:
       hFilterField:VISIBLE = NO.
-      NEXT fieldLoop. 
+      NEXT #Field.
     END.
 
     /* Where *are* we ?? */
     iCurrentPos = phBrowse:X + hColumn:X.
 
     /* If the columns have been resized, some columns might have fallen off the screen */
-    IF hColumn:X < 1 THEN NEXT. 
+    IF hColumn:X < 1 THEN NEXT #Field.
 
     /* Does it fit on the screen? */
-    IF iCurrentPos >= iRightEdge - 5 THEN LEAVE fieldLoop. /* accept some margin */
+    IF iCurrentPos >= iRightEdge - 5 THEN LEAVE #Field. /* accept some margin */
 
     /* Where will this field end? And does it fit? */
     iWidth = hColumn:WIDTH-PIXELS + 4.
@@ -2713,12 +2742,12 @@ PROCEDURE resizeFilterFields :
     iCurrentPos               = iCurrentPos + iWidth.
     hFilterField:VISIBLE      = phBrowse:VISIBLE. /* take over the visibility of the browse */
   END.
-  PUBLISH "timerCommand" ("stop", "resizeFilterFields:fieldLoop").
-  
+  PUBLISH "DD:Timer" ("stop", "resizeFilterFields:#Field").
+
   /* Finally, set the lead button to the utmost left */
   IF VALID-HANDLE(phLeadButton) THEN
-    ASSIGN 
-      phLeadButton:X = phBrowse:X 
+    ASSIGN
+      phLeadButton:X = phBrowse:X
       phLeadButton:Y = phBrowse:Y - 23.
 
   {&timerStop}
@@ -2732,12 +2761,10 @@ END PROCEDURE. /* resizeFilterFields */
 
 &IF DEFINED(EXCLUDE-restoreWindowPos) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE restoreWindowPos Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE restoreWindowPos Procedure
 PROCEDURE restoreWindowPos :
-/*------------------------------------------------------------------------------
-  Name : restoreWindowPos
-  Desc : Restore position / size of a window 
-------------------------------------------------------------------------------*/
+/* Restore position / size of a window
+  */
   DEFINE INPUT PARAMETER phWindow     AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcWindowName AS CHARACTER   NO-UNDO.
 
@@ -2752,7 +2779,7 @@ PROCEDURE restoreWindowPos :
   IF iValue <> ? THEN ASSIGN phWindow:Y = iValue NO-ERROR.
 
   iValue = INTEGER(getRegistry(pcWindowName, 'Window:height' )).
-  IF iValue = ? OR iValue = 0 THEN iValue = INTEGER(getRegistry('DataDigger', 'Window:height' )) - 100. 
+  IF iValue = ? OR iValue = 0 THEN iValue = INTEGER(getRegistry('DataDigger', 'Window:height' )) - 100.
   ASSIGN phWindow:HEIGHT-PIXELS = iValue NO-ERROR.
 
   iValue = INTEGER(getRegistry(pcWindowName, 'Window:width' )).
@@ -2771,55 +2798,41 @@ END PROCEDURE. /* restoreWindowPos */
 
 &IF DEFINED(EXCLUDE-saveConfigFileSorted) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveConfigFileSorted Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveConfigFileSorted Procedure
 PROCEDURE saveConfigFileSorted :
-/*
- * Save settings file sorted
- */
+/* Save settings file sorted
+  */
   DEFINE VARIABLE cUserConfigFile AS CHARACTER NO-UNDO.
   DEFINE BUFFER bfConfig FOR ttConfig.
 
-  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getProgramDir(), getUserName() ).
+  {&timerStart}
 
-  /* Config table holds data from 3 .ini sources, so start fresh */
-  EMPTY TEMP-TABLE bfConfig. 
-  RUN readConfigFile(cUserConfigFile).
+  /* Clean up rubbish settings data */
+  FOR EACH bfConfig
+    WHERE bfConfig.cSetting = '' OR bfConfig.cSetting = ?
+       OR bfConfig.cValue   = '' OR bfConfig.cValue   = ?:
+    DELETE bfConfig.
+  END.
 
-  /* Now write back, sorted */
+  cUserConfigFile = SUBSTITUTE("&1DataDigger-&2.ini", getWorkFolder(), getUserName() ).
   OUTPUT TO VALUE(cUserConfigFile).
 
-  FOR EACH bfConfig 
-    WHERE bfConfig.cSection BEGINS "DataDigger"
-      AND bfConfig.cSetting <> ''
-      AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection:
-  
-    IF FIRST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
-  
+  FOR EACH bfConfig
+    WHERE bfConfig.lUser = TRUE
+    BREAK BY (bfConfig.cSection BEGINS "DataDigger") DESCENDING
+          BY bfConfig.cSection
+          BY bfConfig.cSetting:
+
+    bfConfig.lDirty = FALSE.
+
+    IF FIRST-OF(bfConfig.cSection) THEN PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
     PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-  
-    IF LAST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SKIP(1).
+    IF LAST-OF(bfConfig.cSection) THEN PUT UNFORMATTED SKIP(1).
   END.
 
-  FOR EACH bfConfig 
-    WHERE NOT bfConfig.cSection BEGINS "DataDigger"
-      AND bfConfig.cSetting <> ''
-      AND bfConfig.cSetting <> ?
-    BREAK BY bfConfig.cSection:
-  
-    IF FIRST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SUBSTITUTE("[&1]",bfConfig.cSection) SKIP.
-  
-    PUT UNFORMATTED SUBSTITUTE("&1=&2",bfConfig.cSetting, bfConfig.cValue) SKIP.
-  
-    IF LAST-OF(bfConfig.cSection) THEN
-      PUT UNFORMATTED SKIP(1).
-  END.
+  OUTPUT CLOSE.
 
-  OUTPUT CLOSE. 
-
+  {&timerStop}
 END PROCEDURE. /* saveConfigFileSorted */
 
 /* _UIB-CODE-BLOCK-END */
@@ -2829,71 +2842,65 @@ END PROCEDURE. /* saveConfigFileSorted */
 
 &IF DEFINED(EXCLUDE-saveQuery) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQuery Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQuery Procedure
 PROCEDURE saveQuery :
-/*------------------------------------------------------------------------
-  Name         : saveQuery
-  Description  : Save a query to the INI file. Increase the nr of all 
-                 other queries and place this one at the top
-                 
-  ----------------------------------------------------------------------
-  18-11-2009 pti Created
-  ----------------------------------------------------------------------*/
-
+/* Save a single query to the INI file.
+  */
   DEFINE INPUT  PARAMETER pcDatabase     AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcTable        AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcQuery        AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cQuery AS CHARACTER NO-UNDO. 
-  DEFINE VARIABLE iQuery AS INTEGER   NO-UNDO. 
+  DEFINE VARIABLE cQuery AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE iNewNr AS INTEGER   NO-UNDO.
 
   DEFINE BUFFER bQuery FOR ttQuery.
-  
+
   {&timerStart}
 
   /* Prepare query for saving in ini-file */
   cQuery = pcQuery.
   cQuery = REPLACE(cQuery,'~n',CHR(1)).
   cQuery = REPLACE(cQuery,{&QUERYSEP},CHR(1)).
-  IF cQuery = '' THEN cQuery = '<empty>'.
+  IF cQuery = '' THEN RETURN.
 
-  /* Get the table with queries again, because they might be 
+  /* Get the table with queries again, because they might be
    * changed if the user has more than one window open.
    */
   RUN collectQueryInfo(pcDatabase, pcTable).
 
-  /* Save current query in the tt. If it already is in the 
+  /* Save current query in the tt. If it already is in the
    * TT then just move it to the top
    */
-  FIND bQuery 
+  FIND bQuery
     WHERE bQuery.cDatabase = pcDatabase
-      AND bQuery.cTable    = pcTable 
+      AND bQuery.cTable    = pcTable
       AND bQuery.cQueryTxt = cQuery NO-ERROR.
 
-  IF AVAILABLE bQuery THEN 
+  IF AVAILABLE bQuery THEN
   DO:
     ASSIGN bQuery.iQueryNr = 0.
   END.
-  ELSE 
+  ELSE
   DO:
     CREATE bQuery.
-    ASSIGN bQuery.cDatabase = pcDatabase 
-           bQuery.cTable    = pcTable   
-           bQuery.iQueryNr  = 0
-           bQuery.cQueryTxt = cQuery.
+    ASSIGN bQuery.cDatabase = pcDatabase
+          bQuery.cTable    = pcTable
+          bQuery.iQueryNr  = 0
+          bQuery.cQueryTxt = cQuery.
   END.
 
   /* The ttQuery temp-table is already filled, renumber it */
-  iQuery = 0.
-  REPEAT PRESELECT EACH bQuery 
+  #QueryLoop:
+  REPEAT PRESELECT EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
-      AND bQuery.cTable    = pcTable 
-       BY bQuery.iQueryNr:
+      AND bQuery.cTable    = pcTable
+      BY bQuery.iQueryNr:
 
-    FIND NEXT bQuery.
-    ASSIGN 
-      iQuery          = iQuery + 1
-      bQuery.iQueryNr = iQuery.
+    FIND NEXT bQuery NO-ERROR.
+    IF NOT AVAILABLE bQuery THEN LEAVE #QueryLoop.
+    ASSIGN
+      iNewNr          = iNewNr + 1
+      bQuery.iQueryNr = iNewNr.
   END.
 
   /* And save it to the INI-file */
@@ -2909,62 +2916,55 @@ END PROCEDURE. /* saveQuery */
 
 &IF DEFINED(EXCLUDE-saveQueryTable) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQueryTable Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveQueryTable Procedure
 PROCEDURE saveQueryTable :
-/*------------------------------------------------------------------------
-  Name         : saveQueryTable
-  Description  : Save the queries in the TT to the INI file with a max
-                 of MaxQueryHistory
-                 
-  ----------------------------------------------------------------------
-  18-11-2009 pti Created
-  ----------------------------------------------------------------------*/
-
+/* Save the queries in the TT to the INI file with a max of MaxQueryHistory
+  */
   DEFINE INPUT  PARAMETER table FOR ttQuery.
   DEFINE INPUT  PARAMETER pcDatabase     AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER pcTable        AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE iMaxQueryHistory AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iQuery           AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE cSetting         AS CHARACTER NO-UNDO. 
+  DEFINE VARIABLE iMaxQueryHistory AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iQuery           AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cSetting         AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bQuery FOR ttQuery.
- 
+
   {&timerStart}
- 
-  iMaxQueryHistory = integer(getRegistry("DataDigger", "MaxQueryHistory" )).
+
+  iMaxQueryHistory = INTEGER(getRegistry("DataDigger", "MaxQueryHistory" )).
   IF iMaxQueryHistory = 0 THEN RETURN. /* no query history wanted */
- 
+
   /* If it is not defined use default setting */
-  IF iMaxQueryHistory = ? THEN iMaxQueryHistory = 10. 
+  IF iMaxQueryHistory = ? THEN iMaxQueryHistory = 10.
 
   iQuery = 1.
 
-  saveQuery:
-  FOR EACH bQuery 
+  #SaveQuery:
+  FOR EACH bQuery
     WHERE bQuery.cDatabase = pcDatabase
-      AND bQuery.cTable    = pcTable 
-       BY bQuery.iQueryNr:
-    
+      AND bQuery.cTable    = pcTable
+      BY bQuery.iQueryNr:
+
     cSetting = bQuery.cQueryTxt.
-    IF cSetting = '' THEN NEXT. /* cSetting = '<empty>' */
+    IF cSetting = '' THEN NEXT #SaveQuery.
 
     setRegistry( SUBSTITUTE("DB:&1", pcDatabase)
-               , SUBSTITUTE('&1:query:&2', pcTable, iQuery)
-               , cSetting).
+              , SUBSTITUTE('&1:query:&2', pcTable, iQuery)
+              , cSetting).
     iQuery = iQuery + 1.
-    IF iQuery > iMaxQueryHistory THEN LEAVE saveQuery.
+    IF iQuery > iMaxQueryHistory THEN LEAVE #SaveQuery.
   END.
 
   /* Delete higher nrs than MaxQueryHistory */
   DO WHILE iQuery <= iMaxQueryHistory:
- 
+
     setRegistry( SUBSTITUTE("DB:&1", pcDatabase)
-               , SUBSTITUTE('&1:query:&2', pcTable, iQuery)
-               , ?).
+              , SUBSTITUTE('&1:query:&2', pcTable, iQuery)
+              , ?).
     iQuery = iQuery + 1.
   END. /* iQuery .. MaxQueryHistory */
-  
+
   {&timerStop}
 END PROCEDURE. /* saveQueryTable */
 
@@ -2975,12 +2975,10 @@ END PROCEDURE. /* saveQueryTable */
 
 &IF DEFINED(EXCLUDE-saveWindowPos) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindowPos Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindowPos Procedure
 PROCEDURE saveWindowPos :
-/*
- * Save position / size of a window 
- */
- 
+/* Save position / size of a window
+  */
   DEFINE INPUT PARAMETER phWindow     AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER pcWindowName AS CHARACTER   NO-UNDO.
 
@@ -2998,15 +2996,12 @@ END PROCEDURE. /* saveWindowPos */
 
 &IF DEFINED(EXCLUDE-setCaching) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setCaching Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setCaching Procedure
 PROCEDURE setCaching :
-/*
- * Set the cache vars for the library
- */
-
+/* Set the cache vars for the library
+  */
   glCacheTableDefs = LOGICAL( getRegistry("DataDigger:Cache","TableDefs") ).
   glCacheFieldDefs = LOGICAL( getRegistry("DataDigger:Cache","FieldDefs") ).
-  glCacheSettings  = LOGICAL( getRegistry("DataDigger:Cache","Settings")  ).
 
 END PROCEDURE. /* setCaching */
 
@@ -3017,15 +3012,14 @@ END PROCEDURE. /* setCaching */
 
 &IF DEFINED(EXCLUDE-setLabelPosition) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setLabelPosition Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setLabelPosition Procedure
 PROCEDURE setLabelPosition :
-/*
- * Correct the position of the label for larger fonts 
- */
+/* Correct the position of the label for larger fonts
+  */
   DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
 
   /* Move horizontally far enough from the widget */
-  phWidget:SIDE-LABEL-HANDLE:X = phWidget:X 
+  phWidget:SIDE-LABEL-HANDLE:X = phWidget:X
     - FONT-TABLE:GET-TEXT-WIDTH-PIXELS(phWidget:SIDE-LABEL-HANDLE:SCREEN-VALUE, phWidget:FRAME:FONT)
     - (IF phWidget:TYPE = 'fill-in' THEN 5 ELSE 0)
     .
@@ -3039,47 +3033,44 @@ END PROCEDURE. /* setLabelPosition */
 
 &IF DEFINED(EXCLUDE-setSortArrow) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrow Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrow Procedure
 PROCEDURE setSortArrow :
-/*------------------------------------------------------------------------
-  Name         : setSortArrow
-  Description  : Set the sorting arrow on a browse
-  ----------------------------------------------------------------------*/
-
-  DEFINE INPUT PARAMETER phBrowse    AS HANDLE    NO-UNDO. 
-  DEFINE INPUT PARAMETER pcSortField AS CHARACTER NO-UNDO. 
-  DEFINE INPUT PARAMETER plAscending AS LOGICAL   NO-UNDO. 
+/* Set the sorting arrow on a browse
+  */
+  DEFINE INPUT PARAMETER phBrowse    AS HANDLE    NO-UNDO.
+  DEFINE INPUT PARAMETER pcSortField AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER plAscending AS LOGICAL   NO-UNDO.
 
   DEFINE VARIABLE iColumn    AS INTEGER   NO-UNDO.
   DEFINE VARIABLE hColumn    AS HANDLE    NO-UNDO.
   DEFINE VARIABLE lSortFound AS LOGICAL   NO-UNDO.
-  
+
   {&timerStart}
 
-  do iColumn = 1 to phBrowse:num-columns:
-    hColumn = phBrowse:get-browse-column(iColumn).
+  DO iColumn = 1 TO phBrowse:NUM-COLUMNS:
+    hColumn = phBrowse:GET-BROWSE-COLUMN(iColumn).
 
-    /* If you apply the sort to the same column, the order 
+    /* If you apply the sort to the same column, the order
      * of sorting is inverted.
      */
-    IF hColumn:NAME = pcSortField THEN 
+    IF hColumn:NAME = pcSortField THEN
     DO:
-      phBrowse:set-sort-arrow(iColumn, plAscending ).
+      phBrowse:SET-SORT-ARROW(iColumn, plAscending ).
       lSortFound = TRUE.
 
       /* Setting is one of: ColumnSortFields | ColumnSortIndexes | ColumnSortTables */
       setRegistry( 'DataDigger'
-                 , SUBSTITUTE('ColumnSort&1', SUBSTRING(phBrowse:name,3))  
-                 , SUBSTITUTE('&1,&2',iColumn, plAscending)
-                 ).
+                , SUBSTITUTE('ColumnSort&1', SUBSTRING(phBrowse:NAME,3))
+                , SUBSTITUTE('&1,&2',iColumn, plAscending)
+                ).
     END.
-    ELSE 
-      phBrowse:set-sort-arrow(iColumn, ? ). /* erase existing arrow */
+    ELSE
+      phBrowse:SET-SORT-ARROW(iColumn, ? ). /* erase existing arrow */
   END.
-  
+
   /* If no sort is found, delete setting */
   IF NOT lSortFound THEN
-    setRegistry( 'DataDigger', SUBSTITUTE('ColumnSort&1', SUBSTRING(phBrowse:name,3)), ?).
+    setRegistry( 'DataDigger', SUBSTITUTE('ColumnSort&1', SUBSTRING(phBrowse:NAME,3)), ?).
 
   {&timerStop}
 
@@ -3092,21 +3083,18 @@ END PROCEDURE. /* setSortArrow */
 
 &IF DEFINED(EXCLUDE-setTransparency) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTransparency Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTransparency Procedure
 PROCEDURE setTransparency :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Set transparency level for a frame, using Windows api
+  */
   DEFINE INPUT  PARAMETER phFrame AS HANDLE     NO-UNDO.
   DEFINE INPUT  PARAMETER piLevel AS INTEGER    NO-UNDO.
-  
-  &scop GWL_EXSTYLE         -20
-  &scop WS_EX_LAYERED       524288
-  &scop LWA_ALPHA           2
-  &scop WS_EX_TRANSPARENT   32
-  
+
+  &SCOPED-DEFINE GWL_EXSTYLE         -20
+  &SCOPED-DEFINE WS_EX_LAYERED       524288
+  &SCOPED-DEFINE LWA_ALPHA           2
+  &SCOPED-DEFINE WS_EX_TRANSPARENT   32
+
   DEFINE VARIABLE stat AS INTEGER    NO-UNDO.
 
   /* Set WS_EX_LAYERED on this window  */
@@ -3124,60 +3112,22 @@ END PROCEDURE. /* setTransparency */
 
 &IF DEFINED(EXCLUDE-setUsage) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setUsage Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setUsage Procedure
 PROCEDURE setUsage :
-/*------------------------------------------------------------------------
-  Name         : setUsage
-  Description  : Save DataDigger usage in the INI file
-  ----------------------------------------------------------------------*/
-  DEFINE INPUT PARAMETER pcUsageId AS CHARACTER NO-UNDO.
+/* Save DataDigger usage in the INI file
+  */
+  DEFINE INPUT PARAMETER pcName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
 
-  DEFINE VARIABLE iNumUsed   AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iNumDays   AS INTEGER NO-UNDO.
-  DEFINE VARIABLE cEventType AS CHARACTER   NO-UNDO.
+  {&timerStart}
 
-  /* Save DataDigger usage in the INI file
-   *
-   * [DataDigger:Usage]
-   * btnAdd:lastDate  = 2013-05-06      /* last date it is used */
-   * btnAdd:numUsed   = 32              /* nr of times it is used */
-   * btnAdd:numDays   = 2               /* nr of days on which it is used */
-   * btnAdd:eventType = keypress        /* how was it invoked */
-   *
-   * Valid event types are:
-   *   "KEYPRESS" - Keyboard event identified by key label, such as ESC, CTRL+A, or A.
-   *   "MOUSE"    - Portable or three-button mouse event, such as MOUSE-SELECT-UP or LEFT-MOUSE-UP.
-   *   "PROGRESS" - High-level ABL event. These include all events identified as direct manipulation,
-   *                key function, developer, and other miscellaneous events, such as SELECTION,
-   *                DELETE-LINE, U1, or CHOOSE.
-   */
-  cEventType = getRegistry("DataDigger:Usage", SUBSTITUTE("&1:eventType", pcUsageId)).
-  IF cEventType = ? THEN cEventType = "".
-  IF LOOKUP(LAST-EVENT:EVENT-TYPE, cEventType) = 0 THEN
-  DO:
-    cEventType = TRIM(cEventType + "," + LAST-EVENT:EVENT-TYPE,",").
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:eventType", pcUsageId), cEventType).
-  END.
+  i = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName))).
+  IF i = ? THEN i = 0.
 
-  iNumDays = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numDays", pcUsageId))).
-  IF iNumDays = ? THEN iNumDays = 0.
+  i = i + 1.
+  setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName), STRING(i)).
 
-  /* Update lastDate and numDays only first time per day */
-  IF getRegistry("DataDigger:Usage", SUBSTITUTE("&1:lastDate" , pcUsageId)) <> ISO-DATE(TODAY) THEN
-  DO:
-    /* Num days on which the function is used */
-    iNumDays = iNumDays + 1.
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numDays" , pcUsageId), STRING(iNumDays)).
-  
-    /* Date last used */
-    setRegistry("DataDigger:Usage", SUBSTITUTE("&1:lastDate" , pcUsageId), ISO-DATE(TODAY)).
-  END.
-
-  /* Number of times used */
-  iNumUsed = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcUsageId))).
-  IF iNumUsed = ? THEN iNumUsed = 0.
-  iNumUsed = iNumUsed + 1.
-  setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcUsageId), STRING(iNumUsed)).
+  {&timerStop}
 
 END PROCEDURE. /* setUsage */
 
@@ -3188,11 +3138,10 @@ END PROCEDURE. /* setUsage */
 
 &IF DEFINED(EXCLUDE-setXmlNodeNames) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setXmlNodeNames Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setXmlNodeNames Procedure
 PROCEDURE setXmlNodeNames :
-/* 
- * Set the XML-NODE-NAMES of all fields in a buffer
- */
+/* Set the XML-NODE-NAMES of all fields in a buffer
+  */
   DEFINE INPUT PARAMETER phTable AS HANDLE NO-UNDO.
   DEFINE VARIABLE iField AS INTEGER NO-UNDO.
 
@@ -3209,21 +3158,21 @@ END PROCEDURE. /* setXmlNodeNames */
 
 &IF DEFINED(EXCLUDE-showHelp) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHelp Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHelp Procedure
 PROCEDURE showHelp :
-DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
-  DEFINE INPUT  PARAMETER pcStrings AS CHARACTER   NO-UNDO.
+/* Show a help message and save answer to ini
+  */
+  DEFINE INPUT PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcStrings AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cButtons       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cMessage       AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cMsg           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cPrg           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTitle         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cType          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cUrl           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cCanHide       AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iButtonPressed AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lAnswer        AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lDontShowAgain AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lCanHide       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lHidden        AS LOGICAL     NO-UNDO.
@@ -3241,7 +3190,7 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   lCanHide = LOGICAL(cCanHide) NO-ERROR.
   IF lCanHide = ? THEN lCanHide = TRUE.
 
-  IF cMessage = ? THEN 
+  IF cMessage = ? THEN
   DO:
     IF cUrl = ? AND cPrg = ? THEN RETURN.
     lHidden        = YES. /* suppress empty text window */
@@ -3259,20 +3208,20 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   /* If title is empty, set it to the type of the message */
   cTitle   = getRegistry('DataDigger:help', pcTopic + ':title').
   IF cTitle = ? THEN cTitle = cType.
-  
+
   /* If hidden has strange value, set it to NO */
   lHidden = LOGICAL(getRegistry('DataDigger:help', pcTopic + ':hidden')) NO-ERROR.
   IF lHidden = ? THEN lHidden = NO.
-  
+
   /* If ButtonPressed has strange value, set hidden to NO */
   iButtonPressed = INTEGER( getRegistry('DataDigger:help',pcTopic + ':answer') ) NO-ERROR.
   IF iButtonPressed = ? THEN lHidden = NO.
-  
+
   /* if we have no message, but we do have an URL or prog, then
    * dont show an empty message box.
    */
   IF cMessage = ? THEN
-    ASSIGN 
+    ASSIGN
       lHidden        = YES /* suppress empty text window */
       iButtonPressed = 1.   /* forces to start the url or prog */
 
@@ -3282,16 +3231,16 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
   END.
 
   cMessage = SUBSTITUTE( cMessage
-                       , cUserString[1]
-                       , cUserString[2]
-                       , cUserString[3]
-                       , cUserString[4]
-                       , cUserString[5]
-                       , cUserString[6]
-                       , cUserString[7]
-                       , cUserString[8]
-                       , cUserString[9]
-                       ).
+                      , cUserString[1]
+                      , cUserString[2]
+                      , cUserString[3]
+                      , cUserString[4]
+                      , cUserString[5]
+                      , cUserString[6]
+                      , cUserString[7]
+                      , cUserString[8]
+                      , cUserString[9]
+                      ).
 
   /* If not hidden, show the message and let the user choose an answer */
   IF NOT lHidden THEN
@@ -3304,21 +3253,21 @@ DEFINE INPUT  PARAMETER pcTopic   AS CHARACTER   NO-UNDO.
       , OUTPUT iButtonPressed
       , OUTPUT lDontShowAgain
       ).
-      
+
     IF lDontShowAgain THEN
       setRegistry('DataDigger:help', pcTopic + ':hidden', 'yes').
   END.
-  
-  /* Start external things if needed */                                            
+
+  /* Start external things if needed */
   IF iButtonPressed = 1 THEN
   DO:
     IF cUrl <> ? THEN OS-COMMAND NO-WAIT START (cUrl).
     IF cPrg <> ? THEN RUN VALUE(cPrg) NO-ERROR.
   END.
-  
+
   /* Save answer */
   setRegistry('DataDigger:help',pcTopic + ':answer', STRING(iButtonPressed)).
-      
+
 END PROCEDURE. /* showHelp */
 
 /* _UIB-CODE-BLOCK-END */
@@ -3328,23 +3277,20 @@ END PROCEDURE. /* showHelp */
 
 &IF DEFINED(EXCLUDE-showScrollbars) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showScrollbars Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showScrollbars Procedure
 PROCEDURE showScrollbars :
-/*------------------------------------------------------------------------
-  Name         : showScrollbars
-  Description  : Hide or show scrollbars the hard way
-  ----------------------------------------------------------------------*/
-  
+/* Hide or show scrollbars the hard way
+  */
   DEFINE INPUT PARAMETER ip-Frame      AS HANDLE  NO-UNDO.
   DEFINE INPUT PARAMETER ip-horizontal AS LOGICAL NO-UNDO.
   DEFINE INPUT PARAMETER ip-vertical   AS LOGICAL NO-UNDO.
 
   DEFINE VARIABLE iv-retint AS INTEGER NO-UNDO.
-  
+
   {&timerStart}
-  
+
   IF NOT VALID-HANDLE(ip-Frame) OR ip-Frame:HWND = ? THEN RETURN.
-  
+
   &scoped-define SB_HORZ 0
   &scoped-define SB_VERT 1
   &scoped-define SB_BOTH 3
@@ -3354,8 +3300,8 @@ PROCEDURE showScrollbars :
                       {&SB_HORZ},
                       IF ip-horizontal THEN -1 ELSE 0,
                       OUTPUT iv-retint ).
-       
-  RUN ShowScrollBar ( ip-Frame:HWND, 
+
+  RUN ShowScrollBar ( ip-Frame:HWND,
                       {&SB_VERT},
                       IF ip-vertical  THEN -1 ELSE 0,
                       OUTPUT iv-retint ).
@@ -3374,45 +3320,27 @@ END PROCEDURE. /* ShowScrollbars */
 
 &IF DEFINED(EXCLUDE-unlockWindow) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE unlockWindow Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE unlockWindow Procedure
 PROCEDURE unlockWindow :
-/*------------------------------------------------------------------------
-  Name         : unlockWindow
-  Description  : Force a window to unlock 
-  ----------------------------------------------------------------------
-  26-11-2013 pti Created
-  ----------------------------------------------------------------------*/
-
+/* Force a window to unlock
+  */
   DEFINE INPUT PARAMETER phWindow AS HANDLE  NO-UNDO.
 
-  DEFINE VARIABLE iRet AS INTEGER NO-UNDO. 
-  DEFINE BUFFER ttWindowLock FOR ttWindowLock. 
+  DEFINE VARIABLE iRet AS INTEGER NO-UNDO.
+  DEFINE BUFFER ttWindowLock FOR ttWindowLock.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Window &1, force to unlock", phWindow:TITLE)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Window &1, force to unlock", phWindow:TITLE)).
 
   /* Find window in our tt of locked windows */
   FIND ttWindowLock WHERE ttWindowLock.hWindow = phWindow NO-ERROR.
-  IF NOT AVAILABLE ttWindowLock THEN RETURN. 
+  IF NOT AVAILABLE ttWindowLock THEN RETURN.
 
   IF ttWindowLock.iLockCounter > 0 THEN
   DO:
-    RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
-                    , {&WM_SETREDRAW}
-                    , 1
-                    , 0
-                    , OUTPUT iRet
-                    ).
-    
-    RUN RedrawWindow( phWindow:HWND /* {&window-name}:hwnd */
-                    , 0
-                    , 0
-                    , {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}
-                    , OUTPUT iRet
-                    ).
-
-    /* Clean up tt */
+    RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
+    RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
     DELETE ttWindowLock.
-  END. 
+  END.
 
 END PROCEDURE. /* unlockWindow */
 
@@ -3423,16 +3351,10 @@ END PROCEDURE. /* unlockWindow */
 
 &IF DEFINED(EXCLUDE-updateFields) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE updateFields Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE updateFields Procedure
 PROCEDURE updateFields :
-/*------------------------------------------------------------------------
-  Name         : updateFields
-  Description  : Update the fields temp-table with settings from registry
-  ---------------------------------------------------------------------- 
-  22-10-2012 pti Created
-  24-10-2014 pti Place newly created fields at the bottom
-  ----------------------------------------------------------------------*/
-  
+/* Update the fields temp-table with settings from registry
+  */
   DEFINE INPUT PARAMETER pcDatabase    AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcTableName   AS CHARACTER   NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttField.
@@ -3440,8 +3362,6 @@ PROCEDURE updateFields :
   DEFINE VARIABLE cCustomFormat      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSelectedFields    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldOrder        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lSaveDataFilters   AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lShow              AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE iColumnOrder       AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iFieldOrder        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxExtent         AS INTEGER     NO-UNDO.
@@ -3451,12 +3371,11 @@ PROCEDURE updateFields :
   DEFINE BUFFER bColumn FOR ttColumn.
 
   {&timerStart}
-
-  PUBLISH "debugMessage" (1, SUBSTITUTE("Update field definitions for &1.&2", pcDatabase, pcTableName)).
+  PUBLISH "debugInfo" (1, SUBSTITUTE("Update field definitions for &1.&2", pcDatabase, pcTableName)).
 
   /* Get list of all previously selected fields */
   cSelectedFields = getRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1:fields",pcTableName)).
-  IF cSelectedFields = ? THEN cSelectedFields = '*'.
+  IF cSelectedFields = ? THEN cSelectedFields = '!RECID,!ROWID,*'.
 
   /* Get field ordering */
   cFieldOrder = getRegistry(SUBSTITUTE('DB:&1',pcDatabase), SUBSTITUTE('&1:fieldOrder',pcTableName)).
@@ -3465,14 +3384,11 @@ PROCEDURE updateFields :
   IF cFieldOrder <> ? THEN
   DO:
     lRecRowAtEnd = LOOKUP("ROWID", cFieldOrder) > NUM-ENTRIES(cFieldOrder) - 2 AND LOOKUP("RECID", cFieldOrder) > NUM-ENTRIES(cFieldOrder) - 2.
-    PUBLISH "debugMessage" (2, SUBSTITUTE("Field order for table &1: &2", pcTableName, cFieldOrder)).
-    PUBLISH "debugMessage" (3, SUBSTITUTE("Rowid/recid at the end for table &1: &2", pcTableName, lRecRowAtEnd)).
+    PUBLISH "debugInfo" (2, SUBSTITUTE("Field order for table &1: &2", pcTableName, cFieldOrder)).
+    PUBLISH "debugInfo" (3, SUBSTITUTE("Rowid/recid at the end for table &1: &2", pcTableName, lRecRowAtEnd)).
   END.
 
-  /* Saved data filters? */
-  lSaveDataFilters = LOGICAL(getRegistry ("DataDigger", "SaveDataFilters")).
-
-  FOR EACH bField:
+  FOR EACH bField {&TABLE-SCAN}:
 
     /* Due to a bug the nr of decimals may be set on non-decimal fields
      * See PKB P185263 (article 18087) for more information
@@ -3484,14 +3400,17 @@ PROCEDURE updateFields :
     bField.lShow = CAN-DO(cSelectedFields, bField.cFullName).
 
     /* Customization option for the user to show/hide certain fields */
+    PUBLISH "DD:Timer" ("start", 'customShowField').
     PUBLISH 'customShowField' (pcDatabase, pcTableName, bField.cFieldName, INPUT-OUTPUT bField.lShow).
+    PUBLISH "DD:Timer" ("stop", 'customShowField').
 
     /* Customization option for the user to adjust the format */
+    PUBLISH "DD:Timer" ("start", 'customFormat').
     PUBLISH 'customFormat' (pcDatabase, pcTableName, bField.cFieldName, bField.cDatatype, INPUT-OUTPUT bField.cFormat).
-    
+    PUBLISH "DD:Timer" ("stop", 'customFormat').
+
     /* Restore changed field format. */
-    cCustomFormat = getRegistry( SUBSTITUTE("DB:&1",pcDatabase)
-                               , SUBSTITUTE("&1.&2:format",pcTableName,bField.cFieldName) ).
+    cCustomFormat = getRegistry(SUBSTITUTE("DB:&1",pcDatabase), SUBSTITUTE("&1.&2:format",pcTableName,bField.cFieldName) ).
     IF cCustomFormat <> ? THEN bField.cFormat = cCustomFormat.
 
     /* Restore changed field order. */
@@ -3500,10 +3419,6 @@ PROCEDURE updateFields :
 
     /* Keep track of highest nr */
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
-
-    /* RECID / ROWID field visibility might be changed */
-/*     IF LOOKUP(bField.cFullName, "RECID,ROWID") > 0 THEN                                          */
-/*       bField.lShow = LOGICAL(getRegistry ("DataDigger", "AddDataColumnFor" + bField.cFullName)). */
 
   END. /* f/e bField */
 
@@ -3515,31 +3430,32 @@ PROCEDURE updateFields :
     DELETE bColumn.
   END.
 
-
   IF CAN-FIND(FIRST bField WHERE bField.iOrder = 0) THEN
   DO:
     /* Set new fields (no order assigned) at the end */
-    FOR EACH bField WHERE bField.iOrder = 0 BY bField.iFieldRpos: 
-       ASSIGN 
-         iFieldOrder   = iFieldOrder + 1
-         bField.iOrder = iFieldOrder.      
+    FOR EACH bField WHERE bField.iOrder = 0 BY bField.iFieldRpos:
+      ASSIGN
+        iFieldOrder   = iFieldOrder + 1
+        bField.iOrder = iFieldOrder.
     END.
 
     /* If RECID+ROWID should be at the end then re-assign them */
     IF lRecRowAtEnd THEN
-    FOR EACH bField 
+    FOR EACH bField
       WHERE bField.cFieldName = "RECID" OR bField.cFieldName = "ROWID" BY bField.iOrder:
-      ASSIGN 
+      ASSIGN
         iFieldOrder   = iFieldOrder + 1
         bField.iOrder = iFieldOrder.
-    END. 
+    END.
   END.
 
   /* Reorder fields to get rid of gaps */
   iFieldOrder = 0.
+  #FieldLoop:
   REPEAT PRESELECT EACH bField BY bField.iOrder:
-    FIND NEXT bField.
-    ASSIGN 
+    FIND NEXT bField NO-ERROR.
+    IF NOT AVAILABLE bField THEN LEAVE #FieldLoop.
+    ASSIGN
       iFieldOrder   = iFieldOrder + 1
       bField.iOrder = iFieldOrder.
   END.
@@ -3554,7 +3470,6 @@ PROCEDURE updateFields :
   END.
 
   {&timerStop}
-
 END PROCEDURE. /* updateFields */
 
 /* _UIB-CODE-BLOCK-END */
@@ -3564,34 +3479,31 @@ END PROCEDURE. /* updateFields */
 
 &IF DEFINED(EXCLUDE-updateMemoryCache) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE updateMemoryCache Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE updateMemoryCache Procedure
 PROCEDURE updateMemoryCache :
-/*------------------------------------------------------------------------
-  Name         : updateMemoryCache
-  Description  : Update the memory cache with current settings 
-  ----------------------------------------------------------------------*/
-  
-  DEFINE INPUT PARAMETER pcDatabase    AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER pcTableName   AS CHARACTER NO-UNDO.
+/* Update the memory cache with current settings
+  */
+  DEFINE INPUT PARAMETER pcDatabase  AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTableName AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER TABLE FOR ttField.
   DEFINE INPUT PARAMETER TABLE FOR ttColumn.
 
-  DEFINE BUFFER bField  FOR ttField. 
+  DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
-  DEFINE BUFFER bFieldCache  FOR ttFieldCache. 
+  DEFINE BUFFER bFieldCache  FOR ttFieldCache.
   DEFINE BUFFER bColumnCache FOR ttColumnCache.
 
-  PUBLISH "debugMessage" (2, SUBSTITUTE("Update first-level cache for &1.&2", pcDatabase, pcTableName)).
+  PUBLISH "debugInfo" (2, SUBSTITUTE("Update first-level cache for &1.&2", pcDatabase, pcTableName)).
 
   /* Delete old */
-  FOR EACH bFieldCache 
+  FOR EACH bFieldCache
     WHERE bFieldCache.cDatabase  = pcDatabase
       AND bFieldCache.cTableName = pcTableName:
 
     DELETE bFieldCache.
   END.
 
-  FOR EACH bColumnCache 
+  FOR EACH bColumnCache
     WHERE bColumnCache.cDatabase  = pcDatabase
       AND bColumnCache.cTableName = pcTableName:
 
@@ -3599,11 +3511,12 @@ PROCEDURE updateMemoryCache :
   END.
 
   /* Create new */
-  FOR EACH bField:
+  FOR EACH bField {&TABLE-SCAN}:
     CREATE bFieldCache.
     BUFFER-COPY bField TO bFieldCache.
   END.
-  FOR EACH bColumn:
+
+  FOR EACH bColumn {&TABLE-SCAN}:
     CREATE bColumnCache.
     BUFFER-COPY bColumn TO bColumnCache.
   END.
@@ -3619,31 +3532,20 @@ END PROCEDURE. /* updateMemoryCache */
 
 &IF DEFINED(EXCLUDE-addConnection) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addConnection Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addConnection Procedure
 FUNCTION addConnection RETURNS LOGICAL
-  ( pcDatabase AS CHARACTER 
+  ( pcDatabase AS CHARACTER
   , pcSection  AS CHARACTER ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-    
-define temp-table ttDatabase no-undo rcode-information
-  field cLogicalName  as character column-label "Logical Name" format "x(20)"
-  field cSection      as character column-label "Section"      format "x(20)"
-  index iPrim is primary unique cLogicalName
-  .
-------------------------------------------------------------------------------*/
-
+  /* Add a connection to the temp-table
+  */
   IF NOT CAN-FIND(ttDatabase WHERE ttDatabase.cLogicalName = pcDatabase) THEN
   DO:
     CREATE ttDatabase.
-    ASSIGN 
+    ASSIGN
       ttDatabase.cLogicalName  = pcDatabase
       ttDatabase.cSection      = pcSection
-      . 
-
+      .
   END.
-
   RETURN TRUE.
 
 END FUNCTION.
@@ -3655,25 +3557,20 @@ END FUNCTION.
 
 &IF DEFINED(EXCLUDE-formatQueryString) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION formatQueryString Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION formatQueryString Procedure
 FUNCTION formatQueryString RETURNS CHARACTER
   ( INPUT pcQueryString AS CHARACTER
   , INPUT plExpanded    AS LOGICAL ) :
-
-/*------------------------------------------------------------------------------
-  Purpose: formatQueryString
-    Notes: return a properly formatted query string
-------------------------------------------------------------------------------*/
+  /* Return a properly formatted query string
+  */
   DEFINE VARIABLE cReturnValue AS CHARACTER   NO-UNDO.
 
   {&timerStart}
-  
   cReturnValue = pcQueryString.
-
-  IF cReturnValue <> '' AND cReturnValue <> ? THEN 
+  IF cReturnValue <> '' AND cReturnValue <> ? THEN
   DO:
     /* There might be chr(1) chars in the text (if read from ini, for example)
-     * Replace these with normal CRLF, then proceed 
+     * Replace these with normal CRLF, then proceed
      */
     cReturnValue = REPLACE(cReturnValue,CHR(1),'~n').
 
@@ -3683,8 +3580,8 @@ FUNCTION formatQueryString RETURNS CHARACTER
       cReturnValue = REPLACE(cReturnValue, '~n', {&QUERYSEP}).
   END.
 
+  RETURN cReturnValue.
   {&timerStop}
-  return cReturnValue.
 
 END FUNCTION. /* formatQueryString */
 
@@ -3695,57 +3592,61 @@ END FUNCTION. /* formatQueryString */
 
 &IF DEFINED(EXCLUDE-getColor) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColor Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColor Procedure
 FUNCTION getColor RETURNS INTEGER
   ( pcName AS CHARACTER ) :
-
-/*------------------------------------------------------------------------
-  Name         : getColor
-  Description  : Return the color number for the name given
-                  
-                 pcName = Name of the UI element eg 'DataOddRow' 
-  ---------------------------------------------------------------------- 
-  25-03-2011 pti Created
-  ----------------------------------------------------------------------*/
-  DEFINE VARIABLE iColor AS INTEGER NO-UNDO. 
+  /* Return the color number for a color name
+   */
+  DEFINE BUFFER bColor FOR ttColor.
 
   {&timerStart}
-  
+
+  FIND bColor WHERE bColor.cName = pcName NO-ERROR.
+  IF AVAILABLE bColor THEN RETURN bColor.iColor.
+
+  CREATE bColor.
+  ASSIGN bColor.cName = pcName.
+
   /* Get the setting for this color name */
-  iColor = INTEGER(getRegistry('DataDigger:colors', pcName)) NO-ERROR.
-  
+  bColor.iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
+
   /* Default colors if it is unknown */
-  IF iColor = ? THEN 
+  IF bColor.iColor = ? THEN
   DO:
     CASE pcName:
-      WHEN 'CustomFormat:fg'           THEN iColor = 12. /* red       */
-      WHEN 'CustomOrder:fg'            THEN iColor = 12. /* red       */
-      WHEN 'DataRow:even:bg'           THEN iColor =  8. /* lightgray */
-      WHEN 'DataRow:even:fg'           THEN iColor =  0. /* black     */
-      WHEN 'DataRow:odd:bg'            THEN iColor = 15. /* white     */
-      WHEN 'DataRow:odd:fg'            THEN iColor =  0. /* black     */
-      WHEN 'FilterBox:bg'              THEN iColor = 12. /* red       */
-      WHEN 'IndexInactive:fg'          THEN iColor = 12. /* red       */
-      WHEN 'PrimIndex:bg'              THEN iColor =  8. /* lightgray */
-      WHEN 'QueryCounter:fg'           THEN iColor =  7. /* darkgray  */
-      WHEN 'QueryError:bg'             THEN iColor = 12. /* red       */
-      WHEN 'QueryError:fg'             THEN iColor = 14. /* yellow    */
-      WHEN 'QueryInfo:fg'              THEN iColor =  7. /* darkgray  */
-      WHEN 'RecordCount:Complete:fg'   THEN iColor =  2. /* green     */
-      WHEN 'RecordCount:Incomplete:fg' THEN iColor = 12. /* red       */
-      WHEN 'RecordCount:Selected:fg'   THEN iColor =  7. /* darkgray */
-      WHEN 'WarningBox:bg'             THEN iColor = 14. /* yellow    */
-      WHEN 'WarningBox:fg'             THEN iColor = 12. /* red       */
-      WHEN 'FieldFilter:bg'            THEN iColor = 14. /* yellow    */
-      WHEN 'FieldFilter:fg'            THEN iColor =  9. /* blue      */
+      WHEN 'CustomFormat:fg'           THEN bColor.iColor = 12. /* red       */
+      WHEN 'CustomFormat:bg'           THEN bColor.iColor =  ?. /* default   */
+      WHEN 'CustomOrder:fg'            THEN bColor.iColor = 12. /* red       */
+      WHEN 'CustomOrder:bg'            THEN bColor.iColor =  ?. /* default   */
+      WHEN 'DataRow:even:bg'           THEN bColor.iColor =  8. /* lightgray */
+      WHEN 'DataRow:even:fg'           THEN bColor.iColor =  0. /* black     */
+      WHEN 'DataRow:odd:bg'            THEN bColor.iColor = 15. /* white     */
+      WHEN 'DataRow:odd:fg'            THEN bColor.iColor =  0. /* black     */
+      WHEN 'FilterBox:bg'              THEN bColor.iColor = 12. /* red       */
+      WHEN 'IndexInactive:fg'          THEN bColor.iColor = 12. /* red       */
+      WHEN 'IndexInactive:bg'          THEN bColor.iColor =  ?. /* default   */
+      WHEN 'PrimIndex:fg'              THEN bColor.iColor =  ?. /* default   */
+      WHEN 'PrimIndex:bg'              THEN bColor.iColor =  8. /* lightgray */
+      WHEN 'QueryError:bg'             THEN bColor.iColor = 12. /* red       */
+      WHEN 'QueryError:fg'             THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'RecordCount:Complete:fg'   THEN bColor.iColor =  2. /* green     */
+      WHEN 'RecordCount:Complete:bg'   THEN bColor.iColor =  ?. /* none      */
+      WHEN 'RecordCount:Incomplete:fg' THEN bColor.iColor = 12. /* red       */
+      WHEN 'RecordCount:Incomplete:bg' THEN bColor.iColor =  ?. /* none      */
+      WHEN 'RecordCount:Selected:fg'   THEN bColor.iColor =  7. /* darkgray  */
+      WHEN 'RecordCount:Selected:bg'   THEN bColor.iColor =  ?. /* none      */
+      WHEN 'WarningBox:bg'             THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'WarningBox:fg'             THEN bColor.iColor = 12. /* red       */
+      WHEN 'FieldFilter:bg'            THEN bColor.iColor = 14. /* yellow    */
+      WHEN 'FieldFilter:fg'            THEN bColor.iColor =  9. /* blue      */
     END CASE.
 
-    /* Save it, so the next time it comes from the settings */ 
-    IF iColor <> ? THEN setRegistry('DataDigger:colors', pcName, STRING(iColor)).
+    /* Save it, so the next time it comes from the settings */
+    IF bColor.iColor <> ? THEN setRegistry('DataDigger:Colors', pcName, STRING(bColor.iColor)).
   END.
 
+  RETURN bColor.iColor.   /* Function return value. */
   {&timerStop}
-  RETURN iColor.   /* Function return value. */
 
 END FUNCTION. /* getColor */
 
@@ -3756,25 +3657,26 @@ END FUNCTION. /* getColor */
 
 &IF DEFINED(EXCLUDE-getColumnLabel) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColumnLabel Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColumnLabel Procedure
 FUNCTION getColumnLabel RETURNS CHARACTER
   ( INPUT phFieldBuffer AS HANDLE ):
-
+  /* Return column label, based on settings
+  */
   DEFINE VARIABLE cColumnLabel AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTemplate    AS CHARACTER   NO-UNDO.
-  
+
   {&timerStart}
-  
+
   cTemplate = getRegistry("DataDigger","ColumnLabelTemplate").
   IF cTemplate = ? OR cTemplate = "" THEN cTemplate = "&1".
 
   cColumnLabel = SUBSTITUTE(cTemplate
-                           , phFieldBuffer::cFullName
-                           , phFieldBuffer::iOrder
-                           , phFieldBuffer::cLabel
-                           ).
+                          , phFieldBuffer::cFullName
+                          , phFieldBuffer::iOrder
+                          , phFieldBuffer::cLabel
+                          ).
+  RETURN cColumnLabel.
   {&timerStop}
-  return cColumnLabel.
 
 END FUNCTION. /* getColumnLabel */
 
@@ -3785,31 +3687,31 @@ END FUNCTION. /* getColumnLabel */
 
 &IF DEFINED(EXCLUDE-getColumnWidthList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColumnWidthList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColumnWidthList Procedure
 FUNCTION getColumnWidthList RETURNS CHARACTER
   ( INPUT phBrowse AS HANDLE ):
-
   /* returns a list of all fields and their width like:
    * custnum:12,custname:20,city:12
    */
   DEFINE VARIABLE cWidthList AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hColumn    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iColumn    AS INTEGER     NO-UNDO.
-  
+
   {&timerStart}
-  
-  do iColumn = 1 to phBrowse:num-columns:
-  
-    hColumn = phBrowse:get-browse-column(iColumn).
+
+  DO iColumn = 1 TO phBrowse:NUM-COLUMNS:
+
+    hColumn = phBrowse:GET-BROWSE-COLUMN(iColumn).
     cWidthList = SUBSTITUTE('&1,&2:&3'
-                           , cWidthList 
-                           , hColumn:NAME
-                           , hColumn:WIDTH-PIXELS
-                           ).
+                          , cWidthList
+                          , hColumn:NAME
+                          , hColumn:WIDTH-PIXELS
+                          ).
   END.
-  
+
+  RETURN TRIM(cWidthList,',').
   {&timerStop}
-  return trim(cWidthList,','). 
+
 END FUNCTION. /* getColumnWidthList */
 
 /* _UIB-CODE-BLOCK-END */
@@ -3819,22 +3721,16 @@ END FUNCTION. /* getColumnWidthList */
 
 &IF DEFINED(EXCLUDE-getDatabaseList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDatabaseList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDatabaseList Procedure
 FUNCTION getDatabaseList RETURNS CHARACTER:
-
-/*------------------------------------------------------------------------
-  Name         : getDatabaseList
-  Description  : Return a comma separated list of all connected datbases
-  ---------------------------------------------------------------------- 
-  22-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-  
+  /* Return a comma separated list of all connected datbases
+  */
   DEFINE VARIABLE cDatabaseList  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSchemaHolders AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iCount         AS INTEGER     NO-UNDO.
 
   {&timerStart}
-  
+
   /* Make a list of schema holders */
   DO iCount = 1 TO NUM-DBS:
     IF DBTYPE(iCount) <> 'PROGRESS' THEN cSchemaHolders = cSchemaHolders + ',' + SDBNAME(iCount).
@@ -3842,14 +3738,14 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
 
   /* And a list of all databases. If a database is in the list of schemaholders
    * we don't want to see it here. */
-  DO iCount = 1 to NUM-DBS:
-    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT.
+  #Db:
+  DO iCount = 1 TO NUM-DBS:
+    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT #Db.
     cDatabaseList = cDatabaseList + ',' + LDBNAME(iCount).
   END.
 
-  {&timerStop}
   RETURN TRIM(cDatabaseList,',').
-
+  {&timerStop}
 END FUNCTION. /* getDatabaseList */
 
 /* _UIB-CODE-BLOCK-END */
@@ -3859,21 +3755,19 @@ END FUNCTION. /* getDatabaseList */
 
 &IF DEFINED(EXCLUDE-getEscapedData) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getEscapedData Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getEscapedData Procedure
 FUNCTION getEscapedData RETURNS CHARACTER
   ( pcTarget AS CHARACTER
   , pcString AS CHARACTER ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
+  /* Return html- or 4gl-safe string
+  */
   DEFINE VARIABLE cOutput AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iTmp    AS INTEGER   NO-UNDO.
 
   {&timerStart}
-  
+
   /* Garbage in, garbage out  */
-  cOutput = pcString. 
+  cOutput = pcString.
 
   CASE pcTarget:
     WHEN "HTML" THEN
@@ -3885,7 +3779,7 @@ FUNCTION getEscapedData RETURNS CHARACTER
     WHEN "4GL" THEN
     DO:
       /* Replace single quotes because we are using them for 4GL separating too */
-      cOutput = REPLACE(cOutput, "'", "~~'"). 
+      cOutput = REPLACE(cOutput, "'", "~~'").
 
       /* Replace CHR's 1 till 13  */
       DO iTmp = 1 TO 13:
@@ -3894,8 +3788,8 @@ FUNCTION getEscapedData RETURNS CHARACTER
     END.
   END CASE.
 
-  {&timerStop}
   RETURN pcString.
+  {&timerStop}
 
 END FUNCTION. /* getEscapedData */
 
@@ -3904,18 +3798,60 @@ END FUNCTION. /* getEscapedData */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getFieldList) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList Procedure
+FUNCTION getFieldList RETURNS CHARACTER
+  ( pcDatabase AS CHARACTER
+  , pcFile     AS CHARACTER
+  ):
+  /* Return a comma separated list of all fields of a table
+  */
+  DEFINE VARIABLE hQuery  AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hFile   AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hField  AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cFields AS CHARACTER NO-UNDO.
+
+  CREATE BUFFER hFile FOR TABLE pcDatabase + "._file".
+  CREATE BUFFER hField FOR TABLE pcDatabase + "._field".
+
+  CREATE QUERY hQuery.
+  hQuery:SET-BUFFERS(hFile,hField).
+  hQuery:QUERY-PREPARE(SUBSTITUTE('FOR EACH _File WHERE _File-name = &1, EACH _Field OF _File', QUOTER(pcFile))).
+  hQuery:QUERY-OPEN().
+
+  #CollectFields:
+  REPEAT:
+    hQuery:GET-NEXT().
+    IF hQuery:QUERY-OFF-END THEN LEAVE #CollectFields.
+    cFields = cFields + "," + hField::_Field-name.
+  END. /* #CollectFields */
+
+  RETURN TRIM(cFields, ",").
+
+  FINALLY:
+    hQuery:QUERY-CLOSE().
+    DELETE OBJECT hField.
+    DELETE OBJECT hFile.
+    DELETE OBJECT hQuery.
+  END FINALLY.
+
+END FUNCTION. /* getFieldList */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getFileCategory) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFileCategory Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFileCategory Procedure
 FUNCTION getFileCategory RETURNS CHARACTER
   ( piFileNumber AS INTEGER
   , pcFileName   AS CHARACTER
   ) :
-/*
- * Purpose: Based on name and number, return the category for a table
- */
-
-  /* 
+  /* Based on table name and -number, return the category for a table
+   *
    * Application tables   : _file-number > 0   AND _file-number < 32000
    * Schema tables        : _file-number > -80 AND _file-number < 0
    * Virtual system tables: _file-number < -16384
@@ -3929,7 +3865,7 @@ FUNCTION getFileCategory RETURNS CHARACTER
   IF piFileNumber >= -16384 AND piFileNumber <= -80  THEN RETURN 'Other'.
 
   RETURN ''.   /* Function return value. */
-  
+
 END FUNCTION. /* getFileCategory */
 
 /* _UIB-CODE-BLOCK-END */
@@ -3939,30 +3875,32 @@ END FUNCTION. /* getFileCategory */
 
 &IF DEFINED(EXCLUDE-getFont) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFont Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFont Procedure
 FUNCTION getFont RETURNS INTEGER
-  ( pcFontName AS CHARACTER ) :
-
-/*------------------------------------------------------------------------
-  Name         : getFont
-  Description  : Return the fontnumber for the type given
-  ---------------------------------------------------------------------- 
-  25-03-2011 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE iFontNr AS INTEGER NO-UNDO. 
+  ( pcName AS CHARACTER ) :
+  /* Return the fontnumber for the type given
+  */
+  DEFINE VARIABLE iFont AS INTEGER NO-UNDO.
+  DEFINE BUFFER bFont FOR ttFont.
 
   {&timerStart}
-  iFontNr = integer(getRegistry('DataDigger:Fonts',pcFontName)) no-error.
 
-  IF iFontNr = ? OR iFontNr > 23 THEN 
-  CASE pcFontName:
-    WHEN 'Default' THEN iFontNr = 4.
-    WHEN 'Fixed'   THEN iFontNr = 0.
+  FIND bFont WHERE bFont.cName = pcName NO-ERROR.
+  IF AVAILABLE bFont THEN RETURN bFont.iFont.
+
+  CREATE bFont.
+  ASSIGN bFont.cName = pcName.
+
+  bFont.iFont = INTEGER(getRegistry('DataDigger:Fonts',pcName)) NO-ERROR.
+
+  IF bFont.iFont = ? OR bFont.iFont > 23 THEN
+  CASE pcName:
+    WHEN 'Default' THEN bFont.iFont = 4.
+    WHEN 'Fixed'   THEN bFont.iFont = 0.
   END CASE.
 
+  RETURN bFont.iFont.   /* Function return value. */
   {&timerStop}
-  return iFontNr.   /* Function return value. */
 
 END FUNCTION. /* getFont */
 
@@ -3973,37 +3911,27 @@ END FUNCTION. /* getFont */
 
 &IF DEFINED(EXCLUDE-getImagePath) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getImagePath Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getImagePath Procedure
 FUNCTION getImagePath RETURNS CHARACTER
   ( pcImage AS CHARACTER ) :
-  
-/*------------------------------------------------------------------------
-  Name         : getImagePath
-  Description  : Return the image path + icon set name 
-  ---------------------------------------------------------------------- 
-  22-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-  
+  /* Return the image path + icon set name
+  */
   DEFINE VARIABLE cImagePath AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cIconSet   AS CHARACTER   NO-UNDO.
-  
-  {&timerStart}
-  cIconSet = 'default'.
 
-  cImagePath = SUBSTITUTE('&1Image/&2_&3'
-                         , getProgramDir()
-                         , cIconSet
-                         , pcImage
-                         ).
+  {&timerStart}
+
+  /*
+  cIconSet   = 'default'.
+  cImagePath = SUBSTITUTE('&1Image/&2_&3', getProgramDir(), cIconSet, pcImage).
 
   /* Fall back to the default icon set when image not found */
   IF SEARCH(cImagePath) = ? THEN
-    cImagePath = SUBSTITUTE('&1Image/default_&2'
-                           , getProgramDir()
-                           , pcImage
-                           ).
+  */
+  cImagePath = SUBSTITUTE('&1Image/default_&2', getProgramDir(), pcImage).
+
+  RETURN cImagePath.
   {&timerStop}
-  return cImagePath.
 END FUNCTION. /* getImagePath */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4013,20 +3941,14 @@ END FUNCTION. /* getImagePath */
 
 &IF DEFINED(EXCLUDE-getIndexFields) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getIndexFields Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getIndexFields Procedure
 FUNCTION getIndexFields RETURNS CHARACTER
   ( INPUT pcDatabaseName AS CHARACTER
-  , INPUT pcTableName    AS CHARACTER  
+  , INPUT pcTableName    AS CHARACTER
   , INPUT pcFlags        AS CHARACTER
   ) :
-/*------------------------------------------------------------------------
-  Name         : getIndexFields
-  Description  : Return the index fields of a table.
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  18-12-2012 pti Merged with similar functions
-  ----------------------------------------------------------------------*/
-  
+  /* Return the index fields of a table.
+  */
   DEFINE VARIABLE cWhere            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hQuery            AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldBuffer      AS HANDLE      NO-UNDO.
@@ -4034,28 +3956,29 @@ FUNCTION getIndexFields RETURNS CHARACTER
   DEFINE VARIABLE hIndexBuffer      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hIndexFieldBuffer AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cFieldList        AS CHARACTER   NO-UNDO.
-  
+
   {&timerStart}
-  
-  create buffer hFileBuffer       for table pcDatabaseName + "._File".
+
+  CREATE BUFFER hFileBuffer       FOR TABLE pcDatabaseName + "._File".
   CREATE BUFFER hIndexBuffer      FOR TABLE pcDatabaseName + "._Index".
   CREATE BUFFER hIndexFieldBuffer FOR TABLE pcDatabaseName + "._Index-Field".
   CREATE BUFFER hFieldBuffer      FOR TABLE pcDatabaseName + "._Field".
-  
+
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hFileBuffer,hIndexBuffer,hIndexFieldBuffer,hFieldBuffer).
- 
+
+  {&_proparse_ prolint-nowarn(longstrings)}
   cWhere = SUBSTITUTE("FOR EACH &1._file WHERE &1._file._file-name = &2 AND _File._File-Number < 32768, ~
-                           EACH &1._index       OF &1._file WHERE TRUE &3 &4,  ~
-                           EACH &1._index-field OF &1._index,            ~
-                           EACH &1._field       OF &1._index-field"
-                     , pcDatabaseName
-                     , QUOTER(pcTableName)
-                     , (IF CAN-DO(pcFlags,"U") THEN "AND _index._unique = true" ELSE "")
-                     , (IF CAN-DO(pcFlags,"P") THEN "AND recid(_index) = _file._prime-index" ELSE "")
-                     ).
-  
-  IF hQuery:QUERY-PREPARE (cWhere) THEN 
+                          EACH &1._index       OF &1._file WHERE TRUE &3 &4,  ~
+                          EACH &1._index-field OF &1._index,            ~
+                          EACH &1._field       OF &1._index-field"
+                    , pcDatabaseName
+                    , QUOTER(pcTableName)
+                    , (IF CAN-DO(pcFlags,"U") THEN "AND _index._unique = true" ELSE "")
+                    , (IF CAN-DO(pcFlags,"P") THEN "AND recid(_index) = _file._prime-index" ELSE "")
+                    ).
+
+  IF hQuery:QUERY-PREPARE (cWhere) THEN
   DO:
     hQuery:QUERY-OPEN().
     hQuery:GET-FIRST(NO-LOCK).
@@ -4064,20 +3987,19 @@ FUNCTION getIndexFields RETURNS CHARACTER
       hQuery:GET-NEXT(NO-LOCK).
     END.
   END.
-  
+
   cFieldList = TRIM(cFieldList, ",").
-  
-  hQuery:QUERY-CLOSE. 
-  
+
+  hQuery:QUERY-CLOSE.
+
   DELETE OBJECT hFileBuffer.
   DELETE OBJECT hIndexBuffer.
   DELETE OBJECT hIndexFieldBuffer.
   DELETE OBJECT hFieldBuffer.
   DELETE OBJECT hQuery.
-  
-  {&timerStop}
-  return cFieldList.   /* Function return value. */
 
+  RETURN cFieldList.   /* Function return value. */
+  {&timerStop}
 END FUNCTION. /* getIndexFields */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4087,38 +4009,32 @@ END FUNCTION. /* getIndexFields */
 
 &IF DEFINED(EXCLUDE-getKeyList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getKeyList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getKeyList Procedure
 FUNCTION getKeyList RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
+  /* Return a list of special keys pressed
+  */
+  DEFINE VARIABLE L-KBSTATE AS MEMPTR NO-UNDO.
+  DEFINE VARIABLE L-RETURNVALUE AS INT64 NO-UNDO.
+  DEFINE VARIABLE L-SHIFTLIST AS CHARACTER NO-UNDO.
 
-/*------------------------------------------------------------------------
-  Name         : getKeyList
-  Description  : Return a list of special keys pressed 
-  ---------------------------------------------------------------------- 
-  22-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE L-KBSTATE AS MEMPTR NO-UNDO. 
-  DEFINE VARIABLE L-RETURNVALUE AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE L-SHIFTLIST AS CHARACTER NO-UNDO. 
-  
   SET-SIZE(L-KBSTATE) = 256.
-  
-  /* Get the current state of the keyboard */ 
-  RUN GetKeyboardState(GET-POINTER-VALUE(L-KBSTATE), OUTPUT L-RETURNVALUE). 
-  
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 16), 8, 1) = 1 
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",SHIFT",",").
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 17), 8, 1) = 1 
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",CTRL",",").
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 18), 8, 1) = 1 
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",ALT",",").
-  
-  SET-SIZE(L-KBSTATE) = 0. 
-  
-  RETURN L-SHIFTLIST.   /* Function return value. */ 
 
-END FUNCTION.
+  /* Get the current state of the keyboard */
+  RUN GetKeyboardState(GET-POINTER-VALUE(L-KBSTATE), OUTPUT L-RETURNVALUE).
+
+  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 16), 8, 1) = 1
+  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",SHIFT",",").
+  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 17), 8, 1) = 1
+  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",CTRL",",").
+  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 18), 8, 1) = 1
+  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",ALT",",").
+
+  SET-SIZE(L-KBSTATE) = 0.
+
+  RETURN L-SHIFTLIST.   /* Function return value. */
+
+END FUNCTION. /* getKeyList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4127,60 +4043,19 @@ END FUNCTION.
 
 &IF DEFINED(EXCLUDE-getLinkInfo) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getLinkInfo Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getLinkInfo Procedure
 FUNCTION getLinkInfo RETURNS CHARACTER
   ( INPUT pcFieldName AS CHARACTER
   ):
-
-/*------------------------------------------------------------------------
-  Name         : getLinkInfo
-  Description  : Save name/value of a field.
-  ----------------------------------------------------------------------
-  21-10-2009 pti Created
-  ----------------------------------------------------------------------*/
-
+  /* Save name/value of a field.
+  */
   DEFINE BUFFER bLinkInfo FOR ttLinkInfo.
   {&timerStart}
-  find bLinkInfo where bLinkInfo.cField = pcFieldName no-error.
+  FIND bLinkInfo WHERE bLinkInfo.cField = pcFieldName NO-ERROR.
+
+  RETURN (IF AVAILABLE bLinkInfo THEN bLinkInfo.cValue ELSE "").
   {&timerStop}
-  return (if available bLinkInfo then bLinkInfo.cValue else "").
-
 END FUNCTION. /* getLinkInfo */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-getMatchesValue) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMatchesValue Procedure 
-FUNCTION getMatchesValue RETURNS CHARACTER
-  ( hFillIn AS HANDLE ) :
-
-/*------------------------------------------------------------------------
-  Name         : getMatchesValue
-  Description  : Transform the value of a fillin to something we can use
-                 with the MATCHES function. 
-
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO. 
-
-  cValue = hFillIn:SCREEN-VALUE. 
-  IF cValue = hFillIn:PRIVATE-DATA THEN cValue = ''.
-
-  IF cValue = ? OR cValue = '' THEN cValue = '*'.
-  ELSE 
-  IF    INDEX(cValue,'*') = 0 
-    AND index(cValue,'.') = 0 THEN 
-    cValue = '*' + cValue + '*'.
-
-  RETURN cValue.   /* Function return value. */
-
-END FUNCTION. /* getMatchesValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4189,30 +4064,22 @@ END FUNCTION. /* getMatchesValue */
 
 &IF DEFINED(EXCLUDE-getMaxLength) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMaxLength Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMaxLength Procedure
 FUNCTION getMaxLength RETURNS INTEGER
   ( cFieldList AS CHARACTER ) :
-
-/*------------------------------------------------------------------------
-  Name         : getMaxLength
-  Description  : Return the length of the longest element in a comma 
-                 separated list
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-  DEFINE VARIABLE iField     AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iMaxLength AS INTEGER NO-UNDO. 
-
+  /* Return the length of the longest element in a comma separated list
+  */
+  DEFINE VARIABLE iField     AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMaxLength AS INTEGER NO-UNDO.
   {&timerStart}
-  
+
   /* Get max field length */
-  do iField = 1 to num-entries(cFieldList):
+  DO iField = 1 TO NUM-ENTRIES(cFieldList):
     iMaxLength = MAXIMUM(iMaxLength,LENGTH(ENTRY(iField,cFieldList))).
   END.
 
+  RETURN iMaxLength.   /* Function return value. */
   {&timerStop}
-  return iMaxLength.   /* Function return value. */
-
 END FUNCTION. /* getMaxLength */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4222,15 +4089,11 @@ END FUNCTION. /* getMaxLength */
 
 &IF DEFINED(EXCLUDE-getOsErrorDesc) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getOsErrorDesc Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getOsErrorDesc Procedure
 FUNCTION getOsErrorDesc RETURNS CHARACTER
   (INPUT piOsError AS INTEGER):
-
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-
+  /* Return string for os-error
+  */
   CASE piOsError:
     WHEN   0 THEN RETURN "No error                 ".
     WHEN   1 THEN RETURN "Not owner                ".
@@ -4263,36 +4126,30 @@ END FUNCTION. /* getOsErrorDesc */
 
 &IF DEFINED(EXCLUDE-getProgramDir) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProgramDir Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProgramDir Procedure
 FUNCTION getProgramDir RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
+  /* Return the DataDigger install dir, including a backslash
+  */
 
-/*------------------------------------------------------------------------
-  Name         : getProgramDir
-  Description  : Return the DataDigger install dir, including a backslash
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE cProgDir AS CHARACTER NO-UNDO.
-
-  /* this-procedure:file-name will return the .p name without path when the 
-   * procedure us run without full path. We need to seek it in the propath.
-   */
-  FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
+  /* Cached the value in a global var (about 100x as fast) */
+  IF gcProgramDir = '' THEN
   DO:
-    IF SUBSTRING(THIS-PROCEDURE:FILE-NAME,LENGTH(THIS-PROCEDURE:FILE-NAME) - 1, 2) = ".p" THEN 
-      FILE-INFO:FILE-NAME = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,LENGTH(THIS-PROCEDURE:FILE-NAME) - 2) + ".r".
-  END.
-  
-  cProgDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
-  PUBLISH "message" 
-    ( 50
-    , cProgDir
-    ).
+    /* this-procedure:file-name will return the .p name without path when the
+     * procedure us run without full path. We need to seek it in the propath.
+     */
+    FILE-INFO:FILE-NAME = THIS-PROCEDURE:FILE-NAME.
+    IF FILE-INFO:FULL-PATHNAME = ? THEN
+    DO:
+      IF SUBSTRING(THIS-PROCEDURE:FILE-NAME,LENGTH(THIS-PROCEDURE:FILE-NAME) - 1, 2) = ".p" THEN
+        FILE-INFO:FILE-NAME = SUBSTRING(THIS-PROCEDURE:FILE-NAME,1,LENGTH(THIS-PROCEDURE:FILE-NAME) - 2) + ".r".
+    END.
 
-  RETURN cProgDir. /* Function return value. */
+    gcProgramDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
+    PUBLISH "message"(50,gcProgramDir).
+  END.
+
+  RETURN gcProgramDir.
 
 END FUNCTION. /* getProgramDir */
 
@@ -4303,21 +4160,22 @@ END FUNCTION. /* getProgramDir */
 
 &IF DEFINED(EXCLUDE-getQuery) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQuery Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQuery Procedure
 FUNCTION getQuery RETURNS CHARACTER
   ( INPUT pcDatabase AS CHARACTER
   , INPUT pcTable    AS CHARACTER
   , INPUT piQuery    AS INTEGER
   ) :
-
+  /* Get previously used query nr <piQuery>
+  */
   DEFINE BUFFER bQuery FOR ttQuery.
 
-  FIND bQuery 
+  FIND bQuery
     WHERE bQuery.cDatabase = pcDatabase
       AND bQuery.cTable    = pcTable
       AND bQuery.iQueryNr  = piQuery NO-ERROR.
 
-  IF AVAILABLE bQuery THEN 
+  IF AVAILABLE bQuery THEN
     RETURN bQuery.cQueryTxt.
   ELSE
     RETURN ?.
@@ -4331,19 +4189,13 @@ END FUNCTION. /* getQuery */
 
 &IF DEFINED(EXCLUDE-getReadableQuery) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getReadableQuery Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getReadableQuery Procedure
 FUNCTION getReadableQuery RETURNS CHARACTER
   ( INPUT pcQuery AS CHARACTER ):
+  /* Return a query as a string that is readable for humans.
+  */
+  DEFINE VARIABLE hQuery AS HANDLE NO-UNDO.
 
-  /* Name: getReadableQuery
-   * Desc: Return a query as a string that is readable for humans. 
-   * 
-   *       message getReadableQuery( hQuery:prepare-string ) view-as alert-box.
-   *       
-   *       message getReadableQuery( string(hQuery) ) view-as alert-box.
-   */
-  DEFINE VARIABLE hQuery AS HANDLE      NO-UNDO.
-  
   /* Accept query or query-handle */
   hQuery = WIDGET-HANDLE(pcQuery) NO-ERROR.
   IF VALID-HANDLE( hQuery ) THEN
@@ -4351,7 +4203,7 @@ FUNCTION getReadableQuery RETURNS CHARACTER
     hQuery = WIDGET-HANDLE(pcQuery).
     pcQuery = hQuery:PREPARE-STRING.
   END.
-  
+
   pcQuery = REPLACE(pcQuery,' EACH ' ,' EACH ').
   pcQuery = REPLACE(pcQuery,' FIRST ',' FIRST ').
   pcQuery = REPLACE(pcQuery,' WHERE ',  '~n  WHERE ').
@@ -4362,7 +4214,7 @@ FUNCTION getReadableQuery RETURNS CHARACTER
   pcQuery = REPLACE(pcQuery,' NO-LOCK',  ' NO-LOCK').
   pcQuery = REPLACE(pcQuery,' INDEXED-REPOSITION',  '').
 
-  .pcQuery = pcQuery + '~n'.
+  pcQuery = pcQuery + '~n'.
 
   RETURN pcQuery.
 END FUNCTION. /* getReadableQuery */
@@ -4374,113 +4226,33 @@ END FUNCTION. /* getReadableQuery */
 
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure
 FUNCTION getRegistry RETURNS CHARACTER
     ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER 
+    , pcKey     AS CHARACTER
     ) :
-
-/*------------------------------------------------------------------------
-  Name         : getRegistry 
-  Description  : Get a value from the registry. 
-  ---------------------------------------------------------------------- 
-  15-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lValue AS LOGICAL   NO-UNDO.
-
+  /* Get a value from the registry.
+  */
   {&timerStart}
-  DEFINE BUFFER bfConfig FOR ttConfig.
+  DEFINE BUFFER bDatabase FOR ttDatabase.
+  DEFINE BUFFER bConfig   FOR ttConfig.
 
   /* If this is a DB-specific section then replace db name if needed */
-  if pcSection begins "DB:" then
-  do:
-    FIND ttDatabase WHERE ttDatabase.cLogicalName = entry(2,pcSection,":") NO-ERROR.
-    IF AVAILABLE ttDatabase THEN pcSection = "DB:" + ttDatabase.cSection.
-  END.
-
-
-  IF glCacheSettings THEN
+  IF pcSection BEGINS "DB:" THEN
   DO:
-    /* Load settings if there is nothing in the config table */
-    IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
-    DO:
-      /* Help file is least important */
-      RUN readConfigFile( SUBSTITUTE("&1DataDiggerHelp.ini"
-                                    , getProgramDir()
-                                    )).
-      /* General DD settings */
-      RUN readConfigFile( SUBSTITUTE("&1DataDigger.ini"
-                                    , getProgramDir()
-                                    )).
-      /* Per-user settings */
-      RUN readConfigFile( SUBSTITUTE("&1DataDigger-&2.ini"
-                                    , getProgramDir()
-                                    , getUserName()
-                                    )).
-  
-      /* When all ini-files have been read, we can determine whether 
-       * caching needs to be enabled
-       */
-      lValue = LOGICAL(getRegistry("DataDigger:Cache","Settings")) NO-ERROR.
-      IF lValue <> ? THEN ASSIGN glCacheSettings = lValue.
-
-      lValue = LOGICAL(getRegistry("DataDigger:Cache","TableDefs")) NO-ERROR.
-      IF lValue <> ? THEN ASSIGN glCacheTableDefs = lValue.
-
-      /* If we do not want to cache the registry, empty it now */
-      IF NOT glCacheSettings THEN RUN clearRegistryCache.
-    END.
-
-    /* Search in settings tt */
-    FIND bfConfig
-      WHERE bfConfig.cSection = pcSection
-        AND bfConfig.cSetting = pcKey
-            NO-ERROR.
-            
-    {&timerStop}
-    RETURN ( IF AVAILABLE bfConfig THEN bfConfig.cValue ELSE ? ).
+    FIND bDatabase WHERE bDatabase.cLogicalName = ENTRY(2,pcSection,":") NO-ERROR.
+    IF AVAILABLE bDatabase THEN pcSection = "DB:" + bDatabase.cSection.
   END.
 
-  ELSE 
-  DO:  
-    USE SUBSTITUTE('DataDigger-&1', getUserName() ).
-    GET-KEY-VALUE 
-      SECTION pcSection
-      KEY     pcKey
-      VALUE   cValue.
-  
-    /* If setting is not in the personal INI file
-     * then check the default DataDigger.ini
-     */
-    IF cValue = ? THEN
-    DO:
-      USE 'DataDigger'.
-      GET-KEY-VALUE 
-        SECTION pcSection
-        KEY     pcKey
-        VALUE   cValue.
-    END.
-  
-    /* And if it is still not found, look in 
-     * the DataDiggerHelp ini file 
-     */
-    IF cValue = ? THEN
-    DO:
-      USE 'DataDiggerHelp'.
-      GET-KEY-VALUE 
-        SECTION pcSection
-        KEY     pcKey
-        VALUE   cValue.
-    END. 
-  
-    /* Clean up and return */
-    USE "".
-    {&timerStop}
-    return cValue.
-  END.
+  /* Load settings if there is nothing in the config table */
+  IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
+    RUN loadSettings.
 
+  /* Search in settings tt */
+  FIND bConfig WHERE bConfig.cSection = pcSection AND bConfig.cSetting = pcKey NO-ERROR.
+
+  RETURN ( IF AVAILABLE bConfig THEN bConfig.cValue ELSE ? ).
+  {&timerStop}
 END FUNCTION. /* getRegistry */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4490,25 +4262,29 @@ END FUNCTION. /* getRegistry */
 
 &IF DEFINED(EXCLUDE-getStackSize) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getStackSize Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getStackSize Procedure
 FUNCTION getStackSize RETURNS INTEGER():
+  /* Return value of the -s session setting
+  */
   DEFINE VARIABLE cList      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cParm      AS CHARACTER   CASE-SENSITIVE NO-UNDO.
   DEFINE VARIABLE cSetting   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cValue     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iOption    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iParm      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iStackSize AS INTEGER     NO-UNDO.
-  
+
   cList = SESSION:STARTUP-PARAMETERS.
-  
+
   DO iParm = 1 TO NUM-ENTRIES(cList):
     cSetting = ENTRY(iParm,cList) + " ".
     cParm    = ENTRY(1,cSetting," ").
     cValue   = ENTRY(2,cSetting," ").
-  
-    IF cParm = "-s" THEN 
-      iStackSize = INTEGER(cValue).
+
+    IF cParm = "-s" THEN
+    DO:
+      iStackSize = INTEGER(cValue) NO-ERROR.
+      IF ERROR-STATUS:ERROR THEN iStackSize = 0.
+    END.
   END.
 
   /* If not defined, report the default */
@@ -4524,15 +4300,13 @@ END FUNCTION. /* getStackSize */
 
 &IF DEFINED(EXCLUDE-getTableList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableList Procedure
 FUNCTION getTableList RETURNS CHARACTER
   ( INPUT  pcDatabaseFilter AS CHARACTER
   , INPUT  pcTableFilter    AS CHARACTER
   ) :
-
-/* Get a list of all tables in the current 
- * database that match a certain filter 
- */
+  /* Get a filtered list of all tables in the current database
+  */
   DEFINE VARIABLE cTableList  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cQuery      AS CHARACTER   NO-UNDO.
 
@@ -4559,9 +4333,8 @@ FUNCTION getTableList RETURNS CHARACTER
 
   cTableList = LEFT-TRIM(cTableList, ",").
 
-  {&timerStop}
   RETURN cTableList.   /* Function return value. */
-  
+  {&timerStop}
 END FUNCTION. /* getTableList */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4571,23 +4344,23 @@ END FUNCTION. /* getTableList */
 
 &IF DEFINED(EXCLUDE-getUserName) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getUserName Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getUserName Procedure
 FUNCTION getUserName RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
-
+  /* Return login name of user
+  */
   DEFINE VARIABLE cUserName AS LONGCHAR   NO-UNDO.
   DEFINE VARIABLE intResult AS INTEGER    NO-UNDO.
   DEFINE VARIABLE intSize   AS INTEGER    NO-UNDO.
   DEFINE VARIABLE mUserId   AS MEMPTR     NO-UNDO.
 
+  {&startTimer}
+
   /* Otherwise determine the value */
   SET-SIZE(mUserId) = 256.
   intSize = 255.
 
-  RUN GetUserNameA ( INPUT mUserId
-                   , INPUT-OUTPUT intSize
-                   , OUTPUT intResult).
-
+  RUN GetUserNameA(INPUT mUserId, INPUT-OUTPUT intSize, OUTPUT intResult).
   COPY-LOB mUserId FOR (intSize - 1) TO cUserName NO-CONVERT.
 
   IF intResult <> 1 THEN
@@ -4597,6 +4370,7 @@ FUNCTION getUserName RETURNS CHARACTER
 
   RETURN STRING(cUserName). /* Function return value. */
 
+  {&stopTimer}
 END FUNCTION. /* getUserName */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4606,16 +4380,17 @@ END FUNCTION. /* getUserName */
 
 &IF DEFINED(EXCLUDE-getWidgetUnderMouse) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWidgetUnderMouse Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWidgetUnderMouse Procedure
 FUNCTION getWidgetUnderMouse RETURNS HANDLE
   ( phFrame AS HANDLE ) :
-
+  /* Return the handle of the widget that is currently under the mouse cursor
+  */
   DEFINE VARIABLE hWidget AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iMouseX AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMouseY AS INTEGER NO-UNDO.
 
   {&timerStart}
-  hWidget = phFrame:first-child:first-child. 
+  hWidget = phFrame:FIRST-CHILD:first-child.
   RUN getMouseXY(INPUT phFrame, OUTPUT iMouseX, OUTPUT iMouseY).
 
   REPEAT WHILE VALID-HANDLE(hWidget):
@@ -4627,12 +4402,45 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
       AND iMouseY <= hWidget:Y + hWidget:HEIGHT-PIXELS THEN RETURN hWidget.
 
     hWidget = hWidget:NEXT-SIBLING.
-  END. 
+  END.
 
+  RETURN ?.
   {&timerStop}
-  return ?.
-
 END FUNCTION. /* getWidgetUnderMouse */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getWorkFolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWorkFolder Procedure
+FUNCTION getWorkFolder RETURNS CHARACTER
+  ( /* parameter-definitions */ ) :
+
+  /* Cached the value in a global var  */
+  IF gcWorkFolder = '' THEN
+  DO:
+    gcWorkFolder = getRegistry("DataDigger", "WorkFolder").
+
+    /* Possibility to specify where DD files are created */
+    IF gcWorkFolder = ? OR gcWorkFolder = '' THEN
+      gcWorkFolder = getProgramDir().
+    ELSE
+    DO:
+      gcWorkFolder = RIGHT-TRIM(gcWorkFolder,'/\') + '\'.
+      gcWorkFolder = resolveOsVars(gcWorkFolder).
+      RUN createFolder(gcWorkFolder).
+
+      FILE-INFO:FILE-NAME = gcWorkFolder.
+      IF FILE-INFO:FULL-PATHNAME = ? THEN gcWorkFolder = getProgramDir().
+    END.
+  END.
+
+  RETURN gcWorkFolder.
+
+END FUNCTION. /* getWorkFolder */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4641,17 +4449,15 @@ END FUNCTION. /* getWidgetUnderMouse */
 
 &IF DEFINED(EXCLUDE-getXmlNodeName) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getXmlNodeName Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getXmlNodeName Procedure
 FUNCTION getXmlNodeName RETURNS CHARACTER
   ( pcFieldName AS CHARACTER ) :
-  /* Return a name that is safe to use in XML output by
-   * replacing forbidden characters with an underscore
-   */
-
+  /* Return a name that is safe to use in XML output
+  */
   pcFieldName = REPLACE(pcFieldName,'%', '_').
   pcFieldName = REPLACE(pcFieldName,'#', '_').
 
-  RETURN pcFieldName. 
+  RETURN pcFieldName.
 
 END FUNCTION. /* getXmlNodeName */
 
@@ -4662,36 +4468,32 @@ END FUNCTION. /* getXmlNodeName */
 
 &IF DEFINED(EXCLUDE-isBrowseChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isBrowseChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isBrowseChanged Procedure
 FUNCTION isBrowseChanged RETURNS LOGICAL
   ( INPUT phBrowse AS HANDLE ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-
+  /* Check the browse to see if its size has changed
+  */
   DEFINE VARIABLE iField  AS INTEGER NO-UNDO.
   DEFINE VARIABLE hColumn AS HANDLE  NO-UNDO.
 
-  IF NOT VALID-HANDLE(phBrowse) THEN RETURN FALSE. 
-  IF phBrowse:TYPE <> "BROWSE" THEN RETURN FALSE. 
+  IF NOT VALID-HANDLE(phBrowse) THEN RETURN FALSE.
+  IF phBrowse:TYPE <> "BROWSE" THEN RETURN FALSE.
 
   {&TimerStart}
 
   /* First check the browse itself */
-  if isWidgetChanged(phBrowse) then return true. 
+  IF isWidgetChanged(phBrowse) THEN RETURN TRUE.
 
   DO iField = 1 TO phBrowse:NUM-COLUMNS:
     hColumn = phBrowse:GET-BROWSE-COLUMN(iField):handle.
-    IF isWidgetChanged(hColumn) THEN RETURN TRUE. 
+    IF isWidgetChanged(hColumn) THEN RETURN TRUE.
   END. /* browse */
 
   /* apparently nothing changed, so... */
-  PUBLISH "debugMessage" (2, SUBSTITUTE("Nothing changed in browse: &1", phBrowse:NAME)).
+  PUBLISH "debugInfo" (2, SUBSTITUTE("Nothing changed in browse: &1", phBrowse:NAME)).
 
-  {&TimerStop}
-  return false. 
-
+  RETURN FALSE.
+  {&timerStop}
 END FUNCTION. /* isBrowseChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4701,22 +4503,14 @@ END FUNCTION. /* isBrowseChanged */
 
 &IF DEFINED(EXCLUDE-isDefaultFontsChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isDefaultFontsChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isDefaultFontsChanged Procedure
 FUNCTION isDefaultFontsChanged RETURNS LOGICAL
   ( /* parameter-definitions */ ) :
+  /* Returns whether the default fonts 0-7 were changed.
+  */
+  DEFINE VARIABLE cFontSize AS CHARACTER NO-UNDO EXTENT 8.
+  DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
 
-/*------------------------------------------------------------------------
-  Name         : isDefaultFontsChanged
-  Description  : Returns whether the default fonts 0-7 were changed.
-
-  ----------------------------------------------------------------------
-  26-04-2010 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE VARIABLE cFontSize     AS CHARACTER   NO-UNDO EXTENT 8.
-  DEFINE VARIABLE iFont         AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lFontsChanged AS LOGICAL     NO-UNDO.
-  
   /* These are the expected fontsizes of the text 'DataDigger' */
   cFontSize[1] = '70/14'. /* font0 */
   cFontSize[2] = '54/13'. /* font1 */
@@ -4726,23 +4520,16 @@ FUNCTION isDefaultFontsChanged RETURNS LOGICAL
   cFontSize[6] = '70/16'. /* font5 */
   cFontSize[7] = '65/13'. /* font6 */
   cFontSize[8] = '54/13'. /* font7 */
-  
-  /* Innocent until proven guilty */
-  lFontsChanged = NO.
 
   checkFont:
-  DO iFont = 0 TO 7:
-    IF cFontSize[iFont + 1] <> substitute('&1/&2'
-                                         , FONT-TABLE:GET-TEXT-WIDTH-PIXELS('DataDigger',iFont) 
-                                         , FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(iFont)
-                                         ) THEN 
-    DO:
-      lFontsChanged = TRUE.
-      LEAVE checkFont.
-    END.
+  DO i = 0 TO 7:
+    IF cFontSize[i + 1] <> SUBSTITUTE('&1/&2'
+                                    , FONT-TABLE:GET-TEXT-WIDTH-PIXELS('DataDigger',i)
+                                    , FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(i)
+                                    ) THEN RETURN TRUE.
   END. /* checkFont */
 
-  RETURN lFontsChanged.
+  RETURN FALSE.
 
 END FUNCTION. /* isDefaultFontsChanged */
 
@@ -4753,18 +4540,15 @@ END FUNCTION. /* isDefaultFontsChanged */
 
 &IF DEFINED(EXCLUDE-isFileLocked) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isFileLocked Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isFileLocked Procedure
 FUNCTION isFileLocked RETURNS LOGICAL
   ( pcFileName AS CHARACTER ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-
+  /* Check whether a file is locked on the file system
+  */
   DEFINE VARIABLE lpSecurityAtt AS INTEGER NO-UNDO.
   DEFINE VARIABLE iFileHandle   AS INTEGER NO-UNDO.
   DEFINE VARIABLE nReturn       AS INTEGER NO-UNDO.
-  
+
   /* Try to lock the file agains writing */
   RUN CreateFileA ( INPUT pcFileName
                   , INPUT {&GENERIC_WRITE}
@@ -4775,7 +4559,7 @@ FUNCTION isFileLocked RETURNS LOGICAL
                   , 0
                   , OUTPUT iFileHandle
                   ).
-  
+
   /* Release file handle */
   RUN CloseHandle ( INPUT iFileHandle
                   , OUTPUT nReturn
@@ -4792,23 +4576,20 @@ END FUNCTION. /* isFileLocked */
 
 &IF DEFINED(EXCLUDE-isMouseOver) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isMouseOver Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isMouseOver Procedure
 FUNCTION isMouseOver RETURNS LOGICAL
   ( phWidget AS HANDLE ) :
-
+  /* Return whether the mouse is currently over a certain widget
+  */
   DEFINE VARIABLE iMouseX AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iMouseY AS INTEGER   NO-UNDO.
 
-  IF NOT VALID-HANDLE(phWidget) THEN RETURN FALSE. 
+  IF NOT VALID-HANDLE(phWidget) THEN RETURN FALSE.
+  RUN getMouseXY(INPUT phWidget:FRAME, OUTPUT iMouseX, OUTPUT iMouseY).
 
-  RUN getMouseXY ( INPUT phWidget:FRAME
-                 , OUTPUT iMouseX
-                 , OUTPUT iMouseY
-                 ).
-
-  RETURN (    iMouseX >= phWidget:X 
-          AND iMouseX <= phWidget:X + phWidget:WIDTH-PIXELS 
-          AND iMouseY >= phWidget:Y 
+  RETURN (    iMouseX >= phWidget:X
+          AND iMouseX <= phWidget:X + phWidget:WIDTH-PIXELS
+          AND iMouseY >= phWidget:Y
           AND iMouseY <= phWidget:Y + phWidget:HEIGHT-PIXELS ).
 
 END FUNCTION. /* isMouseOver */
@@ -4820,43 +4601,43 @@ END FUNCTION. /* isMouseOver */
 
 &IF DEFINED(EXCLUDE-isTableFilterUsed) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isTableFilterUsed Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isTableFilterUsed Procedure
 FUNCTION isTableFilterUsed RETURNS LOGICAL
   ( INPUT TABLE ttTableFilter ) :
-  /* Returns whether any setting is used for table filtering 
-   */
+  /* Returns whether any setting is used for table filtering
+  */
   FIND ttTableFilter NO-ERROR.
-  IF NOT AVAILABLE ttTableFilter THEN RETURN FALSE. 
+  IF NOT AVAILABLE ttTableFilter THEN RETURN FALSE.
 
   /* Main toggles */
-  IF   ttTableFilter.lShowNormal = FALSE 
-    OR ttTableFilter.lShowSchema <> LOGICAL(getRegistry('DataDigger','ShowHiddenTables')) 
+  IF   ttTableFilter.lShowNormal = FALSE
+    OR ttTableFilter.lShowSchema <> LOGICAL(getRegistry('DataDigger','ShowHiddenTables'))
     OR ttTableFilter.lShowVst    = TRUE
     OR ttTableFilter.lShowSql    = TRUE
     OR ttTableFilter.lShowOther  = TRUE
-    OR ttTableFilter.lShowHidden = TRUE 
-    OR ttTableFilter.lShowFrozen = TRUE THEN RETURN TRUE. 
+    OR ttTableFilter.lShowHidden = TRUE
+    OR ttTableFilter.lShowFrozen = TRUE THEN RETURN TRUE.
 
   /* Show these tables */
   IF   ttTableFilter.cTableNameShow <> ?
     AND ttTableFilter.cTableNameShow <> ''
-    AND ttTableFilter.cTableNameShow <> '*' THEN RETURN TRUE. 
+    AND ttTableFilter.cTableNameShow <> '*' THEN RETURN TRUE.
 
   /* But hide these */
   IF   ttTableFilter.cTableNameHide <> ?
-    AND ttTableFilter.cTableNameHide <> '' THEN RETURN TRUE. 
+    AND ttTableFilter.cTableNameHide <> '' THEN RETURN TRUE.
 
   /* Show only tables that contain all of these fields */
   IF    ttTableFilter.cTableFieldShow <> ?
     AND ttTableFilter.cTableFieldShow <> ''
-    AND ttTableFilter.cTableFieldShow <> '*' THEN RETURN TRUE. 
+    AND ttTableFilter.cTableFieldShow <> '*' THEN RETURN TRUE.
 
   /* But hide tables that contain any of these */
   IF    ttTableFilter.cTableFieldHide <> ?
-    AND ttTableFilter.cTableFieldHide <> '' THEN RETURN TRUE. 
+    AND ttTableFilter.cTableFieldHide <> '' THEN RETURN TRUE.
 
   /* else */
-  RETURN FALSE. 
+  RETURN FALSE.
 
 END FUNCTION. /* isTableFilterUsed */
 
@@ -4867,13 +4648,13 @@ END FUNCTION. /* isTableFilterUsed */
 
 &IF DEFINED(EXCLUDE-isValidCodePage) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isValidCodePage Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isValidCodePage Procedure
 FUNCTION isValidCodePage RETURNS LOGICAL
   (pcCodepage AS CHARACTER):
   /* Returns whether pcCodePage is valid
   */
   DEFINE VARIABLE cDummy AS LONGCHAR NO-UNDO.
-  
+
   IF pcCodePage = '' THEN RETURN TRUE.
 
   FIX-CODEPAGE(cDummy) = pcCodepage NO-ERROR.
@@ -4888,48 +4669,39 @@ END FUNCTION. /* isValidCodePage */
 
 &IF DEFINED(EXCLUDE-isWidgetChanged) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isWidgetChanged Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isWidgetChanged Procedure
 FUNCTION isWidgetChanged RETURNS LOGICAL
   ( INPUT phWidget AS HANDLE ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-  DEFINE VARIABLE lChangeDetected AS LOGICAL NO-UNDO. 
-  DEFINE VARIABLE iField          AS INTEGER NO-UNDO.
-  DEFINE VARIABLE hColumn         AS HANDLE  NO-UNDO.
-  DEFINE VARIABLE hFirstColumn    AS HANDLE  NO-UNDO.
-
+  /* Returns whether a widget is changed (position or size)
+  */
+  DEFINE VARIABLE lChangeDetected AS LOGICAL NO-UNDO.
   DEFINE BUFFER ttWidget FOR ttWidget.
 
-  IF NOT VALID-HANDLE(phWidget) THEN RETURN FALSE. 
+  IF NOT VALID-HANDLE(phWidget) THEN RETURN FALSE.
   {&timerStart}
 
-  find ttWidget where ttWidget.hWidget = phWidget no-error.
-  IF NOT AVAILABLE ttWidget THEN 
+  FIND ttWidget WHERE ttWidget.hWidget = phWidget NO-ERROR.
+  IF NOT AVAILABLE ttWidget THEN
   DO:
     CREATE ttWidget.
     ASSIGN ttWidget.hWidget = phWidget.
   END.
 
-  PUBLISH "debugMessage" (3, SUBSTITUTE("Widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Widget: &1 &2", phWidget:TYPE, phWidget:NAME)).
 
-  IF ttWidget.iPosX     <> phWidget:X
+  IF ttWidget.iPosX  <> phWidget:X
   OR ttWidget.iWidth <> phWidget:WIDTH-PIXELS THEN
   DO:
     ASSIGN
-      ttWidget.iPosX     = phWidget:X
-      ttWidget.iWidth    = phWidget:WIDTH-PIXELS
-      lChangeDetected    = TRUE.
+      ttWidget.iPosX  = phWidget:X
+      ttWidget.iWidth = phWidget:WIDTH-PIXELS
+      lChangeDetected = TRUE.
   END.
 
-  PUBLISH "debugMessage" (2, SUBSTITUTE("  Widget changed: &1", lChangeDetected)).
+  PUBLISH "debugInfo" (2, SUBSTITUTE("  Widget changed: &1", lChangeDetected)).
 
-  return lChangeDetected.
-
-  FINALLY:
-    {&TimerStop}
-  END FINALLY.
+  RETURN lChangeDetected.
+  {&TimerStop}
 END FUNCTION. /* isWidgetChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4939,22 +4711,23 @@ END FUNCTION. /* isWidgetChanged */
 
 &IF DEFINED(EXCLUDE-readFile) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION readFile Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION readFile Procedure
 FUNCTION readFile RETURNS LONGCHAR
   (pcFilename AS CHARACTER):
-  /* read contents of a file as a longchar. This is used
-   * when the COPY-LOB statement fails as a result of 
-   * conflicting code-pages. 
-   */
+  /* Read contents of a file as a longchar.
+  */
   DEFINE VARIABLE cContent AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cLine    AS CHARACTER NO-UNDO.
 
-  INPUT FROM VALUE(pcFilename).
-  REPEAT:
-    IMPORT UNFORMATTED cLine.
-    cContent = cContent + "~n" + cLine.
+  IF SEARCH(pcFilename) <> ? THEN
+  DO:
+    INPUT FROM VALUE(pcFilename).
+    REPEAT:
+      IMPORT UNFORMATTED cLine.
+      cContent = cContent + "~n" + cLine.
+    END.
+    INPUT CLOSE.
   END.
-  INPUT CLOSE. 
 
   RETURN cContent.
 END FUNCTION. /* readFile */
@@ -4966,25 +4739,17 @@ END FUNCTION. /* readFile */
 
 &IF DEFINED(EXCLUDE-removeConnection) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION removeConnection Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION removeConnection Procedure
 FUNCTION removeConnection RETURNS LOGICAL
   ( pcDatabase AS CHARACTER ) :
-  /*------------------------------------------------------------------------------
-    Purpose:  
-      Notes:  
-      
-  define temp-table ttDatabase no-undo rcode-information
-    field cLogicalName  as character column-label "Logical Name" format "x(20)"
-    field cSection      as character column-label "Section"      format "x(20)"
-    index iPrim is primary unique cLogicalName
-    .
-  ------------------------------------------------------------------------------*/
-  FIND ttDatabase WHERE ttDatabase.cLogicalName = pcDatabase NO-ERROR.
-  IF AVAILABLE ttDatabase THEN DELETE ttDatabase.
-
+  /* Remove record from connection temp-table
+  */
+  DEFINE BUFFER bfDatabase FOR ttDatabase.
+  FIND bfDatabase WHERE bfDatabase.cLogicalName = pcDatabase NO-ERROR.
+  IF AVAILABLE bfDatabase THEN DELETE bfDatabase.
   RETURN TRUE.
 
-END FUNCTION.
+END FUNCTION. /* removeConnection */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -4993,54 +4758,65 @@ END FUNCTION.
 
 &IF DEFINED(EXCLUDE-resolveOsVars) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION resolveOsVars Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION resolveOsVars Procedure
 FUNCTION resolveOsVars RETURNS CHARACTER
   ( pcString AS CHARACTER ) :
 
-  DEFINE VARIABLE iPercStart   AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE iPercEnd     AS INTEGER NO-UNDO. 
-  DEFINE VARIABLE cEnvVarName  AS CHARACTER NO-UNDO. 
-  DEFINE VARIABLE cEnvVarValue AS CHARACTER NO-UNDO. 
-  DEFINE VARIABLE cReturnValue AS CHARACTER NO-UNDO. 
+  /* Return a string with OS vars resolved
+  */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
 
+  DO i = 1 TO NUM-ENTRIES(pcString,'%'):
+    IF i MODULO 2 = 0
+      AND OS-GETENV(ENTRY(i,pcString,'%')) <> ? THEN
+      ENTRY(i,pcString,'%') = OS-GETENV(ENTRY(i,pcString,'%')).
+  END.
+  pcString = REPLACE(pcString,'%','').
+  RETURN pcString.
+
+  /*
+  DEFINE VARIABLE iPercStart   AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iPercEnd     AS INTEGER NO-UNDO.
+  DEFINE VARIABLE cEnvVarName  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cEnvVarValue AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cReturnValue AS CHARACTER NO-UNDO.
 
   /* Support for OS-directives between % eg: %username% will expand
-   * to your username, as long as you have an OS-var for that. Type 'set' on the dos prompt for 
-   * a list of all environment variables
+   * to your username, as long as you have an OS-var for that.
    */
   cReturnValue = pcString.
   iPercStart = INDEX(cReturnValue,'%').
-  
+
   resolveOsVars:
   DO WHILE iPercStart > 0:
     iPercEnd = INDEX(cReturnValue,'%',iPercStart + 1).
-    
+
     IF iPercEnd = 0 THEN LEAVE resolveOsVars. /* single % */
     cEnvVarName = TRIM( SUBSTRING(cReturnValue,iPercStart, iPercEnd - iPercStart) ,'%'). /* Grab text between % */
-    
+
     /* Search in the registry */
     LOAD "System" BASE-KEY "HKEY_LOCAL_MACHINE".
     USE "System".
     GET-KEY-VALUE SECTION "CurrentControlSet~\Control~\Session Manager~\Environment" KEY cEnvVarName VALUE cEnvVarValue.
     UNLOAD "System".
-    
+
     /* If not defined, try our luck in the default env */
     IF cEnvVarValue = ? THEN
       cEnvVarValue = OS-GETENV(cEnvVarName) . /* try to resolve */
-    
+
     /* If still not found, step to next % */
     IF cEnvVarValue = ? THEN
     DO:
       iPercStart = iPercEnd.
-      NEXT resolveOsVars.  
+      NEXT resolveOsVars.
     END.
-    
+
     cReturnValue = REPLACE(cReturnValue,'%' + cEnvVarName + '%', cEnvVarValue). /* Replace with value */
     iPercStart = INDEX(cReturnValue,'%'). /* Find next directive */
   END.
 
   RETURN cReturnValue.
-
+  */
 END FUNCTION. /* resolveOsVars */
 
 /* _UIB-CODE-BLOCK-END */
@@ -5050,22 +4826,23 @@ END FUNCTION. /* resolveOsVars */
 
 &IF DEFINED(EXCLUDE-resolveSequence) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION resolveSequence Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION resolveSequence Procedure
 FUNCTION resolveSequence RETURNS CHARACTER
   ( pcString AS CHARACTER ) :
-
-  DEFINE VARIABLE iFileNr       AS INTEGER    NO-UNDO.
-  DEFINE VARIABLE cSeqMask      AS CHARACTER  NO-UNDO .
-  DEFINE VARIABLE cSeqFormat    AS CHARACTER  NO-UNDO .
-  DEFINE VARIABLE cFileName     AS CHARACTER   NO-UNDO.
+  /* Return a string where sequence nr for file is resolved
+  */
+  DEFINE VARIABLE iFileNr    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cSeqMask   AS CHARACTER NO-UNDO .
+  DEFINE VARIABLE cSeqFormat AS CHARACTER NO-UNDO .
+  DEFINE VARIABLE cFileName  AS CHARACTER NO-UNDO.
 
   cFileName = pcString.
 
-  /* User can specify a sequence for the file. The length of 
+  /* User can specify a sequence for the file. The length of
    * the tag sets the format: <###> translates to a 3-digit nr
    * Special case is <#> which translates to no leading zeros
-   */ 
-  IF    INDEX(cFileName,'<#') > 0 
+   */
+  IF    INDEX(cFileName,'<#') > 0
     AND index(cFileName,'#>') > 0 THEN
   DO:
     cSeqMask = SUBSTRING(cFileName,INDEX(cFileName,'<#')). /* <#####>tralalala */
@@ -5077,7 +4854,7 @@ FUNCTION resolveSequence RETURNS CHARACTER
     setFileNr:
     REPEAT:
       iFileNr = iFileNr + 1.
-      IF SEARCH(REPLACE(cFileName,cSeqMask,TRIM(STRING(iFileNr,cSeqFormat)))) = ? THEN 
+      IF SEARCH(REPLACE(cFileName,cSeqMask,TRIM(STRING(iFileNr,cSeqFormat)))) = ? THEN
       DO:
         cFileName = REPLACE(cFileName,cSeqMask,TRIM(STRING(iFileNr,cSeqFormat))).
         LEAVE setFileNr.
@@ -5096,68 +4873,33 @@ END FUNCTION. /* resolveSequence */
 
 &IF DEFINED(EXCLUDE-setColumnWidthList) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setColumnWidthList Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setColumnWidthList Procedure
 FUNCTION setColumnWidthList RETURNS LOGICAL
-  ( INPUT phBrowse    AS HANDLE 
+  ( INPUT phBrowse    AS HANDLE
   , INPUT pcWidthList AS CHARACTER):
+  /* Set all specified columns in pcWidthList to a specified width
+  */
+  DEFINE VARIABLE cColumnName  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cListItem    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hColumn      AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iColumnWidth AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE i            AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE j            AS INTEGER   NO-UNDO.
 
-  /* set all specified columns in pcWidthList to a specified width like:
-   * custnum:12,custname:20,city:12
-   */
-  DEFINE VARIABLE cColumnName  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cListItem    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iColumnWidth AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iListItem    AS INTEGER     NO-UNDO.
-  
-  DO iListItem = 1 TO NUM-ENTRIES(pcWidthList):
-    cListItem    = ENTRY(iListItem,pcWidthList).
+  DO i = 1 TO NUM-ENTRIES(pcWidthList):
+    cListItem    = ENTRY(i,pcWidthList).
     cColumnName  = ENTRY(1,cListItem,':') NO-ERROR.
     iColumnWidth = INTEGER(ENTRY(2,cListItem,':')) NO-ERROR.
-    
-    DO iColumn = 1 TO phBrowse:NUM-COLUMNS:
-      hColumn = phBrowse:GET-BROWSE-COLUMN(iColumn).
+
+    DO j = 1 TO phBrowse:NUM-COLUMNS:
+      hColumn = phBrowse:GET-BROWSE-COLUMN(j).
       IF hColumn:NAME = cColumnName THEN
         hColumn:WIDTH-PIXELS = iColumnWidth.
-    END. /* iColumn */
-  END. /* iListItem */
-  
-  RETURN TRUE. 
-END FUNCTION. /* setColumnWidthList */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-setFilterFieldColor) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setFilterFieldColor Procedure 
-FUNCTION setFilterFieldColor RETURNS LOGICAL
-  ( phWidget AS HANDLE ) :
-
-/*------------------------------------------------------------------------
-  Name         : setFilterFieldColor
-  Description  : If you enter the field and you have not put in a filter
-                 clear out the field so you can type something yourself. 
-                 
-  ----------------------------------------------------------------------
-  16-01-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  IF NOT VALID-HANDLE(phWidget) THEN MESSAGE "DEBUG ALARM" VIEW-AS ALERT-BOX.
-  
-  IF phWidget:SCREEN-VALUE = phWidget:PRIVATE-DATA THEN 
-    phWidget:FGCOLOR = 7.
-  ELSE 
-    phWidget:FGCOLOR = ?.
-    
-  /* phWidget:bgcolor = ?. */
+    END. /* j */
+  END. /* i */
 
   RETURN TRUE.
-
-END FUNCTION. /* setFilterFieldColor */
+END FUNCTION. /* setColumnWidthList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5166,24 +4908,17 @@ END FUNCTION. /* setFilterFieldColor */
 
 &IF DEFINED(EXCLUDE-setLinkInfo) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setLinkInfo Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setLinkInfo Procedure
 FUNCTION setLinkInfo RETURNS LOGICAL
   ( INPUT pcFieldName AS CHARACTER
   , INPUT pcValue     AS CHARACTER
   ):
-
-/*------------------------------------------------------------------------
-  Name         : setLinkInfo
-  Description  : Save name/value of a field.
-  ----------------------------------------------------------------------
-  21-10-2009 pti Created
-  ----------------------------------------------------------------------*/
-
-  DEFINE BUFFER bLinkInfo FOR ttLinkInfo. 
-
+  /* Save name/value of a field.
+  */
+  DEFINE BUFFER bLinkInfo FOR ttLinkInfo.
   {&timerStart}
 
-  publish "debugMessage" (2, substitute("Set linkinfo for field &1 to &2", pcFieldName, pcValue)).
+  PUBLISH "debugInfo" (2, SUBSTITUTE("Set linkinfo for field &1 to &2", pcFieldName, pcValue)).
 
   FIND bLinkInfo WHERE bLinkInfo.cField = pcFieldName NO-ERROR.
   IF NOT AVAILABLE bLinkInfo THEN
@@ -5193,9 +4928,9 @@ FUNCTION setLinkInfo RETURNS LOGICAL
   END.
 
   bLinkInfo.cValue = TRIM(pcValue).
-  
+
+  RETURN TRUE.   /* Function return value. */
   {&timerStop}
-  return true.   /* Function return value. */
 
 END FUNCTION. /* setLinkInfo */
 
@@ -5206,46 +4941,39 @@ END FUNCTION. /* setLinkInfo */
 
 &IF DEFINED(EXCLUDE-setRegistry) = 0 &THEN
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry Procedure 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry Procedure
 FUNCTION setRegistry RETURNS CHARACTER
-    ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER
-    , pcValue   AS CHARACTER
-    ) :
-    /* Set a value in the registry. */
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) :
+  /* Set a value in the registry.
+  */
+  {&timerStart}
+  DEFINE BUFFER bfConfig FOR ttConfig.
 
-    {&timerStart}
-    
-    DEFINE BUFFER bfConfig FOR ttConfig.
-    
-    USE SUBSTITUTE('DataDigger-&1', getUserName() ) NO-ERROR.
-    IF NOT ERROR-STATUS:ERROR THEN
-    DO:
-      PUT-KEY-VALUE
-        SECTION pcSection
-        KEY     pcKey
-        VALUE   pcValue
-        NO-ERROR
-        .
-      USE "".
-    END.
+  FIND bfConfig
+    WHERE bfConfig.cSection = pcSection
+      AND bfConfig.cSetting = pcKey NO-ERROR.
 
-    /* Update the local cache of the registry as well */
-    FIND bfConfig
-      WHERE bfConfig.cSection = pcSection
-        AND bfConfig.cSetting = pcKey NO-ERROR.
+  IF NOT AVAILABLE bfConfig THEN
+  DO:
+    CREATE bfConfig.
+    ASSIGN
+      bfConfig.cSection = pcSection
+      bfConfig.cSetting = pcKey.
+  END.
 
-    IF NOT AVAILABLE bfConfig THEN
-    DO:
-      CREATE bfConfig.
-      ASSIGN 
-        bfConfig.cSection = pcSection
-        bfConfig.cSetting = pcKey.
-    END.
-    bfConfig.cValue = pcValue.
+  IF pcValue = ? OR TRIM(pcValue) = '' THEN
+    DELETE bfConfig.
+  ELSE
+    ASSIGN
+      bfConfig.lDirty = bfConfig.lDirty OR (bfConfig.cValue <> pcValue)
+      bfConfig.lUser  = TRUE
+      bfConfig.cValue = pcValue.
 
-    {&timerStop}
-    return "". /* Function return value. */
+  RETURN "". /* Function return value. */
+  {&timerStop}
 
 END FUNCTION. /* setRegistry */
 
@@ -5253,4 +4981,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

@@ -8,9 +8,10 @@
 -tmpbsize 8
 -p DataDigger.p
 
-#-cpstream UTF-8
-#-cpcase BASIC
+#-cpstream   UTF-8
+#-cpcase     BASIC
 #-cpinternal UTF-8
-#-cplog UTF-8
-#-cpterm UTF-8
-#-cpcoll BASIC
+#-cplog      UTF-8
+#-cpterm     UTF-8
+#-cpcoll     BASIC
+

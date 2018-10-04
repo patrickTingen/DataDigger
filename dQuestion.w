@@ -2,32 +2,12 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
-/*************************************************************/
-/* Copyright (c) 1984-2005 by Progress Software Corporation  */
-/*                                                           */
-/* All rights reserved.  No part of this program or document */
-/* may be  reproduced in  any form  or by  any means without */
-/* permission in writing from PROGRESS Software Corporation. */
-/*************************************************************/
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
 /*------------------------------------------------------------------------
 
-  File      : adm2/askquestion.w
-  Purpose   : Question Message dialog with one prompt value
-  Parameters: pcMessage  - The message (question) 
-              pcButtons  - Comma delimited string of button labels
-                          - 3 entries  Yes,No,Cancel 
-                          - 2 entries  Yes,No
-                          - 1 entry    Yes 
-             pcFieldInfo - Comma separated list of field info
-                          - 1st entry = label             
-                          - 2nd entry = datatype (optional; default 'char')
-                            Supports char, int and dec. 
-                          - 3rd entry = alignment, L,R,C (optional; default L)
-                          - 4th entry = format commas allowed (optional)
-             pcTitle     - Message Title
-        I-O  pcValue     - Character Value of field  
-        OUT  plOk        - Chosen action (Yes no cancel) button
+  Name: dQuestion.w
+  Desc: Show window to user and give back which button was pressed
+
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
@@ -35,43 +15,43 @@
 /* ***************************  Definitions  ************************** */
 
 &IF DEFINED(UIB_is_Running) NE 0  &THEN
-  DEFINE variable pcTitle         AS CHARACTER  no-undo initial 'Disconnect user'.
-  DEFINE variable pcMessage       AS CHARACTER  no-undo initial 'Do you want to disconnect user "&1" from database "&2"?'.
-  DEFINE variable pcButtons       AS CHARACTER  no-undo initial '&Yes,&No'.
-  define variable plCanHide       as logical    no-undo initial true.
-  DEFINE variable piButton        AS integer    NO-UNDO INIT ?.
-  DEFINE variable plDontShowAgain AS logical    NO-UNDO INIT ?.
+  DEFINE VARIABLE pcTitle         AS CHARACTER  NO-UNDO INITIAL 'Disconnect user'.
+  DEFINE VARIABLE pcMessage       AS CHARACTER  NO-UNDO INITIAL 'Do you want to disconnect user "&1" from database "&2"?'.
+  DEFINE VARIABLE pcButtons       AS CHARACTER  NO-UNDO INITIAL '&Yes,&No'.
+  DEFINE VARIABLE plCanHide       AS LOGICAL    NO-UNDO INITIAL TRUE.
+  DEFINE VARIABLE piButton        AS INTEGER    NO-UNDO INIT ?.
+  DEFINE VARIABLE plDontShowAgain AS LOGICAL    NO-UNDO INIT ?.
 &ELSE
-  DEFINE INPUT PARAMETER  pcTitle         AS CHARACTER  no-undo initial 'Disconnect user'.
-  DEFINE INPUT PARAMETER  pcMessage       AS CHARACTER  no-undo initial 'Do you want to disconnect user "&1" from database "&2"?'.
-  DEFINE INPUT PARAMETER  pcButtons       AS CHARACTER  no-undo initial '&Yes,&No'.
-  DEFINE INPUT PARAMETER  plCanHide       as logical    no-undo initial true.
-  DEFINE OUTPUT PARAMETER piButton        AS integer    NO-UNDO INIT ?.
-  DEFINE OUTPUT PARAMETER plDontShowAgain AS logical    NO-UNDO INIT ?.
+  DEFINE INPUT PARAMETER  pcTitle         AS CHARACTER  NO-UNDO INITIAL 'Disconnect user'.
+  DEFINE INPUT PARAMETER  pcMessage       AS CHARACTER  NO-UNDO INITIAL 'Do you want to disconnect user "&1" from database "&2"?'.
+  DEFINE INPUT PARAMETER  pcButtons       AS CHARACTER  NO-UNDO INITIAL '&Yes,&No'.
+  DEFINE INPUT PARAMETER  plCanHide       AS LOGICAL    NO-UNDO INITIAL TRUE.
+  DEFINE OUTPUT PARAMETER piButton        AS INTEGER    NO-UNDO INITIAL ?.
+  DEFINE OUTPUT PARAMETER plDontShowAgain AS LOGICAL    NO-UNDO INITIAL ?.
 &ENDIF
 
-{ datadigger.i } 
+{ DataDigger.i }
 
 /* Allow testing */
 &IF DEFINED(UIB_is_running) <> 0 &THEN
 
-  define variable hDiggerLib as handle no-undo.
-  run DataDiggerLib.p persistent set hDiggerLib.
-  session:add-super-procedure(hDiggerLib, search-target).
+  DEFINE VARIABLE hDiggerLib AS HANDLE NO-UNDO.
+  RUN DataDiggerLib.p PERSISTENT SET hDiggerLib.
+  SESSION:ADD-SUPER-PROCEDURE(hDiggerLib, SEARCH-TARGET).
 
   /* Load or create personalized ini files */
-  define variable cEnvironment as character no-undo.
-  define variable cProgDir     as character no-undo.
+  DEFINE VARIABLE cEnvironment AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cProgDir     AS CHARACTER NO-UNDO.
 
-  cEnvironment = substitute('DataDigger-&1', getUserName()).
-  output to value(cProgDir + cEnvironment + '.ini') append.
-  output close. 
-  load cEnvironment dir cProgDir base-key 'ini' no-error.
+  cEnvironment = SUBSTITUTE('DataDigger-&1', getUserName()).
+  OUTPUT to value(cProgDir + cEnvironment + '.ini') append.
+  OUTPUT close.
+  LOAD cEnvironment DIR cProgDir BASE-KEY 'ini' NO-ERROR.
 
   cEnvironment = 'DataDigger'.
-  output to value(cProgDir + cEnvironment + '.ini') append.
-  output close. 
-  load cEnvironment dir cProgDir base-key 'ini' no-error.
+  OUTPUT to value(cProgDir + cEnvironment + '.ini') append.
+  OUTPUT close.
+  LOAD cEnvironment DIR cProgDir BASE-KEY 'ini' NO-ERROR.
 
 &ENDIF
 
@@ -79,7 +59,7 @@
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -90,8 +70,8 @@
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS EdMessage BtnYes 
-&Scoped-Define DISPLAYED-OBJECTS tgDontShowAgain 
+&Scoped-Define ENABLED-OBJECTS EdMessage BtnYes
+&Scoped-Define DISPLAYED-OBJECTS tgDontShowAgain
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -106,22 +86,22 @@
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON BtnCancel AUTO-END-KEY 
-     LABEL "Cancel" 
+DEFINE BUTTON BtnCancel AUTO-END-KEY
+     LABEL "Cancel"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnNo AUTO-GO 
-     LABEL "&No" 
+DEFINE BUTTON BtnNo AUTO-GO
+     LABEL "&No"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnYes AUTO-GO 
-     LABEL "&Yes" 
+DEFINE BUTTON BtnYes AUTO-GO
+     LABEL "&Yes"
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE EdMessage AS CHARACTER 
+DEFINE VARIABLE EdMessage AS CHARACTER
      CONTEXT-HELP-ID 0
      VIEW-AS EDITOR NO-BOX
      SIZE-PIXELS 325 BY 74 NO-UNDO.
@@ -129,8 +109,8 @@ DEFINE VARIABLE EdMessage AS CHARACTER
 DEFINE IMAGE imgQuestion TRANSPARENT
      SIZE-PIXELS 32 BY 36.
 
-DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL no 
-     LABEL "&Don't show this message again" 
+DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL NO
+     LABEL "&Don't show this message again"
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 215 BY 17 NO-UNDO.
 
@@ -138,14 +118,14 @@ DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     EdMessage AT Y 11 X 65 NO-LABEL NO-TAB-STOP 
+     EdMessage AT Y 11 X 65 NO-LABEL NO-TAB-STOP
      BtnYes AT Y 115 X 145
      BtnNo AT Y 115 X 227
      BtnCancel AT Y 115 X 309
      tgDontShowAgain AT Y 145 X 5
      imgQuestion AT Y 11 X 10
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
+         SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 402 BY 204
          TITLE "Question"
          DEFAULT-BUTTON BtnYes CANCEL-BUTTON BtnCancel.
@@ -168,7 +148,7 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN 
+ASSIGN
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
@@ -178,7 +158,7 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR EDITOR EdMessage IN FRAME Dialog-Frame
    NO-DISPLAY                                                           */
-ASSIGN 
+ASSIGN
        EdMessage:AUTO-RESIZE IN FRAME Dialog-Frame      = TRUE
        EdMessage:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
@@ -199,7 +179,7 @@ ASSIGN
 */  /* DIALOG-BOX Dialog-Frame */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -243,7 +223,7 @@ END.
 ON CHOOSE OF BtnNo IN FRAME Dialog-Frame /* No */
 DO:
   piButton = 2.
-  plDontShowAgain = tgDontShowAgain:checked.  
+  plDontShowAgain = tgDontShowAgain:checked.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -294,14 +274,14 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
 
 
 /* ***************************  Main Block  *************************** */
 /* Parent the dialog-box to the ACTIVE-WINDOW, if there is no parent.   */
-IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT eq ? THEN 
+IF VALID-HANDLE(ACTIVE-WINDOW) AND FRAME {&FRAME-NAME}:PARENT EQ ? THEN
   FRAME {&FRAME-NAME}:PARENT = ACTIVE-WINDOW.
- 
+
 
 DO ON ERROR   UNDO, LEAVE
    ON END-KEY UNDO, LEAVE:
@@ -311,10 +291,10 @@ DO ON ERROR   UNDO, LEAVE
 
   /* Toggle for Don't Show Again is optional */
   tgDontShowAgain:visible = plCanHide.
-  tgDontShowAgain:sensitive = plCanHide. 
+  tgDontShowAgain:sensitive = plCanHide.
 
   WAIT-FOR GO OF FRAME {&FRAME-NAME}.
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -331,12 +311,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY tgDontShowAgain 
+  DISPLAY tgDontShowAgain
       WITH FRAME Dialog-Frame.
-  ENABLE EdMessage BtnYes 
+  ENABLE EdMessage BtnYes
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -345,114 +325,108 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-   DEFINE VARIABLE lYesNoCancel  AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE lOkCancel     AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE lOk           AS LOGICAL    NO-UNDO.
-   DEFINE VARIABLE iNumButtons   AS INTEGER    NO-UNDO.
-   DEFINE VARIABLE dMargin       AS DECIMAL    NO-UNDO.
-   DEFINE VARIABLE iVertMargin   AS INTEGER    NO-UNDO.
-   DEFINE VARIABLE cYesLabel     AS CHARACTER  NO-UNDO.
-   DEFINE VARIABLE cNoLabel      AS CHARACTER  NO-UNDO.
-   DEFINE VARIABLE cCancelLabel  AS CHARACTER  NO-UNDO.
-   define variable iFrameHeight  as integer    no-undo. 
+/*
+ * Init vars and frame
+ */
+  DEFINE VARIABLE iNumButtons   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE dMargin       AS DECIMAL    NO-UNDO.
+  DEFINE VARIABLE iVertMargin   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE cYesLabel     AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cNoLabel      AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cCancelLabel  AS CHARACTER  NO-UNDO.
 
-   DO WITH FRAME {&FRAME-NAME}:
+  DO WITH FRAME {&FRAME-NAME}:
 
-     /* Get fonts */
-     frame {&frame-name}:font = getFont('Default').
+    /* Get fonts */
+    FRAME {&frame-name}:font = getFont('Default').
 
-     iNumButtons  = NUM-ENTRIES(pcButtons).   
-     IF pcButtons = '' THEN pcButtons = 'OK'.
+    iNumButtons  = NUM-ENTRIES(pcButtons).
+    IF pcButtons = '' THEN pcButtons = 'OK'.
 
-     /* Show Question-image or DD-logo */
-     if pcMessage matches "*?" then
-       imgQuestion:load-image( getImagePath('Question.gif')) no-error.
-     else 
-       imgQuestion:load-image( getImagePath("DataDigger24x24.gif")) no-error.
-     
-     /* Replace fake NEWLINES with chr(10) */
-     pcMessage = replace(pcMessage,'~~n',chr(10)).
+    /* Show Question-image or DD-logo */
+    IF pcMessage MATCHES "*?" THEN
+      imgQuestion:load-image( getImagePath('Question.gif')) NO-ERROR.
+    ELSE
+      imgQuestion:load-image( getImagePath("DataDigger24x24.gif")) NO-ERROR.
 
-     /* Strip leading spaces */
-     pcMessage = TRIM(pcMessage).
+    /* Replace fake NEWLINES with chr(10) */
+    pcMessage = REPLACE(pcMessage,'~~n',CHR(10)).
 
-     PUBLISH "debugMessage" (1, pcMessage).
+    /* Strip leading spaces */
+    pcMessage = TRIM(pcMessage).
 
-     /* Make some room in the frame for moving around with widgets */
-     FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS * 2.
+    PUBLISH "debugInfo" (1, pcMessage).
 
-     ASSIGN            
-       FRAME {&FRAME-NAME}:TITLE  = IF pcTitle > '' THEN pcTitle ELSE FRAME {&FRAME-NAME}:TITLE  
-       edMessage:SCREEN-VALUE     = RIGHT-TRIM(pcMessage,CHR(10))
-       edMessage:INNER-LINES      = edMessage:NUM-LINES
-       dMargin                    = imgQuestion:COL /* Use the editor Y as margin template */
-       iVertMargin                = edMessage:Y 
-       btnYes:Y                   = edMessage:Y + edMessage:HEIGHT-PIXELS + iVertMargin
-       btnNo:Y                    = btnYes:Y 
-       btnCancel:y                = btnYes:Y 
-       .
-                 
-     /* Toggle for Don't Show Again is optional */
-     if plCanHide then
-     do:
-       tgDontShowAgain:visible = plCanHide.
-       tgDontShowAgain:sensitive = plCanHide. 
-       tgDontShowAgain:y = btnYes:Y + btnYes:height-pixels + iVertMargin.
-      
-       /* Add border top and bottom to ensure min heigth  */
-       FRAME {&FRAME-NAME}:HEIGHT-PIXELS = tgDontShowAgain:Y + tgDontShowAgain:HEIGHT-PIXELS
-                                         + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS 
-                                         + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
-                                         + INTEGER(iVertMargin / 2) NO-ERROR.
-     end.
-     else 
-     do:
-       tgDontShowAgain:visible = plCanHide.
-       tgDontShowAgain:sensitive = plCanHide. 
-       tgDontShowAgain:y = 1.
+    /* Make some room in the frame for moving around with widgets */
+    FRAME {&FRAME-NAME}:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS * 2.
 
-       FRAME {&FRAME-NAME}:HEIGHT-P = btnYes:Y + btnYes:height-pixels
-                                    + FRAME {&FRAME-NAME}:BORDER-TOP-P 
-                                    + FRAME {&FRAME-NAME}:BORDER-BOTTOM-P
-                                    + INT(iVertMargin / 2) NO-ERROR.
+    ASSIGN
+      FRAME {&FRAME-NAME}:TITLE  = IF pcTitle > '' THEN pcTitle ELSE FRAME {&FRAME-NAME}:TITLE
+      edMessage:SCREEN-VALUE     = RIGHT-TRIM(pcMessage,CHR(10))
+      edMessage:INNER-LINES      = edMessage:NUM-LINES
+      dMargin                    = imgQuestion:COLUMN /* Use the editor Y as margin template */
+      iVertMargin                = edMessage:Y
+      btnYes:Y                   = edMessage:Y + edMessage:HEIGHT-PIXELS + iVertMargin
+      btnNo:Y                    = btnYes:Y
+      btnCancel:y                = btnYes:Y
+      .
 
-     end.
-    
-     ASSIGN 
-       btnNo:HIDDEN           = iNumButtons < 2
-       btnCancel:HIDDEN       = iNumButtons < 3
-       btnNo:SENSITIVE        = NOT btnNo:HIDDEN
-       btnCancel:SENSITIVE    = NOT btnCancel:HIDDEN
-      
-       cYesLabel              = ENTRY(1,pcButtons)
-       cNoLabel               = ENTRY(2,pcButtons) WHEN iNumButtons >= 2
-       cCancelLabel           = ENTRY(3,pcButtons) WHEN iNumButtons >= 3
-      
-       btnYes:LABEL           = IF cYesLabel > '':U THEN cYesLabel 
+    /* Toggle for Don't Show Again is optional */
+    IF plCanHide THEN
+    DO:
+      tgDontShowAgain:visible = plCanHide.
+      tgDontShowAgain:sensitive = plCanHide.
+      tgDontShowAgain:y = btnYes:Y + btnYes:height-pixels + iVertMargin.
+
+      /* Add border top and bottom to ensure min heigth  */
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = tgDontShowAgain:Y + tgDontShowAgain:HEIGHT-PIXELS
+                                        + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS
+                                        + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
+                                        + INTEGER(iVertMargin / 2) NO-ERROR.
+    END.
+    ELSE
+    DO:
+      tgDontShowAgain:visible = plCanHide.
+      tgDontShowAgain:sensitive = plCanHide.
+      tgDontShowAgain:y = 1.
+
+      FRAME {&FRAME-NAME}:HEIGHT-PIXELS = btnYes:Y + btnYes:height-pixels
+                                        + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS
+                                        + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
+                                   + INTEGER(iVertMargin / 2) NO-ERROR.
+
+    END.
+
+    ASSIGN
+      btnNo:HIDDEN           = iNumButtons < 2
+      btnCancel:HIDDEN       = iNumButtons < 3
+      btnNo:SENSITIVE        = NOT btnNo:HIDDEN
+      btnCancel:SENSITIVE    = NOT btnCancel:HIDDEN
+
+      cYesLabel              = ENTRY(1,pcButtons)
+      cNoLabel               = ENTRY(2,pcButtons) WHEN iNumButtons >= 2
+      cCancelLabel           = ENTRY(3,pcButtons) WHEN iNumButtons >= 3
+
+      btnYes:LABEL           = IF cYesLabel > '':U THEN cYesLabel
                                   ELSE IF iNumButtons = 1 THEN 'OK' ELSE btnYes:LABEL
-       btnNo:LABEL            = IF cNoLabel > '':U THEN cNoLabel ELSE btnNo:LABEL
-       btnCancel:LABEL        = IF cCancelLabel > '':U THEN cCancelLabel ELSE btnCancel:LABEL
-       btnYes:width           = MAX(btnYes:width,FONT-TABLE:GET-TEXT-width(btnYes:LABEL) + 1.5) 
-       btnNo:width            = MAX(btnNo:width,FONT-TABLE:GET-TEXT-width(btnNo:LABEL) + 1.5) 
-       btnCancel:width        = MAX(btnCancel:width,FONT-TABLE:get-text-width(btnCancel:LABEL) + 1.5) 
-       btnCancel:COL          = FRAME {&FRAME-NAME}:width - (btnCancel:width + dMargin)
-       btnNo:COL              = IF btnCancel:HIDDEN  
-                                  THEN FRAME {&FRAME-NAME}:width - (btnNo:width + dMargin) 
-                                  ELSE btnCancel:COL - (btnNo:width + (dMargin / 2))
-       btnYes:COL             = MAX(1, IF btnNo:HIDDEN  
-                                      THEN FRAME {&FRAME-NAME}:width - (btnYes:width + dMargin) 
-                                      ELSE btnNo:COL - (btnYes:width + (dMargin / 2)) ).
-      
-     /* For some reasons, these #*$&# scrollbars keep coming back */
-     run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */
-   END.
+      btnNo:LABEL            = IF cNoLabel > '':U THEN cNoLabel ELSE btnNo:LABEL
+      btnCancel:LABEL        = IF cCancelLabel > '':U THEN cCancelLabel ELSE btnCancel:LABEL
+      btnYes:width           = MAX(btnYes:width,FONT-TABLE:GET-TEXT-WIDTH(btnYes:LABEL) + 1.5)
+      btnNo:width            = MAX(btnNo:width,FONT-TABLE:GET-TEXT-WIDTH(btnNo:LABEL) + 1.5)
+      btnCancel:width        = MAX(btnCancel:width,FONT-TABLE:GET-TEXT-WIDTH(btnCancel:LABEL) + 1.5)
+      btnCancel:COLUMN       = FRAME {&FRAME-NAME}:WIDTH - (btnCancel:width + dMargin)
+      btnNo:COLUMN           = IF btnCancel:HIDDEN
+                                 THEN FRAME {&FRAME-NAME}:width - (btnNo:width + dMargin)
+                                 ELSE btnCancel:COLUMN - (btnNo:width + (dMargin / 2))
+      btnYes:COLUMN          = MAX(1, IF btnNo:HIDDEN
+                                 THEN FRAME {&FRAME-NAME}:width - (btnYes:width + dMargin)
+                                 ELSE btnNo:COLUMN - (btnYes:width + (dMargin / 2)) ).
+
+    /* For some reasons, these #*$&# scrollbars keep coming back */
+    RUN showScrollBars(FRAME {&frame-name}:handle, NO, NO). /* KILL KILL KILL */
+  END.
 
 END PROCEDURE.
 

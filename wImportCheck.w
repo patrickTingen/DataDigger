@@ -1,33 +1,16 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wImport
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImport
 /*------------------------------------------------------------------------
 
-  File: 
+  Name : wImportLoad.w
+  Desc : Check if files can be loaded
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
-
-------------------------------------------------------------------------*/
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
-     
 CREATE WIDGET-POOL.
 
 /* ***************************  Definitions  ************************** */
@@ -49,23 +32,23 @@ DEFINE {&outvar} polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
 DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
-DEFINE VARIABLE gcUniqueFields AS CHARACTER NO-UNDO. 
-DEFINE VARIABLE glInEditMode   AS LOGICAL   NO-UNDO. 
+DEFINE VARIABLE gcUniqueFields AS CHARACTER NO-UNDO.
+DEFINE VARIABLE glInEditMode   AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE ghXmlTable     AS HANDLE    NO-UNDO.
 
 /* Table to hold all xml file names */
 DEFINE TEMP-TABLE ttXmlFile NO-UNDO RCODE-INFORMATION
-  FIELD iFileNr     AS INTEGER 
+  FIELD iFileNr     AS INTEGER
   FIELD cFileName   AS CHARACTER
-  FIELD lValidFile  AS LOGICAL 
+  FIELD lValidFile  AS LOGICAL
   FIELD cBufferName AS CHARACTER
-  FIELD iNumRecords AS INTEGER 
+  FIELD iNumRecords AS INTEGER
   FIELD iNumFields  AS INTEGER
   FIELD cFields     AS CHARACTER FORMAT "X(140)"
   .
 
 DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
-  FIELD iFileNr     AS INTEGER 
+  FIELD iFileNr     AS INTEGER
   FIELD iType       AS INTEGER /* 1=info 2=warning 3=error */
   FIELD cMessage    AS CHARACTER
   .
@@ -74,7 +57,7 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -85,8 +68,8 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 &Scoped-define FRAME-NAME frMain
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS edSummary btnBack btnNext 
-&Scoped-Define DISPLAYED-OBJECTS edSummary 
+&Scoped-Define ENABLED-OBJECTS edSummary btnBack btnNext
+&Scoped-Define DISPLAYED-OBJECTS edSummary
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -97,27 +80,27 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addError wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addError wImport
 FUNCTION addError RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addInfo wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addInfo wImport
 FUNCTION addInfo RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addMessage wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addMessage wImport
 FUNCTION addMessage RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , piType    AS INTEGER
   , pcMessage AS CHARACTER
   )  FORWARD.
@@ -125,16 +108,16 @@ FUNCTION addMessage RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addWarning wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addWarning wImport
 FUNCTION addWarning RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD hasWarnings wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD hasWarnings wImport
 FUNCTION hasWarnings RETURNS LOGICAL
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -145,18 +128,18 @@ FUNCTION hasWarnings RETURNS LOGICAL
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wImport AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wImport AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnBack 
-     LABEL "&Back" 
+DEFINE BUTTON btnBack
+     LABEL "&Back"
      SIZE-PIXELS 74 BY 24 TOOLTIP "cancel load data".
 
-DEFINE BUTTON btnNext AUTO-GO 
-     LABEL "&Next" 
+DEFINE BUTTON btnNext AUTO-GO
+     LABEL "&Next"
      SIZE-PIXELS 74 BY 24.
 
-DEFINE VARIABLE edSummary AS CHARACTER 
+DEFINE VARIABLE edSummary AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL
      SIZE-PIXELS 500 BY 365
      FONT 0 NO-UNDO.
@@ -168,9 +151,9 @@ DEFINE FRAME frMain
      edSummary AT Y 0 X 0 NO-LABEL WIDGET-ID 22
      btnBack AT Y 370 X 340 WIDGET-ID 6
      btnNext AT Y 370 X 420 WIDGET-ID 4
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 1 ROW 1 SCROLLABLE 
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
+         AT COL 1 ROW 1 SCROLLABLE
          CANCEL-BUTTON btnBack WIDGET-ID 100.
 
 
@@ -197,15 +180,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1920
          VIRTUAL-HEIGHT-P   = 1134
          VIRTUAL-WIDTH-P    = 1920
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -219,17 +202,17 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* SETTINGS FOR FRAME frMain
    NOT-VISIBLE FRAME-NAME Size-to-Fit                                   */
-ASSIGN 
+ASSIGN
        FRAME frMain:SCROLLABLE       = FALSE
        FRAME frMain:RESIZABLE        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wImport)
-THEN wImport:HIDDEN = yes.
+THEN wImport:HIDDEN = YES.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -238,7 +221,7 @@ THEN wImport:HIDDEN = yes.
 &Scoped-define SELF-NAME wImport
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wImport wImport
 ON END-ERROR OF wImport /* Load Data - Summary */
-OR ENDKEY OF {&WINDOW-NAME} ANYWHERE 
+OR ENDKEY OF {&WINDOW-NAME} ANYWHERE
 DO:
   /* This case occurs when the user presses the "Esc" key.
      In a persistently run window, just ignore this.  If we did not, the
@@ -283,14 +266,14 @@ DO:
     /* Set frame width */
     FRAME frMain:WIDTH-PIXELS  = wImport:WIDTH-PIXELS NO-ERROR.
     FRAME frMain:HEIGHT-PIXELS = wImport:HEIGHT-PIXELS NO-ERROR.
-  
+
     edSummary:WIDTH-PIXELS = FRAME frMain:WIDTH-PIXELS.
     edSummary:HEIGHT-PIXELS = FRAME frMain:HEIGHT-PIXELS - 32.
     btnNext:X     = FRAME frMain:WIDTH-PIXELS - btnNext:WIDTH-PIXELS.
     btnNext:Y     = FRAME frMain:HEIGHT-PIXELS - 27.
     btnBack:X        = btnNext:X - btnBack:WIDTH-PIXELS - 10.
     btnBack:Y        = btnNext:Y.
-  
+
     /* Save settings */
     RUN saveWindowPos(wImport:HANDLE,"DataDigger:ImportCheck").
   END.
@@ -309,7 +292,7 @@ END.
 ON CHOOSE OF btnBack IN FRAME frMain /* Back */
 OR "ESC" OF edSummary
 DO:
-  polSuccess = FALSE. 
+  polSuccess = FALSE.
   APPLY "CLOSE" TO THIS-PROCEDURE.
 END.
 
@@ -331,18 +314,18 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImport
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
 DO:
   /* Save settings */
   RUN saveWindowPos(wImport:HANDLE,"DataDigger:ImportCheck").
@@ -363,9 +346,9 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   RUN loadFiles(picFileList).
   RUN checkFiles.
 
-  /* Only if there are warnings and/or errors, we 
+  /* Only if there are warnings and/or errors, we
    * want to see the intermediate screen. In other
-   * cases, just proceed to showing the records 
+   * cases, just proceed to showing the records
    */
   IF hasWarnings() THEN
   DO:
@@ -388,13 +371,10 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImport
 PROCEDURE addFile :
-/*------------------------------------------------------------------------
-  Name         : addFile
-  Description  : Add one file to the tt, do some basic checking
-  ----------------------------------------------------------------------*/
-
+  /* Add one file to the tt, do some basic checking
+  */
   DEFINE INPUT PARAMETER pcFileName AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE hTable   AS HANDLE  NO-UNDO.
@@ -406,17 +386,17 @@ PROCEDURE addFile :
   DEFINE BUFFER bfXmlFile FOR ttXmlFile.
 
   /* Sanity check */
-  IF pcFilename = "" OR pcFilename = ? THEN RETURN. 
+  IF pcFilename = "" OR pcFilename = ? THEN RETURN.
 
   /* File nr */
   FIND LAST bfXmlFile NO-ERROR.
   iFileNum = (IF AVAILABLE bfXmlFile THEN bfXmlFile.iFileNr + 1 ELSE 1).
 
   /* Check if we haven't already loaded this one */
-  IF CAN-FIND(FIRST bfXmlFile WHERE bfXmlFile.cFileName = pcFileName) THEN RETURN. 
+  IF CAN-FIND(FIRST bfXmlFile WHERE bfXmlFile.cFileName = pcFileName) THEN RETURN.
 
   CREATE bfXmlFile.
-  ASSIGN 
+  ASSIGN
     bfXmlFile.iFilenr    = iFileNum
     bfXmlFile.cFileName  = pcFileName
     .
@@ -427,42 +407,42 @@ PROCEDURE addFile :
   DO:
     bfXmlFile.lValidFile = FALSE.
     addError(bfXmlFile.iFileNr,SUBSTITUTE("File not found: &1", pcFileName)).
-    RETURN. 
-  END. 
+    RETURN.
+  END.
 
   /* Create TT and read XML */
   CREATE TEMP-TABLE hTable.
   hTable:READ-XML("FILE",pcFileName,"EMPTY",?,?) NO-ERROR.
 
-  IF ERROR-STATUS:ERROR OR ERROR-STATUS:NUM-MESSAGES > 0 THEN 
+  IF ERROR-STATUS:ERROR OR ERROR-STATUS:NUM-MESSAGES > 0 THEN
   DO:
     bfXmlFile.lValidFile = FALSE.
     addError(bfXmlFile.iFileNr,SUBSTITUTE("Cannot read file &1", pcFileName)).
-  END. 
-  ELSE 
+  END.
+  ELSE
   DO:
     hBuffer = hTable:DEFAULT-BUFFER-HANDLE.
-    
+
     /* Create query to find nr of records */
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBuffer).
     hQuery:QUERY-PREPARE(SUBSTITUTE("PRESELECT EACH &1",hBuffer:NAME)).
     hQuery:QUERY-OPEN().
     hQuery:GET-FIRST().
-    
-    ASSIGN  
+
+    ASSIGN
       bfXmlFile.lValidFile  = TRUE
       bfXmlFile.cBufferName = hBuffer:NAME
       bfXmlFile.iNumFields  = hBuffer:NUM-FIELDS
       bfXmlFile.iNumRecords = hQuery:NUM-RESULTS
       .
-  
+
     /* Find all fields in this file */
     DO iField = 1 TO hBuffer:NUM-FIELDS:
       bfXmlFile.cFields = TRIM(bfXmlFile.cFields + "," + hBuffer:BUFFER-FIELD(iField):NAME,",").
     END.
-    
-    hQuery:QUERY-CLOSE. 
+
+    hQuery:QUERY-CLOSE.
     DELETE OBJECT hQuery.
   END.
 
@@ -473,26 +453,23 @@ END PROCEDURE. /* addFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnNextChoose wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnNextChoose wImport
 PROCEDURE btnNextChoose :
-/*------------------------------------------------------------------------
-  Name         : btnNextChoose
-  Description  : Proceed to procedure that shows a preview of the load
-  ----------------------------------------------------------------------*/
-
+  /* Proceed to procedure that shows a preview of the load
+  */
   DEFINE VARIABLE lContinue      AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lOldVisibility AS LOGICAL     NO-UNDO.
 
   /* Check for warnings */
-  IF CAN-FIND(FIRST ttMessage WHERE ttMessage.iType = 2) THEN 
+  IF CAN-FIND(FIRST ttMessage WHERE ttMessage.iType = 2) THEN
   DO:
     MESSAGE "Some warnings were found. Are you sure you want to continue?"
-      VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE lContinue.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE lContinue.
     IF lContinue <> TRUE THEN RETURN NO-APPLY.
   END.
 
   lOldVisibility = wImport:VISIBLE.
-  wImport:VISIBLE = FALSE. 
+  wImport:VISIBLE = FALSE.
 
   RUN VALUE(getProgramDir() + 'wImportLoad.w')
     ( INPUT plReadOnlyDigger
@@ -501,13 +478,13 @@ PROCEDURE btnNextChoose :
     , INPUT picTableName
     , INPUT TABLE ttField  /* do not use by-reference */
     , INPUT TABLE ttColumn /* do not use by-reference */
-    , OUTPUT polSuccess     
+    , OUTPUT polSuccess
     , OUTPUT porRepositionId
     ).
 
   wImport:VISIBLE = lOldVisibility.
 
-  IF polSuccess THEN 
+  IF polSuccess THEN
     APPLY 'close' TO THIS-PROCEDURE.
 
 END PROCEDURE.
@@ -515,13 +492,10 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFiles wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFiles wImport
 PROCEDURE checkFiles :
-/*------------------------------------------------------------------------
-    Name         : checkFiles
-    Description  : Check contents of the files
-    ----------------------------------------------------------------------*/
-  
+  /* Check contents of the files
+  */
   DEFINE VARIABLE hBuffer          AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hQuery           AS HANDLE    NO-UNDO.
   DEFINE VARIABLE iField           AS INTEGER   NO-UNDO.
@@ -550,7 +524,7 @@ PROCEDURE checkFiles :
 
     /* Check all prim index fields */
     cFieldList = "".
-    FOR EACH bfField 
+    FOR EACH bfField
       WHERE bfField.lPrimary = TRUE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
@@ -561,9 +535,9 @@ PROCEDURE checkFiles :
 
     /* Check all unique index fields */
     cFieldList = "".
-    FOR EACH bfField 
-      WHERE bfField.lPrimary = FALSE
-        AND bfField.lUnique  = TRUE
+    FOR EACH bfField
+      WHERE bfField.lPrimary   = FALSE
+        AND bfField.lUniqueIdx = TRUE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
       cFieldList = TRIM(cFieldList + "," + bfField.cFieldName,",").
@@ -573,9 +547,9 @@ PROCEDURE checkFiles :
 
     /* Check all mandatory fields */
     cFieldList = "".
-    FOR EACH bfField 
+    FOR EACH bfField
       WHERE bfField.lPrimary   = FALSE
-        AND bfField.lUnique    = FALSE 
+        AND bfField.lUniqueIdx = FALSE
         AND bfField.lMandatory = TRUE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
@@ -586,9 +560,9 @@ PROCEDURE checkFiles :
 
     /* Check all other fields */
     cFieldList = "".
-    FOR EACH bfField 
+    FOR EACH bfField
       WHERE bfField.lPrimary   = FALSE
-        AND bfField.lUnique    = FALSE 
+        AND bfField.lUniqueIdx = FALSE
         AND bfField.lMandatory = FALSE
         AND LOOKUP(bfField.cFieldName,bfXmlFile.cFields) = 0
         AND LOOKUP(bfField.cFieldName,cIgnoreFields) = 0:
@@ -603,7 +577,7 @@ PROCEDURE checkFiles :
       IF NOT CAN-FIND(bfField WHERE bfField.cFieldName = ENTRY(iField,bfXmlFile.cFields)) THEN
         cFieldList = TRIM(cFieldList + "," + ENTRY(iField,bfXmlFile.cFields),",").
     END.
-    IF cFieldList <> "" THEN 
+    IF cFieldList <> "" THEN
       addWarning(bfXmlFile.iFileNr,SUBSTITUTE("Non-db fields found         : &1", cFieldList)).
   END.
 
@@ -613,7 +587,7 @@ PROCEDURE checkFiles :
   DO:
     CREATE BUFFER hTableBuffer FOR TABLE picDatabase + "." + picTableName.
     CREATE TEMP-TABLE ghXmlTable.
-    
+
     /* To keep it running on 10.1B */
     &IF PROVERSION < '10.1C' &THEN
     ghXmlTable:CREATE-LIKE(hTableBuffer).
@@ -623,55 +597,45 @@ PROCEDURE checkFiles :
 
     ghXmlTable:TEMP-TABLE-PREPARE(picTableName).
     DELETE OBJECT hTableBuffer.
-  
+
     /* Fix XML Node Names for fields in the tt */
     RUN setXmlNodeNames(INPUT ghXmlTable:DEFAULT-BUFFER-HANDLE).
 
     fileLoop:
     FOR EACH bfXmlFile WHERE bfXmlFile.lValidFile:
-      iExpectedRecords = iExpectedRecords + bfXmlFile.iNumRecords. 
-  
+      iExpectedRecords = iExpectedRecords + bfXmlFile.iNumRecords.
+
       ghXmlTable:READ-XML("FILE",bfXmlFile.cFileName,"MERGE",?,?) NO-ERROR.
-      IF ERROR-STATUS:ERROR OR ERROR-STATUS:NUM-MESSAGES > 0 THEN 
+      IF ERROR-STATUS:ERROR OR ERROR-STATUS:NUM-MESSAGES > 0 THEN
       DO:
         addError(bfXmlFile.iFileNr,"Cannot read file contents").
         NEXT fileLoop.
       END.
-  
+
       /* Check on nr of fields in the xml file */
       IF iNumFields = 0 THEN iNumFields = bfXmlFile.iNumFields.
-      IF iNumFields <> bfXmlFile.iNumFields THEN 
+      IF iNumFields <> bfXmlFile.iNumFields THEN
         addWarning(bfXmlFile.iFileNr,"Number of fields are different in the files").
     END.
-  
+
     addInfo(0,SUBSTITUTE("Total number of records  : &1",iExpectedRecords)).
-  
+
     /* Now check the nr of records in the merged XML */
     CREATE QUERY hQuery.
     hBuffer = ghXmlTable:DEFAULT-BUFFER-HANDLE.
-
-    /* Try to set format similar to db
-    DO iField = 1 TO hBuffer:NUM-FIELDS:
-      FIND bfField WHERE bfField.cFieldName = hBuffer:BUFFER-FIELD(iField):NAME NO-ERROR.
-      IF AVAILABLE bfField THEN
-        hBuffer:BUFFER-FIELD(iField):FORMAT = bfField.cFormat.
-      ELSE 
-        hBuffer:BUFFER-FIELD(iField):FORMAT = "X(100)".
-    END.
-    */
 
     hQuery:ADD-BUFFER(hBuffer).
     hQuery:QUERY-PREPARE(SUBSTITUTE("PRESELECT EACH &1",hBuffer:NAME)).
     hQuery:QUERY-OPEN().
     hQuery:GET-FIRST().
-  
-    IF hQuery:NUM-RESULTS <> iExpectedRecords THEN 
+
+    IF hQuery:NUM-RESULTS <> iExpectedRecords THEN
       addWarning(0,SUBSTITUTE("Number of unique records : &1.",hQuery:NUM-RESULTS)).
-  
-    hQuery:QUERY-CLOSE. 
-    DELETE OBJECT hQuery. 
+
+    hQuery:QUERY-CLOSE.
+    DELETE OBJECT hQuery.
   END.
-  ELSE 
+  ELSE
   DO:
     addError(0,"No files to load").
   END.
@@ -687,7 +651,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -708,12 +672,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edSummary 
+  DISPLAY edSummary
       WITH FRAME frMain IN WINDOW wImport.
-  ENABLE edSummary btnBack btnNext 
+  ENABLE edSummary btnBack btnNext
       WITH FRAME frMain IN WINDOW wImport.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
 END PROCEDURE.
@@ -721,22 +685,10 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImport
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------
-  Name         : initializeObject
-  Description  : Setup
-  ----------------------------------------------------------------------*/
-  
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iValue          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
-
+  /* Setup
+  */
   VIEW wImport.
 
   /* Set fonts */
@@ -758,7 +710,7 @@ PROCEDURE initializeObject :
 
     /* Set window back to last known pos */
     RUN restoreWindowPos(wImport:HANDLE, "DataDigger:ImportCheck").
-  END. 
+  END.
 
   IF plReadOnlyDigger THEN btnBack:SENSITIVE = FALSE.
 
@@ -767,12 +719,10 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadFiles wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadFiles wImport
 PROCEDURE loadFiles :
-/*------------------------------------------------------------------------
-  Name         : loadFile
-  Description  : Add files, check and show summary
-  ----------------------------------------------------------------------*/
+  /* Add files, check and show summary
+  */
   DEFINE INPUT PARAMETER pcFileList AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE iFile AS INTEGER NO-UNDO.
@@ -786,18 +736,15 @@ END PROCEDURE. /* loadFiles */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showSummary wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showSummary wImport
 PROCEDURE showSummary :
-/*------------------------------------------------------------------------
-  Name         : showSummary
-  Description  : Show summary before loading the data
-  ----------------------------------------------------------------------*/
-
+  /* Show summary before loading the data
+  */
   DEFINE VARIABLE cSummary AS CHARACTER   NO-UNDO.
 
   cSummary = "Summary of files to be loaded:".
 
-  FOR EACH ttXmlFile BY ttXmlFile.iFileNr:
+  FOR EACH ttXmlFile {&TABLE-SCAN} BY ttXmlFile.iFileNr:
     cSummary = cSummary + "~n~n" + SUBSTITUTE("File: &1", ttXmlFile.cFilename).
 
     FOR EACH ttMessage WHERE ttMessage.iFileNr = ttXmlFile.iFileNr:
@@ -829,9 +776,9 @@ END PROCEDURE. /* showSummary */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addError wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addError wImport
 FUNCTION addError RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   ) :
 
@@ -842,9 +789,9 @@ END FUNCTION. /* addError */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addInfo wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addInfo wImport
 FUNCTION addInfo RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   ) :
 
@@ -855,14 +802,14 @@ END FUNCTION. /* addInfo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addMessage wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addMessage wImport
 FUNCTION addMessage RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , piType    AS INTEGER
   , pcMessage AS CHARACTER
   ) :
 
-  DEFINE BUFFER bfMessage FOR ttMessage. 
+  DEFINE BUFFER bfMessage FOR ttMessage.
 
   CREATE bfMessage.
   ASSIGN
@@ -878,9 +825,9 @@ END FUNCTION. /* addMessage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addWarning wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addWarning wImport
 FUNCTION addWarning RETURNS LOGICAL
-  ( piFileNr  AS INTEGER 
+  ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
   ) :
 
@@ -891,7 +838,7 @@ END FUNCTION. /* addWarning */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION hasWarnings wImport 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION hasWarnings wImport
 FUNCTION hasWarnings RETURNS LOGICAL
   ( /* parameter-definitions */ ) :
 

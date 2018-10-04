@@ -1,32 +1,15 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wImportSel
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImportSel 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImportSel
 /*------------------------------------------------------------------------
 
-  File: 
+  Name : wImportSel.w
+  Desc : Select files to import
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
-
-------------------------------------------------------------------------*/
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -54,7 +37,7 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -66,8 +49,8 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS fcFilename btnGetFile btnAddFile edFileList ~
-btnBack BtnNext fiText 
-&Scoped-Define DISPLAYED-OBJECTS fcFilename edFileList fiText 
+btnBack BtnNext fiText
+&Scoped-Define DISPLAYED-OBJECTS fcFilename edFileList fiText
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -80,38 +63,38 @@ btnBack BtnNext fiText
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR wImportSel AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE wImportSel AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnAddFile 
-     LABEL "+" 
+DEFINE BUTTON btnAddFile
+     LABEL "+"
      SIZE-PIXELS 25 BY 21 TOOLTIP "add file".
 
-DEFINE BUTTON btnBack DEFAULT 
-     LABEL "&Back" 
+DEFINE BUTTON btnBack DEFAULT
+     LABEL "&Back"
      SIZE-PIXELS 75 BY 24 TOOLTIP "cancel load data"
      BGCOLOR 8 .
 
-DEFINE BUTTON btnGetFile 
-     LABEL "..." 
+DEFINE BUTTON btnGetFile
+     LABEL "..."
      SIZE-PIXELS 25 BY 21 TOOLTIP "add one or more files".
 
-DEFINE BUTTON BtnNext 
-     LABEL "&Next" 
+DEFINE BUTTON BtnNext
+     LABEL "&Next"
      SIZE-PIXELS 75 BY 24 TOOLTIP "analyze files"
      BGCOLOR 8 .
 
-DEFINE VARIABLE edFileList AS CHARACTER 
+DEFINE VARIABLE edFileList AS CHARACTER
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL
      SIZE 100 BY 7.14 TOOLTIP "the files to load" NO-UNDO.
 
-DEFINE VARIABLE fcFilename AS CHARACTER FORMAT "X(256)":U 
-     LABEL "File" 
-     VIEW-AS FILL-IN 
+DEFINE VARIABLE fcFilename AS CHARACTER FORMAT "X(256)":U
+     LABEL "File"
+     VIEW-AS FILL-IN
      SIZE-PIXELS 415 BY 21 TOOLTIP "the name of the file to load" NO-UNDO.
 
-DEFINE VARIABLE fiText AS CHARACTER FORMAT "X(256)":U INITIAL "Select the files you want to load or drag them onto this window" 
-      VIEW-AS TEXT 
+DEFINE VARIABLE fiText AS CHARACTER FORMAT "X(256)":U INITIAL "Select the files you want to load or drag them onto this window"
+      VIEW-AS TEXT
      SIZE-PIXELS 380 BY 19 NO-UNDO.
 
 
@@ -125,8 +108,8 @@ DEFINE FRAME frMain
      btnBack AT Y 213 X 340 WIDGET-ID 8
      BtnNext AT Y 213 X 423 WIDGET-ID 6
      fiText AT Y 6 X 9 NO-LABEL WIDGET-ID 4
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
+         SIDE-LABELS NO-UNDERLINE THREE-D
          AT X 0 Y 0
          SIZE-PIXELS 500 BY 239
          CANCEL-BUTTON btnBack DROP-TARGET WIDGET-ID 100.
@@ -155,15 +138,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1400
          VIRTUAL-HEIGHT-P   = 1000
          VIRTUAL-WIDTH-P    = 1400
-         RESIZE             = yes
-         SCROLL-BARS        = no
-         STATUS-AREA        = no
+         RESIZE             = YES
+         SCROLL-BARS        = NO
+         STATUS-AREA        = NO
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = yes
-         THREE-D            = yes
-         MESSAGE-AREA       = no
-         SENSITIVE          = yes.
+         KEEP-FRAME-Z-ORDER = YES
+         THREE-D            = YES
+         MESSAGE-AREA       = NO
+         SENSITIVE          = YES.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -180,12 +163,12 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* SETTINGS FOR FILL-IN fiText IN FRAME frMain
    ALIGN-L                                                              */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wImportSel)
-THEN wImportSel:HIDDEN = no.
+THEN wImportSel:HIDDEN = NO.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
- 
+
 
 
 
@@ -236,14 +219,14 @@ DO:
     /* Set frame width */
     FRAME frMain:WIDTH-PIXELS  = wImportSel:WIDTH-PIXELS NO-ERROR.
     FRAME frMain:HEIGHT-PIXELS = wImportSel:HEIGHT-PIXELS NO-ERROR.
-  
+
     /* Adjust the editor */
     edFileList:WIDTH-PIXELS  = FRAME frMain:WIDTH-PIXELS - 3.
     edFileList:HEIGHT-PIXELS = FRAME frMain:HEIGHT-PIXELS - 90.
     btnAddFile:X   = edFileList:X + edFileList:WIDTH-PIXELS - btnAddFile:WIDTH-PIXELS.
     btnGetFile:X   = btnAddFile:X - btnGetFile:WIDTH-PIXELS.
     fcFileName:WIDTH-PIXELS = FRAME frMain:WIDTH-PIXELS - 90.
-    
+
     btnNext:X      = edFileList:X + edFileList:WIDTH-PIXELS - btnNext:WIDTH-PIXELS.
     btnNext:Y      = FRAME frMain:HEIGHT-PIXELS - 27.
     btnBack:X    = btnNext:X - btnBack:WIDTH-PIXELS - 10.
@@ -281,7 +264,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain wImportSel
 ON GO OF FRAME frMain
 DO:
-  APPLY "CHOOSE" TO btnNext. 
+  APPLY "CHOOSE" TO btnNext.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -296,7 +279,7 @@ DO:
   DEFINE VARIABLE lAdded AS LOGICAL     NO-UNDO.
   RUN addFile(fcFileName:SCREEN-VALUE,OUTPUT lAdded).
   IF lAdded THEN fcFileName:SCREEN-VALUE = "".
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -306,7 +289,7 @@ END.
 &Scoped-define SELF-NAME btnBack
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnBack wImportSel
 ON CHOOSE OF btnBack IN FRAME frMain /* Back */
-OR ENDKEY OF {&WINDOW-NAME} anywhere 
+OR ENDKEY OF {&WINDOW-NAME} ANYWHERE
 DO:
   polSuccess = FALSE.
   APPLY "CLOSE" TO THIS-PROCEDURE.
@@ -324,18 +307,18 @@ DO:
   DEFINE VARIABLE lOKpressed AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lAdded     AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cDataFile  AS CHARACTER   NO-UNDO.
-  
+
   SYSTEM-DIALOG GET-FILE cDataFile
-    TITLE   "Choose File to load ..."    
+    TITLE   "Choose File to load ..."
     FILTERS "XML files (*.xml)" "*.xml",
-            "All files (*.*)"   "*.*"    
-    MUST-EXIST    
-    USE-FILENAME    
+            "All files (*.*)"   "*.*"
+    MUST-EXIST
+    USE-FILENAME
     UPDATE lOKpressed.
 
   IF lOKpressed THEN
     RUN addFile(cDataFile,OUTPUT lAdded).
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -348,13 +331,13 @@ ON CHOOSE OF BtnNext IN FRAME frMain /* Next */
 DO:
   DEFINE VARIABLE cFileList      AS CHARACTER NO-UNDO.
   DEFINE VARIABLE lOldVisibility AS LOGICAL   NO-UNDO.
-  
+
   cFileList = edFileList:SCREEN-VALUE.
 
   IF cFileList <> "" THEN
   DO:
     lOldVisibility = wImportSel:VISIBLE.
-    wImportSel:VISIBLE = FALSE. 
+    wImportSel:VISIBLE = FALSE.
 
     RUN VALUE(getProgramDir() + 'wImportCheck.w')
       ( INPUT plReadOnlyDigger
@@ -363,13 +346,13 @@ DO:
       , INPUT picTableName
       , INPUT TABLE ttField  /* do not use by-reference */
       , INPUT TABLE ttColumn /* do not use by-reference */
-      , OUTPUT polSuccess     
+      , OUTPUT polSuccess
       , OUTPUT porRepositionId
       ).
 
     wImportSel:VISIBLE = lOldVisibility.
 
-    IF polSuccess THEN 
+    IF polSuccess THEN
       APPLY 'close' TO THIS-PROCEDURE.
   END.
 
@@ -381,18 +364,18 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImportSel 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImportSel
 
 
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
 DO:
   /* Save settings */
   RUN saveWindowPos(wImportSel:HANDLE,"DataDigger:ImportSel").
@@ -425,13 +408,10 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImportSel 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImportSel
 PROCEDURE addFile :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+  /* Add a file to the queue of files to load
+  */
   DEFINE INPUT PARAMETER pcFileName AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER plAdded   AS LOGICAL     NO-UNDO.
 
@@ -441,24 +421,24 @@ PROCEDURE addFile :
     IF FILE-INFO:FULL-PATHNAME = ? THEN
     DO:
       MESSAGE SUBSTITUTE("Cannot find file '&1', please retry.",pcFilename)
-        VIEW-AS ALERT-BOX INFO BUTTONS OK.
-      RETURN. 
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+      RETURN.
     END.
 
     /* Only accept regular files */
-    IF NOT FILE-INFO:FILE-TYPE BEGINS "F" THEN 
+    IF NOT FILE-INFO:FILE-TYPE BEGINS "F" THEN
     DO:
-      MESSAGE "This is not a regular file, please retry." VIEW-AS ALERT-BOX INFO BUTTONS OK.
-      RETURN. 
+      MESSAGE "This is not a regular file, please retry." VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+      RETURN.
     END.
-  
+
     IF LOOKUP(FILE-INFO:FULL-PATHNAME,edFileList:SCREEN-VALUE) = 0 THEN
     DO:
       edFileList:SCREEN-VALUE = TRIM(edFileList:SCREEN-VALUE,"~n").
       edFileList:SCREEN-VALUE = edFileList:SCREEN-VALUE + "~n" + FILE-INFO:FULL-PATHNAME.
       edFileList:SCREEN-VALUE = TRIM(edFileList:SCREEN-VALUE,"~n").
     END.
-    plAdded = TRUE. 
+    plAdded = TRUE.
   END.
 
 END PROCEDURE.
@@ -472,7 +452,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide 
+               dynamic widgets we have created and/or hide
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -493,12 +473,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other 
+               These statements here are based on the "Other
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fcFilename edFileList fiText 
+  DISPLAY fcFilename edFileList fiText
       WITH FRAME frMain IN WINDOW wImportSel.
-  ENABLE fcFilename btnGetFile btnAddFile edFileList btnBack BtnNext fiText 
+  ENABLE fcFilename btnGetFile btnAddFile edFileList btnBack BtnNext fiText
       WITH FRAME frMain IN WINDOW wImportSel.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
 END PROCEDURE.
@@ -506,21 +486,10 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImportSel 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImportSel
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------
-  Name         : initializeObject
-  Description  : Setup
-  ----------------------------------------------------------------------*/
-  
-  DEFINE VARIABLE cExtentFormat   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cValueList      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iFieldExtent    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iMaxFieldLength AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lNewRecord      AS LOGICAL     NO-UNDO.
-  
+  /* Setup
+  */
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Get fonts */
@@ -529,10 +498,7 @@ PROCEDURE initializeObject :
 
     /* Window position and size */
     /* Set title of the window */
-    wImportSel:TITLE = SUBSTITUTE('Load Data For &1.&2 - Select Files'
-                            , picDatabase 
-                            , picTableName
-                            ).
+    wImportSel:TITLE = SUBSTITUTE('Load Data For &1.&2 - Select Files', picDatabase, picTableName).
 
     /* Set minimum size of the window */
     wImportSel:MIN-WIDTH-PIXELS  = 400.
@@ -543,10 +509,9 @@ PROCEDURE initializeObject :
 
     /* Set window back to last known pos */
     RUN restoreWindowPos(wImportSel:HANDLE, "DataDigger:ImportSel").
-  END. 
+  END.
 
 END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

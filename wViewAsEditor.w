@@ -4,38 +4,25 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wEditor 
 /*------------------------------------------------------------------------
 
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+  Name: wViewAsEditor.w
+  Desc: Show text in editor widget
 
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
+/*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
 /* ***************************  Definitions  ************************** */
 
-{datadigger.i}
+{ DataDigger.i }
 
 /* Parameters Definitions ---                                           */
-DEFINE INPUT-OUTPUT PARAMETER pcValue   AS CHARACTER NO-UNDO.
+&IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
+  DEFINE INPUT-OUTPUT PARAMETER pcValue AS LONGCHAR NO-UNDO.
+&ELSE
+  DEFINE VARIABLE pcValue AS LONGCHAR NO-UNDO.
+&ENDIF
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -80,7 +67,7 @@ DEFINE BUTTON btnOk AUTO-GO
      BGCOLOR 8 .
 
 DEFINE VARIABLE edValue AS CHARACTER 
-     VIEW-AS EDITOR SCROLLBAR-VERTICAL
+     VIEW-AS EDITOR SCROLLBAR-VERTICAL LARGE
      SIZE-PIXELS 400 BY 130 NO-UNDO.
 
 
@@ -88,8 +75,8 @@ DEFINE VARIABLE edValue AS CHARACTER
 
 DEFINE FRAME DEFAULT-FRAME
      edValue AT Y 0 X 0 NO-LABEL WIDGET-ID 36
-     btnOk AT Y 140 X 245 WIDGET-ID 34
-     btnCancel AT Y 140 X 325 WIDGET-ID 32
+     btnOk AT Y 140 X 234 WIDGET-ID 34
+     btnCancel AT Y 140 X 314 WIDGET-ID 32
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -169,7 +156,7 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wEditor wEditor
 ON LEAVE OF wEditor /* Edit Field Value */
-OR "LEAVE" of wEditor
+OR "LEAVE" OF wEditor
 DO:
   /* This event will close the window and terminate the procedure.  */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
@@ -197,8 +184,8 @@ ON WINDOW-RESIZED OF wEditor /* Edit Field Value */
 DO:
 
   /* Sanity checks */
-  IF wEditor:WIDTH-PIXELS < 100 
-    OR wEditor:HEIGHT-PIXELS < 100 THEN RETURN. 
+  IF wEditor:WIDTH-PIXELS < 100
+    OR wEditor:HEIGHT-PIXELS < 100 THEN RETURN.
 
   RUN LockWindow (INPUT wEditor:HANDLE, INPUT YES).
 
@@ -213,24 +200,24 @@ DO:
     edValue:Y   = 0.
     edValue:WIDTH-PIXELS = 10.
     edValue:HEIGHT-PIXELS = 10.
-  
+
     /* Set frame width */
     FRAME {&FRAME-NAME}:WIDTH-PIXELS  = wEditor:WIDTH-PIXELS NO-ERROR.
     FRAME {&FRAME-NAME}:HEIGHT-PIXELS = wEditor:HEIGHT-PIXELS NO-ERROR.
-  
+
     /* Adjust the browse */
     edValue:WIDTH-PIXELS  = FRAME {&FRAME-NAME}:WIDTH-PIXELS.
     edValue:HEIGHT-PIXELS = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 40.
-    btnOk:X               = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 155.
+    btnOk:X               = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 165.
     btnOk:Y               = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 30.
-    btnCancel:X           = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 75.
+    btnCancel:X           = FRAME {&FRAME-NAME}:WIDTH-PIXELS - 85.
     btnCancel:Y           = FRAME {&FRAME-NAME}:HEIGHT-PIXELS - 30.
-  
+
     /* Save settings */
-    setRegistry("DataDigger:ViewAsEditor", "Window:x", STRING(wEditor:X) ).                             
-    setRegistry("DataDigger:ViewAsEditor", "Window:y", STRING(wEditor:Y) ).                             
-    setRegistry("DataDigger:ViewAsEditor", "Window:height", STRING(wEditor:HEIGHT-PIXELS) ).                             
-    setRegistry("DataDigger:ViewAsEditor", "Window:width", STRING(wEditor:WIDTH-PIXELS) ).                             
+    setRegistry("DataDigger:ViewAsEditor", "Window:x", STRING(wEditor:X) ).
+    setRegistry("DataDigger:ViewAsEditor", "Window:y", STRING(wEditor:Y) ).
+    setRegistry("DataDigger:ViewAsEditor", "Window:height", STRING(wEditor:HEIGHT-PIXELS) ).
+    setRegistry("DataDigger:ViewAsEditor", "Window:width", STRING(wEditor:WIDTH-PIXELS) ).
   END.
 
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
@@ -248,7 +235,18 @@ ON CHOOSE OF btnOk IN FRAME DEFAULT-FRAME /* OK */
 OR "F2" OF edValue
 DO:
   pcValue = edValue:SCREEN-VALUE.
-  APPLY "CLOSE" TO THIS-PROCEDURE. 
+  APPLY "CLOSE" TO THIS-PROCEDURE.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME edValue
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL edValue wEditor
+ON CTRL-A OF edValue IN FRAME DEFAULT-FRAME
+DO:
+  edValue:SET-SELECTION(1,LENGTH(edValue:SCREEN-VALUE) + 1).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -263,12 +261,12 @@ END.
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
 DO:
   /* Save settings */
   setRegistry("DataDigger:ViewAsEditor", "Window:x", STRING(wEditor:X) ).
@@ -288,7 +286,7 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  ASSIGN edValue = pcValue.  
+  ASSIGN edValue = pcValue.
   RUN enable_UI.
   RUN initializeObject.
 
@@ -345,12 +343,8 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wEditor 
 PROCEDURE initializeObject :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+/* Init frame and font
+  */
   DEFINE VARIABLE iValue AS INTEGER NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
@@ -359,9 +353,6 @@ PROCEDURE initializeObject :
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
     edValue:FONT = getFont('Fixed').
 
-    /* For some reasons, these #*$&# scrollbars keep coming back */
-    .run showScrollBars(frame {&frame-name}:handle, no, no). /* KILL KILL KILL */
-    
     /* Restore window */
     iValue = INTEGER(getRegistry('DataDigger:ViewAsEditor', 'Window:x' )).
     IF iValue > 0 THEN ASSIGN wEditor:X = iValue NO-ERROR.

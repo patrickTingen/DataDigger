@@ -4,29 +4,12 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wDump 
 /*------------------------------------------------------------------------
 
-  File: 
+  Name : wDump.w
+  Desc : Dump data
 
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
-
-------------------------------------------------------------------------*/
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
@@ -72,12 +55,12 @@ DEFINE STREAM strDump.
 btnChooseDumpFile cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator ~
 cbNumericFormat cbiRecordSelection cbDateFormat cbiFieldSelection btnDump ~
 btnClose tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView ~
-tbDumpReadyClipboard 
+tbDumpReadyClipboard ficMessageNow ficMessage 
 &Scoped-Define DISPLAYED-OBJECTS ficFileName cbDumpType cbCodePage ~
 tbUseCustomizedFormats cbSeparator cbNumericFormat tbExportSchema ~
 cbiRecordSelection cbDateFormat tbMinimalSchema cbiFieldSelection ~
-ficMessageNow ficMessage tbDumpReadyClose tbDumpReadyExplore ~
-tbDumpReadyView tbDumpReadyClipboard 
+tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView tbDumpReadyClipboard ~
+ficMessageNow ficMessage 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -88,10 +71,11 @@ tbDumpReadyView tbDumpReadyClipboard
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getEscapedData wDump 
-FUNCTION getEscapedData RETURNS CHARACTER
-  ( pcTarget AS CHARACTER
-  , pcString AS CHARACTER )  FORWARD.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD allFieldsInList wDump 
+FUNCTION allFieldsInList RETURNS LOGICAL
+  ( INPUT pcFields AS CHARACTER
+  , INPUT pcList   AS CHARACTER
+  )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -114,16 +98,7 @@ FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldValue wDump 
 FUNCTION getFieldValue RETURNS CHARACTER
   ( phField AS HANDLE
-  , piExtent AS INTEGER 
-  )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD multipleLookUpGreaterThanZero wDump 
-FUNCTION multipleLookUpGreaterThanZero RETURNS LOGICAL
-  ( INPUT picExpressions AS CHARACTER
-  , INPUT picList        AS CHARACTER
+  , piExtent AS INTEGER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -219,12 +194,12 @@ DEFINE VARIABLE ficFileName AS CHARACTER FORMAT "X(256)":U
      SIZE-PIXELS 570 BY 21 TOOLTIP "the name and path of the resulting dumpfile" NO-UNDO.
 
 DEFINE VARIABLE ficMessage AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 735 BY 22 NO-UNDO.
+      VIEW-AS TEXT 
+     SIZE-PIXELS 735 BY 13 NO-UNDO.
 
 DEFINE VARIABLE ficMessageNow AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 130 BY 21 NO-UNDO.
+      VIEW-AS TEXT 
+     SIZE-PIXELS 130 BY 13 NO-UNDO.
 
 DEFINE RECTANGLE RECT-2
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
@@ -306,16 +281,16 @@ DEFINE FRAME DEFAULT-FRAME
      cbDateFormat AT Y 95 X 384 COLON-ALIGNED WIDGET-ID 50
      tbMinimalSchema AT Y 104 X 576 WIDGET-ID 22
      cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED WIDGET-ID 30
-     ficMessageNow AT Y 184 X 10 NO-LABEL WIDGET-ID 18
      btnViewLastDump AT Y 200 X 750 WIDGET-ID 28
      btnOpenLastDumpDir AT Y 200 X 773 WIDGET-ID 32
-     ficMessage AT Y 203 X 10 NO-LABEL WIDGET-ID 16
      btnDump AT Y 265 X 649 WIDGET-ID 62
      btnClose AT Y 265 X 729 WIDGET-ID 60
      tbDumpReadyClose AT Y 270 X 15 WIDGET-ID 36
      tbDumpReadyExplore AT Y 270 X 145 WIDGET-ID 38
      tbDumpReadyView AT Y 270 X 282 WIDGET-ID 40
      tbDumpReadyClipboard AT Y 270 X 406 WIDGET-ID 56
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
      "Last dump" VIEW-AS TEXT
           SIZE-PIXELS 87 BY 13 AT Y 163 X 13 WIDGET-ID 26
      "After the dump ..." VIEW-AS TEXT
@@ -394,10 +369,12 @@ ASSIGN FRAME infoFrame:FRAME = FRAME DEFAULT-FRAME:HANDLE.
    NO-ENABLE                                                            */
 /* SETTINGS FOR BUTTON btnViewLastDump IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
-/* SETTINGS FOR FILL-IN ficMessage IN FRAME DEFAULT-FRAME
-   NO-ENABLE ALIGN-L                                                    */
-/* SETTINGS FOR FILL-IN ficMessageNow IN FRAME DEFAULT-FRAME
-   NO-ENABLE ALIGN-L                                                    */
+ASSIGN 
+       ficMessage:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+
+ASSIGN 
+       ficMessageNow:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+
 /* SETTINGS FOR TOGGLE-BOX tbExportSchema IN FRAME DEFAULT-FRAME
    NO-ENABLE                                                            */
 /* SETTINGS FOR TOGGLE-BOX tbMinimalSchema IN FRAME DEFAULT-FRAME
@@ -488,8 +465,8 @@ DO:
     DEFAULT-EXTENSION ".xml"
     SAVE-AS
     UPDATE lOkay.
-  
-  IF NOT lOkay THEN 
+
+  IF NOT lOkay THEN
     RETURN.
 
   DO WITH FRAME {&frame-name}:
@@ -506,7 +483,7 @@ END.
 &Scoped-define SELF-NAME btnDump
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDump wDump
 ON CHOOSE OF btnDump IN FRAME DEFAULT-FRAME /* Dump */
-OR GO OF FRAME {&frame-name} 
+OR GO OF FRAME {&frame-name}
 DO:
   DEFINE VARIABLE lContinue AS LOGICAL NO-UNDO.
   RUN btnDumpChoose(OUTPUT lContinue).
@@ -575,7 +552,7 @@ END.
 &Scoped-define SELF-NAME cbiFieldSelection
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbiFieldSelection wDump
 ON VALUE-CHANGED OF cbiFieldSelection IN FRAME DEFAULT-FRAME /* Fields */
-DO:  
+DO:
   RUN cbiFieldSelectionValueChanged.
 END.
 
@@ -586,7 +563,7 @@ END.
 &Scoped-define SELF-NAME cbiRecordSelection
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbiRecordSelection wDump
 ON VALUE-CHANGED OF cbiRecordSelection IN FRAME DEFAULT-FRAME /* Records */
-DO:  
+DO:
   RUN cbiRecordSelectionValueChanged.
 END.
 
@@ -642,7 +619,7 @@ DO:
   IF tbDumpReadyView     :CHECKED THEN cDumpReadyAction = cDumpReadyAction + ',View'.
   IF tbDumpReadyClipboard:CHECKED THEN cDumpReadyAction = cDumpReadyAction + ',Clipboard'.
 
-  cDumpReadyAction = REPLACE(cDumpReadyAction,",,",","). 
+  cDumpReadyAction = REPLACE(cDumpReadyAction,",,",",").
   cDumpReadyAction = TRIM(cDumpReadyAction,",").
   IF cDumpReadyAction = "" THEN cDumpReadyAction = "Nothing".
 
@@ -694,12 +671,12 @@ END.
 /* ***************************  Main Block  *************************** */
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
-ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME} 
+ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
        THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
@@ -730,37 +707,37 @@ SESSION:NUMERIC-FORMAT = gcSessionNumericFormat.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose wDump 
 PROCEDURE btnDumpChoose :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
   DEFINE OUTPUT PARAMETER plContinue AS LOGICAL NO-UNDO.
 
   DEFINE VARIABLE cAction  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iAction  AS INTEGER     NO-UNDO. 
+  DEFINE VARIABLE iAction  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cError   AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME {&frame-name}:
 
     IF NOT isValidCodePage(cbCodePage:SCREEN-VALUE) THEN
     DO:
-      MESSAGE cbCodePage:SCREEN-VALUE 'is not a valid code page' VIEW-AS ALERT-BOX INFO BUTTONS OK.
-      RETURN. 
+      MESSAGE cbCodePage:SCREEN-VALUE 'is not a valid code page' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+      RETURN.
     END.
-    
+
     RUN checkDir(INPUT ficFileName:SCREEN-VALUE, OUTPUT cError).
-    IF cError <> '' THEN 
+    IF cError <> '' THEN
     DO:
-      MESSAGE cError VIEW-AS ALERT-BOX INFO BUTTONS OK.
-      RETURN. 
+      MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+      RETURN.
     END.
 
     RUN dumpData
-      ( INPUT pihBrowse                       /*   input  pihDdBrowse         as handle    */ 
-      , INPUT cbDumpType:SCREEN-VALUE         /*   input  picFormat           as character */ 
-      , INPUT cbiRecordSelection:SCREEN-VALUE /*   input  piiRecordSelection  as integer   */ 
-      , INPUT cbiFieldSelection:SCREEN-VALUE  /*   input  piiRecordSelection  as integer   */ 
-      , INPUT ficFileName:SCREEN-VALUE        /*   input  picFile             as character */ 
+      ( INPUT pihBrowse                       /*   input  pihDdBrowse         as handle    */
+      , INPUT cbDumpType:SCREEN-VALUE         /*   input  picFormat           as character */
+      , INPUT cbiRecordSelection:SCREEN-VALUE /*   input  piiRecordSelection  as integer   */
+      , INPUT cbiFieldSelection:SCREEN-VALUE  /*   input  piiRecordSelection  as integer   */
+      , INPUT ficFileName:SCREEN-VALUE        /*   input  picFile             as character */
       ).
 
     cAction = getRegistry('DumpAndLoad','DumpReadyAction').
@@ -773,7 +750,7 @@ PROCEDURE btnDumpChoose :
     END.
 
     /* Do the close as last action */
-    plContinue = TRUE. 
+    plContinue = TRUE.
     IF CAN-DO(cAction,"Close") THEN APPLY "CLOSE" TO THIS-PROCEDURE.
   END.
 
@@ -785,9 +762,9 @@ END PROCEDURE. /* btnDumpChoose */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOpenLastDumpDirChoose wDump 
 PROCEDURE btnOpenLastDumpDirChoose :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
   DEFINE VARIABLE cDumpDir AS CHARACTER   NO-UNDO.
@@ -796,7 +773,7 @@ PROCEDURE btnOpenLastDumpDirChoose :
 
     /* Strip filename, only keep path */
     cDumpDir = getRegistry("DumpAndLoad", "DumpLastFileName").
-    IF cDumpDir = ? THEN RETURN. 
+    IF cDumpDir = ? THEN RETURN.
 
     ENTRY(NUM-ENTRIES(cDumpDir,'\'),cDumpDir,'\') = ''.
     IF cDumpDir = "" THEN cDumpDir = ".". /* if blank go to DD dir */
@@ -806,7 +783,7 @@ PROCEDURE btnOpenLastDumpDirChoose :
       OS-COMMAND NO-WAIT explorer /n, /e, VALUE(FILE-INFO:FULL-PATHNAME).
     ELSE
       MESSAGE SUBSTITUTE("Last used dir '&1' not found.", cDumpDir)
-        VIEW-AS ALERT-BOX INFO BUTTONS OK TITLE "Invalid Dir" .
+        VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE "Invalid Dir" .
   END.
 
 END PROCEDURE.
@@ -817,9 +794,9 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpChoose wDump 
 PROCEDURE btnViewLastDumpChoose :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
   DEFINE VARIABLE     cCmd           AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE     cDumpType      AS CHARACTER  NO-UNDO.
@@ -844,15 +821,15 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewLastDumpEnable wDump 
 PROCEDURE btnViewLastDumpEnable :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
+
   DO WITH FRAME {&frame-name}:
 
     gcLastFile = getRegistry("DumpAndLoad", "DumpLastFileName").
-    
+
     IF gcLastFile <> ? THEN
     DO:
       FILE-INFO:FILENAME = gcLastFile.
@@ -874,18 +851,18 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbCodePageValueChanged wDump 
 PROCEDURE cbCodePageValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
+
   DO WITH FRAME {&frame-name}:
-    
+
     ASSIGN cbCodePage.
     setRegistry("DumpAndLoad", "DumpCodePage", cbCodePage ).
 
   END.
-  
+
 END PROCEDURE. /* cbCodePageValueChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -894,18 +871,18 @@ END PROCEDURE. /* cbCodePageValueChanged */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDateFormatValueChanged wDump 
 PROCEDURE cbDateFormatValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
+
   DO WITH FRAME {&frame-name}:
-    
+
     ASSIGN cbDateFormat.
     setRegistry("DumpAndLoad", "DumpDateFormat", cbDateFormat ).
 
   END.
-  
+
 END PROCEDURE. /* cbDateFormatValueChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -914,13 +891,13 @@ END PROCEDURE. /* cbDateFormatValueChanged */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbDumpTypeValueChanged wDump 
 PROCEDURE cbDumpTypeValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
   DO WITH FRAME {&frame-name}:
-    
+
     ASSIGN cbDumpType.
 
     /* Save dump type */
@@ -961,24 +938,24 @@ PROCEDURE cbDumpTypeValueChanged :
     /* For progress dump file and XML, use dictionary format by default
      * For others, use customized
      */
-    IF   cbDumpType = "XML" 
+    IF   cbDumpType = "XML"
       OR cbDumpType = "D" THEN
     DO:
-      /* But only if there has been changed something by the 
-       * user, otherwise this is not relevant 
+      /* But only if there has been changed something by the
+       * user, otherwise this is not relevant
        */
-      tbUseCustomizedFormats:SENSITIVE = FALSE. 
+      tbUseCustomizedFormats:SENSITIVE = FALSE.
       tbUseCustomizedFormats:CHECKED   = FALSE.
     END.
-    ELSE 
+    ELSE
     DO:
       /* Find out whether the user has some customized fields */
       IF CAN-FIND(FIRST ttField WHERE ttField.cFormat <> ttField.cFormatOrg) THEN
         ASSIGN tbUseCustomizedFormats:SENSITIVE = TRUE
-               tbUseCustomizedFormats:CHECKED   = TRUE. 
-      ELSE 
+               tbUseCustomizedFormats:CHECKED   = TRUE.
+      ELSE
         ASSIGN tbUseCustomizedFormats:SENSITIVE = FALSE
-               tbUseCustomizedFormats:CHECKED   = FALSE. 
+               tbUseCustomizedFormats:CHECKED   = FALSE.
     END.
 
     /* Separator only for csv */
@@ -990,13 +967,13 @@ PROCEDURE cbDumpTypeValueChanged :
 
     IF NUM-ENTRIES(ficFileName,'.') > 1 THEN
       ENTRY(NUM-ENTRIES(ficFileName,'.'),ficFileName,'.') = LOWER(cbDumpType).
-    ELSE 
+    ELSE
       ficFileName = ficFileName + '.' + lower(cbDumpType).
 
     DISPLAY ficFileName cbNumericFormat cbDateFormat.
 
   END.
-  
+
   RUN tbExportSchemaValueChanged.
   RUN tbUseCustomizedFormatsValueChanged.
 
@@ -1009,15 +986,15 @@ END PROCEDURE. /* cbDumpTypeValueChanged */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiFieldSelectionValueChanged wDump 
 PROCEDURE cbiFieldSelectionValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
-  DO WITH FRAME {&frame-name}:    
+
+  DO WITH FRAME {&frame-name}:
     ASSIGN cbiFieldSelection.
   END.
-  
+
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -1026,16 +1003,16 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbiRecordSelectionValueChanged wDump 
 PROCEDURE cbiRecordSelectionValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
   Notes:       cbiRecordSelectionValueChanged
 ------------------------------------------------------------------------------*/
-  
+
   DO WITH FRAME {&frame-name}:
-    
+
     ASSIGN cbiRecordSelection.
 
-    IF (   ( cbiRecordSelection = 2 AND pihBrowse:QUERY:num-results = 0) 
+    IF (   ( cbiRecordSelection = 2 AND pihBrowse:QUERY:num-results = 0)
         OR ( cbiRecordSelection = 3 AND pihBrowse:NUM-SELECTED-ROWS = 0) )
       AND NOT glNoRecordsWarning THEN
     DO:
@@ -1053,18 +1030,18 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cbNumericFormatValueChanged wDump 
 PROCEDURE cbNumericFormatValueChanged :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
+
   DO WITH FRAME {&frame-name}:
-    
+
     ASSIGN cbNumericFormat.
     setRegistry("DumpAndLoad", "DumpNumericFormat", cbNumericFormat ).
 
   END.
-  
+
 END PROCEDURE. /* cbNumericFormatValueChanged */
 
 /* _UIB-CODE-BLOCK-END */
@@ -1091,19 +1068,14 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpData wDump 
 PROCEDURE dumpData :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Actual dump of the data
+  */
+  DEFINE INPUT PARAMETER pihDdBrowse         AS HANDLE      NO-UNDO.
+  DEFINE INPUT PARAMETER picFormat           AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER piiRecordSelection  AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER piiFieldSelection   AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER picFile             AS CHARACTER   NO-UNDO.
 
-  DEFINE INPUT PARAMETER    pihDdBrowse         AS HANDLE      NO-UNDO.
-  DEFINE INPUT PARAMETER    picFormat           AS CHARACTER   NO-UNDO.
-  DEFINE INPUT PARAMETER    piiRecordSelection  AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER    piiFieldSelection   AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER    picFile             AS CHARACTER   NO-UNDO.
-  
-  DEFINE VARIABLE cDumpDir            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iNumRecs            AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cTtField            AS CHARACTER   NO-UNDO.
@@ -1123,31 +1095,23 @@ PROCEDURE dumpData :
   DEFINE VARIABLE cIndexFields        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
 
-  glAborted = FALSE. 
-
-  RUN setStatusMessage
-    ( INPUT NOW
-    , INPUT SUBSTITUTE
-              ( "Dumping records from table &1.&2 in progres..."
-              , gcDb
-              , gcTable
-              )
-    ).
+  glAborted = FALSE.
+  RUN setStatusMessage(NOW, SUBSTITUTE("Dumping records from table &1.&2 in progres...", gcDb, gcTable) ).
 
   /* Construct the Query-string... */
   CASE piiRecordSelection:
     WHEN 1 THEN cExportQueryString = SUBSTITUTE("for each &1.&2 no-lock", gcDb, gcTable ).
     WHEN 2 THEN cExportQueryString = pihDdBrowse:QUERY:prepare-string.
   END CASE. /* case piiRecordSelection: */
-  
+
   /* Create temptable-handle... */
   CREATE TEMP-TABLE hExportTt.
-  
+
   /* Add fields & indexes to TempTable... */
   CASE piiFieldSelection:
-    
+
     /* Add all fields & indexes from the db-table... */
-    WHEN 1 THEN 
+    WHEN 1 THEN
     DO:
       hExportTt:CREATE-LIKE(SUBSTITUTE("&1.&2",gcDb,gcTable)).
     END. /* when 1 then  */
@@ -1157,6 +1121,7 @@ PROCEDURE dumpData :
     WHEN 2 THEN
     DO:
       /* add selected fields to the temp-table layout */
+      #FieldLoop:
       DO iCurField = 1 TO NUM-ENTRIES(picSelectedFields):
 
         ASSIGN
@@ -1165,39 +1130,37 @@ PROCEDURE dumpData :
           .
 
         /* skip ROWID and RECID fields as they don't exist in the table */
-        IF LOOKUP(cTtField,"ROWID,RECID") > 0 THEN NEXT.
-        
+        IF LOOKUP(cTtField,"ROWID,RECID") > 0 THEN NEXT #FieldLoop.
         hExportTt:ADD-LIKE-FIELD(cTtField,cDbField).
 
       END. /* do iCurField = 1 to num-entries(picSelectedFields): */
-      
+
       /* add all indexes to the temp-table layout which consists of selected fields  */
       CREATE BUFFER hExportQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
 
       iCurIndex = 0.
+      #AddIndex:
       DO WHILE TRUE:
-
         ASSIGN
           iCurIndex  = iCurIndex + 1
           cIndexInfo = hExportQueryBuffer:INDEX-INFORMATION(iCurIndex)
           .
 
-        IF cIndexInfo = ? THEN
-          LEAVE.
+        IF cIndexInfo = ? THEN LEAVE #AddIndex.
 
         ASSIGN
           cIndexName   = ENTRY(1,cIndexInfo)
-          cIndexFields = getFieldListFromIndexInformation(INPUT cIndexInfo) 
+          cIndexFields = getFieldListFromIndexInformation(INPUT cIndexInfo)
           .
 
-        IF multipleLookUpGreaterThanZero(cIndexFields,picSelectedFields) THEN
+        IF allFieldsInList(cIndexFields,picSelectedFields) THEN
           hExportTt:ADD-LIKE-INDEX(cIndexName,cIndexName,SUBSTITUTE("&1.&2", gcDB, gcTable)).
 
       END. /* do while true: */
 
       DELETE OBJECT hExportQueryBuffer.
     END. /* when 2 then */
-  END. /* case piiFieldSelection: */
+  END CASE. /* case piiFieldSelection: */
 
   /* Prepare the TempTable... */
   hExportTt:TEMP-TABLE-PREPARE(SUBSTITUTE("&1",gcTable)).
@@ -1214,11 +1177,12 @@ PROCEDURE dumpData :
       hExportQuery:SET-BUFFERS(hExportQueryBuffer).
       hExportQuery:QUERY-PREPARE(cExportQueryString).
 
-      hExportQuery:QUERY-OPEN(). 
-      REPEAT:    
-        hExportQuery:GET-NEXT().    
-        IF hExportQuery:QUERY-OFF-END THEN 
-          LEAVE.
+      hExportQuery:QUERY-OPEN().
+
+      #DumpRecord:
+      REPEAT:
+        hExportQuery:GET-NEXT().
+        IF hExportQuery:QUERY-OFF-END THEN LEAVE #DumpRecord.
 
         ASSIGN iNumRecs = iNumRecs + 1.
         IF (ETIME - iTimeStarted) > 1000 THEN
@@ -1226,7 +1190,7 @@ PROCEDURE dumpData :
           iTimeStarted = ETIME.
           RUN showProgressBar(SUBSTITUTE('Collected &1 records',iNumRecs), 0).
           PROCESS EVENTS.
-          IF glAborted THEN LEAVE. 
+          IF glAborted THEN LEAVE #DumpRecord.
         END.
 
         hExportTtBuffer:BUFFER-CREATE.
@@ -1235,10 +1199,11 @@ PROCEDURE dumpData :
       hExportQuery:QUERY-CLOSE().
 
     END. /* when 1 or when 2 then */
-    
+
     /* Records from the selection */
     WHEN 3 THEN
     DO:
+      #DumpSelectedRow:
       DO iCurSelectedRow = 1 TO pihDdBrowse:NUM-SELECTED-ROWS:
         pihDdBrowse:FETCH-SELECTED-ROW(iCurSelectedRow).
         hExportTtBuffer:BUFFER-CREATE.
@@ -1250,77 +1215,27 @@ PROCEDURE dumpData :
           iTimeStarted = ETIME.
           RUN showProgressBar(SUBSTITUTE('Collected &1 records',iNumRecs), 0).
           PROCESS EVENTS.
-          IF glAborted THEN LEAVE. 
+          IF glAborted THEN LEAVE #DumpSelectedRow.
         END.
 
       END. /* when 3 then */
     END.
-  END. /* case piiRecordSelection: */
+  END CASE. /* case piiRecordSelection: */
 
   /* Dump the TempTable... */
   SESSION:NUMERIC-FORMAT = cbNumericFormat.
   SESSION:DATE-FORMAT = cbDateFormat.
 
   CASE picFormat:
-
-    WHEN "D" THEN 
-      RUN DumpDataProgressD
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "HTML" THEN 
-      RUN DumpDataHtml
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "TXT" THEN 
-      RUN DumpDataTxt
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "XLS" THEN 
-      RUN DumpDataExcel
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "XML" THEN 
-      RUN dumpDataXml
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "P" THEN 
-      RUN dumpData4GL
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
-    WHEN "CSV" THEN 
-      RUN dumpDataCSV
-            ( INPUT  picFile
-            , INPUT  hExportTt
-            , INPUT  iNumRecs
-            , INPUT  cbCodePage
-            ).
-
+    WHEN "D"    THEN RUN DumpDataProgressD(picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "HTML" THEN RUN DumpDataHtml     (picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "TXT"  THEN RUN DumpDataTxt      (picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "XLS"  THEN RUN DumpDataExcel    (picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "XML"  THEN RUN dumpDataXml      (picFile, hExportTt, iNumRecs).
+    WHEN "P"    THEN RUN dumpData4GL      (picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "CSV"  THEN RUN dumpDataCSV      (picFile, hExportTt, iNumRecs, cbCodePage).
   END CASE. /* case picFormat: */
-  
+
   SESSION:NUMERIC-FORMAT = gcSessionNumericFormat.
   SESSION:DATE-FORMAT = gcSessionDateFormat.
 
@@ -1330,25 +1245,16 @@ PROCEDURE dumpData :
   IF VALID-HANDLE(hExportTt         ) THEN DELETE OBJECT hExportTt.
 
   DO WITH FRAME {&frame-name}:
-    
-    IF glAborted THEN 
+
+    IF glAborted THEN
     DO:
       cStatus = SUBSTITUTE( "Dumping table &1 aborted", gcTable ).
       RUN showHelp('DumpAborted', gcTable).
     END.
-    ELSE 
-      cStatus = SUBSTITUTE( "&1 records dumped from table &2.&3 to &4"
-                          , iNumRecs
-                          , gcDb
-                          , gcTable
-                          , picFile
-                          ).
+    ELSE
+      cStatus = SUBSTITUTE( "&1 records dumped from table &2.&3 to &4", iNumRecs, gcDb, gcTable, picFile).
 
     RUN setStatusMessage( INPUT NOW, INPUT cStatus ).
-
-    ASSIGN
-      cDumpDir = SUBSTRING(picFile, 1, R-INDEX(picFile,"~\"))
-      .
 
     setRegistry( "DumpAndLoad", "DumpExportType"      , cbDumpType).
     setRegistry( "DumpAndLoad", "DumpFilter"          , STRING(cbiRecordSelection) ).
@@ -1389,33 +1295,33 @@ PROCEDURE DumpData4GL :
   DEFINE VARIABLE iMaxLength          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumFields          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iLength             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cBufName            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cKeyFields          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLine               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iExtBegin           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtEnd             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cFieldName          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldNameFormat    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldValue         AS CHARACTER   NO-UNDO.
-  
+  DEFINE VARIABLE i                   AS INTEGER     NO-UNDO.
+
   ASSIGN
     cCodePage    = (IF pcCodePage <> "" THEN pcCodePage ELSE SESSION:CPSTREAM)
     iTimeStarted = ETIME
     hTTBuffer    = pihTempTable:DEFAULT-BUFFER-HANDLE
-    iNumRecords = 0
+    iNumRecords  = 0
     cKeyFields   = getIndexFields(gcDB, gcTable, "P,U")
+    cBufName     = 'b' + CAPS(SUBSTRING(gcTable,1,1)) + LC(SUBSTRING(gcTable,2)).
     .
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) convert target cCodePage.
-  PUT STREAM strDump UNFORMATTED 
-         SUBSTITUTE("/* Generated procedure for &1.&2 ", gcDB, gcTable)
-    SKIP SUBSTITUTE(" * Date: &1 ", STRING(NOW,"99-99-9999 HH:MM"))
-    SKIP SUBSTITUTE(" * By  : &1 ", getUsername() )
-    SKIP SUBSTITUTE(" */" ) 
-    SKIP SUBSTITUTE("DEFINE BUFFER bData FOR &1.&2.", gcDB, gcTable)
+  OUTPUT STREAM strDump TO VALUE(picFileName) CONVERT TARGET cCodePage.
+  PUT STREAM strDump UNFORMATTED
+         SUBSTITUTE("/* Data-create procedure for &1.&2 ", gcDB, gcTable)
+    SKIP SUBSTITUTE(" * Generated &1 by &2", STRING(NOW,"99-99-9999 HH:MM"), getUsername() )
+    SKIP SUBSTITUTE(" */" )
+    SKIP SUBSTITUTE("DEFINE BUFFER &1 FOR &2.&3.", cBufName, gcDB, gcTable)
     SKIP SUBSTITUTE(" ")
     .
 
@@ -1424,6 +1330,12 @@ PROCEDURE DumpData4GL :
   hQuery:SET-BUFFERS(hTTBuffer).
   hQuery:QUERY-PREPARE(SUBSTITUTE("FOR EACH &1 NO-LOCK", hTTBuffer:NAME)).
   hQuery:QUERY-OPEN().
+
+  /* Calc max key field length */
+  DO i = 1 TO NUM-ENTRIES(cKeyfields):
+    iMaxLength = MAXIMUM(iMaxLength,LENGTH(ENTRY(i,cKeyfields))).
+  END.
+  cFieldNameFormat = SUBSTITUTE("X(&1)",iMaxLength).
 
 
   /* Pump the table data into the table */
@@ -1437,13 +1349,13 @@ PROCEDURE DumpData4GL :
       iTimeStarted = ETIME.
       RUN showProgressBar("Dumping, please wait", iNumRecords / piNumRecords * 100).
       PROCESS EVENTS.
-      IF glAborted THEN LEAVE pumpDataLoop. 
+      IF glAborted THEN LEAVE pumpDataLoop.
     END.
 
     iNumRecords = iNumRecords + 1.
 
-    PUT STREAM strDump UNFORMATTED 
-      SKIP "FIND bData".
+    PUT STREAM strDump UNFORMATTED
+      SKIP SUBSTITUTE("FIND &1 EXCLUSIVE-LOCK", cBufName).
 
     /* Keyfields and calculation of name length */
     iNumFields = 0.
@@ -1459,28 +1371,29 @@ PROCEDURE DumpData4GL :
 
         IF LOOKUP(hField:NAME, cKeyfields) > 0 OR cKeyfields = "" THEN
         DO:
-            iNumFields = iNumFields + 1.
-            cFieldValue = getFieldValue(hField,iExtent).
+          iNumFields = iNumFields + 1.
+          cFieldValue = getFieldValue(hField,iExtent).
 
-            PUT STREAM strDump UNFORMATTED SKIP 
-              SUBSTITUTE("  &1 bData.&2 = &3"
-                          , (IF iNumFields = 1 THEN "WHERE" ELSE "  AND")
-                          , cFieldName
-                          , cFieldValue
-                          ).
+          PUT STREAM strDump UNFORMATTED 
+            (IF NUM-ENTRIES(cKeyfields) > 2 THEN (IF iNumFields = 1 THEN "~n  " ELSE "~n    ") ELSE ' ')
+            SUBSTITUTE("&1 &2.&3 = &4"
+                        , (IF iNumFields = 1 THEN "WHERE" ELSE "AND")
+                        , cBufName
+                        , (IF NUM-ENTRIES(cKeyfields) > 2 THEN STRING(cFieldName,cFieldNameFormat) ELSE cFieldName)
+                        , cFieldValue
+                        ).
         END.
       END.
     END.
+    
+    PUT STREAM strDump UNFORMATTED
+      (IF NUM-ENTRIES(cKeyfields) > 2 THEN '~n        NO-ERROR.~n' ELSE ' NO-ERROR.').
 
     /* Calculate the format for the fields to allign then nicely */
     cFieldNameFormat = SUBSTITUTE("X(&1)",iMaxLength).
 
-    PUT STREAM strDump UNFORMATTED 
-      SKIP "        EXCLUSIVE-LOCK NO-ERROR."
-      SKIP " "
-      SKIP "IF NOT AVAILABLE bData THEN"
-      SKIP "  CREATE bData."
-      SKIP " ".
+    PUT STREAM strDump UNFORMATTED
+      SKIP SUBSTITUTE("IF NOT AVAILABLE &1 THEN CREATE &1.", cBufName).
 
     /* data */
     iNumFields = 0.
@@ -1495,7 +1408,7 @@ PROCEDURE DumpData4GL :
         IF iNumFields MODULO 100 = 0 THEN
         DO:
           /* Closing dot for previouse assign */
-          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("  ."). 
+          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("  .").
           /* New assign */
           PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("ASSIGN").
         END.
@@ -1504,8 +1417,9 @@ PROCEDURE DumpData4GL :
         iNumFields = iNumFields + 1.
         cFieldValue = getFieldValue(hField,iExtent).
 
-        PUT STREAM strDump UNFORMATTED 
-          SKIP SUBSTITUTE("  bData.&1 = &2"
+        PUT STREAM strDump UNFORMATTED
+          SKIP SUBSTITUTE("  &1.&2 = &3"
+                          , cBufName
                           , STRING(cFieldName,cFieldNameFormat)
                           , cFieldValue
                           ).
@@ -1515,7 +1429,7 @@ PROCEDURE DumpData4GL :
 
   END. /* pumpDataLoop */
 
-  OUTPUT stream strDump close.
+  OUTPUT STREAM strDump close.
 
   /* Hide progress bar frame */
   RUN showProgressBar("", ?).
@@ -1529,16 +1443,14 @@ END PROCEDURE. /* DumpData4GL */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataCSV wDump 
 PROCEDURE DumpDataCSV :
-/*------------------------------------------------------------------------------
-  Notes: Copied the TXT dump procedure and updated to make CSV - mbd 2015.03.20
-------------------------------------------------------------------------------*/
+/* Dump data as csv file
+  */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cFieldFormat        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cName               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hField              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
@@ -1547,7 +1459,7 @@ PROCEDURE DumpDataCSV :
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO. 
+  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSeparator          AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
@@ -1565,31 +1477,27 @@ PROCEDURE DumpDataCSV :
   END.
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) convert target cCodePage.
+  OUTPUT STREAM strDump to value(picFileName) convert target cCodePage.
 
   /* Pump field names as column headers*/
   iField = 0.
+  #FieldLoop:
   DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
     hField = hTTBuffer:BUFFER-FIELD(iCurField).
-    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
+    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT #FieldLoop.
     iField = iField + 1.
-    
-    /* Take regular field name or including extent */
-    cName = (IF hField:EXTENT > 1 
-               THEN SUBSTITUTE('&1[&2]',hField:NAME, hField:EXTENT) 
-               ELSE hField:LABEL ).
 
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
-      PUT STREAM strDump UNFORMATTED 
+      PUT STREAM strDump UNFORMATTED
         (IF iCurField = 1 AND iExtent = 1 THEN "" ELSE cSeparator)
-        SUBSTITUTE('&1[&2]',hField:LABEL, iExtent).
+        SUBSTITUTE('&1[&2]',hField:NAME, iExtent).
     END.
     ELSE
     DO:
       PUT STREAM strDump UNFORMATTED
        (IF iCurField = 1 THEN "" ELSE cSeparator)
-       hField:LABEL.
+       hField:NAME.
     END.
   END.
   PUT STREAM strDump UNFORMATTED SKIP.
@@ -1611,45 +1519,49 @@ PROCEDURE DumpDataCSV :
       iTimeStarted = ETIME.
       RUN showProgressBar( 'Dumping records, please wait', iNrOfRecords / piNumRecords * 100 ).
       PROCESS EVENTS.
-      IF glAborted THEN LEAVE pumpDataLoop. 
+      IF glAborted THEN LEAVE pumpDataLoop.
     END.
 
     iNrOfRecords = iNrOfRecords + 1.
     iField = 0.
+
+    #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
       hField = hTTBuffer:BUFFER-FIELD(iCurField).
-      
-      IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
+
+      IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT #FieldLoop.
       iField = iField + 1.
 
       /* Find out format of field */
-      FIND ttField WHERE ttField.cFullName = hField:NAME.
+      FIND ttField WHERE ttField.cFullName = hField:NAME NO-ERROR.
+      IF NOT AVAILABLE ttField THEN NEXT #FieldLoop.
+
       IF tbUseCustomizedFormats THEN cFieldFormat = ttField.cFormat.
                                 ELSE cFieldFormat = ttField.cFormatOrg.
 
       IF hField:EXTENT > 1 THEN
       DO iExtent = 1 TO hField:EXTENT:
-        PUT STREAM strDump UNFORMATTED 
+        PUT STREAM strDump UNFORMATTED
           (IF iCurField = 1 AND iExtent = 1 THEN "" ELSE cSeparator)
           QUOTER(TRIM(SUBSTITUTE('&1', STRING(hField:BUFFER-VALUE(iExtent), cFieldFormat)))).
       END.
       ELSE
       DO:
-        PUT STREAM strDump UNFORMATTED 
+        PUT STREAM strDump UNFORMATTED
           (IF iCurField = 1 THEN "" ELSE cSeparator)
           QUOTER(TRIM(SUBSTITUTE('&1',STRING(hField:BUFFER-VALUE,cFieldFormat)))).
       END.
-    END. 
+    END.
 
     PUT STREAM strDump UNFORMATTED SKIP.
 
   END. /* pumpDataLoop */
-   
+
   OUTPUT stream strDump close.
-  
+
   /* Hide progress bar frame */
   RUN showProgressBar('',?).
-  
+
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataCSV */
@@ -1660,9 +1572,9 @@ END PROCEDURE. /* DumpDataCSV */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataExcel wDump 
 PROCEDURE DumpDataExcel :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
@@ -1670,20 +1582,13 @@ PROCEDURE DumpDataExcel :
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cColumnRange        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hExcel              AS COM-HANDLE  NO-UNDO.
   DEFINE VARIABLE hWorkbook           AS COM-HANDLE  NO-UNDO.
   DEFINE VARIABLE hWorksheet          AS COM-HANDLE  NO-UNDO.
 
   /* First, dump the file as HTML */
-  RUN DumpDataHtml
-        ( INPUT picFileName 
-        , INPUT pihTempTable
-        , INPUT piNumRecords
-        , INPUT pcCodePage
-        ).
-
-  IF glAborted THEN RETURN. 
+  RUN DumpDataHtml(picFileName, pihTempTable, piNumRecords, pcCodePage).
+  IF glAborted THEN RETURN.
 
   FILE-INFO:FILE-NAME = picFileName.
 
@@ -1694,7 +1599,7 @@ PROCEDURE DumpDataExcel :
     hWorkbook      = hExcel:Workbooks:open(FILE-INFO:FULL-PATHNAME)
     hWorkSheet     = hExcel:Sheets:item(1)
     .
-  
+
   /* Adjust column sizes */
   hExcel:columns("A:ZZ"):select.
   hExcel:selection:columns:Autofit.
@@ -1704,14 +1609,14 @@ PROCEDURE DumpDataExcel :
   hWorkbook:Windows(1):SplitColumn = 0.
   hWorkbook:Windows(1):SplitRow    = 1.
   hWorkbook:Windows(1):FreezePanes = TRUE.
-  hWorksheet:Range("A1:A1"):AutoFilter(1,?,?). 
+  hWorksheet:Range("A1:A1"):AutoFilter(1,?,?).
 
   /* Perform housekeeping and cleanup steps */
   hExcel:DisplayAlerts = FALSE.  /* don't show confirmation dialog from excel */
   hWorkbook:SaveAs(picFileName,1,?,?,?,?,?).
   hExcel:application:Workbooks:close() NO-ERROR.
   hExcel:application:quit NO-ERROR.
-  
+
   RELEASE OBJECT hWorksheet.
   RELEASE OBJECT hWorkbook.
   RELEASE OBJECT hExcel.
@@ -1723,12 +1628,8 @@ END PROCEDURE. /* DumpDataExcel */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataHtml wDump 
 PROCEDURE DumpDataHtml :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+/* Dump data as HTML
+  */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
@@ -1741,8 +1642,8 @@ PROCEDURE DumpDataHtml :
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO. 
-  DEFINE VARIABLE cData               AS CHARACTER   NO-UNDO. 
+  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cData               AS CHARACTER   NO-UNDO.
 
   ASSIGN
     iTimeStarted = ETIME
@@ -1752,14 +1653,15 @@ PROCEDURE DumpDataHtml :
     .
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) convert target cCodePage.
-  PUT STREAM strDump UNFORMATTED 
+  OUTPUT STREAM strDump TO VALUE(picFileName) CONVERT TARGET cCodePage.
+  PUT STREAM strDump UNFORMATTED
     '<html><body><table border="0"><tr bgcolor="KHAKI">'.
 
-  /* Pump field names as column headers*/
+  /* Pump field names as column headers */
+  #Field:
   DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
     hField = hTTBuffer:BUFFER-FIELD(iCurField).
-    IF LOOKUP(hField:DATA-TYPE,'clob,blob,raw') > 0 THEN NEXT. 
+    IF LOOKUP(hField:DATA-TYPE,'clob,blob,raw') > 0 THEN NEXT #Field.
 
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
@@ -1774,7 +1676,7 @@ PROCEDURE DumpDataHtml :
   END.
 
   PUT STREAM strDump UNFORMATTED '</tr>'.
-  
+
   /* Build query */
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hTTBuffer).
@@ -1792,54 +1694,61 @@ PROCEDURE DumpDataHtml :
       iTimeStarted = ETIME.
       RUN showProgressBar( 'Dumping records, please wait', iNrOfRecords / piNumRecords * 100 ).
       PROCESS EVENTS.
-      IF glAborted THEN LEAVE pumpDataLoop. 
+      IF glAborted THEN LEAVE pumpDataLoop.
     END.
 
-    PUT STREAM strDump UNFORMATTED SKIP 
+    PUT STREAM strDump UNFORMATTED SKIP
       SUBSTITUTE('<tr bgcolor="&1">', TRIM(STRING(iNrOfRecords MOD 2 = 1,'WHITE/LIGHTYELLOW')) ).
 
     iNrOfRecords = iNrOfRecords + 1.
+    #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
       hField = hTTBuffer:BUFFER-FIELD(iCurField).
-      IF LOOKUP(hField:DATA-TYPE,'clob,blob,raw') > 0 THEN NEXT. 
+      IF LOOKUP(hField:DATA-TYPE,'clob,blob,raw') > 0 THEN NEXT #FieldLoop.
 
       /* Find out format of field */
-      FIND ttField WHERE ttField.cFullName = hField:NAME.
+      FIND ttField WHERE ttField.cFullName = hField:NAME NO-ERROR.
+      IF NOT AVAILABLE ttField THEN NEXT #FieldLoop.
 
-      IF hField:EXTENT > 1 THEN
-      DO iExtent = 1 TO hField:EXTENT:
+/*       IF hField:EXTENT > 1 THEN */
+      DO iExtent = (IF hField:EXTENT = 0 THEN 0 ELSE 1) TO MAXIMUM(0,hField:EXTENT):
 
-        cData = IF tbUseCustomizedFormats 
-                  THEN TRIM(STRING(hField:BUFFER-VALUE(iExtent),ttField.cFormat))
-                  ELSE hField:BUFFER-VALUE(iExtent).
-
-        cData = getEscapedData("HTML", cData).
-
-        PUT STREAM strDump UNFORMATTED 
-          SKIP SUBSTITUTE('<td>&1</td>', cData).
-      END.
-      ELSE
-      DO:
-        cData = IF tbUseCustomizedFormats 
-                  THEN TRIM(STRING(hField:BUFFER-VALUE,ttField.cFormat))
-                  ELSE hField:BUFFER-VALUE.
+        ASSIGN 
+          cData = IF tbUseCustomizedFormats
+                    THEN TRIM(STRING(hField:BUFFER-VALUE(iExtent),ttField.cFormat))
+                    ELSE hField:BUFFER-VALUE(iExtent) NO-ERROR.
+        
+        /* "** Value X cannot be displayed using Y. (74) " */
+        IF ERROR-STATUS:GET-NUMBER(1) = 74 THEN 
+          ASSIGN cData = TRIM(STRING(hField:BUFFER-VALUE(iExtent)))
 
         cData = getEscapedData("HTML", cData).
 
-        PUT STREAM strDump UNFORMATTED 
+        PUT STREAM strDump UNFORMATTED
           SKIP SUBSTITUTE('<td>&1</td>', cData).
       END.
-    END. 
+/*       ELSE                                                               */
+/*       DO:                                                                */
+/*         cData = IF tbUseCustomizedFormats                                */
+/*                   THEN TRIM(STRING(hField:BUFFER-VALUE,ttField.cFormat)) */
+/*                   ELSE hField:BUFFER-VALUE.                              */
+/*                                                                          */
+/*         cData = getEscapedData("HTML", cData).                           */
+/*                                                                          */
+/*         PUT STREAM strDump UNFORMATTED                                   */
+/*           SKIP SUBSTITUTE('<td>&1</td>', cData).                         */
+/*       END.                                                               */
+    END.
     PUT STREAM strDump UNFORMATTED '</tr>'.
 
   END. /* pumpDataLoop */
-   
+
   PUT STREAM strDump UNFORMATTED '</table></body></html>'.
-  OUTPUT stream strDump close.
-  
+  OUTPUT STREAM strDump CLOSE.
+
   /* Hide progress bar frame */
   RUN showProgressBar('',?).
-  
+
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataExcel */
@@ -1849,12 +1758,8 @@ END PROCEDURE. /* DumpDataExcel */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataProgressD wDump 
 PROCEDURE DumpDataProgressD :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+/* Dump as Progress .d file
+  */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
@@ -1871,7 +1776,7 @@ PROCEDURE DumpDataProgressD :
   DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iTrailer            AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lFirstFieldOfRecord AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO. 
+  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
 
   ASSIGN
     cCodePage    = (IF pcCodePage <> "" THEN pcCodePage ELSE SESSION:CPSTREAM)
@@ -1879,27 +1784,27 @@ PROCEDURE DumpDataProgressD :
     hTTBuffer    = pihTempTable:DEFAULT-BUFFER-HANDLE
     iNrOfRecords = 0
     cTimeStamp   = STRING(YEAR( TODAY),"9999":u) + "/":u
-                 + string(MONTH(TODAY),"99":u  ) + "/":u
-                 + string(DAY(  TODAY),"99":u  ) + "-":u
-                 + string(TIME,"HH:MM:SS":u).
+                 + STRING(MONTH(TODAY),"99":u  ) + "/":u
+                 + STRING(DAY(  TODAY),"99":u  ) + "-":u
+                 + STRING(TIME,"HH:MM:SS":u).
 
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hTTBuffer).
-  hQuery:QUERY-PREPARE( SUBSTITUTE( "for each &1 no-lock", hTTBuffer:NAME)).
+  hQuery:QUERY-PREPARE( SUBSTITUTE( "FOR EACH &1 NO-LOCK", hTTBuffer:NAME)).
   hQuery:QUERY-OPEN().
-  
+
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) no-echo no-map convert target cCodePage.
+  OUTPUT STREAM strDump TO VALUE(picFileName) NO-ECHO NO-MAP CONVERT TARGET cCodePage.
   EXPORT STREAM strDump ?.
   iBack = SEEK(strDump) - 1.
-  SEEK STREAM strDump TO 0.    
-  
+  SEEK STREAM strDump TO 0.
+
   pumpDataLoop:
   REPEAT:
     hQuery:GET-NEXT().
     IF hQuery:QUERY-OFF-END THEN LEAVE pumpDataLoop.
 
-    ASSIGN 
+    ASSIGN
       iNrOfRecords        = iNrOfRecords + 1
       lFirstFieldOfRecord = TRUE
       .
@@ -1909,15 +1814,16 @@ PROCEDURE DumpDataProgressD :
       iTimeStarted = ETIME.
       RUN showProgressBar( 'Dumping records, please wait', iNrOfRecords / piNumRecords * 100 ).
       PROCESS EVENTS.
-      IF glAborted THEN LEAVE pumpDataLoop. 
+      IF glAborted THEN LEAVE pumpDataLoop.
     END.
 
+    #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
 
       IF cbiFieldSelection = 2 THEN
       DO:
-        cField = hTTBuffer:BUFFER-FIELD(iCurField):name.
-        IF LOOKUP(cField,picSelectedFields) = 0 THEN NEXT.
+        cField = hTTBuffer:BUFFER-FIELD(iCurField):NAME.
+        IF LOOKUP(cField,picSelectedFields) = 0 THEN NEXT #FieldLoop.
       END.
 
       IF lFirstFieldOfRecord THEN
@@ -1930,7 +1836,7 @@ PROCEDURE DumpDataProgressD :
 
       IF hTTBuffer:BUFFER-FIELD(iCurField):extent > 1 THEN
       DO iExtent = 1 TO hTTBuffer:BUFFER-FIELD(iCurField):extent:
-        
+
         IF iExtent > 1 THEN
         DO:
           SEEK STREAM strDump TO SEEK(strDump) - iBack.
@@ -1944,33 +1850,33 @@ PROCEDURE DumpDataProgressD :
 
     END. /* Fields */
   END. /* while hTTBuffer:available */
-  
+
   hQuery:QUERY-CLOSE().
   DELETE OBJECT hQuery.
   hQuery = ?.
-  
+
   IF NOT glAborted THEN
   DO:
     PUT STREAM strDump UNFORMATTED ".":u SKIP.
     iTrailer = SEEK(strDump).
-    
+
     PUT STREAM strDump UNFORMATTED
-           "PSC":u 
-      SKIP "filename=":u   SUBSTRING(hTTBuffer:TABLE,INDEX(hTTBuffer:TABLE,"_") + 1) 
-      SKIP "records=":u    STRING(iNrOfRecords,"9999999999999":u) 
+           "PSC":u
+      SKIP "filename=":u   SUBSTRING(hTTBuffer:TABLE,INDEX(hTTBuffer:TABLE,"_") + 1)
+      SKIP "records=":u    STRING(iNrOfRecords,"9999999999999":u)
       SKIP "ldbname=":u    ENTRY(1,hTTBuffer:TABLE,"_")
-      SKIP "timestamp=":u  cTimeStamp 
-      SKIP "numformat=":u  ASC(SESSION:NUMERIC-SEPARATOR) ",":u ASC(SESSION:NUMERIC-DECIMAL-POINT) 
-      SKIP "dateformat=":u SESSION:DATE-FORMAT "-":u SESSION:YEAR-OFFSET 
-      SKIP "map=NO-MAP":u 
-      SKIP "cpstream=":u   cCodePage 
-      SKIP ".":u 
-      SKIP STRING(iTrailer,"9999999999":u) 
+      SKIP "timestamp=":u  cTimeStamp
+      SKIP "numformat=":u  ASC(SESSION:NUMERIC-SEPARATOR) ",":u ASC(SESSION:NUMERIC-DECIMAL-POINT)
+      SKIP "dateformat=":u SESSION:DATE-FORMAT "-":u SESSION:YEAR-OFFSET
+      SKIP "map=NO-MAP":u
+      SKIP "cpstream=":u   cCodePage
+      SKIP ".":u
+      SKIP STRING(iTrailer,"9999999999":u)
       SKIP.
   END.
-  
+
   OUTPUT stream strDump close.
-  
+
   /* Hide progress bar frame */
   RUN showProgressBar('',?).
 
@@ -1981,20 +1887,16 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataTxt wDump 
 PROCEDURE DumpDataTxt :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-
+/* Dump data as plain txt
+  */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cFieldFormat        AS CHARACTER   NO-UNDO. 
-  DEFINE VARIABLE cDumpFormat         AS CHARACTER   NO-UNDO. 
-  DEFINE VARIABLE cName               AS CHARACTER   NO-UNDO. 
+  DEFINE VARIABLE cFieldFormat        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDumpFormat         AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cName               AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hField              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
@@ -2006,7 +1908,7 @@ PROCEDURE DumpDataTxt :
   DEFINE VARIABLE iLength             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cDumpFormatList     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldFormatList    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO. 
+  DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
 
   ASSIGN
     cCodePage    = (IF pcCodePage <> "" THEN pcCodePage ELSE SESSION:CPSTREAM)
@@ -2020,21 +1922,23 @@ PROCEDURE DumpDataTxt :
 
   /* Pump field names as column headers*/
   iField = 0.
+  #FieldLoop:
   DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
     hField = hTTBuffer:BUFFER-FIELD(iCurField).
-    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
+    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT #FieldLoop.
     iField = iField + 1.
-    
+
     /* Take the larger one of name and actual format */
-    cName = (IF hField:EXTENT > 1 
-               THEN SUBSTITUTE('&1[&2]',hField:NAME, hField:EXTENT) 
+    cName = (IF hField:EXTENT > 1
+               THEN SUBSTITUTE('&1[&2]',hField:NAME, hField:EXTENT)
                ELSE hField:LABEL ).
 
     /* Find out format of field */
-    FIND ttField WHERE ttField.cFullName = hField:NAME.
+    FIND ttField WHERE ttField.cFullName = hField:NAME NO-ERROR.
+    IF NOT AVAILABLE ttField THEN NEXT #FieldLoop.
     IF tbUseCustomizedFormats THEN cFieldFormat = ttField.cFormat.
                               ELSE cFieldFormat = ttField.cFormatOrg.
-    
+
     /* What is the largest? Take at least length 10 for date fields */
     iLength = MAXIMUM( LENGTH( STRING(hField:INITIAL, cFieldFormat) )
                      , LENGTH( cName )).
@@ -2048,7 +1952,7 @@ PROCEDURE DumpDataTxt :
 
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
-      PUT STREAM strDump UNFORMATTED 
+      PUT STREAM strDump UNFORMATTED
         STRING(SUBSTITUTE('&1[&2]',hField:LABEL, iExtent),cDumpFormat) ' '.
     END.
     ELSE
@@ -2059,12 +1963,13 @@ PROCEDURE DumpDataTxt :
   END.
   PUT STREAM strDump UNFORMATTED SKIP.
 
-  
+
   /* And nice lines below them please */
   iField = 0.
+  #FieldLoop:
   DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
     hField = hTTBuffer:BUFFER-FIELD(iCurField).
-    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
+    IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT #FieldLoop.
     iField = iField + 1.
 
     cFieldFormat = ENTRY(iField,cFieldFormatList,CHR(1)).
@@ -2072,7 +1977,7 @@ PROCEDURE DumpDataTxt :
 
     IF hField:EXTENT > 1 THEN
     DO iExtent = 1 TO hField:EXTENT:
-      PUT STREAM strDump UNFORMATTED 
+      PUT STREAM strDump UNFORMATTED
         STRING(FILL('-', 1000),cDumpFormat) ' '.
     END.
     ELSE
@@ -2080,7 +1985,7 @@ PROCEDURE DumpDataTxt :
       PUT STREAM strDump UNFORMATTED
         STRING(FILL('-', 1000),cDumpFormat) ' '.
     END.
-  END. 
+  END.
   PUT STREAM strDump UNFORMATTED SKIP.
 
   /* Build query */
@@ -2100,14 +2005,15 @@ PROCEDURE DumpDataTxt :
       iTimeStarted = ETIME.
       RUN showProgressBar( 'Dumping records, please wait', iNrOfRecords / piNumRecords * 100 ).
       PROCESS EVENTS.
-      IF glAborted THEN LEAVE pumpDataLoop. 
+      IF glAborted THEN LEAVE pumpDataLoop.
     END.
 
     iNrOfRecords = iNrOfRecords + 1.
     iField = 0.
+    #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
       hField = hTTBuffer:BUFFER-FIELD(iCurField).
-      IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT.
+      IF LOOKUP(hField:DATA-TYPE,'raw,clob,blob') > 0 THEN NEXT #FieldLoop.
       iField = iField + 1.
 
       cFieldFormat = ENTRY(iField,cFieldFormatList,CHR(1)).
@@ -2115,25 +2021,25 @@ PROCEDURE DumpDataTxt :
 
       IF hField:EXTENT > 1 THEN
       DO iExtent = 1 TO hField:EXTENT:
-        PUT STREAM strDump UNFORMATTED 
+        PUT STREAM strDump UNFORMATTED
           STRING( SUBSTITUTE('&1', STRING(hField:BUFFER-VALUE(iExtent), cFieldFormat)), cDumpFormat ) ' '.
       END.
       ELSE
       DO:
-        PUT STREAM strDump UNFORMATTED 
+        PUT STREAM strDump UNFORMATTED
           STRING( SUBSTITUTE('&1', STRING(hField:BUFFER-VALUE, cFieldFormat)), cDumpFormat ) ' '.
       END.
-    END. 
+    END.
 
     PUT STREAM strDump UNFORMATTED SKIP.
 
   END. /* pumpDataLoop */
-   
+
   OUTPUT stream strDump close.
-  
+
   /* Hide progress bar frame */
   RUN showProgressBar('',?).
-  
+
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataText */
@@ -2144,15 +2050,14 @@ END PROCEDURE. /* DumpDataText */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataXml wDump 
 PROCEDURE DumpDataXml :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
 
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
   DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cTargetType      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFile            AS CHARACTER   NO-UNDO.
@@ -2161,21 +2066,21 @@ PROCEDURE DumpDataXml :
   DEFINE VARIABLE cSchemaLocation  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lWriteSchema     AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lMinSchema       AS LOGICAL     NO-UNDO.
-  
+
   DO WITH FRAME {&frame-name}:
 
     RUN showProgressBar( SUBSTITUTE('Dumping &1 records, please wait', piNumRecords) , 0).
 
-    ASSIGN     
-      cTargetType     = "file"     
+    ASSIGN
+      cTargetType     = "file"
       cFile           = picFileName
-      lFormatted      = YES     
-      cEncoding       = ?     
-      cSchemaLocation = ?     
+      lFormatted      = YES
+      cEncoding       = ?
+      cSchemaLocation = ?
       lWriteSchema    = tbExportSchema:checked
       lMinSchema      = tbMinimalSchema:checked
       .
-  
+
     /* Fix XML Node Names for fields in the tt */
     RUN setXmlNodeNames(INPUT pihTempTable:DEFAULT-BUFFER-HANDLE).
 
@@ -2188,7 +2093,7 @@ PROCEDURE DumpDataXml :
       , lWriteSchema
       , lMinSchema
       ).
-  
+
     RUN showProgressBar( '', ? ).
   END. /* do with frame {&frame-name}: */
 
@@ -2210,15 +2115,14 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY ficFileName cbDumpType cbCodePage tbUseCustomizedFormats cbSeparator 
           cbNumericFormat tbExportSchema cbiRecordSelection cbDateFormat 
-          tbMinimalSchema cbiFieldSelection ficMessageNow ficMessage 
-          tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView 
-          tbDumpReadyClipboard 
+          tbMinimalSchema cbiFieldSelection tbDumpReadyClose tbDumpReadyExplore 
+          tbDumpReadyView tbDumpReadyClipboard ficMessageNow ficMessage 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
   ENABLE RECT-2 RECT-3 RECT-4 ficFileName btnChooseDumpFile cbDumpType 
          cbCodePage tbUseCustomizedFormats cbSeparator cbNumericFormat 
          cbiRecordSelection cbDateFormat cbiFieldSelection btnDump btnClose 
          tbDumpReadyClose tbDumpReadyExplore tbDumpReadyView 
-         tbDumpReadyClipboard 
+         tbDumpReadyClipboard ficMessageNow ficMessage 
       WITH FRAME DEFAULT-FRAME IN WINDOW wDump.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   DISPLAY fcInfoLine 
@@ -2235,9 +2139,9 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wDump 
 PROCEDURE initializeObject :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
   DEFINE VARIABLE cFileViewCmd     AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cDumpReadyAction AS CHARACTER  NO-UNDO.
@@ -2261,7 +2165,7 @@ PROCEDURE initializeObject :
     RUN setLabelPosition(cbCodePage:HANDLE).
     RUN setLabelPosition(cbNumericFormat:HANDLE).
     RUN setLabelPosition(cbDateFormat:HANDLE).
-                                          
+
     btnViewLastDump:LOAD-IMAGE(getImagePath('View.gif')).
     btnOpenLastDumpDir:LOAD-IMAGE(getImagePath('OpenFolder.gif')).
 
@@ -2281,7 +2185,7 @@ PROCEDURE initializeObject :
       ASSIGN cFileViewCmd = "Start &1".
       setRegistry("DumpAndLoad", "DumpFileViewCmd", cFileViewCmd ).
     END.
-    
+
     cbDumpType = getRegistry("DumpAndLoad", "DumpExportType" ).
     IF cbDumpType = ? THEN cbDumpType = "XML".
 
@@ -2296,7 +2200,7 @@ PROCEDURE initializeObject :
 
     tbMinimalSchema = LOGICAL( getRegistry("DumpAndLoad", "DumpMinimalXmlSchema")).
     IF tbMinimalSchema = ? THEN tbMinimalSchema = FALSE.
-    
+
     cbSeparator = INTEGER(getRegistry("DumpAndLoad", "FieldSeparator")).
     IF cbSeparator = ? THEN cbSeparator = 1. /* comma */
 
@@ -2326,21 +2230,21 @@ PROCEDURE initializeObject :
         tbDumpReadyClipboard:CHECKED = LOOKUP('Clipboard', cDumpReadyAction ) > 0
         .
 
-    DISPLAY 
-      cbDumpType 
-      cbiRecordSelection 
-      cbiFieldSelection 
+    DISPLAY
+      cbDumpType
+      cbiRecordSelection
+      cbiFieldSelection
       cbSeparator
-      tbExportSchema 
-      tbMinimalSchema 
+      tbExportSchema
+      tbMinimalSchema
       cbCodePage
       cbNumericFormat
       cbDateFormat
-      ficMessageNow 
+      ficMessageNow
       ficMessage.
 
   END.
-  
+
   RUN setDumpFileName.
   RUN cbDumpTypeValueChanged.
   RUN cbiRecordSelectionValueChanged.
@@ -2357,12 +2261,11 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDumpFileName wDump 
 PROCEDURE setDumpFileName :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
-  DEFINE VARIABLE cError    AS CHARACTER   NO-UNDO.
+
   DEFINE VARIABLE cFileName AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME {&frame-name}:
@@ -2371,13 +2274,13 @@ PROCEDURE setDumpFileName :
 
     RUN getDumpFileName
       ( INPUT 'Dump'
-      , INPUT gcDB       
-      , INPUT gcTable    
+      , INPUT gcDB
+      , INPUT gcTable
       , INPUT cbDumpType
       , INPUT ""
       , OUTPUT cFileName
       ).
-  
+
     ficFileName = cFileName.
     DISPLAY ficFileName.
   END.
@@ -2392,9 +2295,9 @@ END PROCEDURE. /* setDumpFileName */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setStatusMessage wDump 
 PROCEDURE setStatusMessage :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
   DEFINE INPUT PARAMETER pidtTimeStamp AS DATETIME   NO-UNDO.
   DEFINE INPUT PARAMETER picMessage    AS CHARACTER  NO-UNDO.
@@ -2403,12 +2306,12 @@ PROCEDURE setStatusMessage :
 
     IF pidtTimeStamp = ? THEN
       ficMessageNow = ''.
-    ELSE 
+    ELSE
       ficMessageNow = STRING(pidtTimeStamp,"99-99-9999 HH:MM:SS").
 
     IF picMessage = ? THEN
       ficMessage = "".
-    ELSE 
+    ELSE
       ficMessage = picMessage.
 
     DISPLAY ficMessageNow ficMessage.
@@ -2423,31 +2326,31 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showProgressBar wDump 
 PROCEDURE showProgressBar :
 /*------------------------------------------------------------------------------
-  Purpose:     
+  Purpose:
   Parameters:  <none>
-  Notes:       
+  Notes:
 ------------------------------------------------------------------------------*/
-  
+
   DEFINE INPUT  PARAMETER pcInfoText AS CHARACTER   NO-UNDO.
   DEFINE INPUT  PARAMETER piPrcDone  AS INTEGER     NO-UNDO.
 
   DEFINE VARIABLE iNewWidth AS INTEGER     NO-UNDO.
-  
+
   PROCESS EVENTS.
-  
+
   IF piPrcDone = ? THEN
   DO:
     FRAME infoFrame:visible = NO.
   END.
-  ELSE 
+  ELSE
   DO:
     VIEW FRAME infoFrame.
-    ENABLE btAbort WITH FRAME infoFrame. 
+    ENABLE btAbort WITH FRAME infoFrame.
     fcInfoLine:SCREEN-VALUE = pcInfoText.
 
     iNewWidth = (MINIMUM(100,piPrcDone) / 100) * rcBorder:width-pixels.
     rcBody:VISIBLE = (iNewWidth > 0).
-    IF iNewWidth > 0 THEN 
+    IF iNewWidth > 0 THEN
       rcBody:WIDTH-PIXELS = iNewWidth.
 
     PROCESS EVENTS.
@@ -2460,51 +2363,45 @@ END PROCEDURE. /* showProgressBar */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbDumpReadyClipboard wDump 
 PROCEDURE tbDumpReadyClipboard :
-/*------------------------------------------------------------------------------
-  Purpose:     Put last dumpfile in clipboard
-  2012-09-14 JEE Created
-------------------------------------------------------------------------------*/
-
+/* Put last dumpfile in clipboard
+  */
   DEFINE VARIABLE cLine    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iLength  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lTooMuch AS LOGICAL     NO-UNDO.
 
   OUTPUT TO "clipboard".
   INPUT STREAM strDump FROM VALUE(gcLastFile).
+  #ReadLine:
   REPEAT:
     IMPORT STREAM strDump UNFORMATTED cLine.
+
     IF cLine <> ? THEN
     DO:
       PUT UNFORMATTED cLine SKIP.
-      iLength = iLength + length(cLine).
+      iLength = iLength + LENGTH(cLine).
     END.
+
     IF iLength > 65535 THEN
     DO:
       lTooMuch = TRUE.
-      LEAVE.
+      LEAVE #ReadLine.
     END.
   END.
   INPUT STREAM strDump CLOSE.
   OUTPUT CLOSE.
 
-  IF lTooMuch THEN
-    MESSAGE "Too much data for clipboard. Data has been put on clipboard only partially!" VIEW-AS ALERT-BOX WARNING.
+  IF lTooMuch THEN RUN showHelp('DataTooLarge','').
 
-END PROCEDURE.
+END PROCEDURE. /* tbDumpReadyClipboard */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbExportSchemaValueChanged wDump 
 PROCEDURE tbExportSchemaValueChanged :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  
+/* Value changed for Export Schema
+  */
   DO WITH FRAME {&frame-name}:
-    
     ASSIGN tbExportSchema.
 
     IF cbDumpType = "XML" AND tbExportSchema:CHECKED THEN
@@ -2522,12 +2419,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbMinimalSchemaValueChanged wDump 
 PROCEDURE tbMinimalSchemaValueChanged :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  DO WITH FRAME {&frame-name}:    
+/* Value changed for Minimal Schema
+  */
+  DO WITH FRAME {&frame-name}:
     ASSIGN tbMinimalSchema.
   END.
 END PROCEDURE.
@@ -2537,12 +2431,9 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tbUseCustomizedFormatsValueChanged wDump 
 PROCEDURE tbUseCustomizedFormatsValueChanged :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
-  DO WITH FRAME {&frame-name}:    
+/* Value changed for Use Customized Formats
+  */
+  DO WITH FRAME {&frame-name}:
     ASSIGN tbUseCustomizedFormats.
   END.
 END PROCEDURE.
@@ -2552,42 +2443,22 @@ END PROCEDURE.
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getEscapedData wDump 
-FUNCTION getEscapedData RETURNS CHARACTER
-  ( pcTarget AS CHARACTER
-  , pcString AS CHARACTER ) :
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-  DEFINE VARIABLE cOutput AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iTmp    AS INTEGER   NO-UNDO.
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION allFieldsInList wDump 
+FUNCTION allFieldsInList RETURNS LOGICAL
+  ( INPUT pcFields AS CHARACTER
+  , INPUT pcList   AS CHARACTER
+  ) :
+  /* Check if all fields occur in the list
+  */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
 
-  /* Garbage in, garbage out  */
-  cOutput = pcString. 
+  DO i = 1 TO NUM-ENTRIES(pcFields):
+    IF LOOKUP(ENTRY(i,pcFields), pcList) = 0 THEN RETURN FALSE.
+  END.
 
-  CASE pcTarget:
-    WHEN "HTML" THEN
-    DO:
-      cOutput = REPLACE(cOutput,"<","&lt;").
-      cOutput = REPLACE(cOutput,">","&gt;").
-    END.
+  RETURN TRUE.
 
-    WHEN "4GL" THEN
-    DO:
-      /* Replace single quotes because we are using them for 4GL separating too */
-      cOutput = REPLACE(cOutput, "'", "~~'"). 
-
-      /* Replace CHR's 1 till 13  */
-      DO iTmp = 1 TO 13:
-        cOutput = REPLACE(cOutput, CHR(iTmp), "' + CHR(" + STRING(iTmp) + ") + '").
-      END.
-    END.
-  END CASE.
-
-  RETURN pcString.
-
-END FUNCTION.
+END FUNCTION. /* allFieldsInList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -2595,11 +2466,8 @@ END FUNCTION.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getExcelCol wDump 
 FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER ) :
-/*------------------------------------------------------------------------------
-  Purpose: Transform a column nr to Excel Column name (27 -> AA)
-    Notes:  
-------------------------------------------------------------------------------*/
-
+  /* Transform a column nr to Excel Column name (27 -> AA)
+  */
   DEFINE VARIABLE ifirst  AS INTEGER   NO-UNDO.
   DEFINE VARIABLE isecond AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cCols   AS CHARACTER NO-UNDO.
@@ -2607,11 +2475,9 @@ FUNCTION getExcelCol RETURNS CHARACTER
   iFirst  = INTEGER(TRUNCATE((iColumnNr - 1) / 26, 0)).
   iSecond = iColumnNr - (26 * iFirst).
   cCols   = CHR(64 + iSecond).
-  IF iFirst > 0 THEN
-    cCols = CHR(64 + iFirst) + cCols.
+  IF iFirst > 0 THEN cCols = CHR(64 + iFirst) + cCols.
 
   RETURN cCols.
-
 END FUNCTION. /* getExcelCol */
 
 /* _UIB-CODE-BLOCK-END */
@@ -2621,14 +2487,9 @@ END FUNCTION. /* getExcelCol */
 FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   ( INPUT picIndexInformation AS CHARACTER
   ) :
-
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-
+  /* Get field names from index information string
+  */
   DEFINE VARIABLE cFieldList AS CHARACTER  NO-UNDO.
-  DEFINE VARIABLE cIndexName AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE iCurPair   AS INTEGER    NO-UNDO.
 
   /*   The returned comma-separated list consists of the following in the specified order:  */
@@ -2638,25 +2499,20 @@ FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   /*     2 the index primary                                                                */
   /*     3 the index is a word index.                                                       */
   /*   - The names of the index fields, each followed by a 0 (ascending) or 1 (descending). */
+  IF picIndexInformation = ? THEN RETURN cFieldList.
 
-  ASSIGN cFieldList = "".
-
-  IF picIndexInformation = ? THEN
-    RETURN cFieldList.
-
-  cIndexName = ENTRY(1,picIndexInformation).  
-  ENTRY(1,picIndexInformation) = "".  
+  ENTRY(1,picIndexInformation) = "".
   picIndexInformation = SUBSTRING(picIndexInformation,8).
-  
+
   DO iCurPair = 1 TO NUM-ENTRIES(picIndexInformation) - 1 BY 2:
 
     cFieldList = SUBSTITUTE( "&1&2&3"
-                           , cFieldList 
+                           , cFieldList
                            , (IF cFieldList = "" THEN "" ELSE ",")
                            , ENTRY(iCurPair,picIndexInformation)
                            ).
   END. /* do iCurPair = 1 to num-entries(picIndexInformation) - 1 by 2: */
-  
+
   RETURN cFieldList.
 END FUNCTION. /* getFieldListFromIndexInformation */
 
@@ -2666,14 +2522,10 @@ END FUNCTION. /* getFieldListFromIndexInformation */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldValue wDump 
 FUNCTION getFieldValue RETURNS CHARACTER
   ( phField AS HANDLE
-  , piExtent AS INTEGER 
+  , piExtent AS INTEGER
   ) :
-
-/*------------------------------------------------------------------------------
-  Purpose: Give back the value of a field in such a way that it can be 
-           used to write an assign statement. 
-  ------------------------------------------------------------------------------*/
-
+  /* Give back the value of a field for use in an assign statement.
+  */
   DEFINE VARIABLE cFieldValue AS CHARACTER   NO-UNDO.
 
   IF phField:BUFFER-VALUE(piExtent) <> ? THEN
@@ -2701,44 +2553,12 @@ FUNCTION getFieldValue RETURNS CHARACTER
       OTHERWISE cFieldValue = STRING(phField:BUFFER-VALUE(piExtent)).
     END CASE.
   END.
-  ELSE 
+  ELSE
     cFieldValue = "?".
 
   RETURN cFieldValue.
-              
+
 END FUNCTION. /* getFieldValue */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION multipleLookUpGreaterThanZero wDump 
-FUNCTION multipleLookUpGreaterThanZero RETURNS LOGICAL
-  ( INPUT picExpressions AS CHARACTER
-  , INPUT picList        AS CHARACTER
-  ) :
-
-/*------------------------------------------------------------------------------
-  Purpose:  
-    Notes:  
-------------------------------------------------------------------------------*/
-
-  DEFINE VARIABLE lGreaterThanZero AS LOGICAL    NO-UNDO.
-  DEFINE VARIABLE iTel             AS INTEGER    NO-UNDO.
-  
-  ASSIGN lGreaterThanZero = TRUE.
-  
-  DO iTel = 1 TO NUM-ENTRIES(picExpressions):
-
-    ASSIGN
-      lGreaterThanZero = lGreaterThanZero AND LOOKUP(ENTRY(iTel,picExpressions), picList) > 0      .
-
-    IF NOT lGreaterThanZero THEN
-      RETURN lGreaterThanZero.
-  END.
-
-  RETURN lGreaterThanZero.
-
-END FUNCTION. /* function multipleLookUpGreaterThanZero returns logical */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

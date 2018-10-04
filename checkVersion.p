@@ -1,11 +1,12 @@
 /*------------------------------------------------------------------------
-  File : checkVersion.p
-  Desc : Check if there is a new version on GitHub
-    
+
+  Name : checkVersion.p
+  Desc : Check if there is a new version 
+
   Notes:
     The version nr is increased when it is ready for production, the
-    build nr is increaded when something is ready for beta testing.
-    
+    build nr is increased when something is ready for beta testing.
+
   Parameters:
     piChannel     : 0=no check, 1=check stable, 2=check beta
     plManualCheck : TRUE when user presses 'Check Now' button
@@ -16,56 +17,70 @@ DEFINE INPUT PARAMETER plManualCheck AS LOGICAL NO-UNDO.
 
 { DataDigger.i }
 
-DEFINE VARIABLE cLocalVersion  AS CHARACTER   NO-UNDO INITIAL '{version.i}'.
-DEFINE VARIABLE cLocalBuildNr  AS CHARACTER   NO-UNDO INITIAL '{build.i}'.
-DEFINE VARIABLE cRemoteVersion AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE cRemoteBuildNr AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE lAutoCheck     AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE cLocalBuild    AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE cRemoteBuild   AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE cNewVersionUrl AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE lVisit         AS LOGICAL     NO-UNDO INITIAL TRUE.
+DEFINE VARIABLE cStableBuild   AS CHARACTER   NO-UNDO.
 
-RUN getVersionInfo.p(OUTPUT cRemoteVersion, OUTPUT cRemoteBuildNr).
+/* Might be spaces in the include file */
+cLocalBuild = TRIM('{build.i}').
 
-/* If version cannot be determined then don't bother. Unless this
- * is a manual check. Then report it.
- */
-IF cRemoteBuildNr = '' THEN
+/* If channel is set to manual, but this is not a manual check then return. */
+IF piChannel = {&CHECK-MANUAL} AND NOT plManualCheck THEN RETURN.
+
+/* Get current stable build */
+RUN getVersionInfo.p(INPUT 'master', OUTPUT cStableBuild).
+
+/* Get proper version info, depending on channel */
+IF piChannel = {&CHECK-MANUAL} OR piChannel = {&CHECK-STABLE} THEN 
 DO:
-  IF plManualCheck THEN MESSAGE 'Cannot reach version the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  /* If local build is newer than stable, set update channel to BETA */
+  IF cLocalBuild > cStableBuild THEN 
+  DO:
+    setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
+    piChannel = {&CHECK-BETA}.
+  END.
+  ELSE 
+    cRemoteBuild = cStableBuild.
+END.
+   
+IF piChannel = {&CHECK-BETA} THEN 
+  RUN getVersionInfo.p(INPUT 'develop', OUTPUT cRemoteBuild).
+
+/* If version cannot be determined then don't bother. Unless this is a manual check */
+IF cRemoteBuild = '' OR cRemoteBuild = ? THEN
+DO:
+  IF plManualCheck THEN MESSAGE 'Cannot reach the DataDigger website' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
   RETURN.
 END.
 
-/* If remote build is different than local, but we have already 
- * noticed this before, then do not report new version
- * Unless - of course - when doing a manual check
- */
-IF NOT plManualCheck
-  AND cRemoteBuildNr <> ?
-  AND cRemoteBuildNr = getRegistry('DataDigger:Update', 'RemoteBuildNr') THEN RETURN.
-IF cRemoteBuildNr <> ? THEN setRegistry('DataDigger:Update', 'RemoteBuildNr', cRemoteBuildNr).
+/* Save remote version / build */
+setRegistry('DataDigger:Update', 'RemoteBuildNr', cRemoteBuild).
 
-IF (cRemoteVersion > cLocalVersion)
-  AND (   plManualCheck = TRUE
-       OR piChannel = {&CHECK-STABLE} 
-       OR piChannel = {&CHECK-BETA}) THEN
+/* Check build to detect new versions */
+IF cRemoteBuild > cLocalBuild THEN
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/status').
-  MESSAGE 'A new version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
-END.
-    
-ELSE
-IF    (cRemoteVersion = cLocalVersion)
-  AND (cRemoteBuildNr > cLocalBuildNr)
-  AND (   plManualCheck = TRUE 
-       OR piChannel = {&CHECK-BETA}) THEN
-DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/category/beta').
-  MESSAGE 'A new BETA version is available on the DataDigger website' VIEW-AS ALERT-BOX INFO BUTTONS OK.
-END.
+  IF piChannel = {&CHECK-MANUAL} OR piChannel = {&CHECK-STABLE} THEN 
+    cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/latest'.
+  ELSE 
+    cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/'.
   
-/* In case of a manual check, report what is found */
-ELSE
-IF plManualCheck
-  AND cRemoteVersion <= cLocalVersion
-  AND cRemoteBuildNr <= cLocalBuildNr THEN
-DO:
-  MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  IF plManualCheck THEN
+  DO:
+    MESSAGE 'A new version is available on the DataDigger website~n~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
+    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE(cNewVersionUrl).
+  END.
+  ELSE 
+    setRegistry('DataDigger:Update', 'NewVersionURL', cNewVersionUrl).
 END.
+
+ELSE
+/* Up to date */
+DO:
+  IF plManualCheck THEN
+    MESSAGE 'No new version available, you are up to date.' VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+  ELSE 
+    setRegistry('DataDigger:Update', 'NewVersionURL', '').
+END.
+

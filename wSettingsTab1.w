@@ -3,41 +3,17 @@
 &Scoped-define WINDOW-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*------------------------------------------------------------------------
-
-  File: 
-
-  Description: 
-
-  Input Parameters:
-      <none>
-
-  Output Parameters:
-      <none>
-
-  Author: 
-
-  Created: 
+  Name: wSettingsTab1.w
+  Desc: Settings tab for Behaviour
 
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
+/*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
-
-/* Create an unnamed pool to store all the widgets created 
-     by this procedure. This is a good default which assures
-     that this procedure's triggers and internal procedures 
-     will execute in this procedure's storage, and that proper
-     cleanup will occur on deletion of the procedure. */
 
 CREATE WIDGET-POOL.
 
-/* ***************************  Definitions  ************************** */
-
-/* Parameters Definitions ---                                           */
-
-DEFINE INPUT  PARAMETER phParent    AS HANDLE      NO-UNDO.
-DEFINE INPUT  PARAMETER phRectangle AS HANDLE      NO-UNDO.
-
-/* Local Variable Definitions ---                                       */
+DEFINE INPUT PARAMETER phParent    AS HANDLE      NO-UNDO.
+DEFINE INPUT PARAMETER phRectangle AS HANDLE      NO-UNDO.
 
 { DataDigger.i }
 
@@ -72,11 +48,11 @@ DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnPingBack 
      LABEL "More info" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "click for more info on pingback".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "click for more info on pingback".
 
 DEFINE BUTTON btnPingBackStats 
      LABEL "Statistics" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "Show statistics".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "Show statistics".
 
 DEFINE VARIABLE tgPingback AS LOGICAL INITIAL no 
      LABEL "Allow &pingback" 
@@ -85,7 +61,7 @@ DEFINE VARIABLE tgPingback AS LOGICAL INITIAL no
 
 DEFINE BUTTON btnClearCache 
      LABEL "Clear Cache" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "clear all objects from the cache".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "clear all objects from the cache".
 
 DEFINE VARIABLE fiPreCacheInterval AS INTEGER FORMAT ">>>,>>9":U INITIAL 0 
      LABEL "Interval" 
@@ -94,7 +70,7 @@ DEFINE VARIABLE fiPreCacheInterval AS INTEGER FORMAT ">>>,>>9":U INITIAL 0
 
 DEFINE RECTANGLE RECT-21
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 330 BY 110.
+     SIZE-PIXELS 360 BY 94.
 
 DEFINE VARIABLE tgCacheFieldDefs AS LOGICAL INITIAL no 
      LABEL "Field Definitions" 
@@ -105,11 +81,6 @@ DEFINE VARIABLE tgCacheTableDefs AS LOGICAL INITIAL no
      LABEL "Table Definitions" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 175 BY 17 TOOLTIP "cache table definitions" NO-UNDO.
-
-DEFINE VARIABLE tgCacheUserSettings AS LOGICAL INITIAL no 
-     LABEL "Cache User Settings" 
-     VIEW-AS TOGGLE-BOX
-     SIZE-PIXELS 175 BY 17 TOOLTIP "cache user settings" NO-UNDO.
 
 DEFINE VARIABLE tgPreCache AS LOGICAL INITIAL no 
      LABEL "Background caching" 
@@ -153,6 +124,11 @@ DEFINE VARIABLE cbDoubleClick AS CHARACTER FORMAT "X(256)":U
      DROP-DOWN-LIST
      SIZE-PIXELS 70 BY 21 TOOLTIP "what to do when you double click on a record in the data browse" NO-UNDO.
 
+DEFINE VARIABLE fiMaxExtent AS INTEGER FORMAT ">,>>>,>>9":U INITIAL 0 
+     LABEL "Maximum nr of &extent fields to show" 
+     VIEW-AS FILL-IN 
+     SIZE-PIXELS 30 BY 21 NO-UNDO.
+
 DEFINE VARIABLE cbViewType AS CHARACTER FORMAT "X(256)":U 
      LABEL "Default &View type" 
      VIEW-AS COMBO-BOX INNER-LINES 5
@@ -180,14 +156,26 @@ DEFINE VARIABLE tgUseWriteTriggers AS LOGICAL INITIAL no
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 176 BY 17 TOOLTIP "enable or disable WRITE triggers when editing/creating records" NO-UNDO.
 
-DEFINE VARIABLE fiMaxExtent AS INTEGER FORMAT ">,>>>,>>9":U INITIAL 0 
-     LABEL "Maximum nr of &extent fields to show" 
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 30 BY 21 NO-UNDO.
+DEFINE VARIABLE tgShowHints AS LOGICAL INITIAL yes 
+     LABEL "Show &Hints on new features" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 210 BY 17 TOOLTIP "shows a yellow popup with additional information on new features" NO-UNDO.
+
+DEFINE BUTTON btnFactoryReset 
+     LABEL "Go back to factory settings" 
+     SIZE-PIXELS 345 BY 26 TOOLTIP "delete all settings and start again".
+
+DEFINE BUTTON btnResetQuestions 
+     LABEL "Reset all 'Do not ask again' questions" 
+     SIZE-PIXELS 345 BY 26 TOOLTIP "choose this if you want to restore questions".
+
+DEFINE RECTANGLE RECT-20
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
+     SIZE-PIXELS 360 BY 78.
 
 DEFINE BUTTON btnCheckNow 
      LABEL "Check Now" 
-     SIZE-PIXELS 90 BY 24 TOOLTIP "check on the latest version of DataDigger".
+     SIZE-PIXELS 90 BY 26 TOOLTIP "check on the latest version of DataDigger".
 
 DEFINE VARIABLE cbUpdateChannel AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0 
      LABEL "Check" 
@@ -210,7 +198,7 @@ DEFINE VARIABLE fiCurrentVersion AS CHARACTER FORMAT "X(256)":U
 
 DEFINE RECTANGLE RECT-19
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 330 BY 78.
+     SIZE-PIXELS 360 BY 74.
 
 
 /* ************************  Frame Definitions  *********************** */
@@ -219,7 +207,149 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 767 BY 1057 WIDGET-ID 100.
+         SIZE-PIXELS 833 BY 728 WIDGET-ID 100.
+
+DEFINE FRAME FRAME-Y
+     tgShowHints AT Y 4 X 10 WIDGET-ID 94
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 260
+         SIZE-PIXELS 390 BY 55
+         TITLE "1" WIDGET-ID 3800.
+
+DEFINE FRAME FRAME-J
+     fiMaxExtent AT Y 1 X 235 COLON-ALIGNED WIDGET-ID 62
+     "(0=show all)" VIEW-AS TEXT
+          SIZE-PIXELS 85 BY 13 AT Y 5 X 282 WIDGET-ID 102
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 535
+         SIZE-PIXELS 390 BY 45
+         TITLE "1" WIDGET-ID 3700.
+
+DEFINE FRAME FRAME-V
+     tgStartOnPrimaryMonitor AT Y 4 X 10 WIDGET-ID 94
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 195
+         SIZE-PIXELS 390 BY 55
+         TITLE "1" WIDGET-ID 3100.
+
+DEFINE FRAME FRAME-S
+     cbViewType AT Y 3 X 235 COLON-ALIGNED WIDGET-ID 92
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 502
+         SIZE-PIXELS 390 BY 50
+         TITLE "1" WIDGET-ID 1900.
+
+DEFINE FRAME FRAME-I
+     cbDoubleClick AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 92
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 565
+         SIZE-PIXELS 390 BY 53
+         TITLE "1" WIDGET-ID 1100.
+
+DEFINE FRAME FRAME-F
+     fiMaxColumns AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 62
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 432
+         SIZE-PIXELS 390 BY 55
+         TITLE "1" WIDGET-ID 800.
+
+DEFINE FRAME FRAME-C
+     fiMaxFilterHistory AT Y 1 X 235 COLON-ALIGNED WIDGET-ID 66
+     "(0=disable)" VIEW-AS TEXT
+          SIZE-PIXELS 85 BY 13 AT Y 5 X 285 WIDGET-ID 100
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 470
+         SIZE-PIXELS 390 BY 45
+         TITLE "1" WIDGET-ID 500.
+
+DEFINE FRAME FRAME-H
+     fiQueryTimeOut AT Y 5 X 235 COLON-ALIGNED WIDGET-ID 178
+     "msec" VIEW-AS TEXT
+          SIZE-PIXELS 56 BY 13 AT Y 8 X 282 WIDGET-ID 100
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 328
+         SIZE-PIXELS 390 BY 55
+         TITLE "1" WIDGET-ID 1000.
+
+DEFINE FRAME FRAME-G
+     fiMaxQueryHistory AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 66
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 395
+         SIZE-PIXELS 390 BY 55
+         TITLE "1" WIDGET-ID 900.
+
+DEFINE FRAME FRAME-E
+     tgShowHiddenTables AT Y 4 X 10 WIDGET-ID 68
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 130
+         SIZE-PIXELS 390 BY 50
+         TITLE "1" WIDGET-ID 700.
+
+DEFINE FRAME FRAME-D
+     tgAutoExpandQueryEditor AT Y 4 X 10 WIDGET-ID 64
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 95
+         SIZE-PIXELS 390 BY 50
+         TITLE "1" WIDGET-ID 600.
+
+DEFINE FRAME frUpdate
+     fiCurrentBuild AT Y 23 X 235 COLON-ALIGNED WIDGET-ID 186
+     fiCurrentVersion AT Y 25 X 85 COLON-ALIGNED WIDGET-ID 188
+     btnCheckNow AT Y 50 X 235 WIDGET-ID 180
+     cbUpdateChannel AT Y 51 X 85 COLON-ALIGNED WIDGET-ID 200
+     "Check for updates" VIEW-AS TEXT
+          SIZE-PIXELS 110 BY 17 AT Y 2 X 15 WIDGET-ID 184
+     RECT-19 AT Y 11 X 5 WIDGET-ID 176
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 5 Y 5
+         SIZE-PIXELS 390 BY 110
+         TITLE "1" WIDGET-ID 2900.
+
+DEFINE FRAME FRAME-U
+     tgKeepAlive AT Y 4 X 10 WIDGET-ID 94
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 162
+         SIZE-PIXELS 390 BY 47
+         TITLE "1" WIDGET-ID 3000.
+
+DEFINE FRAME FRAME-W
+     tgUseDeleteTriggers AT Y 4 X 10 WIDGET-ID 94
+     tgUseWriteTriggers AT Y 4 X 189 WIDGET-ID 96
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 227
+         SIZE-PIXELS 390 BY 50
+         TITLE "1" WIDGET-ID 3200.
+
+DEFINE FRAME FRAME-AB
+     tgCacheTableDefs AT Y 30 X 25 WIDGET-ID 188
+     btnClearCache AT Y 30 X 235 WIDGET-ID 200
+     tgCacheFieldDefs AT Y 50 X 25 WIDGET-ID 196
+     fiPreCacheInterval AT Y 68 X 249 COLON-ALIGNED WIDGET-ID 66
+     tgPreCache AT Y 70 X 25 WIDGET-ID 198
+     "Caching" VIEW-AS TEXT
+          SIZE-PIXELS 55 BY 17 AT Y 2 X 15 WIDGET-ID 184
+     "sec" VIEW-AS TEXT
+          SIZE-PIXELS 35 BY 13 AT Y 72 X 293 WIDGET-ID 100
+     RECT-21 AT Y 11 X 5 WIDGET-ID 102
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 415 Y 290
+         SIZE-PIXELS 390 BY 130
+         TITLE "1" WIDGET-ID 3300.
 
 DEFINE FRAME FRAME-A
      btnPingBack AT Y 5 X 153 WIDGET-ID 206
@@ -227,144 +357,21 @@ DEFINE FRAME FRAME-A
      tgPingback AT Y 10 X 10 WIDGET-ID 202
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 120
-         SIZE-PIXELS 340 BY 60
+         AT X 415 Y 30
+         SIZE-PIXELS 390 BY 60
          TITLE "1" WIDGET-ID 3500.
 
-DEFINE FRAME FRAME-Y
-     fiMaxExtent AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 62
-     "(0=show all)" VIEW-AS TEXT
-          SIZE-PIXELS 85 BY 13 AT Y 8 X 280 WIDGET-ID 100
+DEFINE FRAME frReset
+     btnResetQuestions AT Y 24 X 11 WIDGET-ID 206
+     btnFactoryReset AT Y 54 X 11 WIDGET-ID 210
+     "Reset" VIEW-AS TEXT
+          SIZE-PIXELS 45 BY 17 AT Y 2 X 15 WIDGET-ID 184
+     RECT-20 AT Y 11 X 5 WIDGET-ID 176
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 839
-         SIZE-PIXELS 390 BY 60
-         TITLE "1" WIDGET-ID 3400.
-
-DEFINE FRAME FRAME-AB
-     tgCacheTableDefs AT Y 25 X 25 WIDGET-ID 188
-     btnClearCache AT Y 25 X 235 WIDGET-ID 200
-     tgCacheFieldDefs AT Y 45 X 25 WIDGET-ID 196
-     fiPreCacheInterval AT Y 63 X 249 COLON-ALIGNED WIDGET-ID 66
-     tgPreCache AT Y 65 X 25 WIDGET-ID 198
-     tgCacheUserSettings AT Y 95 X 25 WIDGET-ID 192
-     "Caching" VIEW-AS TEXT
-          SIZE-PIXELS 55 BY 17 AT Y 0 X 15 WIDGET-ID 184
-     "sec" VIEW-AS TEXT
-          SIZE-PIXELS 35 BY 13 AT Y 67 X 291 WIDGET-ID 100
-     RECT-21 AT Y 5 X 5 WIDGET-ID 102
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 452
-         SIZE-PIXELS 390 BY 150
-         TITLE "1" WIDGET-ID 3300.
-
-DEFINE FRAME FRAME-W
-     tgUseDeleteTriggers AT Y 4 X 10 WIDGET-ID 94
-     tgUseWriteTriggers AT Y 4 X 189 WIDGET-ID 96
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 397
-         SIZE-PIXELS 390 BY 50
-         TITLE "1" WIDGET-ID 3200.
-
-DEFINE FRAME FRAME-U
-     tgKeepAlive AT Y 4 X 10 WIDGET-ID 94
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 289
-         SIZE-PIXELS 390 BY 47
-         TITLE "1" WIDGET-ID 3000.
-
-DEFINE FRAME frUpdate
-     fiCurrentBuild AT Y 23 X 235 COLON-ALIGNED WIDGET-ID 186
-     fiCurrentVersion AT Y 25 X 85 COLON-ALIGNED WIDGET-ID 188
-     btnCheckNow AT Y 50 X 235 WIDGET-ID 180
-     cbUpdateChannel AT Y 52 X 85 COLON-ALIGNED WIDGET-ID 200
-     "Check for updates" VIEW-AS TEXT
-          SIZE-PIXELS 110 BY 17 AT Y 0 X 15 WIDGET-ID 184
-     RECT-19 AT Y 7 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 5
-         SIZE-PIXELS 390 BY 110
-         TITLE "1" WIDGET-ID 2900.
-
-DEFINE FRAME FRAME-D
-     tgAutoExpandQueryEditor AT Y 4 X 10 WIDGET-ID 64
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 183
-         SIZE-PIXELS 340 BY 50
-         TITLE "1" WIDGET-ID 600.
-
-DEFINE FRAME FRAME-E
-     tgShowHiddenTables AT Y 4 X 10 WIDGET-ID 68
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 235
-         SIZE-PIXELS 340 BY 50
-         TITLE "1" WIDGET-ID 700.
-
-DEFINE FRAME FRAME-G
-     fiMaxQueryHistory AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 66
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 606
-         SIZE-PIXELS 340 BY 55
-         TITLE "1" WIDGET-ID 900.
-
-DEFINE FRAME FRAME-H
-     fiQueryTimeOut AT Y 5 X 235 COLON-ALIGNED WIDGET-ID 178
-     "msec" VIEW-AS TEXT
-          SIZE-PIXELS 56 BY 13 AT Y 8 X 279 WIDGET-ID 100
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 665
-         SIZE-PIXELS 340 BY 55
-         TITLE "1" WIDGET-ID 1000.
-
-DEFINE FRAME FRAME-C
-     fiMaxFilterHistory AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 66
-     "(0=disable)" VIEW-AS TEXT
-          SIZE-PIXELS 85 BY 13 AT Y 8 X 280 WIDGET-ID 100
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 723
-         SIZE-PIXELS 390 BY 55
-         TITLE "1" WIDGET-ID 500.
-
-DEFINE FRAME FRAME-F
-     fiMaxColumns AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 62
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 782
-         SIZE-PIXELS 390 BY 55
-         TITLE "1" WIDGET-ID 800.
-
-DEFINE FRAME FRAME-I
-     cbDoubleClick AT Y 4 X 235 COLON-ALIGNED WIDGET-ID 92
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 956
-         SIZE-PIXELS 390 BY 53
-         TITLE "1" WIDGET-ID 1100.
-
-DEFINE FRAME FRAME-S
-     cbViewType AT Y 3 X 235 COLON-ALIGNED WIDGET-ID 92
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 902
-         SIZE-PIXELS 390 BY 50
-         TITLE "1" WIDGET-ID 1900.
-
-DEFINE FRAME FRAME-V
-     tgStartOnPrimaryMonitor AT Y 4 X 10 WIDGET-ID 94
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 5 Y 340
-         SIZE-PIXELS 390 BY 55
-         TITLE "1" WIDGET-ID 3100.
+         AT X 5 Y 595
+         SIZE-PIXELS 390 BY 115
+         TITLE "1" WIDGET-ID 3600.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -384,8 +391,8 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "<insert window title>"
-         HEIGHT-P           = 1057
-         WIDTH-P            = 843
+         HEIGHT-P           = 738
+         WIDTH-P            = 846
          MAX-HEIGHT-P       = 1057
          MAX-WIDTH-P        = 1600
          VIRTUAL-HEIGHT-P   = 1057
@@ -420,11 +427,13 @@ ASSIGN FRAME FRAME-A:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-G:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-H:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-I:FRAME = FRAME DEFAULT-FRAME:HANDLE
+       FRAME FRAME-J:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-S:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-U:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-V:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-W:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME FRAME-Y:FRAME = FRAME DEFAULT-FRAME:HANDLE
+       FRAME frReset:FRAME = FRAME DEFAULT-FRAME:HANDLE
        FRAME frUpdate:FRAME = FRAME DEFAULT-FRAME:HANDLE.
 
 /* SETTINGS FOR FRAME DEFAULT-FRAME
@@ -432,14 +441,16 @@ ASSIGN FRAME FRAME-A:FRAME = FRAME DEFAULT-FRAME:HANDLE
 
 DEFINE VARIABLE XXTABVALXX AS LOGICAL NO-UNDO.
 
-ASSIGN XXTABVALXX = FRAME FRAME-S:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-I:HANDLE)
-       XXTABVALXX = FRAME FRAME-Y:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-S:HANDLE)
-       XXTABVALXX = FRAME FRAME-F:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-Y:HANDLE)
-       XXTABVALXX = FRAME FRAME-C:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-F:HANDLE)
-       XXTABVALXX = FRAME FRAME-H:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-C:HANDLE)
-       XXTABVALXX = FRAME FRAME-G:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-H:HANDLE)
-       XXTABVALXX = FRAME FRAME-AB:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-G:HANDLE)
-       XXTABVALXX = FRAME FRAME-W:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-AB:HANDLE)
+ASSIGN XXTABVALXX = FRAME FRAME-I:MOVE-BEFORE-TAB-ITEM (FRAME frReset:HANDLE)
+       XXTABVALXX = FRAME FRAME-J:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-I:HANDLE)
+       XXTABVALXX = FRAME FRAME-S:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-J:HANDLE)
+       XXTABVALXX = FRAME FRAME-C:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-S:HANDLE)
+       XXTABVALXX = FRAME FRAME-F:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-C:HANDLE)
+       XXTABVALXX = FRAME FRAME-G:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-F:HANDLE)
+       XXTABVALXX = FRAME FRAME-H:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-G:HANDLE)
+       XXTABVALXX = FRAME FRAME-AB:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-H:HANDLE)
+       XXTABVALXX = FRAME FRAME-Y:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-AB:HANDLE)
+       XXTABVALXX = FRAME FRAME-W:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-Y:HANDLE)
        XXTABVALXX = FRAME FRAME-V:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-W:HANDLE)
        XXTABVALXX = FRAME FRAME-U:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-V:HANDLE)
        XXTABVALXX = FRAME FRAME-E:MOVE-BEFORE-TAB-ITEM (FRAME FRAME-U:HANDLE)
@@ -476,10 +487,6 @@ ASSIGN
 ASSIGN 
        tgCacheTableDefs:PRIVATE-DATA IN FRAME FRAME-AB     = 
                 "DataDigger:Cache,TableDefs".
-
-ASSIGN 
-       tgCacheUserSettings:PRIVATE-DATA IN FRAME FRAME-AB     = 
-                "DataDigger:Cache,Settings".
 
 ASSIGN 
        tgPreCache:PRIVATE-DATA IN FRAME FRAME-AB     = 
@@ -548,6 +555,15 @@ ASSIGN
        cbDoubleClick:PRIVATE-DATA IN FRAME FRAME-I     = 
                 "DataDigger,DataDoubleClick".
 
+/* SETTINGS FOR FRAME FRAME-J
+   NOT-VISIBLE                                                          */
+ASSIGN 
+       FRAME FRAME-J:HIDDEN           = TRUE.
+
+ASSIGN 
+       fiMaxExtent:PRIVATE-DATA IN FRAME FRAME-J     = 
+                "DataDigger,MaxExtent".
+
 /* SETTINGS FOR FRAME FRAME-S
    NOT-VISIBLE 1                                                        */
 ASSIGN 
@@ -594,8 +610,13 @@ ASSIGN
        FRAME FRAME-Y:HIDDEN           = TRUE.
 
 ASSIGN 
-       fiMaxExtent:PRIVATE-DATA IN FRAME FRAME-Y     = 
-                "DataDigger,MaxExtent".
+       tgShowHints:PRIVATE-DATA IN FRAME FRAME-Y     = 
+                "DataDigger,ShowHints".
+
+/* SETTINGS FOR FRAME frReset
+   NOT-VISIBLE                                                          */
+ASSIGN 
+       FRAME frReset:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FRAME frUpdate
    NOT-VISIBLE                                                          */
@@ -661,7 +682,7 @@ ON CHOOSE OF btnCheckNow IN FRAME frUpdate /* Check Now */
 DO:
 
   RUN btnCheckUpgrade.
-      
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -675,7 +696,19 @@ ON CHOOSE OF btnClearCache IN FRAME FRAME-AB /* Clear Cache */
 DO:
   RUN clearDiskCache.
   RUN clearRegistryCache.
-  MESSAGE "Cache cleared" VIEW-AS ALERT-BOX INFO BUTTONS OK.
+  MESSAGE "Cache cleared" VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME frReset
+&Scoped-define SELF-NAME btnFactoryReset
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFactoryReset C-Win
+ON CHOOSE OF btnFactoryReset IN FRAME frReset /* Go back to factory settings */
+DO:
+  PUBLISH 'factoryReset'.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -698,7 +731,26 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnPingBackStats C-Win
 ON CHOOSE OF btnPingBackStats IN FRAME FRAME-A /* Statistics */
 DO:
-  OS-COMMAND NO-WAIT START VALUE("{&PINGBACKURL}+").
+  OS-COMMAND NO-WAIT START VALUE("{&PINGBACKSTATS}").
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define FRAME-NAME frReset
+&Scoped-define SELF-NAME btnResetQuestions
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnResetQuestions C-Win
+ON CHOOSE OF btnResetQuestions IN FRAME frReset /* Reset all 'Do not ask again' questions */
+DO:
+  DEFINE VARIABLE lReset AS LOGICAL NO-UNDO.
+
+  MESSAGE 'Reset all "do not ask again" questions?' 
+    VIEW-AS ALERT-BOX QUESTION BUTTONS YES-NO-CANCEL UPDATE lReset.
+  IF lReset <> TRUE THEN RETURN. 
+
+  RUN resetAnswers.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -711,7 +763,7 @@ END.
 ON VALUE-CHANGED OF tgCacheTableDefs IN FRAME FRAME-AB /* Table Definitions */
 , tgCacheFieldDefs
 DO:
-  
+
   tgPreCache:SENSITIVE = (tgCacheFieldDefs:CHECKED OR tgCacheTableDefs:CHECKED).
   APPLY "VALUE-CHANGED" TO tgPreCache.
 
@@ -744,7 +796,7 @@ END.
 
 /* The CLOSE event can be used from inside or outside the procedure to  */
 /* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE 
+ON CLOSE OF THIS-PROCEDURE
    RUN disable_UI.
 
 /* Best default for GUI applications is...                              */
@@ -759,7 +811,7 @@ PAUSE 0 BEFORE-HIDE.
 MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
-  
+
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
     WAIT-FOR CLOSE OF THIS-PROCEDURE.
 END.
@@ -775,7 +827,7 @@ PROCEDURE btnCheckUpgrade :
 /* Check for an upgrade of DataDigger
  */
   DEFINE VARIABLE iChannel   AS INTEGER NO-UNDO.
-  
+
   iChannel = INTEGER(cbUpdateChannel:SCREEN-VALUE IN FRAME frUpdate).
   RUN checkVersion.p(INPUT iChannel, INPUT TRUE). /* TRUE for manual check */
 
@@ -851,48 +903,55 @@ PROCEDURE enable_UI :
   ENABLE tgUseDeleteTriggers tgUseWriteTriggers 
       WITH FRAME FRAME-W IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-W}
+  DISPLAY tgShowHints 
+      WITH FRAME FRAME-Y IN WINDOW C-Win.
+  ENABLE tgShowHints 
+      WITH FRAME FRAME-Y IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-FRAME-Y}
   DISPLAY tgCacheTableDefs tgCacheFieldDefs fiPreCacheInterval tgPreCache 
-          tgCacheUserSettings 
       WITH FRAME FRAME-AB IN WINDOW C-Win.
   ENABLE RECT-21 tgCacheTableDefs btnClearCache tgCacheFieldDefs 
-         fiPreCacheInterval tgPreCache tgCacheUserSettings 
+         fiPreCacheInterval tgPreCache 
       WITH FRAME FRAME-AB IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-AB}
-  DISPLAY fiMaxQueryHistory 
-      WITH FRAME FRAME-G IN WINDOW C-Win.
-  ENABLE fiMaxQueryHistory 
-      WITH FRAME FRAME-G IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-G}
   DISPLAY fiQueryTimeOut 
       WITH FRAME FRAME-H IN WINDOW C-Win.
   ENABLE fiQueryTimeOut 
       WITH FRAME FRAME-H IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-H}
-  DISPLAY fiMaxFilterHistory 
-      WITH FRAME FRAME-C IN WINDOW C-Win.
-  ENABLE fiMaxFilterHistory 
-      WITH FRAME FRAME-C IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-C}
+  DISPLAY fiMaxQueryHistory 
+      WITH FRAME FRAME-G IN WINDOW C-Win.
+  ENABLE fiMaxQueryHistory 
+      WITH FRAME FRAME-G IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-FRAME-G}
   DISPLAY fiMaxColumns 
       WITH FRAME FRAME-F IN WINDOW C-Win.
   ENABLE fiMaxColumns 
       WITH FRAME FRAME-F IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-F}
-  DISPLAY fiMaxExtent 
-      WITH FRAME FRAME-Y IN WINDOW C-Win.
-  ENABLE fiMaxExtent 
-      WITH FRAME FRAME-Y IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-FRAME-Y}
+  DISPLAY fiMaxFilterHistory 
+      WITH FRAME FRAME-C IN WINDOW C-Win.
+  ENABLE fiMaxFilterHistory 
+      WITH FRAME FRAME-C IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-FRAME-C}
   DISPLAY cbViewType 
       WITH FRAME FRAME-S IN WINDOW C-Win.
   ENABLE cbViewType 
       WITH FRAME FRAME-S IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-S}
+  DISPLAY fiMaxExtent 
+      WITH FRAME FRAME-J IN WINDOW C-Win.
+  ENABLE fiMaxExtent 
+      WITH FRAME FRAME-J IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-FRAME-J}
   DISPLAY cbDoubleClick 
       WITH FRAME FRAME-I IN WINDOW C-Win.
   ENABLE cbDoubleClick 
       WITH FRAME FRAME-I IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-I}
+  ENABLE RECT-20 btnResetQuestions btnFactoryReset 
+      WITH FRAME frReset IN WINDOW C-Win.
+  {&OPEN-BROWSERS-IN-QUERY-frReset}
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -900,16 +959,12 @@ END PROCEDURE.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE localInitialize C-Win 
 PROCEDURE localInitialize :
-/*------------------------------------------------------------------------------
-  Purpose:     
-  Parameters:  <none>
-  Notes:       
-------------------------------------------------------------------------------*/
+/* Init fonts
+  */
+  fiCurrentVersion:FONT IN FRAME frUpdate = getFont("Fixed").
+  fiCurrentBuild:FONT   IN FRAME frUpdate = getFont("Fixed").
 
-  fiCurrentVersion:font in frame frUpdate = getFont("Fixed").
-  fiCurrentBuild:font   in frame frUpdate = getFont("Fixed").
-
-END PROCEDURE.
+END PROCEDURE. /* localInitialize */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
