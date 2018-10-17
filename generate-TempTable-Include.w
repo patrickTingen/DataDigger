@@ -559,9 +559,9 @@ PROCEDURE generateCode :
 /* Generate the code for the include
 */
   DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
+  DEFINE VARIABLE cMask         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cPrefix       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cName         AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cMask         AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cUnique       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cHeader       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cTable        AS CHARACTER NO-UNDO.
@@ -679,13 +679,17 @@ PROCEDURE generateCode :
                           , cUnique
                           ).
         DO i = 1 TO NUM-ENTRIES(bIndex.cFieldList):
-          FIND bField WHERE bField.cFieldName = ENTRY(i, bIndex.cFieldList).
-          cText = SUBSTITUTE('&1 &2', cText, TRIM(getNameString(bField.cFieldName, bField.cDataType, iMaxName))).
+          FIND bField WHERE bField.cFieldName = ENTRY(i, bIndex.cFieldList) NO-ERROR.
+          IF AVAILABLE bField THEN 
+            ASSIGN 
+              cMask = '&1 &2'
+              cText = SUBSTITUTE(cMask, cText, TRIM(getNameString(bField.cFieldName, bField.cDataType, iMaxName))).
         END.
 
       END.
     END.
-    cText = SUBSTITUTE('&1~n&2.', cText, cIndent).
+    cMask = '&1~n&2.'.
+    cText = SUBSTITUTE(cMask, cText, cIndent).
  
     edDefinition:SCREEN-VALUE = cText.
   END.

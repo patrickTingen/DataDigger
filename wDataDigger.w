@@ -202,15 +202,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS btnClearTableFilter btnTableFilter rctQuery ~
-rctEdit fiTableFilter btnFavourite cbDatabaseFilter tgSelAll ~
-fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables ~
-brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere ~
-btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
-btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
+btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
+fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
+brIndexes tgDebugMode btnTableFilter fiTableDesc cbFavouriteGroup ficWhere ~
+btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
+btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
+btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
+btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete ~
+btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -963,10 +963,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableFilter AT Y 3 X 56 NO-LABEL
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -977,10 +975,12 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
@@ -4811,7 +4811,8 @@ PROCEDURE btnEditChoose :
       , OUTPUT rNewRecord /* not handled here */
       ).
   
-    IF lRecordsUpdated THEN ghDataBrowse:REFRESH().
+    IF lRecordsUpdated
+      AND ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
     c-win:MOVE-TO-TOP().
   END.
@@ -5116,8 +5117,8 @@ PROCEDURE btnViewChoose :
     BREAK BY bView.iVer BY bView.iHor:
 
     /* Determine format for data to get names aligned */
-    FIND ttColumnWidth WHERE ttColumnWidth.iHor = bView.iHor.
-    cDataFormat = FILL('x', ttColumnWidth.iWidth).
+    FIND ttColumnWidth WHERE ttColumnWidth.iHor = bView.iHor NO-ERROR.
+    IF AVAILABLE ttColumnWidth THEN cDataFormat = FILL('x', ttColumnWidth.iWidth).
 
     IF FIRST-OF(bView.iVer) THEN
     DO:
@@ -5381,9 +5382,8 @@ PROCEDURE collectFieldInfo PRIVATE :
 
   FIND bTable
     WHERE bTable.cDatabase  = gcCurrentDatabase
-      AND bTable.cTableName = pcTableName.
-
-  ASSIGN bTable.lCached = TRUE.
+      AND bTable.cTableName = pcTableName  NO-ERROR.
+  IF AVAILABLE bTable THEN ASSIGN bTable.lCached = TRUE.
 
   {&timerStop}
 
@@ -6888,15 +6888,15 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE btnClearTableFilter btnTableFilter rctQuery rctEdit fiTableFilter 
-         btnFavourite cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter 
-         fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes 
-         tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnAddFavGroup 
-         btnWhere btnQueries btnView btnTools btnTabTables btnClear 
-         btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
-         btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
-         btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
-         btnClone btnAdd btnEdit fiFeedback 
+  ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
+         tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
+         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
+         btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite 
+         btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
+         btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
+         btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
+         btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
+         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -8517,6 +8517,7 @@ PROCEDURE initializeSettingsFile :
   DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
   DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE lNewIniFile  AS LOGICAL     NO-UNDO.
 
   /* Find out where DataDigger is installed and how we"re logged on */
   cProgramDir = getProgramDir().
@@ -8533,7 +8534,9 @@ PROCEDURE initializeSettingsFile :
   cEnvironment = SUBSTITUTE("DataDigger-&1", getUserName() ).
 
   /* If not exist, create it */
-  IF SEARCH(cWorkFolder + cEnvironment + ".ini") = ? THEN
+  lNewIniFile = (SEARCH(cWorkFolder + cEnvironment + ".ini") = ?).
+
+  IF lNewIniFile THEN
   DO:
     OUTPUT TO VALUE(cWorkFolder + cEnvironment + ".ini").
     OUTPUT CLOSE.
@@ -8622,16 +8625,8 @@ PROCEDURE initializeSettingsFile :
   IF getRegistry("DataDigger:Fonts","AutoSetFont") = ? THEN setRegistry("DataDigger:Fonts","AutoSetFont", "YES").
 
   /* If no colors defined for data rows or useSystemColors not defined, set "useSystemColors" to TRUE */
-  IF    getRegistry("DataDigger:Colors","DataRow:UseSystem") = ?
-    OR (getRegistry("DataDigger:Colors","DataRow:odd:fg") = ?
-    AND getRegistry("DataDigger:Colors","DataRow:odd:bg") = ?
-    AND getRegistry("DataDigger:Colors","DataRow:even:fg") = ?
-    AND getRegistry("DataDigger:Colors","DataRow:even:bg") = ?) THEN setRegistry("DataDigger:Colors","DataRow:UseSystem","YES").
-
-  /* colors for favourite tables */
-  IF getRegistry('DataDigger:Colors','FavouriteTable:HiLite') = ? THEN setRegistry('DataDigger:Colors','FavouriteTable:HiLite', 'yes').
-  IF getRegistry('DataDigger:Colors','FavouriteTable:FG')     = ? THEN setRegistry('DataDigger:Colors','FavouriteTable:FG'    , '9').    
-  IF getRegistry('DataDigger:Colors','FavouriteTable:BG')     = ? THEN setRegistry('DataDigger:Colors','FavouriteTable:BG'    , '').    
+  IF getRegistry("DataDigger:Colors", "DataRow:UseSystem") = ? THEN setRegistry("DataDigger:Colors","DataRow:UseSystem","YES").
+  IF getRegistry('DataDigger:Colors', 'FavouriteTable:HiLite') = ? THEN setRegistry('DataDigger:Colors', 'FavouriteTable:HiLite', 'yes').
 
   /* How to deal with filtering */
   IF getRegistry("DataDigger","FilterWithMatches") = ? THEN setRegistry("DataDigger","FilterWithMatches", "YES").
@@ -8681,6 +8676,38 @@ PROCEDURE initializeSettingsFile :
 
   /* Don't reveal the first time */
   IF getRegistry("DataDigger", "FeelingLucky") = ? THEN setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
+
+  /* Set colors to default values. Cannot check for getRegistry = ? because ? might be a valid setting */
+  IF lNewIniFile THEN
+  DO:
+    setRegistry('DataDigger:Colors', 'CustomFormat:fg'           ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'CustomFormat:bg'           , '?'). /* default   */
+    setRegistry('DataDigger:Colors', 'CustomOrder:fg'            ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'CustomOrder:bg'            , '?'). /* default   */
+    setRegistry('DataDigger:Colors', 'DataRow:even:bg'           , '8'). /* lightgray */
+    setRegistry('DataDigger:Colors', 'DataRow:even:fg'           , '0'). /* black     */
+    setRegistry('DataDigger:Colors', 'DataRow:odd:bg'            ,'15'). /* white     */
+    setRegistry('DataDigger:Colors', 'DataRow:odd:fg'            , '0'). /* black     */
+    setRegistry('DataDigger:Colors', 'FavouriteTable:FG'         , '9'). /* blue      */
+    setRegistry('DataDigger:Colors', 'FavouriteTable:BG'         , '?'). /* default   */
+    setRegistry('DataDigger:Colors', 'FieldFilter:bg'            ,'14'). /* yellow    */
+    setRegistry('DataDigger:Colors', 'FieldFilter:fg'            , '9'). /* blue      */
+    setRegistry('DataDigger:Colors', 'FilterBox:bg'              ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'IndexInactive:fg'          ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'IndexInactive:bg'          , '?'). /* default   */
+    setRegistry('DataDigger:Colors', 'PrimIndex:fg'              , '?'). /* default   */
+    setRegistry('DataDigger:Colors', 'PrimIndex:bg'              , '8'). /* lightgray */
+    setRegistry('DataDigger:Colors', 'QueryError:bg'             ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'QueryError:fg'             ,'14'). /* yellow    */
+    setRegistry('DataDigger:Colors', 'RecordCount:Complete:fg'   , '2'). /* green     */
+    setRegistry('DataDigger:Colors', 'RecordCount:Complete:bg'   , '?'). /* none      */
+    setRegistry('DataDigger:Colors', 'RecordCount:Incomplete:fg' ,'12'). /* red       */
+    setRegistry('DataDigger:Colors', 'RecordCount:Incomplete:bg' , '?'). /* none      */
+    setRegistry('DataDigger:Colors', 'RecordCount:Selected:fg'   , '7'). /* darkgray  */
+    setRegistry('DataDigger:Colors', 'RecordCount:Selected:bg'   , '?'). /* none      */
+    setRegistry('DataDigger:Colors', 'WarningBox:bg'             ,'14'). /* yellow    */
+    setRegistry('DataDigger:Colors', 'WarningBox:fg'             ,'12'). /* red       */
+  END.
 
   {&timerStop}
 END PROCEDURE. /* initializeSettingsFile */
@@ -9150,8 +9177,8 @@ PROCEDURE moveField :
   /* Find the active record */
   FIND bField WHERE ROWID(bField) = rCurrentField NO-ERROR.
   IF NOT AVAILABLE bField THEN RETURN.
-  FIND FIRST bColumnOrg WHERE bColumnOrg.cFieldName = bField.cFieldName.
-  iOldOrder = bField.iOrder.
+  FIND FIRST bColumnOrg WHERE bColumnOrg.cFieldName = bField.cFieldName NO-ERROR.
+  IF AVAILABLE bColumnOrg THEN iOldOrder = bField.iOrder.
 
   /* Change the order of the fields by 1.5
    * This sets the field exactly where we want it
@@ -9195,10 +9222,11 @@ PROCEDURE moveField :
   /* Now apply 'normal' numbers to the Columns */
   iCounter = 0.
   REPEAT PRESELECT EACH bField BY bField.iOrder:
-    FIND NEXT bField.
-    ASSIGN
-      iCounter      = iCounter + 1
-      bField.iOrder = iCounter.
+    FIND NEXT bField NO-ERROR.
+    IF AVAILABLE bField THEN 
+      ASSIGN
+        iCounter      = iCounter + 1
+        bField.iOrder = iCounter.
   END.
 
   /* Column follows field */
@@ -11413,8 +11441,8 @@ PROCEDURE setTableFilterOptions :
 
   DO WITH FRAME frMain:
     RUN VALUE(getProgramDir() + 'dFilter.w') (INPUT-OUTPUT TABLE ttTableFilter).
-    FIND ttTableFilter.
-    gcFieldFilterList = ttTableFilter.cTableFieldShow.
+    FIND ttTableFilter NO-ERROR.
+    IF AVAILABLE ttTableFilter THEN gcFieldFilterList = ttTableFilter.cTableFieldShow.
   END.
 
   RUN setRedLines.
@@ -11520,22 +11548,19 @@ PROCEDURE setTimer :
     RETURN.
   END.
 
-  /* Find it */
-  FIND bTimer WHERE bTimer.cProc = pcTimerProc NO-ERROR.
-
-  /* Create it if needed */
-  IF NOT AVAILABLE bTimer THEN
-  DO:
-    CREATE bTimer.
-    ASSIGN bTimer.cProc = pcTimerProc.
-  END.
-
-  /* When it is disabled, delete it */
+  /* Remove when disabled */
   IF piInterval = 0 THEN
-    DELETE bTimer.
+  DO:
+    FIND bTimer WHERE bTimer.cProc = pcTimerProc NO-ERROR.
+    IF AVAILABLE bTimer THEN DELETE bTimer.
+  END.
   ELSE
   DO:
+    FIND bTimer WHERE bTimer.cProc = pcTimerProc NO-ERROR.
+    IF NOT AVAILABLE bTimer THEN CREATE bTimer.
+    
     ASSIGN
+      bTimer.cProc = pcTimerProc
       bTimer.iTime = piInterval
       bTimer.tNext = ADD-INTERVAL(NOW, piInterval,"milliseconds")
       .
@@ -11558,8 +11583,16 @@ PROCEDURE setTimerInterval :
 
   /* Ignore this when the timer is not running */
   IF NOT glUseTimer THEN RETURN.
-
   IF NOT VALID-HANDLE(chCtrlFrame) THEN RETURN.
+
+  chCtrlFrame:pstimer:ENABLED = CAN-FIND(FIRST bTimer).
+
+  /* Check if there are old timers with datetime < now 
+   * these can be present when you hibernate your pc 
+   */
+  FOR EACH bTimer WHERE bTimer.tNext < NOW:
+    bTimer.tNext = ADD-INTERVAL(NOW, bTimer.iTime,"milliseconds").
+  END.
 
   /* Find the next timer to fire */
   FOR FIRST bTimer BY bTimer.tNext:
@@ -11568,7 +11601,19 @@ PROCEDURE setTimerInterval :
     chCtrlFrame:pstimer:INTERVAL = MAXIMUM(1,MTIME(bTimer.tNext) - MTIME(NOW)).
 
     /* Turn on events */
-    chCtrlFrame:pstimer:ENABLED = TRUE.
+    /* chCtrlFrame:pstimer:ENABLED = TRUE. */
+  END.
+  
+  /* DEBUG */
+  IF CONNECTED('pkf') THEN
+  DO:
+    OUTPUT TO c:\temp\timers.txt APPEND.
+    FOR EACH bTimer:
+      DISPLAY bTimer.cProc FORMAT 'x(20)'
+              bTimer.iTime FORMAT '>>>>>>9'
+              bTimer.tNext WITH STREAM-IO.
+    END.
+    OUTPUT CLOSE.
   END.
 
 END PROCEDURE. /* setTimerInterval */
@@ -11668,7 +11713,8 @@ PROCEDURE setWindowTitle :
   DEFINE VARIABLE hOwner          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE lStartWithTable AS LOGICAL   NO-UNDO.
 
-  FIND ttTableFilter.
+  FIND ttTableFilter NO-ERROR.
+  IF AVAILABLE ttTableFilter THEN 
   ASSIGN
     cNameShow  = ttTableFilter.cTableNameShow
     cNameHide  = ttTableFilter.cTableNameHide
@@ -13014,13 +13060,14 @@ FUNCTION getQueryFromFields RETURNS CHARACTER
   cQuery = ''.
   DO iField = 1 TO NUM-ENTRIES(pcFieldList):
     cField = ENTRY(iField,pcFieldList).
-    FIND ttField WHERE ttField.cFieldName = cField.
-    cQuery = SUBSTITUTE('&1&2 &3 = &4'
-                       , cQuery
-                       , (IF iField = 1 THEN 'WHERE' ELSE '~n  AND')
-                       , STRING(cField,cNameFormat)
-                       , QUOTER(getLinkInfo(cField))
-                       ).
+    FIND ttField WHERE ttField.cFieldName = cField NO-ERROR.
+    IF AVAILABLE ttField THEN 
+      cQuery = SUBSTITUTE('&1&2 &3 = &4'
+                         , cQuery
+                         , (IF iField = 1 THEN 'WHERE' ELSE '~n  AND')
+                         , STRING(cField,cNameFormat)
+                         , QUOTER(getLinkInfo(cField))
+                         ).
   END.
 
   PUBLISH "debugInfo" (1,SUBSTITUTE('Query From Fields: &1', cQuery)).

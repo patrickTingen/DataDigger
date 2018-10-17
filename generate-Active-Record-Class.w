@@ -470,10 +470,10 @@ END PROCEDURE. /* fillTT */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateClass C-Win 
 PROCEDURE generateClass :
-DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
+  DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cPrefix       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cName         AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cMask         AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cMask         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cHeader       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cIndent       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iMaxName      AS INTEGER   NO-UNDO.
@@ -509,7 +509,8 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
     IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
     cText = SUBSTITUTE(cMask, cHeader).
 
-    cText = SUBSTITUTE('&1~n&2 data.&3.&4'
+    cMask = '&1~n&2 data.&3.&4'.
+    cText = SUBSTITUTE(cMask
                       , cText
                       , (IF tgLowerCase:CHECKED THEN 'class' ELSE 'CLASS')
                       , pcDatabase

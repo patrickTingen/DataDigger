@@ -533,13 +533,13 @@ PROCEDURE drawElement :
 
   DEFINE BUFFER bBlock FOR ttBlock.
 
-  FIND bBlock WHERE RECID(bBlock) = prBlock.
-
-  ASSIGN
-    bBlock.hBlock:X             = ( bBlock.iPosX - 1) * giBlockWidth + 1 
-    bBlock.hBlock:Y             = ( bBlock.iPosY - 1) * giBlockHeight + 1
-    bBlock.hBlock:WIDTH-PIXELS  = giBlockWidth
-    bBlock.hBlock:HEIGHT-PIXELS = giBlockHeight.
+  FIND bBlock WHERE RECID(bBlock) = prBlock NO-ERROR.
+  IF AVAILABLE bBlock THEN 
+    ASSIGN
+      bBlock.hBlock:X             = ( bBlock.iPosX - 1) * giBlockWidth + 1 
+      bBlock.hBlock:Y             = ( bBlock.iPosY - 1) * giBlockHeight + 1
+      bBlock.hBlock:WIDTH-PIXELS  = giBlockWidth
+      bBlock.hBlock:HEIGHT-PIXELS = giBlockHeight.
 
 END PROCEDURE. /* drawElement */
 
@@ -699,7 +699,8 @@ PROCEDURE moveBlock :
   DEFINE BUFFER bBox    FOR ttBlock.
   DEFINE BUFFER bTarget FOR ttBlock.
 
-  FIND bBox WHERE RECID(bBox) = prBox.
+  FIND bBox WHERE RECID(bBox) = prBox NO-ERROR.
+  IF NOT AVAILABLE bBox THEN RETURN.
 
   /* Was there a target place underneath the box? */
   FIND bTarget
@@ -758,7 +759,9 @@ PROCEDURE movePlayer :
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Move the player to the new position */
-    FIND bPlayer WHERE bPlayer.cType = 'player'.
+    FIND bPlayer WHERE bPlayer.cType = 'player' NO-ERROR.
+    IF NOT AVAILABLE bPlayer THEN RETURN.
+    
     ASSIGN 
       bPlayer.iPosX = bPlayer.iPosX + piMoveX
       bPlayer.iPosY = bPlayer.iPosY + piMoveY
@@ -819,7 +822,9 @@ PROCEDURE processKeystroke :
   END CASE.
 
   /* Calculate new position of the player */
-  FIND bBlock WHERE bBlock.cType = 'player'.
+  FIND bBlock WHERE bBlock.cType = 'player' NO-ERROR.
+  IF NOT AVAILABLE bBlock THEN RETURN.
+  
   ASSIGN
     iNewX = bBlock.iPosX + bMove.iDeltaX
     iNewY = bBlock.iPosY + bMove.iDeltaY.
