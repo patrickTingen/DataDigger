@@ -1087,10 +1087,9 @@ PROCEDURE btnGoChoose :
                                     , hBufferDB:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent)
                                     ) ).
 
+            /* 1=yes 2=no 3=yes-all 4=cancel */
             CASE getRegistry('DataDigger:help', 'DataChanged:answer'):
-              WHEN '1' THEN . /* yes */
               WHEN '2' THEN NEXT #RecordLoop. /* no */
-              WHEN '3' THEN . /* yes-all */
               WHEN '4' THEN UNDO #CommitLoop, LEAVE #CommitLoop. /* cancel */
             END CASE.
           END.
@@ -1293,9 +1292,7 @@ PROCEDURE getOriginalData :
  * Get the original data from the database so we
  * can check on changes that were made by others
  */
-  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER phBrowse   AS HANDLE    NO-UNDO.
+  DEFINE INPUT PARAMETER phBrowse AS HANDLE    NO-UNDO.
 
   DEFINE VARIABLE hBufferTT    AS HANDLE  NO-UNDO.
   DEFINE VARIABLE hBufferDB    AS HANDLE  NO-UNDO.
@@ -1497,8 +1494,7 @@ PROCEDURE initializeObject :
   END.
    
   /* When editing records, keep a copy of the original data */
-  IF picMode = 'Edit' THEN
-    RUN getOriginalData(picDatabase, picTableName, pihBrowse).
+  IF picMode = 'Edit' THEN RUN getOriginalData(pihBrowse).
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -1748,3 +1744,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

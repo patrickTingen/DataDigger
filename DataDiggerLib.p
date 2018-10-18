@@ -2007,7 +2007,6 @@ PROCEDURE getTables :
   DEFINE VARIABLE cCacheFile      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hDbBuffer       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hDbStatusBuffer AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hFileBuffer     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery          AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hDbQuery        AS HANDLE      NO-UNDO.
   DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
@@ -2048,48 +2047,6 @@ PROCEDURE getTables :
     DO:
       CREATE ALIAS 'dictdb' FOR DATABASE VALUE(LDBNAME(iDatabase)).
       RUN getSchema.p(INPUT TABLE ttTable BY-REFERENCE).
-
-/*      CREATE BUFFER hDbBuffer    FOR TABLE LDBNAME(iDatabase) + "._Db"    IN WIDGET-POOL "metaInfo".                                                       */
-/*      CREATE BUFFER hFileBuffer  FOR TABLE LDBNAME(iDatabase) + "._file"  IN WIDGET-POOL "metaInfo".                                                       */
-/*      CREATE QUERY hQuery  IN WIDGET-POOL "metaInfo".                                                                                                      */
-/*                                                                                                                                                           */
-/*      hQuery:SET-BUFFERS(hDbBuffer, hFileBuffer).                                                                                                          */
-/*      hQuery:QUERY-PREPARE( "FOR EACH _Db NO-LOCK "                                                                                                        */
-/*                              + "   WHERE _Db._Db-local = TRUE"                                                                                            */
-/*                              + ",   EACH _File NO-LOCK"                                                                                                   */
-/*                              + "   WHERE _File._Db-recid    = RECID(_Db)"                                                                                 */
-/*                              + "     AND _File._File-Number < 32768"                                                                                      */
-/*                              + "     AND (IF _Db._Db-slave THEN _File._For-Type = 'TABLE' ELSE TRUE)"                                                     */
-/*                              + ",   EACH _Field NO-LOCK"                                                                                                  */
-/*                              + "   WHERE _Field._File-recid = RECID(_File)"                                                                               */
-/*                              ).                                                                                                                           */
-/*      hQuery:QUERY-OPEN().                                                                                                                                 */
-/*                                                                                                                                                           */
-/*      #File:                                                                                                                                               */
-/*      REPEAT:                                                                                                                                              */
-/*        hQuery:GET-NEXT().                                                                                                                                 */
-/*        IF hQuery:QUERY-OFF-END THEN LEAVE #File.                                                                                                          */
-/*                                                                                                                                                           */
-/*        CREATE ttTable.                                                                                                                                    */
-/*        ASSIGN                                                                                                                                             */
-/*          ttTable.cDatabase   = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase))                                                 */
-/*          ttTable.cTableName  = hFileBuffer::_file-name                                                                                                    */
-/*          ttTable.cTableDesc  = (IF hFileBuffer::_file-label <> ? AND hFileBuffer::_file-label <> '' THEN hFileBuffer::_file-label ELSE hFileBuffer::_desc)*/
-/*          ttTable.lHidden     = hFileBuffer::_hidden                                                                                                       */
-/*          ttTable.lFrozen     = hFileBuffer::_frozen                                                                                                       */
-/*          ttTable.cCrc        = hFileBuffer::_crc                                                                                                          */
-/*          ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, hFileBuffer::_file-name, hFileBuffer::_crc)                                      */
-/*          ttTable.iFileNumber = hFileBuffer::_file-number                                                                                                  */
-/*          .                                                                                                                                                */
-/*                                                                                                                                                           */
-/*        ttTable.cCategory   = getFileCategory(hFileBuffer::_file-number, hFileBuffer::_file-name).                                                         */
-/*        ttTable.cFields = getFieldList(ttTable.cDatabase, ttTable.cTableName).                                                                             */
-/*      END.                                                                                                                                                 */
-/*                                                                                                                                                           */
-/*      hQuery:QUERY-CLOSE().                                                                                                                                */
-/*      DELETE OBJECT hQuery.                                                                                                                                */
-/*      DELETE OBJECT hFileBuffer.                                                                                                                           */
-/*      DELETE OBJECT hDbBuffer.                                                                                                                             */
 
       /* Save cache file for next time */
       IF glCacheTableDefs THEN
@@ -3846,7 +3803,6 @@ FUNCTION getFont RETURNS INTEGER
   ( pcName AS CHARACTER ) :
   /* Return the fontnumber for the type given
   */
-  DEFINE VARIABLE iFont AS INTEGER NO-UNDO.
   DEFINE BUFFER bFont FOR ttFont.
 
   {&timerStart}
@@ -3882,22 +3838,10 @@ FUNCTION getImagePath RETURNS CHARACTER
   ( pcImage AS CHARACTER ) :
   /* Return the image path + icon set name
   */
-  DEFINE VARIABLE cImagePath AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cIconSet   AS CHARACTER   NO-UNDO.
-
   {&timerStart}
-
-  /*
-  cIconSet   = 'default'.
-  cImagePath = SUBSTITUTE('&1Image/&2_&3', getProgramDir(), cIconSet, pcImage).
-
-  /* Fall back to the default icon set when image not found */
-  IF SEARCH(cImagePath) = ? THEN
-  */
-  cImagePath = SUBSTITUTE('&1Image/default_&2', getProgramDir(), pcImage).
-
-  RETURN cImagePath.
+  RETURN SUBSTITUTE('&1Image/default_&2', getProgramDir(), pcImage).
   {&timerStop}
+  
 END FUNCTION. /* getImagePath */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4511,7 +4455,6 @@ FUNCTION isFileLocked RETURNS LOGICAL
   ( pcFileName AS CHARACTER ) :
   /* Check whether a file is locked on the file system
   */
-  DEFINE VARIABLE lpSecurityAtt AS INTEGER NO-UNDO.
   DEFINE VARIABLE iFileHandle   AS INTEGER NO-UNDO.
   DEFINE VARIABLE nReturn       AS INTEGER NO-UNDO.
 
@@ -4519,7 +4462,7 @@ FUNCTION isFileLocked RETURNS LOGICAL
   RUN CreateFileA ( INPUT pcFileName
                   , INPUT {&GENERIC_WRITE}
                   , {&FILE_SHARE_READ}
-                  , lpSecurityAtt
+                  , 0
                   , {&OPEN_EXISTING}
                   , {&FILE_ATTRIBUTE_NORMAL}
                   , 0
@@ -4737,52 +4680,9 @@ FUNCTION resolveOsVars RETURNS CHARACTER
       AND OS-GETENV(ENTRY(i,pcString,'%')) <> ? THEN
       ENTRY(i,pcString,'%') = OS-GETENV(ENTRY(i,pcString,'%')).
   END.
+  
   pcString = REPLACE(pcString,'%','').
   RETURN pcString.
-
-  /*
-  DEFINE VARIABLE iPercStart   AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iPercEnd     AS INTEGER NO-UNDO.
-  DEFINE VARIABLE cEnvVarName  AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cEnvVarValue AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cReturnValue AS CHARACTER NO-UNDO.
-
-  /* Support for OS-directives between % eg: %username% will expand
-   * to your username, as long as you have an OS-var for that.
-   */
-  cReturnValue = pcString.
-  iPercStart = INDEX(cReturnValue,'%').
-
-  resolveOsVars:
-  DO WHILE iPercStart > 0:
-    iPercEnd = INDEX(cReturnValue,'%',iPercStart + 1).
-
-    IF iPercEnd = 0 THEN LEAVE resolveOsVars. /* single % */
-    cEnvVarName = TRIM( SUBSTRING(cReturnValue,iPercStart, iPercEnd - iPercStart) ,'%'). /* Grab text between % */
-
-    /* Search in the registry */
-    LOAD "System" BASE-KEY "HKEY_LOCAL_MACHINE".
-    USE "System".
-    GET-KEY-VALUE SECTION "CurrentControlSet~\Control~\Session Manager~\Environment" KEY cEnvVarName VALUE cEnvVarValue.
-    UNLOAD "System".
-
-    /* If not defined, try our luck in the default env */
-    IF cEnvVarValue = ? THEN
-      cEnvVarValue = OS-GETENV(cEnvVarName) . /* try to resolve */
-
-    /* If still not found, step to next % */
-    IF cEnvVarValue = ? THEN
-    DO:
-      iPercStart = iPercEnd.
-      NEXT resolveOsVars.
-    END.
-
-    cReturnValue = REPLACE(cReturnValue,'%' + cEnvVarName + '%', cEnvVarValue). /* Replace with value */
-    iPercStart = INDEX(cReturnValue,'%'). /* Find next directive */
-  END.
-
-  RETURN cReturnValue.
-  */
 END FUNCTION. /* resolveOsVars */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4947,4 +4847,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

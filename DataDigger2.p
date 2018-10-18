@@ -234,11 +234,12 @@ PROCEDURE createDummyDb :
   DEFINE OUTPUT PARAMETER pcDummyDb AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cDatabase AS CHARACTER NO-UNDO.
 
+  #FindName:
   REPEAT:
     pcDummyDb = "DD_" + STRING(ETIME).
     cDatabase = SESSION:TEMP-DIR + pcDummyDb + ".db".
     FILE-INFORMATION:FILE-NAME = cDatabase.
-    IF FILE-INFORMATION:FULL-PATHNAME = ? THEN LEAVE.
+    IF FILE-INFORMATION:FULL-PATHNAME = ? THEN LEAVE #FindName.
   END.
 
   CREATE DATABASE cDatabase FROM "EMPTY" REPLACE NO-ERROR.
@@ -452,7 +453,7 @@ PROCEDURE recompileDataDigger :
       IF NUM-DBS = 0 THEN 
       DO:
         MESSAGE "Cannot create dummy database in folder" cDummyDb SKIP 
-                "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFO BUTTONS OK.
+                "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
         OS-COMMAND NO-WAIT START 'https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
         STOP.
       END.

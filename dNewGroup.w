@@ -130,7 +130,7 @@ DO:
   IF CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = fiGroupname:SCREEN-VALUE) THEN
   DO:
     MESSAGE 'This group already exists, please use another name'
-      VIEW-AS ALERT-BOX INFO BUTTONS OK.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
     RETURN NO-APPLY.
   END.
 
@@ -234,4 +234,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

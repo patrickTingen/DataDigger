@@ -852,7 +852,6 @@ PROCEDURE initializeObject :
   /* Don't accept rubbish */
   IF tTempDate = ? THEN tTempDate = TODAY.
 
-  /* Set calendar to this day */
   RUN setDate(tTempDate).
 
 END PROCEDURE. /* initializeObject */

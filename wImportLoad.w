@@ -368,7 +368,6 @@ PROCEDURE createBrowse :
   DEFINE VARIABLE iMinWidth    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cMyFormat    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iPos         AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE hField       AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cColumnName  AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -395,14 +394,7 @@ PROCEDURE createBrowse :
     COLUMN-RESIZABLE  = TRUE
     COLUMN-SCROLLING  = TRUE /* scroll with whole columns at a time */
     TRIGGERS:
-/*       ON "CTRL-A"           PERSISTENT RUN dataSelectAll           IN THIS-PROCEDURE (ghDataBrowse). */
-/*       ON "CTRL-D"           PERSISTENT RUN dataSelectNone          IN THIS-PROCEDURE (ghDataBrowse). */
       ON "ROW-DISPLAY"      PERSISTENT RUN dataRowDisplay          IN THIS-PROCEDURE (ghXmlBuffer).
-/*       ON "START-SEARCH"     PERSISTENT RUN dataColumnSort          IN THIS-PROCEDURE.                */
-/*       ON "VALUE-CHANGED"    PERSISTENT RUN dataRowValueChanged     IN THIS-PROCEDURE (ghXmlBuffer).  */
-/*       ON "END"              PERSISTENT RUN dataRowJumpToEnd        IN THIS-PROCEDURE (ghXmlBuffer).  */
-/*       ON "DEFAULT-ACTION"   PERSISTENT RUN dataDoubleClick         IN THIS-PROCEDURE (ghDataBrowse). */
-/*       ON "OFF-HOME"         PERSISTENT RUN dataOffHome             IN THIS-PROCEDURE.                */
     END TRIGGERS.
 
 
@@ -488,14 +480,11 @@ PROCEDURE createBrowse :
     /* Get last defined width from registry. Might have been set by user */
     iColumnWidth = INTEGER(getRegistry(SUBSTITUTE("DB:&1",bColumn.cDatabase), SUBSTITUTE("&1.&2:width", bColumn.cTableName, bColumn.cFullname)) ) NO-ERROR.
 
-    .message bColumn.cFullname iColumnWidth view-as alert-box.
-
     /* If it's not set, calculate a width. Make sure it is not wider than 300px */
     IF iColumnWidth = ? THEN iColumnWidth = MINIMUM(300, bColumn.hColumn:WIDTH-PIXELS).
 
     /* Make sure the column is at least as wide as its name */
     iMinWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(bColumn.cFullname,getFont("default")).
-    .message bColumn.cFullname iMinWidth view-as alert-box.
 
     /* For the combo-filters, reserve some extra space for the arrow down */
     /* And if the filter is of type COMBO, reserve some extra space for the arrow down */
@@ -504,23 +493,6 @@ PROCEDURE createBrowse :
 
     bColumn.hColumn:WIDTH-PIXELS = iColumnWidth.
   END.
-
-END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnSort wImportLoad
-PROCEDURE dataColumnSort :
-/*------------------------------------------------------------------------------
-  Purpose:
-  Parameters:  <none>
-  Notes:
-------------------------------------------------------------------------------*/
-
-  /*
-    run reopenDataBrowse(self:current-column:name,?).
-  */
 
 END PROCEDURE.
 
@@ -711,11 +683,6 @@ PROCEDURE initializeObject :
 
   /* Set window back to last known pos */
   RUN restoreWindowPos(wImportLoad:HANDLE, "DataDigger:ImportLoad").
-
-  /* Restore sort */
-/*   cSetting = getRegistry('DataDigger','ColumnSortRecord').                                */
-/*   IF cSetting <> ? THEN                                                                   */
-/*     ghDataBrowse:SET-SORT-ARROW(INTEGER(ENTRY(1,cSetting)), LOGICAL(ENTRY(2,cSetting)) ). */
 
   /* In read-only mode, disable FINISH button */
   IF plReadOnlyDigger THEN btnFinish:SENSITIVE = FALSE.

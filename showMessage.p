@@ -50,9 +50,9 @@ iWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(pcMessage,iFont) + cMessage:x + 30.
 iWidth = MAXIMUM(iWidth,150).
 
 winMessage:WIDTH-PIXELS = iWidth .
-cMessage:width-pixels = iWidth - 10.
-cMessage:screen-value = pcMessage.
-FRAME infoFrame:width-pixels = iWidth.
+cMessage:WIDTH-PIXELS = iWidth - 10.
+cMessage = pcMessage.
+FRAME infoFrame:WIDTH-PIXELS = iWidth.
 
 /* Center the window */
 winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS - winMessage:WIDTH-PIXELS) / 2.

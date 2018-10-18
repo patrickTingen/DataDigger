@@ -243,7 +243,7 @@ DO:
     AND CAN-DO(pcGroupList, fiGroupname:SCREEN-VALUE) THEN
   DO:
     MESSAGE 'There is another group with this name. Do you want to merge the groups?'
-      VIEW-AS ALERT-BOX INFO BUTTONS YES-NO-CANCEL UPDATE lMerge.
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lMerge.
 
     IF lMerge <> YES THEN RETURN NO-APPLY.
   END.
@@ -342,7 +342,7 @@ DO:
   DEFINE BUFFER bTable FOR ttTable.
 
   MESSAGE 'Are you sure you want to delete this group?'
-    VIEW-AS ALERT-BOX INFO BUTTONS YES-NO-CANCEL UPDATE lDelete.
+    VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lDelete.
 
   IF lDelete THEN
   DO:
@@ -398,7 +398,7 @@ END.
 
 &Scoped-define SELF-NAME fiGroupname
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiGroupname Dialog-Frame
-ON RETURN OF fiGroupname IN FRAME Dialog-Frame /* Group */
+ON RETURN OF fiGroupname IN FRAME Dialog-Frame
 DO:
   SELF:CLEAR-SELECTION(). 
   fiGroupname:READ-ONLY = TRUE.
@@ -541,8 +541,9 @@ PROCEDURE selectTables :
     DO:
       rTable = ROWID(ttTable).
       /* Position in browse */
+      #FindRow:
       DO iBrowseRow = 1 TO brTables:NUM-ENTRIES:
-        IF brTables:IS-ROW-SELECTED(iBrowseRow) THEN LEAVE. 
+        IF brTables:IS-ROW-SELECTED(iBrowseRow) THEN LEAVE #FindRow. 
       END.
     END.
 

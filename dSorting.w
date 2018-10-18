@@ -515,14 +515,6 @@ PROCEDURE initializeObject :
 /*
  * Prepare widgets
  */
-/*
-DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
-  FIELD iGroup     AS INTEGER /* 1:query, 2:browse */
-  FIELD iSortNr    AS INTEGER
-  FIELD cSortField AS CHARACTER
-  FIELD lAscending AS LOGICAL
-  INDEX iPrim IS PRIMARY iGroup iSortNr
- */
 DEFINE VARIABLE cFields   AS CHARACTER NO-UNDO.
 DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
 

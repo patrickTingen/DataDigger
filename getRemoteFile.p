@@ -26,10 +26,12 @@ END PROCEDURE. /* DeleteUrlCacheEntry */
 */
 DEFINE VARIABLE iResult   AS INTEGER   NO-UNDO.
 DEFINE VARIABLE cTempFile AS CHARACTER   NO-UNDO.
+
 /* Figure out a temp name */
+#GetName:
 REPEAT:
   cTempFile = SUBSTITUTE('&1_remote-file-&2.txt', SESSION:TEMP-DIRECTORY, ETIME).
-  IF SEARCH(cTempFile) = ? THEN LEAVE.
+  IF SEARCH(cTempFile) = ? THEN LEAVE #GetName.
 END.
 
 /* Download */

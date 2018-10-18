@@ -25,7 +25,9 @@ FOR EACH dictdb._File NO-LOCK
   ASSIGN
     ttTable.cDatabase   = (IF dictdb._Db._Db-slave THEN dictdb._Db._Db-name ELSE LDBNAME('dictdb'))
     ttTable.cTableName  = dictdb._File._file-name                                            
-    ttTable.cTableDesc  = (IF dictdb._File._file-label <> ? AND dictdb._File._file-label <> '' THEN dictdb._File._file-label ELSE dictdb._File._desc)
+    ttTable.cTableDesc  = TRIM( (IF dictdb._File._file-label <> ? AND dictdb._File._file-label <> '' THEN dictdb._File._file-label + ', ' ELSE '') 
+                              + (IF dictdb._File._desc <> ? AND dictdb._File._desc <> '' AND dictdb._File._desc <> dictdb._File._file-label THEN dictdb._File._desc ELSE '') 
+                              , ' ,')
     ttTable.lHidden     = dictdb._File._hidden
     ttTable.lFrozen     = dictdb._File._frozen 
     ttTable.cCrc        = STRING(dictdb._File._crc)     

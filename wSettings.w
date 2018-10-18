@@ -602,11 +602,12 @@ PROCEDURE factoryReset :
 
   /* Get a list of all folders in the DD dir */
   INPUT FROM OS-DIR(getProgramDir()).
+  #ReadLoop:
   REPEAT:
     IMPORT cFile.
-    IF NOT cFile[3] BEGINS 'D' THEN NEXT.
-    IF cFile[1] BEGINS '.' THEN NEXT.
-    IF cFile[1] = 'image' THEN NEXT.
+    IF NOT cFile[3] BEGINS 'D' THEN NEXT #ReadLoop.
+    IF cFile[1] BEGINS '.' THEN NEXT #ReadLoop.
+    IF cFile[1] = 'image' THEN NEXT #ReadLoop.
     cFolders = cFolders + '~n - delete folder ' + cFile[2].
     cFolderList = TRIM(SUBSTITUTE('&1~n&2',cFolderList,cFile[2]),'~n').
   END.
@@ -906,7 +907,7 @@ PROCEDURE setPage :
       hButton:Y = 60 + (iPage * 35)
       hButton:WIDTH-PIXELS = 125
       hButton:HEIGHT-PIXELS = 35
-      hButton:LABEL = hButton:PRIVATE-DATA.
+      hButton:LABEL = hButton:PRIVATE-DATA
       .
 
     /* Selected button */

@@ -1133,7 +1133,7 @@ PROCEDURE dumpData :
         IF LOOKUP(cTtField,"ROWID,RECID") > 0 THEN NEXT #FieldLoop.
         hExportTt:ADD-LIKE-FIELD(cTtField,cDbField).
 
-      END. /* do iCurField = 1 to num-entries(picSelectedFields): */
+      END. /* do iCurField */
 
       /* add all indexes to the temp-table layout which consists of selected fields  */
       CREATE BUFFER hExportQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
@@ -1312,7 +1312,7 @@ PROCEDURE DumpData4GL :
     hTTBuffer    = pihTempTable:DEFAULT-BUFFER-HANDLE
     iNumRecords  = 0
     cKeyFields   = getIndexFields(gcDB, gcTable, "P,U")
-    cBufName     = 'b' + CAPS(SUBSTRING(gcTable,1,1)) + LC(SUBSTRING(gcTable,2)).
+    cBufName     = 'b' + CAPS(SUBSTRING(gcTable,1,1)) + LC(SUBSTRING(gcTable,2))
     .
 
   /* Open outputfile */
@@ -1397,11 +1397,12 @@ PROCEDURE DumpData4GL :
 
     /* data */
     iNumFields = 0.
+    #DataLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
       hField    = hTTBuffer:BUFFER-FIELD(iCurField).
       iExtBegin = (IF hField:EXTENT = 0 THEN 0 ELSE 1).
       iExtEnd   = MAXIMUM(hField:EXTENT, 0).
-      IF LOOKUP(hField:DATA-TYPE, "raw,clob,blob") > 0 THEN NEXT.
+      IF LOOKUP(hField:DATA-TYPE, "raw,clob,blob") > 0 THEN NEXT #DataLoop.
 
       DO iExtent = iExtBegin TO iExtEnd:
         /* Place an assign statement every 100 fields */
@@ -1710,7 +1711,6 @@ PROCEDURE DumpDataHtml :
       FIND ttField WHERE ttField.cFullName = hField:NAME NO-ERROR.
       IF NOT AVAILABLE ttField THEN NEXT #FieldLoop.
 
-/*       IF hField:EXTENT > 1 THEN */
       DO iExtent = (IF hField:EXTENT = 0 THEN 0 ELSE 1) TO MAXIMUM(0,hField:EXTENT):
 
         ASSIGN 
@@ -2489,8 +2489,8 @@ FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   ) :
   /* Get field names from index information string
   */
-  DEFINE VARIABLE cFieldList AS CHARACTER  NO-UNDO.
-  DEFINE VARIABLE iCurPair   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE cList AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE i     AS INTEGER    NO-UNDO.
 
   /*   The returned comma-separated list consists of the following in the specified order:  */
   /*   - The index name.                                                                    */
@@ -2499,21 +2499,21 @@ FUNCTION getFieldListFromIndexInformation RETURNS CHARACTER
   /*     2 the index primary                                                                */
   /*     3 the index is a word index.                                                       */
   /*   - The names of the index fields, each followed by a 0 (ascending) or 1 (descending). */
-  IF picIndexInformation = ? THEN RETURN cFieldList.
+  IF picIndexInformation = ? THEN RETURN cList.
 
   ENTRY(1,picIndexInformation) = "".
   picIndexInformation = SUBSTRING(picIndexInformation,8).
 
-  DO iCurPair = 1 TO NUM-ENTRIES(picIndexInformation) - 1 BY 2:
+  DO i = 1 TO NUM-ENTRIES(picIndexInformation) - 1 BY 2:
 
-    cFieldList = SUBSTITUTE( "&1&2&3"
-                           , cFieldList
-                           , (IF cFieldList = "" THEN "" ELSE ",")
-                           , ENTRY(iCurPair,picIndexInformation)
-                           ).
-  END. /* do iCurPair = 1 to num-entries(picIndexInformation) - 1 by 2: */
+    cList = SUBSTITUTE( "&1&2&3"
+                      , cList
+                      , (IF cList = "" THEN "" ELSE ",")
+                      , ENTRY(i,picIndexInformation)
+                      ).
+  END. /* do iCurPair */
 
-  RETURN cFieldList.
+  RETURN cList.
 END FUNCTION. /* getFieldListFromIndexInformation */
 
 /* _UIB-CODE-BLOCK-END */
