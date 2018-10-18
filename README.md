@@ -20,7 +20,7 @@ More info on the [wiki](https://github.com/patrickTingen/DataDigger/wiki/HowTo-I
 Special thanks to the members of the DataDigger testing team!
 
 ## Code quality
-Code quality of the develop branch is measured by [Sonar Cube](http://sonar.riverside-software.fr/dashboard?branch=develop&id=patrickTingen%3ADataDigger), hosted by Gilles Querret. Current status is ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=alert_status)
+Code quality of the develop branch is measured by [Sonar Cube](http://sonar.riverside-software.fr/dashboard?branch=develop&id=patrickTingen%3ADataDigger), hosted by Gilles Querret.<br/>Current status is ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=alert_status)
 
 Overall status|Details
 --------------|-------
