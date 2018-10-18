@@ -20,12 +20,7 @@ More info on the [wiki](https://github.com/patrickTingen/DataDigger/wiki/HowTo-I
 Special thanks to the members of the DataDigger testing team!
 
 ## Code quality
-Code quality of the develop branch is measured by [Sonar Cube](http://sonar.riverside-software.fr/dashboard?branch=develop&id=patrickTingen%3ADataDigger), hosted by Gilles Querret.<br/>Current status is ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=alert_status)
-
-Overall status|Details
---------------|-------
-![](http://sonar.riverside-software.fr/api/project_badges/quality_gate?branch=develop&project=patrickTingen%3ADataDigger)|![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=ncloc) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=duplicated_lines_density)<br/>![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=bugs) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=code_smells) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=sqale_index)<br/>![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=sqale_rating) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=reliability_rating) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=security_rating)
-
+Code quality of the develop branch is measured by [Sonar Cube](http://sonar.riverside-software.fr/dashboard?branch=develop&id=patrickTingen%3ADataDigger), hosted by Gilles Querret.<br/>Current status is ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=alert_status) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=bugs)
 
 ## History
 
