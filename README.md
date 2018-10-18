@@ -4,12 +4,11 @@ A dynamic, open source dataviewer for your Progress / OpenEdge databases
 
 ## Getting started
 
-- Download DataDigger and extract it its own folder. 
-- Add your own database connections to DataDigger.pf 
-- Start DataDigger.p 
+- Download DataDigger.zip
+- Extract it to its own folder
+- Double-click DataDigger.pf
 
-Note that DataDigger recognises db’s that are connected at startup.
-You can define extra database connections inside DataDigger or connect them on the fly.
+More info on the [wiki](https://github.com/patrickTingen/DataDigger/wiki/HowTo-InstallDataDigger)
 
 - For general info consult the [DataDigger blog](<https://datadigger.wordpress.com>)
 - Download [stable](<https://github.com/patrickTingen/DataDigger/archive/master.zip>) or [develop](<https://github.com/patrickTingen/DataDigger/archive/develop.zip>) version
@@ -20,11 +19,21 @@ You can define extra database connections inside DataDigger or connect them on t
 
 Special thanks to the members of the DataDigger testing team!
 
+## Code quality
+Code quality of the develop branch is measured by [Sonar Cube](http://sonar.riverside-software.fr/dashboard?branch=develop&id=patrickTingen%3ADataDigger), hosted by Gilles Querret. Current status is ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=alert_status)
+
+Overall status|Details
+--------------|-------
+![](http://sonar.riverside-software.fr/api/project_badges/quality_gate?branch=develop&project=patrickTingen%3ADataDigger)|![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=ncloc) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=duplicated_lines_density)<br/>![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=bugs) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=code_smells) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=sqale_index)<br/>![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=sqale_rating) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=reliability_rating) ![](http://sonar.riverside-software.fr/api/project_badges/measure?branch=develop&project=patrickTingen%3ADataDigger&metric=security_rating)
+
+
 ## History
 
 In 2008 I needed a tool like this and ended up with DataHack made by Richard Tardivon. Soon I  started fiddling with the program and after a few months I decided to fork it under the name of DataDigger. Build 13 of 13 jan 2010 was the first that appeared on the OpenEdge Hive. Starting with v19 the home of the DataDigger is at GitHub.
 
 ## Version history:
+
+Full changelog can be found [here](https://raw.githubusercontent.com/patrickTingen/DataDigger/develop/DataDigger.txt)
 
 - DataDigger 24 -  3 oct 2018 (Pure Gold)
 - DataDigger 23 - 15 apr 2017 (Easter Egg Edition)
