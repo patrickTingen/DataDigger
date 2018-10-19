@@ -201,7 +201,7 @@ END PROCEDURE. /* URLDownloadToFileA */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
 btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
 fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
-brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup btnTableFilter ficWhere ~
 btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
 btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
 btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
@@ -339,6 +339,16 @@ FUNCTION setQuery RETURNS LOGICAL
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQueryEditor C-Win 
 FUNCTION setQueryEditor RETURNS LOGICAL
   ( pcQueryEditorState AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry C-Win 
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -973,9 +983,9 @@ DEFINE FRAME frMain
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
@@ -1397,7 +1407,7 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
 &Scoped-define SELF-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON ALT-CTRL-D OF C-Win /* DataDigger */
-ANYWHERE 
+ANYWHERE
 DO:
   RUN flushKeyBuffer. /* to eat strange characters */
 
@@ -1477,7 +1487,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON CTRL-B OF C-Win /* DataDigger */
 DO:
-  
+
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnAboutChoose.
 
@@ -1489,12 +1499,12 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON CTRL-C OF C-Win /* DataDigger */
-OR 'CTRL-SHIFT-C' OF c-win ANYWHERE  
+OR 'CTRL-SHIFT-C' OF c-win ANYWHERE
 DO:
-  
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnConnectionsChoose.
-  ELSE 
+  ELSE
     FOCUS:EDIT-COPY() NO-ERROR.
 
 END.
@@ -1508,7 +1518,7 @@ ON CTRL-D OF C-Win /* DataDigger */
 OR 'CTRL-SHIFT-D' OF c-win ANYWHERE
 DO:
 
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN startTool('dict').
 
 END.
@@ -1523,7 +1533,7 @@ OR "CTRL-SHIFT-N" OF c-win ANYWHERE
 DO:
 
   RUN flushKeyBuffer. /* to eat strange characters */
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnDataDiggerChoose.
 
 END.
@@ -1536,7 +1546,7 @@ END.
 ON CTRL-P OF C-Win /* DataDigger */
 OR "CTRL-SHIFT-P" OF c-win ANYWHERE
 DO:
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnQueriesChoose.
 END.
 
@@ -1549,7 +1559,7 @@ ON CTRL-Q OF C-Win /* DataDigger */
 OR "CTRL-SHIFT-Q" OF c-win ANYWHERE
 DO:
 
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnQueryTesterChoose.
 
 END.
@@ -1560,13 +1570,13 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
 ON CTRL-S OF C-Win /* DataDigger */
-OR 'CTRL-SHIFT-S' OF c-win ANYWHERE 
+OR 'CTRL-SHIFT-S' OF c-win ANYWHERE
 DO:
   RUN flushKeyBuffer. /* to eat strange characters */
 
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnSettingsChoose.
-  ELSE 
+  ELSE
     RUN btnDumpChoose.
 
 END.
@@ -1579,8 +1589,8 @@ END.
 ON CTRL-W OF C-Win /* DataDigger */
 OR "CTRL-SHIFT-W" OF c-win ANYWHERE
 DO:
-  
-  IF CAN-DO(GetKeyList(),'SHIFT') THEN 
+
+  IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnHelpChoose.
 
 END.
@@ -1650,7 +1660,7 @@ ANYWHERE DO:
 
   IF glReadOnlyDigger <> plReadOnlyDigger THEN
     glReadOnlyDigger = plReadOnlyDigger.
-  ELSE 
+  ELSE
     glReadOnlyDigger = TRUE.
 
   RUN setWindowTitle.
@@ -1675,7 +1685,7 @@ ANYWHERE DO:
     FRAME frData:FGCOLOR = 8.  /* light gray */
 
     FRAME frSettings:BGCOLOR = 26. /* BG dark gray */
-    FRAME frSettings:FGCOLOR = 15. 
+    FRAME frSettings:FGCOLOR = 15.
 
     giDataOddRowColor[1]  = 15. /* FG white*/
     giDataOddRowColor[2]  = 25. /* BG very dark gray */
@@ -1713,22 +1723,22 @@ END.
 ON F12 OF C-Win /* DataDigger */
 ANYWHERE DO:
 
-  /* Show position of focussed widget 
+  /* Show position of focussed widget
   */
   &IF DEFINED (UIB_is_running) &THEN
-  
+
     DEFINE VARIABLE hWidget  AS HANDLE    NO-UNDO.
     DEFINE VARIABLE iTargetX AS INTEGER   NO-UNDO.
     DEFINE VARIABLE iTargetY AS INTEGER   NO-UNDO.
     DEFINE VARIABLE cWidgets AS CHARACTER NO-UNDO.
-  
+
     hWidget = FOCUS.
     REPEAT:
       IF NOT VALID-HANDLE(hWidget) OR hWidget:TYPE = 'window' THEN LEAVE.
-  
+
       IF hWidget:X <> ? THEN iTargetX = iTargetX + hWidget:X.
       IF hWidget:Y <> ? THEN iTargetY = iTargetY + hWidget:Y.
-  
+
       cWidgets = SUBSTITUTE("&1 &2: pos: &3,&4 (&5 x &6)~n&7"
                            , hWidget:TYPE
                            , hWidget:NAME
@@ -1738,14 +1748,14 @@ ANYWHERE DO:
                            , hWidget:HEIGHT-PIXELS
                            , cWidgets
                            ).
-  
+
       hWidget = hWidget:PARENT.
     END.
-  
+
     MESSAGE
       cWidgets SKIP(0) 'Final widget position:' iTargetX ',' iTargetY
       VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE ' Debug info '.
-  
+
   &ENDIF
 
 END.
@@ -2019,7 +2029,7 @@ DO:
   DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
   PUBLISH "debugInfo" (3, SUBSTITUTE("Filter : &1", gcFieldFilterList)).
-  
+
   FOR EACH bColumnHandle WHERE bColumnHandle.hBrowse = brFields:HANDLE:
 
     /* Set colors if field is matched on FieldFilter */
@@ -2037,13 +2047,13 @@ DO:
 
       /* Set color if format is non-default */
       CASE bColumnHandle.cColumn:
-        WHEN "cFormat" THEN 
-          ASSIGN 
+        WHEN "cFormat" THEN
+          ASSIGN
             bColumnHandle.hColumn:FGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN giColorCustomFormatFG ELSE ?)
             bColumnHandle.hColumn:BGCOLOR = (IF ttField.cFormat <> ttField.cFormatOrg THEN giColorCustomFormatBG ELSE ?).
 
-        WHEN "iOrder"  THEN 
-          ASSIGN 
+        WHEN "iOrder"  THEN
+          ASSIGN
             bColumnHandle.hColumn:FGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN giColorCustomOrderFG ELSE ?)
             bColumnHandle.hColumn:BGCOLOR = (IF ttField.iOrder  <> ttField.iOrderOrg  THEN giColorCustomOrderBG ELSE ?).
 
@@ -2269,8 +2279,8 @@ DO:
   DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
   FOR EACH bColumnHandle WHERE bColumnHandle.hBrowse = brIndexes:HANDLE:
-    bColumnHandle.hColumn:FGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactivFG  ELSE ?). /* red */  
-    bColumnHandle.hColumn:BGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactiveBG ELSE ?). /* red */  
+    bColumnHandle.hColumn:FGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactivFG  ELSE ?). /* red */
+    bColumnHandle.hColumn:BGCOLOR = (IF ttIndex.lIndexActive = FALSE THEN giColorIndexInactiveBG ELSE ?). /* red */
   END.
 
 END.
@@ -2321,7 +2331,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
 ON f OF brTables IN FRAME frMain
 DO:
-  
+
   RUN toggleFavourite.
 
 END.
@@ -2471,7 +2481,7 @@ DO:
     fiTableDesc:SCREEN-VALUE = hBuffer::cTableDesc.
     fiTableDesc:TOOLTIP      = hBuffer::cTableDesc.
 
-    IF glShowFavourites THEN 
+    IF glShowFavourites THEN
       btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
     ELSE
       RUN showFavouriteIcon(CAN-DO(hBuffer::cFavourites,cbFavouriteGroup:SCREEN-VALUE)).
@@ -2492,7 +2502,7 @@ DO:
     fiTableDesc:SCREEN-VALUE = "".
     fiTableDesc:TOOLTIP      = ''.
 
-    IF glShowFavourites THEN 
+    IF glShowFavourites THEN
       btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
     ELSE
       RUN showFavouriteIcon(IF glShowFavourites THEN TRUE ELSE FALSE).
@@ -2583,7 +2593,7 @@ END.
 &Scoped-define SELF-NAME btnAbout
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout C-Win
 ON CHOOSE OF btnAbout IN FRAME frSettings /* Info */
-OR "CHOOSE" OF btnAbout-txt 
+OR "CHOOSE" OF btnAbout-txt
 OR "CTRL-SHIFT-B" OF c-win ANYWHERE
 DO:
 
@@ -2762,7 +2772,7 @@ DO:
     RUN timedTableFilter.
     APPLY 'ENTRY' TO brTables.
   END.
-  ELSE 
+  ELSE
     RUN btnClearTableFilterChoose.
 END.
 
@@ -2828,7 +2838,7 @@ END. /* choose of btnDelete */
 &Scoped-define SELF-NAME btnConnections
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections C-Win
 ON CHOOSE OF btnConnections IN FRAME frSettings /* Con */
-OR "CHOOSE" OF btnConnections-txt 
+OR "CHOOSE" OF btnConnections-txt
 DO:
 
   RUN btnConnectionsChoose.
@@ -2842,7 +2852,7 @@ END.
 &Scoped-define SELF-NAME btnDataAdmin
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataAdmin C-Win
 ON CHOOSE OF btnDataAdmin IN FRAME frSettings /* ADM */
-OR "CHOOSE" OF btnDataAdmin-txt 
+OR "CHOOSE" OF btnDataAdmin-txt
 DO:
   RUN startTool("Admin").
 END.
@@ -2854,7 +2864,7 @@ END.
 &Scoped-define SELF-NAME btnDataDigger
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger C-Win
 ON CHOOSE OF btnDataDigger IN FRAME frSettings /* DD */
-OR "CHOOSE" OF btnDataDigger-txt 
+OR "CHOOSE" OF btnDataDigger-txt
 OR "ALT-D" OF FRAME frMain ANYWHERE
 DO:
   RUN btnDataDiggerChoose.
@@ -2895,7 +2905,7 @@ END. /* choose of btnDelete */
 &Scoped-define SELF-NAME btnDict
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict C-Win
 ON CHOOSE OF btnDict IN FRAME frSettings /* DD */
-OR "CHOOSE" OF btnDict-txt 
+OR "CHOOSE" OF btnDict-txt
 DO:
 
   RUN startTool('Dict').
@@ -2936,7 +2946,7 @@ END.
 &Scoped-define SELF-NAME btnEditor
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEditor C-Win
 ON CHOOSE OF btnEditor IN FRAME frSettings /* Ed */
-OR "CHOOSE" OF btnEditor-txt 
+OR "CHOOSE" OF btnEditor-txt
 OR "CTRL-SHIFT-E" OF c-win
 OR "SHIFT-F3" OF c-win ANYWHERE
 DO:
@@ -2952,7 +2962,7 @@ END.
 &Scoped-define SELF-NAME btnExpand
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
 ON CHOOSE OF btnExpand IN FRAME frSettings /* < > */
-OR "CHOOSE" OF btnExpand-txt 
+OR "CHOOSE" OF btnExpand-txt
 OR "CTRL-ALT-T" OF c-win ANYWHERE
 DO:
   DEFINE VARIABLE hFocus     AS HANDLE    NO-UNDO.
@@ -2970,7 +2980,7 @@ DO:
 
   setWindowFreeze(NO).
   APPLY 'entry' TO hFocus.
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3009,8 +3019,8 @@ END.
 &Scoped-define SELF-NAME btnHelp
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
 ON CHOOSE OF btnHelp IN FRAME frSettings /* Help */
-OR "CHOOSE" OF btnHelp-txt 
-OR "HELP" OF c-win 
+OR "CHOOSE" OF btnHelp-txt
+OR "HELP" OF c-win
 DO:
 
   glShowTour = TRUE.
@@ -3025,13 +3035,13 @@ END.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
 ON MOUSE-MENU-CLICK OF btnHelp IN FRAME frSettings /* Help */
-, btnHelp-txt 
+, btnHelp-txt
 DO:
 
   glShowTour = TRUE.
   RUN showNewFeatures.
   glShowTour = FALSE.
-  
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3203,7 +3213,7 @@ END.
 &Scoped-define SELF-NAME btnQueryTester
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryTester C-Win
 ON CHOOSE OF btnQueryTester IN FRAME frSettings /* Q */
-OR "CHOOSE" OF btnQueryTester-txt 
+OR "CHOOSE" OF btnQueryTester-txt
 DO:
   RUN btnQueryTesterChoose.
 END.
@@ -3230,7 +3240,7 @@ END.
 &Scoped-define SELF-NAME btnSettings
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
 ON CHOOSE OF btnSettings IN FRAME frSettings /* Set */
-OR "CHOOSE" OF btnSettings-txt 
+OR "CHOOSE" OF btnSettings-txt
 DO:
   RUN btnSettingsChoose.
 END.
@@ -3356,7 +3366,7 @@ OR "CTRL-T" OF FRAME frMain ANYWHERE
 DO:
   DEFINE VARIABLE hFocus       AS HANDLE  NO-UNDO.
   DEFINE VARIABLE lShowToolbar AS LOGICAL NO-UNDO.
-  
+
   /* Show hint when first time entering the toolbar */
   IF getRegistry('DataDigger:Usage', 'useToolbar:numUsed') = ? THEN
   DO:
@@ -3367,15 +3377,15 @@ DO:
   PUBLISH "setUsage" ("useToolbar"). /* user behaviour */
 
   /* CTRL-SHIFT-T is for showing/hiding only */
-  IF CAN-DO(GetKeyList(),'SHIFT') OR LAST-EVENT:LABEL = 'CHOOSE' THEN 
+  IF CAN-DO(GetKeyList(),'SHIFT') OR LAST-EVENT:LABEL = 'CHOOSE' THEN
   DO:
     hFocus = FOCUS.
     lShowToolbar = (NOT FRAME frSettings:VISIBLE).
   END.
 
-  /* CTRL-T is for accessing the toolbar, 
+  /* CTRL-T is for accessing the toolbar,
    * but we must make sure it is visible */
-  ELSE 
+  ELSE
   DO:
     lShowToolbar = TRUE.
     hFocus = btnDataDigger:HANDLE IN FRAME frSettings.
@@ -3385,7 +3395,7 @@ DO:
   RUN showToolbar(lShowToolbar).
   RUN endResize.
   IF VALID-HANDLE(hFocus) THEN APPLY 'entry' TO hFocus.
-  
+
   RETURN NO-APPLY.
 END.
 
@@ -3513,7 +3523,7 @@ DO:
    */
   APPLY "VALUE-CHANGED" TO brTables IN FRAME frMain.
 
-  /* Check whether a table change event is pending 
+  /* Check whether a table change event is pending
    * this happens if you change tables in the browse and IMMEDIATELY press enter
    * then the fields table is not yet populated
    */
@@ -3557,7 +3567,7 @@ DO:
     END.
 
   END CASE.
-  
+
   RETURN NO-APPLY.
 END.
 
@@ -3989,13 +3999,13 @@ ON RETURN OF fiTableFilter IN FRAME frMain
 , cbDatabaseFilter, brTables
 DO:
 
-  /* If the timer is running, then try to open the query on this table 
-   * if the timer is NOT running, user will use RETURN to filter the 
+  /* If the timer is running, then try to open the query on this table
+   * if the timer is NOT running, user will use RETURN to filter the
    * table browse, since it is not done automatically
    */
   IF glUseTimer = TRUE THEN
     APPLY 'CHOOSE' TO btnViewData.
-  ELSE 
+  ELSE
     RUN filterTables.
 
   RETURN NO-APPLY.
@@ -4269,7 +4279,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   /* Notify launcher that the window started */
   PUBLISH 'DataDigger'(+1).
-  
+
   RUN initializeUi.
   RUN initializeObjects.
 
@@ -4284,7 +4294,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   /* Auto-start DD on selected text */
   RUN setTable(?).
 
-  setWindowFreeze(NO). 
+  setWindowFreeze(NO).
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
   DO:
@@ -4357,11 +4367,11 @@ PROCEDURE btnAddFavGroupChoose :
 
   DO WITH FRAME {&FRAME-NAME}:
     RUN dNewGroup.w(INPUT TABLE ttFavGroup BY-REFERENCE, OUTPUT cName).
-    
+
     RUN getFavourites.
     cbFavouriteGroup:SCREEN-VALUE = cName.
     APPLY 'VALUE-CHANGED' TO cbFavouriteGroup.
-    
+
     IF cName <> '' THEN RUN editFavourites.
   END.
 
@@ -4429,16 +4439,16 @@ PROCEDURE btnClearTableFilterChoose :
   DO WITH FRAME {&FRAME-NAME}:
     PUBLISH "setUsage" ("clearTableFilter"). /* user behaviour */
 
-    /* Clear the filters in two steps: if user entered something then clear 
+    /* Clear the filters in two steps: if user entered something then clear
      * that first. In second step clear out the advanced filter settings
      */
-    IF FilterModified(fiTableFilter:HANDLE,?) 
-      AND getRegistry('DataDigger:usage','TwoStepClearTableFilter:numUsed') = ? 
-      AND ttTableFilter.lModified THEN  
+    IF FilterModified(fiTableFilter:HANDLE,?)
+      AND getRegistry('DataDigger:usage','TwoStepClearTableFilter:numUsed') = ?
+      AND ttTableFilter.lModified THEN
     DO:
       RUN showHint(fiTableFilter:HANDLE,{&ARROW-LEFT-UP}, "~nClearing the filter is now in two steps, first time this field will be cleared").
       RUN showHint(btnTableFilter:HANDLE,{&ARROW-LEFT-UP}, "~nThe second time these settings will be cleared").
-      PUBLISH "setUsage" ("TwoStepClearTableFilter"). /* user behaviour */  
+      PUBLISH "setUsage" ("TwoStepClearTableFilter"). /* user behaviour */
     END.
 
     IF NOT FilterModified(fiTableFilter:HANDLE,?) THEN
@@ -4620,7 +4630,7 @@ PROCEDURE btnDeleteChoose :
   END.
 
   RUN showHelp('ConfirmDelete', STRING(ghDataBrowse:NUM-SELECTED-ROWS)).
-  IF getRegistry('DataDigger:help', 'ConfirmDelete:answer') <> '1' THEN 
+  IF getRegistry('DataDigger:help', 'ConfirmDelete:answer') <> '1' THEN
   DO:
     /* Don't save 'NO' or 'CANCEL' as answer to this question */
     setRegistry('DataDigger:help', 'ConfirmDelete:answer', ?).
@@ -4719,7 +4729,7 @@ PROCEDURE btnDumpChoose :
 
   /* Prevent illegal calls */
   IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN.
-  IF NOT btnDump:SENSITIVE IN FRAME frMain THEN RETURN. 
+  IF NOT btnDump:SENSITIVE IN FRAME frMain THEN RETURN.
 
   /* If no data then go back */
   IF ghDataBrowse:QUERY:num-results = 0
@@ -4742,9 +4752,9 @@ PROCEDURE btnDumpChoose :
 
   /* Check Date-format in ini file */
   cSetting = getRegistry('DataDigger', 'DateFormat').
-  IF cSetting = ? THEN 
+  IF cSetting = ? THEN
     setRegistry('DataDigger', 'DateFormat', SESSION:DATE-FORMAT).
-  ELSE 
+  ELSE
     SESSION:DATE-FORMAT = cSetting.
 
   RUN VALUE(getProgramDir() + 'wDump.w')
@@ -4790,7 +4800,7 @@ PROCEDURE btnEditChoose :
   /* If shift key pressed, then display instead of edit */
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnViewChoose.
-  ELSE 
+  ELSE
   DO:
     RUN VALUE(getProgramDir() + 'wEdit.w')
       ( INPUT glReadOnlyDigger
@@ -4803,7 +4813,7 @@ PROCEDURE btnEditChoose :
       , OUTPUT lRecordsUpdated
       , OUTPUT rNewRecord /* not handled here */
       ).
-  
+
     IF lRecordsUpdated
       AND ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
@@ -5510,7 +5520,7 @@ PROCEDURE connectDatabase :
         .
 
       /* Rebuild context menu for table browse */
-      RUN createMenuTableBrowse. 
+      RUN createMenuTableBrowse.
 
       /* Get list of all tables of all databases */
       RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
@@ -5844,7 +5854,7 @@ PROCEDURE convertSettings :
       /* Remove usage info, except for numUsed */
       RUN getRegistryTable(OUTPUT TABLE bfConfig).
       FOR EACH bfConfig WHERE bfConfig.cSection = 'DataDigger:Usage':
-        IF NOT bfConfig.cSetting MATCHES '*:NumUsed' THEN 
+        IF NOT bfConfig.cSetting MATCHES '*:NumUsed' THEN
           setRegistry(bfConfig.cSection,bfConfig.cSetting,?).
       END.
 
@@ -5998,39 +6008,39 @@ PROCEDURE createMenuTableBrowse :
   DEFINE VARIABLE cFile           AS CHARACTER EXTENT 3 NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
-      
+
     hMenu = createMenu(brTables:HANDLE).
     cProgDir = getProgramDir().
-    
+
     /* Submenu 'Connections' */
     hSubMenu = createMenuItem(hMenu,"SubMenu","Connections").
 
     /* Quick Connect */
     hMenuItem = createMenuItem(hSubMenu,"Item","Quick Connect").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN quickConnect IN THIS-PROCEDURE.
-    
+
     /* Disconnect current db */
     hMenuItem = createMenuItem(hSubMenu,"Item","Disconnect current db").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN disconnectDatabase IN THIS-PROCEDURE.
-    
+
     /* Manage connections */
     hMenuItem = createMenuItem(hSubMenu,"Item","Manage Connections").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnConnectionsChoose IN THIS-PROCEDURE.
 
     /* Rule */
     hMenuItem = createMenuItem(hSubMenu,"Rule","").
-    
+
     /* Get list of connections */
     RUN VALUE(cProgDir + 'wConnections.w')
       ( INPUT 'getConnections'
       , INPUT ''
       , OUTPUT cConnectionList
       ).
-    
+
     /* And add them to the menu */
     DO iConn = 1 TO NUM-ENTRIES(cConnectionList):
       cDatabase = ENTRY(iConn,cConnectionList).
-    
+
       /* Skip if already connected */
       IF NOT CONNECTED(cDatabase) THEN
       DO:
@@ -6038,7 +6048,7 @@ PROCEDURE createMenuTableBrowse :
         ON 'CHOOSE' OF hMenuItem PERSISTENT RUN connectDatabase IN THIS-PROCEDURE (cDatabase).
       END.
     END. /* do iConn */
-    
+
     /* Submenu 'Generate' */
     hSubMenu = createMenuItem(hMenu,"SubMenu","Generate Code").
     INPUT FROM OS-DIR(cProgDir).
@@ -6063,14 +6073,14 @@ PROCEDURE createMenuTableBrowse :
     /* Set/unset as favourite */
     hMenuItem = createMenuItem(hMenu,"Item","Set / Unset as Favourite").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN toggleFavourite IN THIS-PROCEDURE.
-    
+
     /* Rule */
     hMenuItem = createMenuItem(hMenu,"Rule","").
-    
+
     /* Dump table definitions */
     hMenuItem = createMenuItem(hMenu,"Item","Dump Definitions").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN dumpDefinitions IN THIS-PROCEDURE.
-    
+
     /* Clone this Database */
     hMenuItem = createMenuItem(hMenu,"Item","Clone this Database").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN cloneDatabase IN THIS-PROCEDURE.
@@ -6081,7 +6091,7 @@ PROCEDURE createMenuTableBrowse :
       hMenuItem = createMenuItem(hMenu,"Item","I'm feeling lucky").
       ON "CHOOSE" OF hMenuItem PERSISTENT RUN feelingLucky IN THIS-PROCEDURE.
     END.
-    
+
     brTables:POPUP-MENU = hMenu.
 
   END. /* do with frame */
@@ -6279,7 +6289,7 @@ PROCEDURE dataGotoFilter :
     END.
   END.
 
-  IF AVAILABLE bColumn THEN 
+  IF AVAILABLE bColumn THEN
     APPLY 'entry' TO bColumn.hFilter.
 
 END PROCEDURE. /* dataGotoFilter */
@@ -6289,7 +6299,7 @@ END PROCEDURE. /* dataGotoFilter */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
 PROCEDURE dataOffHome :
-/* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back 
+/* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back
 */
  RUN showHelp('JumpToFilter', '').
 
@@ -6467,7 +6477,7 @@ PROCEDURE dataSelectAll :
   /* If shift-key is pressed, go to data admin */
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN startTool("Admin").
-  ELSE 
+  ELSE
   DO:
     setWindowFreeze(YES).
     SESSION:SET-WAIT-STATE('general').
@@ -6624,7 +6634,7 @@ PROCEDURE disconnectDatabase :
     gcCurrentTable    = "".
 
   /* Rebuild context menu for table browse */
-  RUN createMenuTableBrowse. 
+  RUN createMenuTableBrowse.
 
   /* Get list of all tables of all databases */
   RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
@@ -6769,7 +6779,7 @@ END PROCEDURE.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDefinitions C-Win 
 PROCEDURE dumpDefinitions :
 /* Dump a .df of this table
-*/  
+*/
   DO WITH FRAME frMain:
 
     CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
@@ -6796,10 +6806,10 @@ PROCEDURE editFavourites :
 
   DO WITH FRAME {&FRAME-NAME}:
     /* Keep old values */
-    FOR EACH bTable: 
+    FOR EACH bTable:
       bTable.lFavourite = CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE).
     END.
-  
+
     cGroup = cbFavouriteGroup:SCREEN-VALUE.
     RUN VALUE(getProgramDir() + 'dEditGroup.w')
       ( INPUT-OUTPUT cGroup
@@ -6807,15 +6817,15 @@ PROCEDURE editFavourites :
       , INPUT cbFavouriteGroup:LIST-ITEMS
       , OUTPUT lOk
       ).
-  
+
     IF lOk THEN
     DO:
       SESSION:SET-WAIT-STATE('general').
 
       FOR EACH bTable:
-         
+
         /* Changed fav status */
-        IF bTable.lFavourite <> CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE) THEN 
+        IF bTable.lFavourite <> CAN-DO(bTable.cFavourites, cbFavouriteGroup:SCREEN-VALUE) THEN
           RUN setFavourite( bTable.cDatabase
                           , bTable.cTableName
                           , cbFavouriteGroup:SCREEN-VALUE
@@ -6847,13 +6857,13 @@ PROCEDURE editFavourites :
 
       /* Repopulate fav combo */
       EMPTY TEMP-TABLE ttFavGroup.
-      RUN getFavourites. 
+      RUN getFavourites.
       cbFavouriteGroup:SCREEN-VALUE = cGroup NO-ERROR.
 
       RUN reopenTableBrowse(?).
       SESSION:SET-WAIT-STATE('').
     END. /* lOk */
-  END. 
+  END.
 
 END PROCEDURE. /* editFavourites */
 
@@ -6879,7 +6889,7 @@ PROCEDURE enable_UI :
   ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
+         fiTableDesc cbFavouriteGroup btnTableFilter ficWhere btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -6939,7 +6949,7 @@ PROCEDURE endResize :
     setWindowFreeze(YES).
 
     RUN setTimer('timedScrollNotify',0).
-    
+
     /* Set max width */
     IF C-Win:WIDTH > 384 THEN C-Win:WIDTH = 384.
 
@@ -7003,7 +7013,7 @@ PROCEDURE endResize :
       cbFavouriteGroup:WIDTH-PIXELS = fiTableDesc:WIDTH-PIXELS - btnAddFavGroup:WIDTH-PIXELS
 
       btnFavourite:X = fiTableDesc:X + fiTableDesc:WIDTH-PIXELS
-      btnFavourite:Y = fiTableDesc:Y 
+      btnFavourite:Y = fiTableDesc:Y
       btnFavourite:HEIGHT-PIXELS = fiTableDesc:HEIGHT-PIXELS
 
       btnAddFavGroup:X = btnFavourite:X - btnAddFavGroup:WIDTH-PIXELS
@@ -7012,7 +7022,7 @@ PROCEDURE endResize :
       NO-ERROR.
 
     cbFavouriteGroup:MOVE-TO-TOP().
-    cbFavouriteGroup:SENSITIVE = YES.  
+    cbFavouriteGroup:SENSITIVE = YES.
 
     /* Data */
     DO WITH FRAME frData:
@@ -7024,7 +7034,7 @@ PROCEDURE endResize :
         ghDataBrowse:HEIGHT-PIXELS = 100
         ghDataBrowse:Y = 1
         ghDataBrowse:X = 1 NO-ERROR.
-        
+
       /* Prepare embedding frame, first make small to avoid errors. */
       ASSIGN
         btnClearDataFilter:X = 0
@@ -7038,16 +7048,16 @@ PROCEDURE endResize :
         FRAME frData:VIRTUAL-WIDTH-PIXELS = FRAME frData:WIDTH-PIXELS
         FRAME frData:VIRTUAL-HEIGHT-PIXELS = FRAME frData:HEIGHT-PIXELS
         NO-ERROR.
-        
+
       /* Data filters */
       FOR EACH bFilter WHERE bFilter.hBrowse = ghDataBrowse:
         ASSIGN
           bFilter.hFilter:X = 1
           bFilter.hFilter:WIDTH-PIXELS = 10.
       END.
-      
+
       /* Num records */
-      ASSIGN 
+      ASSIGN
         fiNumSelected:X = 1
         fiNumSelected:Y = 1
         fiNumRecords:X = 1
@@ -7208,11 +7218,11 @@ PROCEDURE endResize :
   rctEdit:VISIBLE  = FALSE.
   rctQuery:VISIBLE = FALSE.
   rctData:VISIBLE  = FALSE.
-  
+
   /* Restore suppress-warnings setting */
   SESSION:SUPPRESS-WARNINGS = lSuppressWarnings.
 
-  APPLY "entry" TO c-win. 
+  APPLY "entry" TO c-win.
   {&timerStop}
 
 END PROCEDURE.
@@ -7226,21 +7236,21 @@ PROCEDURE expandToolbar :
 */
   DEFINE INPUT PARAMETER plExpand AS LOGICAL NO-UNDO.
 
-  IF plExpand THEN 
+  IF plExpand THEN
   DO:
     FRAME frSettings:WIDTH-PIXELS = 145.
     btnExpand-txt:LABEL = 'Collapse'.
     btnExpand:LOAD-IMAGE(getImagePath("SidebarCollapse.gif")).
   END.
 
-  ELSE 
+  ELSE
   DO:
     FRAME frSettings:WIDTH-PIXELS = 32.
     btnExpand-txt:LABEL = 'Expand'.
     btnExpand:LOAD-IMAGE(getImagePath("SidebarExpand.gif")).
   END.
 
-  setRegistry('DataDigger','Toolbar:Expanded', STRING(plExpand)). 
+  setRegistry('DataDigger','Toolbar:Expanded', STRING(plExpand)).
 
 END PROCEDURE. /* expandToolbar */
 
@@ -7250,7 +7260,7 @@ END PROCEDURE. /* expandToolbar */
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE feelingLucky C-Win 
 PROCEDURE feelingLucky :
 /* Feeling lucky
- * Start link https://is.gd/FeelingLucky 
+ * Start link https://is.gd/FeelingLucky
  */
   setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
   OS-COMMAND NO-WAIT START VALUE("https://is.gd/FeelingLucky").
@@ -7338,11 +7348,11 @@ PROCEDURE filterFieldEntry :
   setFilterFieldColor(phFilterField).
 
   /* Remember that we were in this filterfield */
-  IF plPreserveLastUsed THEN 
+  IF plPreserveLastUsed THEN
     ghLastFilterField = phFilterField.
 
   PUBLISH "debugInfo" (1, SUBSTITUTE("Entry &1, last filterfield:&2", phFilterField:NAME, ghLastFilterField:NAME)).
-  
+
 END PROCEDURE. /* filterFieldEntry */
 
 /* _UIB-CODE-BLOCK-END */
@@ -7365,11 +7375,11 @@ PROCEDURE filterFieldLeave :
   END.
 
   setFilterFieldColor(phFilterField).
-  
+
   /* Remember that we were in this filterfield */
   IF plPreserveLastUsed THEN
     ghLastFilterField = phFilterField.
-  
+
   PUBLISH "debugInfo" (1, SUBSTITUTE("Leave &1, last filterfield:&2", phFilterField:NAME, ghLastFilterField:NAME)).
 
 END PROCEDURE. /* filterFieldLeave */
@@ -7536,6 +7546,18 @@ END PROCEDURE. /* flushKeyBuffer */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushRegistry C-Win 
+PROCEDURE flushRegistry :
+/* Local version to extend super */
+
+  RUN SUPER.
+  RUN setTimer('flushRegistry',0). /* disable */
+
+END PROCEDURE. /* flushRegistry */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDataQuery C-Win 
 PROCEDURE getDataQuery :
 /* Return the query that belongs to the currently shown data
@@ -7631,7 +7653,7 @@ END PROCEDURE. /* getDataQuery */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFavourites C-Win 
 PROCEDURE getFavourites :
-/* Fill combo box for favourite groups 
+/* Fill combo box for favourite groups
  */
   DEFINE VARIABLE i             AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cCurrentGroup AS CHARACTER NO-UNDO.
@@ -7671,7 +7693,7 @@ PROCEDURE getFavourites :
     /* Restore old value */
     IF CAN-FIND(bFavGroup WHERE bFavGroup.cGroup = cCurrentGroup) THEN
       cbFavouriteGroup:SCREEN-VALUE = cCurrentGroup.
-    ELSE 
+    ELSE
     DO:
       FIND FIRST bFavGroup NO-ERROR.
       IF AVAILABLE bFavGroup THEN cbFavouriteGroup:SCREEN-VALUE = bFavGroup.cGroup.
@@ -8042,7 +8064,7 @@ END PROCEDURE. /* incQueriesServed */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeColors C-Win 
 PROCEDURE initializeColors :
-/* Set color nrs in vars so we don"t have to call the function 
+/* Set color nrs in vars so we don"t have to call the function
    * inside the ROW-DISPLAY trigger
   */
 
@@ -8051,7 +8073,7 @@ PROCEDURE initializeColors :
   giColorFavouriteTableFG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:FG")).
   giColorFavouriteTableBG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:BG")).
 
-  /* Colors for fields browse */  
+  /* Colors for fields browse */
   giColorFieldFilterFG  = getColor("FieldFilter:fg").
   giColorFieldFilterBG  = getColor("FieldFilter:bg").
   giColorPrimIndexFG    = getColor("PrimIndex:fg").
@@ -8178,7 +8200,7 @@ PROCEDURE initializeObjects :
   /* Open the settings file */
   RUN initializeSettingsFile.
 
-  IF LOGICAL(getRegistry('DataDigger','StartDebugger')) = TRUE THEN 
+  IF LOGICAL(getRegistry('DataDigger','StartDebugger')) = TRUE THEN
     RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
 
   /* Set fonts and load Images */
@@ -8271,7 +8293,7 @@ PROCEDURE initializeObjects :
 
       /* Save handles in tt for the row-display */
       CREATE bColumnHandle.
-      ASSIGN 
+      ASSIGN
         bColumnHandle.hBrowse = brTables:HANDLE
         bColumnHandle.hColumn = brTables:GET-BROWSE-COLUMN(iField):HANDLE
         bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
@@ -8300,7 +8322,7 @@ PROCEDURE initializeObjects :
 
       /* Save handles in tt for the row-display */
       CREATE bColumnHandle.
-      ASSIGN 
+      ASSIGN
         bColumnHandle.hBrowse = brIndexes:HANDLE
         bColumnHandle.hColumn = brIndexes:GET-BROWSE-COLUMN(iField):HANDLE
         bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
@@ -8328,7 +8350,7 @@ PROCEDURE initializeObjects :
 
       /* Save handles in tt for the row-display */
       CREATE bColumnHandle.
-      ASSIGN 
+      ASSIGN
         bColumnHandle.hBrowse = brFields:HANDLE
         bColumnHandle.hColumn = brFields:GET-BROWSE-COLUMN(iField):HANDLE
         bColumnHandle.cColumn = bColumnHandle.hColumn:NAME
@@ -8368,7 +8390,7 @@ PROCEDURE initializeObjects :
 
     /* Get last used favgroup */
     cGroup = getRegistry('DataDigger','FavGroup').
-    IF cGroup = ? THEN cGroup = ENTRY(1,cbFavouriteGroup:LIST-ITEMS). 
+    IF cGroup = ? THEN cGroup = ENTRY(1,cbFavouriteGroup:LIST-ITEMS).
 
     /* Set favourites to last chosen group */
     IF LOOKUP(cGroup,cbFavouriteGroup:LIST-ITEMS) > 0 THEN
@@ -8487,7 +8509,7 @@ PROCEDURE initializeObjects :
     END.
 
     /* Flush registry timer */
-    RUN setTimer('flushRegistry',5000). 
+    RUN setTimer('flushRegistry',5000).
 
     /* Set caching in library */
     RUN setCaching.
@@ -8525,7 +8547,7 @@ PROCEDURE initializeSettingsFile :
   cWorkFolder = getWorkFolder().
 
   /* Load the general ini file if present */
-  IF SEARCH(cProgramDir + "DataDigger.ini") <> ? THEN 
+  IF SEARCH(cProgramDir + "DataDigger.ini") <> ? THEN
     LOAD "DataDigger" DIR cWorkFolder BASE-KEY "ini" NO-ERROR.
 
   /* Load the helpfile (it SHOULD exist!) */
@@ -8633,7 +8655,7 @@ PROCEDURE initializeSettingsFile :
   IF getRegistry("DataDigger","FilterWithMatches") = ? THEN setRegistry("DataDigger","FilterWithMatches", "YES").
 
   /* Dump & Load settings */
-  IF    getRegistry("DumpAndLoad", "DumpDir") = ? 
+  IF    getRegistry("DumpAndLoad", "DumpDir") = ?
     AND getRegistry("DumpAndLoad", "DumpFileTemplate") = ? THEN
   DO:
     setRegistry("DumpAndLoad", "DumpDir"         , "<LASTDIR>").
@@ -8660,9 +8682,9 @@ PROCEDURE initializeSettingsFile :
   IF   getRegistry("DataDigger:Backup", "BackupDir") = ?
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<WORKDIR>\Backup\").
 
-  /* If backup is on, create a folder for it */  
+  /* If backup is on, create a folder for it */
   RUN checkBackupFolder(OUTPUT lOk).
-  
+
   /* Update check, set to check on STABLE */
   IF getRegistry("DataDigger:Update","UpdateChannel") = ? THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-STABLE}").
   IF getRegistry('DataDigger:Update','PingBack') = ? THEN setRegistry('DataDigger:Update','PingBack','YES').
@@ -8672,8 +8694,8 @@ PROCEDURE initializeSettingsFile :
   IF getRegistry('DataDigger','TitleStartsWithTableName') = ? THEN setRegistry('DataDigger','TitleStartsWithTableName','no').
 
   /* Toolbar visibility */
-  IF getRegistry('DataDigger','Toolbar:Visible')  = ? THEN setRegistry('DataDigger','Toolbar:Visible' , 'YES'). 
-  IF getRegistry('DataDigger','Toolbar:Expanded') = ? THEN setRegistry('DataDigger','Toolbar:Expanded', 'NO'). 
+  IF getRegistry('DataDigger','Toolbar:Visible')  = ? THEN setRegistry('DataDigger','Toolbar:Visible' , 'YES').
+  IF getRegistry('DataDigger','Toolbar:Expanded') = ? THEN setRegistry('DataDigger','Toolbar:Expanded', 'NO').
 
   /* Don't reveal the first time */
   IF getRegistry("DataDigger", "FeelingLucky") = ? THEN setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
@@ -8801,7 +8823,7 @@ PROCEDURE initializeUi :
   /* FRAME frSettings */
   ENABLE ALL WITH FRAME frSettings.
 
-  RUN createMenuTableBrowse. 
+  RUN createMenuTableBrowse.
 
 END PROCEDURE. /* initializeUi */
 
@@ -8817,7 +8839,7 @@ PROCEDURE initializeVisuals :
   DEFINE VARIABLE iColor        AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iRgbValue     AS INTEGER   NO-UNDO.
 
-  /* Expand the color table with 1 to hold a color for "ButtonFace" 
+  /* Expand the color table with 1 to hold a color for "ButtonFace"
    * which is used if the user sets "use system colors" for row coloring
    */
   COLOR-TABLE:NUM-ENTRIES = MINIMUM(255,COLOR-TABLE:NUM-ENTRIES + 1).
@@ -8945,7 +8967,7 @@ PROCEDURE initializeVisuals :
       btnAbout-txt:FONT       = giDefaultFont.
       btnDataDigger-txt:FONT  = giDefaultFont.
       btnHelp-txt:FONT        = giDefaultFont.
-      
+
     END.
 
     btnTableFilter:LOAD-IMAGE     (getImagePath("Filter.gif")).
@@ -9217,12 +9239,14 @@ PROCEDURE moveField :
 
   /* Now apply 'normal' numbers to the Columns */
   iCounter = 0.
+  #FieldLoop:
   REPEAT PRESELECT EACH bField BY bField.iOrder:
     FIND NEXT bField NO-ERROR.
-    IF AVAILABLE bField THEN 
-      ASSIGN
-        iCounter      = iCounter + 1
-        bField.iOrder = iCounter.
+    IF NOT AVAILABLE bField THEN LEAVE #FieldLoop.
+      
+    ASSIGN
+      iCounter      = iCounter + 1
+      bField.iOrder = iCounter.
   END.
 
   /* Column follows field */
@@ -9397,26 +9421,26 @@ PROCEDURE quickConnect :
 
   DO WITH FRAME frMain:
     iNumDbs = NUM-DBS.
-  
+
     RUN adecomm\_dbconn.p ( INPUT-OUTPUT cPhysicalName
                           , INPUT-OUTPUT cLogicalName
                           , INPUT-OUTPUT cTypes
                           ).
-  
+
     IF NUM-DBS = iNumDbs THEN RETURN. /* nothing connected */
-  
+
     /* Rebuild context menu for table browse */
-    RUN createMenuTableBrowse. 
+    RUN createMenuTableBrowse.
 
     /* Get list of all tables of all databases */
     RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-  
+
     /* Get all connected databases */
     cDatabases = getDatabaseList().
     cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
     cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
     APPLY 'value-changed' TO cbDatabaseFilter.
-  END. 
+  END.
 
 END PROCEDURE. /* QuickConnect */
 
@@ -9452,7 +9476,7 @@ PROCEDURE registerFilters :
 /* Register filter fields for table and index browse
   */
   DO WITH FRAME {&FRAME-NAME}:
-    
+
     /* Table browse, table name */
     RUN registerFilterField(fiTableFilter    :HANDLE, brTables:HANDLE).
 
@@ -9625,7 +9649,7 @@ PROCEDURE reopenDataBrowse :
   /* Make sure all filter fields have the correct 'modified' status */
   IF VALID-HANDLE(FOCUS) AND FOCUS:TYPE = 'fill-in' THEN
     APPLY 'leave' TO FOCUS.
-  
+
   /* Show or hide red line around filters */
   rctDataFilter:VISIBLE IN FRAME frData = FALSE.
   #Column:
@@ -9744,7 +9768,7 @@ PROCEDURE reopenDataBrowse-create :
       ON "CTRL-J"           PERSISTENT RUN reopenDataBrowse        IN THIS-PROCEDURE.
       ON "ROW-DISPLAY"      PERSISTENT RUN dataRowDisplay          IN THIS-PROCEDURE (ghDataBuffer).
       ON "START-SEARCH"     PERSISTENT RUN dataColumnSort          IN THIS-PROCEDURE.
-      ON "INSERT-MODE"      PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE. 
+      ON "INSERT-MODE"      PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE.
       ON "ALT-A"            PERSISTENT RUN btnAddChoose            IN THIS-PROCEDURE.
       ON "SHIFT-INS"        PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
       ON "ALT-O"            PERSISTENT RUN btnCloneChoose          IN THIS-PROCEDURE.
@@ -10700,14 +10724,14 @@ END PROCEDURE. /* saveFilterValue */
 PROCEDURE saveWindow :
 /* Save size and position of the window.
  */
- 
+
   IF c-win:WINDOW-STATE = 3 THEN /* normal state */
   DO:
     /* Upper left corner of window */
     setRegistry("DataDigger", "Window:x", STRING(c-win:X) ).
     setRegistry("DataDigger", "Window:y", STRING(c-win:Y) ).
   END.
-  
+
   /* Width and height */
   setRegistry("DataDigger", "Window:height", STRING(c-win:HEIGHT-PIXELS) ).
   setRegistry("DataDigger", "Window:width", STRING(c-win:WIDTH-PIXELS) ).
@@ -10825,7 +10849,7 @@ PROCEDURE setCurrentTable :
             NO-ERROR.
     IF NOT AVAILABLE bTable THEN RETURN.
 
-    BROWSE brTables:SET-REPOSITIONED-ROW(1,"CONDITIONAL"). 
+    BROWSE brTables:SET-REPOSITIONED-ROW(1,"CONDITIONAL").
     brTables:QUERY:REPOSITION-TO-ROWID( ROWID(bTable) ) NO-ERROR.
   END.
 
@@ -10907,13 +10931,13 @@ PROCEDURE setDataFilter :
       DO:
         bColumn.hFilter:SCREEN-VALUE = cColumnValue.
         FilterModified(bColumn.hFilter,TRUE).
-        
-        /* We want this column's filter to be the most recently used, 
+
+        /* We want this column's filter to be the most recently used,
          * so make sure the cursor is there because reopenDataBrowse
          * will apply a LEAVE to it. Should the cursor be in a different
-         * filter, then that one would become the most recently used. 
+         * filter, then that one would become the most recently used.
          */
-        APPLY 'entry' TO bColumn.hFilter. 
+        APPLY 'entry' TO bColumn.hFilter.
       END.
       ELSE
       IF plClearOtherFilters THEN
@@ -10951,14 +10975,14 @@ PROCEDURE setFavourite :
   FIND bTable
     WHERE bTable.cDatabase  = pcDatabase
       AND bTable.cTableName = pcTable NO-ERROR.
-  
-  IF NOT AVAILABLE bTable THEN RETURN. 
+
+  IF NOT AVAILABLE bTable THEN RETURN.
 
   /* Toggle fav status */
   IF plFavourite = ? THEN plFavourite = NOT CAN-DO(bTable.cFavourites, pcGroupName).
 
   /* Remove or add to list */
-  IF NOT plFavourite THEN 
+  IF NOT plFavourite THEN
   DO:
     i = LOOKUP(pcGroupName, bTable.cFavourites).
     IF i > 0 THEN
@@ -10969,7 +10993,7 @@ PROCEDURE setFavourite :
     END.
   END.
 
-  ELSE 
+  ELSE
   DO:
     i = LOOKUP(pcGroupName,bTable.cFavourites).
     IF i = 0 THEN
@@ -11063,6 +11087,7 @@ PROCEDURE setPage :
         btnTabTables    :LOAD-IMAGE( getImagePath('tab_tables_active.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_inactive.gif' )).
         btnTableFilter  :SENSITIVE = TRUE.
+        btnTableFilter  :HIDDEN    = FALSE.
 
         cbFavouriteGroup:SENSITIVE = FALSE.
         cbFavouriteGroup:VISIBLE   = FALSE.
@@ -11076,6 +11101,7 @@ PROCEDURE setPage :
         btnTabTables    :LOAD-IMAGE( getImagePath('tab_tables_inactive.gif'    )).
         btnTabFavourites:LOAD-IMAGE( getImagePath('tab_Favourites_active.gif' )).
         btnTableFilter  :SENSITIVE = FALSE.
+        btnTableFilter  :HIDDEN    = TRUE.
 
         cbFavouriteGroup:SENSITIVE = TRUE.
         cbFavouriteGroup:VISIBLE   = TRUE.
@@ -11092,7 +11118,7 @@ PROCEDURE setPage :
   setWindowFreeze(NO).
 
   /* Show additional info on first use of favourites tab */
-  IF piPage = {&PAGE-FAVOURITES} 
+  IF piPage = {&PAGE-FAVOURITES}
     AND getRegistry("DataDigger:Usage", SUBSTITUTE("setPage-&1:numUsed",piPage)) = '1' THEN
   DO:
     RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"(1/3)~n~nI created a default group for your favourites").
@@ -11298,7 +11324,7 @@ PROCEDURE setTable :
       DO:
         RUN setTableContext(INPUT gcCurrentTable ).
         RUN reopenDataBrowse.
-        RUN setTimer('timedTableChange',0). 
+        RUN setTimer('timedTableChange',0).
       END.
       ELSE
       DO:
@@ -11483,34 +11509,34 @@ PROCEDURE setTableView :
   DO WITH FRAME {&FRAME-NAME}:
     /* What view are we in? */
     glShowFavourites = plFavouritesView.
-  
-    IF glShowFavourites THEN 
+
+    IF glShowFavourites THEN
       btnFavourite:LOAD-IMAGE(getImagePath('Edit.gif')).
 
     btnFavourite:TOOLTIP = STRING(glShowFavourites,'edit this group/toggle as favourite').
-  
+
     /* If we switch manually to Fav-view for the first time... */
     IF NOT plFiredBySystem
       AND glShowFavourites = TRUE
       AND getRegistry("DataDigger:Usage", "switchTableView:numUsed") = ? THEN
     DO:
       lFirstRun = TRUE.
-  
+
       #SetFav:
       FOR EACH bTable
         WHERE bTable.lHidden     = FALSE
           AND bTable.iNumQueries > 0
         BY bTable.iNumQueries DESCENDING
         BY bTable.tLastUsed DESCENDING:
-  
+
         RUN setFavourite(bTable.cDatabase, bTable.cTableName, 'myFavourites', TRUE).
         iNumFav = iNumFav + 1.
         IF iNumFav >= 4 THEN LEAVE #SetFav.
       END.
     END.
-  
+
     PUBLISH "setUsage" ("switchTableView"). /* user behaviour */
-  
+
     setRegistry("DataDigger","TableView", STRING(glShowFavourites,"F/T")).
     RUN reopenTableBrowse(?).
 
@@ -11552,7 +11578,7 @@ PROCEDURE setTimer :
   DO:
     FIND bTimer WHERE bTimer.cProc = pcTimerProc NO-ERROR.
     IF NOT AVAILABLE bTimer THEN CREATE bTimer.
-    
+
     ASSIGN
       bTimer.cProc = pcTimerProc
       bTimer.iTime = piInterval
@@ -11581,8 +11607,8 @@ PROCEDURE setTimerInterval :
 
   chCtrlFrame:pstimer:ENABLED = CAN-FIND(FIRST bTimer).
 
-  /* Check if there are old timers with datetime < now 
-   * these can be present when you hibernate your pc 
+  /* Check if there are old timers with datetime < now
+   * these can be present when you hibernate your pc
    */
   FOR EACH bTimer WHERE bTimer.tNext < NOW:
     bTimer.tNext = ADD-INTERVAL(NOW, bTimer.iTime,"milliseconds").
@@ -11592,8 +11618,8 @@ PROCEDURE setTimerInterval :
   FOR FIRST bTimer BY bTimer.tNext:
     chCtrlFrame:pstimer:INTERVAL = MAXIMUM(1,MTIME(bTimer.tNext) - MTIME(NOW)).
   END.
-  
-  /* DEBUG */
+
+  /* DEBUG
   IF CONNECTED('pkf') THEN
   DO:
     OUTPUT TO c:\temp\timers.txt APPEND.
@@ -11604,6 +11630,7 @@ PROCEDURE setTimerInterval :
     END.
     OUTPUT CLOSE.
   END.
+  */
 
 END PROCEDURE. /* setTimerInterval */
 
@@ -11703,7 +11730,7 @@ PROCEDURE setWindowTitle :
   DEFINE VARIABLE lStartWithTable AS LOGICAL   NO-UNDO.
 
   FIND ttTableFilter NO-ERROR.
-  IF AVAILABLE ttTableFilter THEN 
+  IF AVAILABLE ttTableFilter THEN
   ASSIGN
     cNameShow  = ttTableFilter.cTableNameShow
     cNameHide  = ttTableFilter.cTableNameHide
@@ -11748,7 +11775,7 @@ PROCEDURE setWindowTitle :
   **
   ** DataDigger 17 - DEVELOP - sports.customer
   */
-  IF lStartWithTable 
+  IF lStartWithTable
     THEN cTitleMask = "&4&5 - &1 &2 &3 - &6".   /* sports.customer - DataDigger 24 */
     ELSE cTitleMask = "&1 &2 &3 - &4&5 &6".     /* DataDigger 24 - sports.customer */
 
@@ -11761,7 +11788,7 @@ PROCEDURE setWindowTitle :
                      , (IF cFilter <> '' THEN '(' + cFilter + ')'  ELSE '')
                      ).
   cTitle = TRIM(cTitle,'- ').
-  
+
   /* Add warning for read-only mode */
   IF glReadOnlyDigger THEN cTitle = cTitle + " ** READ-ONLY **".
 
@@ -11900,7 +11927,7 @@ PROCEDURE showHint :
    * when she pressed the 'help' button */
   IF NOT glShowTour
     AND LOGICAL(getRegistry("DataDigger", "ShowHints")) = FALSE THEN RETURN.
-  
+
   /* If user pressed ESC during show of hint, this is TRUE */
   IF glHintCancelled THEN RETURN.
 
@@ -12082,7 +12109,7 @@ PROCEDURE showNewFeatures :
     /* Toolbar */
     RUN showHint(FRAME frSettings:HANDLE, {&ARROW-LEFT-DOWN}, "1/5~n~nThe toolbar is docked, but can be hidden or collapsed").
     IF glHintCancelled THEN LEAVE demoLoop.
-    
+
     /* Sort button */
     RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "2/5~n~nGenerate different types of code straight from the context menu ~n(and add your own)").
     IF glHintCancelled THEN LEAVE demoLoop.
@@ -12237,7 +12264,7 @@ PROCEDURE showTour :
     RUN showHint(BROWSE brFields:HANDLE, {&ARROW-RIGHT-UP} , "4/{&t}~n~nHide fields by unchecking the toggle or click on the format to change it on the fly (just your session, not the db)").
 
     RUN showHint(ficWhere:HANDLE,        {&ARROW-RIGHT-UP} , "5/{&t}~n~nYour custom query goes here ...").
-    
+
     /* Let the hint frame point to the 2nd visible filter instead of the 1st */
     #Column:
     FOR EACH bColumn:
@@ -12258,7 +12285,7 @@ PROCEDURE showTour :
     FOR EACH bColumn:
       IF NOT bColumn.hColumn:VISIBLE THEN NEXT #Column.
       iColumn = iColumn + 1.
-      IF iColumn = 1 THEN 
+      IF iColumn = 1 THEN
         RUN showHint(btnDataSort:HANDLE IN FRAME frData,{&ARROW-LEFT-UP}, "7/{&t}~n~n(Control) Click on column headers or this button to add up to 9 sort levels").
       ELSE
       IF iColumn = 2 THEN
@@ -12432,11 +12459,11 @@ END PROCEDURE. /* startDiggerLib */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startGenerateProc C-Win 
 PROCEDURE startGenerateProc :
-/* Start a generate-procedure 
-*/  
+/* Start a generate-procedure
+*/
   DEFINE INPUT PARAMETER pcProc AS CHARACTER   NO-UNDO.
 
-  RUN VALUE(pcProc) 
+  RUN VALUE(pcProc)
     ( INPUT gcCurrentDatabase
     , INPUT gcCurrentTable
     , INPUT TABLE ttField
@@ -12482,7 +12509,7 @@ PROCEDURE startSession :
   setRegistry('DataDigger', 'Build', '{&build}').
 
   /* If we come from an older version, do some conversions */
-  IF lNewVersion OR lNewBuild THEN 
+  IF lNewVersion OR lNewBuild THEN
   DO:
     lUpgraded = TRUE.
 
@@ -12498,7 +12525,7 @@ PROCEDURE startSession :
     END.
     DELETE OBJECT hWindow.
     SESSION:SET-WAIT-STATE("").
-  
+
     /* Wipe disk cache */
     RUN clearDiskCache.
   END.
@@ -12524,34 +12551,34 @@ PROCEDURE startSession :
   IF lNewUser THEN RUN showTour.
   ELSE IF lUpgraded THEN RUN showNewFeatures.
 
-  /* DD Phone Home, but don't be alarmed, this link refers to the build.i 
+  /* DD Phone Home, but don't be alarmed, this link refers to the build.i
    * version on GitHub. This to track the use of DataDigger.
    * Interested yourself? Check https://is.gd/DataDigger- to see statistics
   */
-  IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE 
+  IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE
     AND getRegistry('DataDigger:Update','LastPingBack') <> ISO-DATE(TODAY) THEN
   DO:
     RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0).
     setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)).
   END.
-  
+
   /* Check for new version only once a day */
   iChannel = INTEGER(getRegistry('DataDigger:Update','UpdateChannel')).
   IF iChannel <> {&CHECK-MANUAL}
     AND getRegistry('DataDigger:Update','LastUpdateCheck') <> ISO-DATE(TODAY) THEN
   DO:
-    /* If you are using a build that is newer than the production version, 
-     * you are in the beta program. Then automatically check for beta changes 
+    /* If you are using a build that is newer than the production version,
+     * you are in the beta program. Then automatically check for beta changes
      */
     RUN getVersionInfo.p(INPUT 'master', OUTPUT cRemoteBuildNr).
     IF '{build.i}' > cRemoteBuildNr THEN setRegistry("DataDigger:Update","UpdateChannel", "{&CHECK-BETA}").
-    
+
     /* Check for new versions on GitHub */
-    RUN checkVersion.p(INPUT iChannel, INPUT FALSE). 
+    RUN checkVersion.p(INPUT iChannel, INPUT FALSE).
 
     setRegistry('DataDigger:Update','LastUpdateCheck',ISO-DATE(TODAY)).
   END.
-  
+
   IF getRegistry('DataDigger:Update','RemoteBuildNr') > '{build.i}' THEN
   DO WITH FRAME frMain:
     fiFeedback:SCREEN-VALUE = '  New version available, click for info'.
@@ -12781,8 +12808,8 @@ END PROCEDURE. /* timedTableChange */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE toggleFavourite C-Win 
 PROCEDURE toggleFavourite :
-/* Toggle a table's favourite status 
-  */ 
+/* Toggle a table's favourite status
+  */
   DEFINE VARIABLE cName AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bTable FOR ttTable.
@@ -12792,30 +12819,30 @@ PROCEDURE toggleFavourite :
 
   DO WITH FRAME frMain:
     /* if no tables in browser, do nothing */
-    IF NOT brTables:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN. 
+    IF NOT brTables:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN.
 
     /* get current favgroup */
     cName = cbFavouriteGroup:SCREEN-VALUE.
-    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN 
+    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN
     DO:
       RUN getFavourites.
       FIND FIRST bFavGroup NO-ERROR.
       IF AVAILABLE bFavGroup THEN cName = bFavGroup.cGroup.
     END.
-    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN RETURN. 
+    IF NOT CAN-FIND(ttFavGroup WHERE ttFavGroup.cGroup = cName) THEN RETURN.
 
     RUN setFavourite(gcCurrentDatabase, gcCurrentTable, cbFavouriteGroup:SCREEN-VALUE, ?).
 
     /* If we are in the favo-view then refresh the browse */
-    IF glShowFavourites THEN 
+    IF glShowFavourites THEN
       RUN reopenTableBrowse(?).
-    ELSE 
+    ELSE
       brTables:REFRESH().
 
     IF giCurrentPage <> {&PAGE-FAVOURITES} THEN
       APPLY 'value-changed' TO brTables.
   END.
-  
+
 END PROCEDURE. /* toggleFavourite */
 
 /* _UIB-CODE-BLOCK-END */
@@ -12977,7 +13004,7 @@ FUNCTION getFieldList RETURNS CHARACTER
   DEFINE QUERY qField FOR ttField.
 
   {&timerStart}
-  
+
   iMaxFields = INTEGER(getRegistry('DataDigger','MaxColumns')) NO-ERROR.
   IF iMaxFields = ? THEN iMaxFields = 500.
 
@@ -12998,7 +13025,7 @@ FUNCTION getFieldList RETURNS CHARACTER
   cFieldList = LEFT-TRIM(cFieldList, ",").
 
   RETURN cFieldList.
-  
+
   {&timerStop}
 END FUNCTION. /* getFieldList */
 
@@ -13048,7 +13075,7 @@ FUNCTION getQueryFromFields RETURNS CHARACTER
   DO iField = 1 TO NUM-ENTRIES(pcFieldList):
     cField = ENTRY(iField,pcFieldList).
     FIND ttField WHERE ttField.cFieldName = cField NO-ERROR.
-    IF AVAILABLE ttField THEN 
+    IF AVAILABLE ttField THEN
       cQuery = SUBSTITUTE('&1&2 &3 = &4'
                          , cQuery
                          , (IF iField = 1 THEN 'WHERE' ELSE '~n  AND')
@@ -13127,7 +13154,7 @@ FUNCTION killMenu RETURNS LOGICAL
     /* Delete a menu and all of its siblings
      */
     hMenuItem = phMenu:FIRST-CHILD.
-    
+
     /* Kill subitems */
     DO WHILE VALID-HANDLE(hMenuItem):
       IF hMenuItem:DYNAMIC THEN hItemToDelete = hMenuItem.
@@ -13135,7 +13162,7 @@ FUNCTION killMenu RETURNS LOGICAL
       IF VALID-HANDLE(hItemToDelete) THEN
         DELETE OBJECT hItemToDelete NO-ERROR.
     END.
-    
+
     /* Kill the menu itself */
     DELETE OBJECT phMenu NO-ERROR.
   END.
@@ -13290,6 +13317,21 @@ FUNCTION setQueryEditor RETURNS LOGICAL
 
   RETURN TRUE.
 END FUNCTION. /* setQueryEditor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry C-Win 
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) :
+
+  SUPER(pcSection, pcKey, pcValue).
+  RUN setTimer('flushRegistry',2000).
+
+END FUNCTION. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
