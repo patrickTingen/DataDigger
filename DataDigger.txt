@@ -12,6 +12,9 @@ DataDigger version 25
 - Solved: User defined color '?' was reset to default value after restart
 - Solved: Fixed SonarCube issues marked as 'bug' (Gilles Querret)
 - Solved: Timer frozen when computer wakes up from hibernate (Richard Kelters)
+- Solved: Character field with format '99999' could not be updated (Damir Pen)
+- Solved: UI errors in query tester (Alan Copeland)
+- Change: File description now shows both label and description (Johan Geerts)
 
 =====================================================================================
 

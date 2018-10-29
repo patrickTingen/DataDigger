@@ -136,7 +136,7 @@ DEFINE VARIABLE resultset AS CHARACTER
 
 DEFINE RECTANGLE RECT-1
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE 100 BY 5.95.
+     SIZE-PIXELS 500 BY 125.
 
 
 /* ************************  Frame Definitions  *********************** */
@@ -394,7 +394,9 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
     RECT-1:visible = TRUE.
     h-SeqName   = h-Browser:ADD-CALC-COLUMN("INTEGER",">,>>9","","Seq").
+    h-SeqName:WIDTH-CHARS = 5.
     h-ProgName  = h-Browser:ADD-CALC-COLUMN("CHARACTER","x(30)","","Table").
+    h-ProgName:WIDTH-CHARS = 30.
     h-QueryName = h-Browser:ADD-CALC-COLUMN("CHARACTER","x(105)","","Query").
 
   ASSIGN

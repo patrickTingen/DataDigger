@@ -24,13 +24,13 @@ FOR EACH dictdb._File NO-LOCK
   CREATE ttTable.
   ASSIGN
     ttTable.cDatabase   = (IF dictdb._Db._Db-slave THEN dictdb._Db._Db-name ELSE LDBNAME('dictdb'))
-    ttTable.cTableName  = dictdb._File._file-name                                            
-    ttTable.cTableDesc  = TRIM( (IF dictdb._File._file-label <> ? AND dictdb._File._file-label <> '' THEN dictdb._File._file-label + ', ' ELSE '') 
-                              + (IF dictdb._File._desc <> ? AND dictdb._File._desc <> '' AND dictdb._File._desc <> dictdb._File._file-label THEN dictdb._File._desc ELSE '') 
+    ttTable.cTableName  = dictdb._File._file-name
+    ttTable.cTableDesc  = TRIM( (IF dictdb._File._file-label <> ? AND dictdb._File._file-label <> '' THEN dictdb._File._file-label + ', ' ELSE '')
+                              + (IF dictdb._File._desc <> ? AND dictdb._File._desc <> '' AND dictdb._File._desc <> dictdb._File._file-label THEN dictdb._File._desc ELSE '')
                               , ' ,')
     ttTable.lHidden     = dictdb._File._hidden
-    ttTable.lFrozen     = dictdb._File._frozen 
-    ttTable.cCrc        = STRING(dictdb._File._crc)     
+    ttTable.lFrozen     = dictdb._File._frozen
+    ttTable.cCrc        = STRING(dictdb._File._crc)
     ttTable.cCacheId    = SUBSTITUTE('&1.&2.&3', ttTable.cDatabase, dictdb._File._file-name, dictdb._File._crc)
     ttTable.iFileNumber = dictdb._File._file-number
     .
@@ -50,7 +50,8 @@ FOR EACH dictdb._File NO-LOCK
   ELSE IF dictdb._File._file-number < -16384                                        THEN ttTable.cCategory = 'VST'.
 
   FOR EACH dictdb._Field OF dictdb._File NO-LOCK:
-    ttTable.cFields = SUBSTITUTE('&1,&2',ttTable.cFields, dictdb._Field._Field-name).
+    ttTable.cFields = ttTable.cFields + ',' + dictdb._Field._Field-name.
+/*    ttTable.cFields = SUBSTITUTE('&1,&2',ttTable.cFields, dictdb._Field._Field-name).*/
   END.
   ttTable.cFields = TRIM(ttTable.cFields,',').
 END.

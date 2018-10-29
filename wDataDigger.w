@@ -731,11 +731,11 @@ DEFINE BUTTON btnQueries-txt  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnQueryTester 
      LABEL "&Q" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "start MFC Query Tester #(CTRL-SHIFT-Q)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "start MCF's Query Tester #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnQueryTester-txt  NO-FOCUS FLAT-BUTTON
      LABEL "&Query Tester" 
-     SIZE-PIXELS 100 BY 30 TOOLTIP "start MFC Query Tester #(CTRL-SHIFT-Q)".
+     SIZE-PIXELS 100 BY 30 TOOLTIP "start MCF's Query Tester #(CTRL-SHIFT-Q)".
 
 DEFINE BUTTON btnSettings 
      LABEL "&Set" 
@@ -10825,7 +10825,7 @@ PROCEDURE selectClickedRow :
     END.
 
     /* Save the column value to be able to add it to filters */
-    phBrowse:PRIVATE-DATA = pcColumnName + CHR(1) + cColumnValue.
+    phBrowse:PRIVATE-DATA = pcColumnName + CHR(1) + cColumnValue + CHR(1).
 
     PUBLISH "debugInfo" (2, SUBSTITUTE("Column &1 has value &2", pcColumnName, cColumnValue)).
   END. /* used the mouse */
@@ -13429,4 +13429,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
