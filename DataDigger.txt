@@ -14,6 +14,8 @@ DataDigger version 25
 - Solved: Timer frozen when computer wakes up from hibernate (Richard Kelters)
 - Solved: Character field with format '99999' could not be updated (Damir Pen)
 - Solved: UI errors in query tester (Alan Copeland)
+- Solved: Compile error on 64bit when prowin32 is not available (Sergejus Kornejevas)
+
 - Change: File description now shows both label and description (Johan Geerts)
 
 =====================================================================================
