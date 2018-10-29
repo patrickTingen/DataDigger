@@ -149,6 +149,16 @@ FUNCTION setRegistry RETURNS CHARACTER
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProwin Procedure
+FUNCTION getProwin RETURNS CHARACTER() FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 
 /* *********************** Procedure Settings ************************ */
 
@@ -551,7 +561,7 @@ PROCEDURE recompileSelf :
   OUTPUT TO VALUE(cLogFile).
   PUT UNFORMATTED "DataDigger recompile as of " STRING(NOW,"99-99-9999 HH:MM:SS").
 
-  FILE-INFO:FILE-NAME = "prowin32.exe".
+  FILE-INFO:FILE-NAME = getProwin().
   cProgressDriveType = getDriveType(ENTRY(1,FILE-INFO:FULL-PATHNAME,"\")).
   cDiggerDriveType   = getDriveType(ENTRY(1,gcProgramDir,"\")).
 
@@ -950,3 +960,26 @@ END FUNCTION. /* setRegistry */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProwin Procedure
+FUNCTION getProwin RETURNS CHARACTER():
+  /* Return the prowin executable name
+  */
+
+  DEFINE VARIABLE cProwin64 AS CHARACTER NO-UNDO INIT "prowin.exe".
+  DEFINE VARIABLE cProwin32 AS CHARACTER NO-UNDO INIT "prowin32.exe".
+
+  FILE-INFO:FILE-NAME = cProwin64.
+  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin64.
+
+  FILE-INFO:FILE-NAME = cProwin32.
+  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin32.
+
+  RETURN "".
+END FUNCTION. /* getProwin */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
