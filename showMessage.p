@@ -51,7 +51,7 @@ iWidth = MAXIMUM(iWidth,150).
 
 winMessage:WIDTH-PIXELS = iWidth .
 cMessage:WIDTH-PIXELS = iWidth - 10.
-cMessage = pcMessage.
+cMessage:SCREEN-VALUE = pcMessage.
 FRAME infoFrame:WIDTH-PIXELS = iWidth.
 
 /* Center the window */
