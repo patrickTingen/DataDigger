@@ -16,6 +16,7 @@ DataDigger version 25
 - Solved: UI errors in query tester (Alan Copeland)
 - Solved: Compile error on 64bit when prowin32 is not available (Sergejus Kornejevas)
 - Solved: Frames mixed up when dumping large tables (Dirk Vreken)
+- Solved: Double click on fields excluded from browser gives error (Dirk Vreken)
 
 - Change: File description now shows both label and description (Johan Geerts)
 

@@ -1905,7 +1905,7 @@ DO:
     FIND FIRST bColumn WHERE bColumn.cFieldName = bField.cFieldName NO-ERROR.
 
     /* If you double-click on a raw (or similar) field, the column is not there */
-    IF NOT AVAILABLE bColumn THEN RETURN.
+    IF NOT AVAILABLE bColumn OR NOT VALID-HANDLE(bColumn.hColumn) THEN RETURN.
 
     iRow = ghDatabrowse:FOCUSED-ROW.
     IF iRow <> ? THEN
