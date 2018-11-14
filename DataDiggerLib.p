@@ -432,6 +432,32 @@ FUNCTION getStackSize RETURNS INTEGER() FORWARD.
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getTableDesc) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableDesc Procedure 
+FUNCTION getTableDesc RETURNS CHARACTER
+  ( INPUT  pcDatabase AS CHARACTER
+  , INPUT  pcTable    AS CHARACTER
+  )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getTableLabel) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableLabel Procedure 
+FUNCTION getTableLabel RETURNS CHARACTER
+  ( INPUT  pcDatabase AS CHARACTER
+  , INPUT  pcTable    AS CHARACTER
+  )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getTableList) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableList Procedure 
@@ -604,6 +630,18 @@ FUNCTION resolveOsVars RETURNS CHARACTER
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD resolveSequence Procedure 
 FUNCTION resolveSequence RETURNS CHARACTER
   ( pcString AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-setColor) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setColor Procedure 
+FUNCTION setColor RETURNS INTEGER
+  ( pcName  AS CHARACTER 
+  , piColor AS INTEGER)  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -3556,21 +3594,12 @@ FUNCTION getColor RETURNS INTEGER
    */
   DEFINE BUFFER bColor FOR ttColor.
 
-  {&timerStart}
-
   FIND bColor WHERE bColor.cName = pcName NO-ERROR.
   IF NOT AVAILABLE bColor THEN 
-  DO:
-    CREATE bColor.
-    ASSIGN bColor.cName = pcName.
+    RETURN setColor(pcName,?).
+  ELSE 
+    RETURN bColor.iColor.   /* Function return value. */
 
-    /* Get the setting for this color name */
-    bColor.iColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
-  END.
-
-  RETURN bColor.iColor.   /* Function return value. */
-
-  {&timerStop}
 END FUNCTION. /* getColor */
 
 /* _UIB-CODE-BLOCK-END */
@@ -4208,6 +4237,50 @@ END FUNCTION. /* getStackSize */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getTableDesc) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableDesc Procedure 
+FUNCTION getTableDesc RETURNS CHARACTER
+  ( INPUT  pcDatabase AS CHARACTER
+  , INPUT  pcTable    AS CHARACTER
+  ) :
+  DEFINE BUFFER bTable FOR ttTable.
+
+  FIND bTable 
+    WHERE bTable.cDatabase  = pcDatabase
+      AND bTable.cTableName = pcTable NO-ERROR.
+
+  RETURN (IF AVAILABLE bTable THEN bTable.cTableDesc ELSE '').
+
+END FUNCTION. /* getTableDesc */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getTableLabel) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableLabel Procedure 
+FUNCTION getTableLabel RETURNS CHARACTER
+  ( INPUT  pcDatabase AS CHARACTER
+  , INPUT  pcTable    AS CHARACTER
+  ) :
+  DEFINE BUFFER bTable FOR ttTable.
+
+  FIND bTable 
+    WHERE bTable.cDatabase  = pcDatabase
+      AND bTable.cTableName = pcTable NO-ERROR.
+
+  RETURN (IF AVAILABLE bTable THEN bTable.cTableLabel ELSE '').
+
+END FUNCTION. /* getTableLabel */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getTableList) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableList Procedure 
@@ -4737,6 +4810,40 @@ END FUNCTION. /* resolveSequence */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-setColor) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setColor Procedure 
+FUNCTION setColor RETURNS INTEGER
+  ( pcName  AS CHARACTER 
+  , piColor AS INTEGER) :
+  /* Set color nr in the color tt
+   */
+  DEFINE BUFFER bColor FOR ttColor.
+
+  FIND bColor WHERE bColor.cName = pcName NO-ERROR.
+  IF NOT AVAILABLE bColor THEN 
+  DO:
+    CREATE bColor.
+    ASSIGN bColor.cName = pcName.
+  END.
+
+  /* Set to default value from settings */
+  IF piColor = ? THEN
+  DO:
+    piColor = INTEGER(getRegistry('DataDigger:Colors', pcName)) NO-ERROR.
+    IF ERROR-STATUS:ERROR THEN piColor = ?.
+  END.
+  
+  bColor.iColor = piColor.
+  RETURN bColor.iColor.
+
+END FUNCTION. /* setColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-setColumnWidthList) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setColumnWidthList Procedure 
@@ -4847,3 +4954,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

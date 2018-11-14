@@ -257,57 +257,17 @@ DEFINE FRAME DEFAULT-FRAME
          AT COL 1 ROW 1
          SIZE 184 BY 31.38 WIDGET-ID 100.
 
-DEFINE FRAME FRAME-AB
-     rsTitleBarDbName AT Y 28 X 85 NO-LABEL WIDGET-ID 186
-     tgTitleStartsWithTableName AT Y 95 X 85 WIDGET-ID 190
-     "Database Name in Title Bar" VIEW-AS TEXT
-          SIZE-PIXELS 180 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-22 AT Y 11 X 5 WIDGET-ID 176
+DEFINE FRAME FRAME-Z
+     rsColumnLabelTemplate AT Y 30 X 85 NO-LABEL WIDGET-ID 186
+     fiExample AT Y 111 X 75 COLON-ALIGNED WIDGET-ID 192
+     "Data Browse Column Label Template" VIEW-AS TEXT
+          SIZE-PIXELS 240 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     RECT-19 AT Y 11 X 5 WIDGET-ID 176
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 40
-         SIZE-PIXELS 415 BY 150
-         TITLE "2" WIDGET-ID 3000.
-
-DEFINE FRAME FRAME-J
-     tgAutoFont AT Y 25 X 88 WIDGET-ID 122
-     btnDefaultFont AT Y 46 X 88 WIDGET-ID 98
-     btnFixedFont AT Y 46 X 245 WIDGET-ID 100
-     "Fonts" VIEW-AS TEXT
-          SIZE-PIXELS 55 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     "Set fonts:" VIEW-AS TEXT
-          SIZE-PIXELS 73 BY 13 AT Y 51 X 10 WIDGET-ID 102
-     RECT-20 AT Y 11 X 5 WIDGET-ID 124
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 15
-         SIZE-PIXELS 415 BY 115
-         TITLE "2" WIDGET-ID 1200.
-
-DEFINE FRAME FRAME-T
-     tgHighlightFavouriteTables AT Y 20 X 170 WIDGET-ID 192
-     fiFavouriteTable AT Y 39 X 160 COLON-ALIGNED WIDGET-ID 190 NO-TAB-STOP 
-     btnFavouriteTable AT Y 39 X 344 WIDGET-ID 188
-     fiFieldFilter AT Y 74 X 160 COLON-ALIGNED WIDGET-ID 186 NO-TAB-STOP 
-     btnFieldFilter AT Y 74 X 344 WIDGET-ID 184
-     fiCustomOrder AT Y 100 X 160 COLON-ALIGNED WIDGET-ID 200 NO-TAB-STOP 
-     btnfiCustomOrder AT Y 100 X 344 WIDGET-ID 194
-     fiCustomFormat AT Y 126 X 160 COLON-ALIGNED WIDGET-ID 198 NO-TAB-STOP 
-     btnfiCustomFormat AT Y 126 X 344 WIDGET-ID 182
-     fiWarningBox AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 202 NO-TAB-STOP 
-     btnWarningBox AT Y 152 X 344 WIDGET-ID 196
-     fiIndexInactive AT Y 179 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnIndexInactive AT Y 179 X 344 WIDGET-ID 116
-     fiPrimIndex AT Y 205 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnPrimIndex AT Y 205 X 344 WIDGET-ID 204
-     "Schema highlighting colors" VIEW-AS TEXT
-          SIZE-PIXELS 175 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-14 AT Y 11 X 5 WIDGET-ID 176
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 465 Y 205
-         SIZE-PIXELS 415 BY 275
-         TITLE "2" WIDGET-ID 2000.
+         AT X 10 Y 155
+         SIZE-PIXELS 415 BY 170
+         TITLE "2" WIDGET-ID 2900.
 
 DEFINE FRAME FRAME-V
      tgUseSystemColors AT Y 25 X 170 WIDGET-ID 122
@@ -334,17 +294,57 @@ DEFINE FRAME FRAME-V
          SIZE-PIXELS 415 BY 265
          TITLE "2" WIDGET-ID 2100.
 
-DEFINE FRAME FRAME-Z
-     rsColumnLabelTemplate AT Y 30 X 85 NO-LABEL WIDGET-ID 186
-     fiExample AT Y 111 X 75 COLON-ALIGNED WIDGET-ID 192
-     "Data Browse Column Label Template" VIEW-AS TEXT
-          SIZE-PIXELS 240 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-19 AT Y 11 X 5 WIDGET-ID 176
+DEFINE FRAME FRAME-T
+     tgHighlightFavouriteTables AT Y 20 X 170 WIDGET-ID 192
+     fiFavouriteTable AT Y 39 X 160 COLON-ALIGNED WIDGET-ID 190 NO-TAB-STOP 
+     btnFavouriteTable AT Y 39 X 344 WIDGET-ID 188
+     fiFieldFilter AT Y 74 X 160 COLON-ALIGNED WIDGET-ID 186 NO-TAB-STOP 
+     btnFieldFilter AT Y 74 X 344 WIDGET-ID 184
+     fiCustomOrder AT Y 100 X 160 COLON-ALIGNED WIDGET-ID 200 NO-TAB-STOP 
+     btnfiCustomOrder AT Y 100 X 344 WIDGET-ID 194
+     fiCustomFormat AT Y 126 X 160 COLON-ALIGNED WIDGET-ID 198 NO-TAB-STOP 
+     btnfiCustomFormat AT Y 126 X 344 WIDGET-ID 182
+     fiWarningBox AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 202 NO-TAB-STOP 
+     btnWarningBox AT Y 152 X 344 WIDGET-ID 196
+     fiIndexInactive AT Y 179 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
+     btnIndexInactive AT Y 179 X 344 WIDGET-ID 116
+     fiPrimIndex AT Y 205 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
+     btnPrimIndex AT Y 205 X 344 WIDGET-ID 204
+     "Schema highlighting colors" VIEW-AS TEXT
+          SIZE-PIXELS 175 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     RECT-14 AT Y 11 X 5 WIDGET-ID 176
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT X 10 Y 155
-         SIZE-PIXELS 415 BY 170
-         TITLE "2" WIDGET-ID 2900.
+         AT X 465 Y 205
+         SIZE-PIXELS 415 BY 275
+         TITLE "2" WIDGET-ID 2000.
+
+DEFINE FRAME FRAME-J
+     tgAutoFont AT Y 25 X 88 WIDGET-ID 122
+     btnDefaultFont AT Y 46 X 88 WIDGET-ID 98
+     btnFixedFont AT Y 46 X 245 WIDGET-ID 100
+     "Fonts" VIEW-AS TEXT
+          SIZE-PIXELS 55 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     "Set fonts:" VIEW-AS TEXT
+          SIZE-PIXELS 73 BY 13 AT Y 51 X 10 WIDGET-ID 102
+     RECT-20 AT Y 11 X 5 WIDGET-ID 124
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 10 Y 15
+         SIZE-PIXELS 415 BY 115
+         TITLE "2" WIDGET-ID 1200.
+
+DEFINE FRAME FRAME-AB
+     rsTitleBarDbName AT Y 28 X 85 NO-LABEL WIDGET-ID 186
+     tgTitleStartsWithTableName AT Y 95 X 85 WIDGET-ID 190
+     "Database Name in Title Bar" VIEW-AS TEXT
+          SIZE-PIXELS 180 BY 17 AT Y 2 X 15 WIDGET-ID 180
+     RECT-22 AT Y 11 X 5 WIDGET-ID 176
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT X 465 Y 40
+         SIZE-PIXELS 415 BY 150
+         TITLE "2" WIDGET-ID 3000.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -609,7 +609,7 @@ END.
 ON CHOOSE OF btnEven IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiEvenRow
 DO:
-  RUN setColor(fiEvenRow:HANDLE).
+  RUN chooseColor(fiEvenRow:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -622,7 +622,7 @@ END.
 ON CHOOSE OF btnFavouriteTable IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiFavouriteTable
 DO:
-  RUN setColor(fiFavouriteTable:HANDLE).
+  RUN chooseColor(fiFavouriteTable:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -634,7 +634,7 @@ END.
 ON CHOOSE OF btnfiCustomFormat IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiCustomFormat
 DO:
-  RUN setColor(fiCustomFormat:HANDLE).
+  RUN chooseColor(fiCustomFormat:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -646,7 +646,7 @@ END.
 ON CHOOSE OF btnfiCustomOrder IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiCustomOrder
 DO:
-  RUN setColor(fiCustomOrder:HANDLE).
+  RUN chooseColor(fiCustomOrder:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -658,7 +658,7 @@ END.
 ON CHOOSE OF btnFieldFilter IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiFieldFilter
 DO:
-  RUN setColor(fiFieldFilter:HANDLE).
+  RUN chooseColor(fiFieldFilter:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -671,7 +671,7 @@ END.
 ON CHOOSE OF btnFilterBox IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiFilterBox
 DO:
-  RUN setColor(fiFilterBox:HANDLE).
+  RUN chooseColor(fiFilterBox:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -708,7 +708,7 @@ END.
 ON CHOOSE OF btnIndexInactive IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiIndexInactive
 DO:
-  RUN setColor(fiIndexInactive:HANDLE).
+  RUN chooseColor(fiIndexInactive:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -721,7 +721,7 @@ END.
 ON CHOOSE OF btnOdd IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiOddRow
 DO:
-  RUN setColor(fiOddRow:HANDLE).
+  RUN chooseColor(fiOddRow:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -734,7 +734,7 @@ END.
 ON CHOOSE OF btnPrimIndex IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiPrimIndex
 DO:
-  RUN setColor(fiPrimIndex:HANDLE).
+  RUN chooseColor(fiPrimIndex:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -747,7 +747,7 @@ END.
 ON CHOOSE OF btnQueryError IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiQueryError
 DO:
-  RUN setColor(fiQueryError:HANDLE).
+  RUN chooseColor(fiQueryError:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -759,7 +759,7 @@ END.
 ON CHOOSE OF btnRecordCountComplete IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountComplete
 DO:
-  RUN setColor(fiRecordCountComplete:HANDLE).
+  RUN chooseColor(fiRecordCountComplete:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -771,7 +771,7 @@ END.
 ON CHOOSE OF btnRecordCountIncomplete IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountIncomplete
 DO:
-  RUN setColor(fiRecordCountIncomplete:HANDLE).
+  RUN chooseColor(fiRecordCountIncomplete:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -783,7 +783,7 @@ END.
 ON CHOOSE OF btnRecordCountSelected IN FRAME FRAME-V /* Set */
 OR MOUSE-SELECT-CLICK OF fiRecordCountSelected
 DO:
-  RUN setColor(fiRecordCountSelected:HANDLE).
+  RUN chooseColor(fiRecordCountSelected:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -796,7 +796,7 @@ END.
 ON CHOOSE OF btnWarningBox IN FRAME FRAME-T /* Set */
 OR MOUSE-SELECT-CLICK OF fiWarningBox
 DO:
-  RUN setColor(fiWarningBox:HANDLE).
+  RUN chooseColor(fiWarningBox:HANDLE).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -906,6 +906,50 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE chooseColor C-Win 
+PROCEDURE chooseColor :
+/* Set color for a field, assign colors to widget
+  */
+  DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
+
+  DEFINE VARIABLE iBG  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iFG  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iSep AS INTEGER NO-UNDO.
+  DEFINE VARIABLE lOk  AS LOGICAL NO-UNDO.
+  
+  iBg = phWidget:BGCOLOR.
+  iFg = phWidget:FGCOLOR.
+
+  RUN adecomm/_chscolr.p (  "Choose color for " + phWidget:SCREEN-VALUE
+                          , ""
+                          , FALSE
+                          , ?
+                          , ?
+                          , ?
+                          , INPUT-OUTPUT iBG
+                          , INPUT-OUTPUT iFG
+                          , INPUT-OUTPUT iSep
+                          , OUTPUT lOk
+                          ).
+  IF lOk THEN ASSIGN phWidget:FGCOLOR = iFg phWidget:BGCOLOR = iBg.
+  /*
+    ipTitle        - Title for the dialog
+    cipMessage     - Message to write at bottom of screen
+    lipSeparator   - Indicates if separator colors need to display for browse widgets
+    iipDfltBgColor - color number to use as default background
+    iipDfltFgColor - color number to use as default foreground
+    iipDfltSpColor - color number to use as default separator color
+    iiopBgColor    - background color number
+    iiopFgColor    - foreground color number
+    iiopSpColor    - separator color number
+    lOk     - FALSE if cancelled dialog box.
+  */  
+
+END PROCEDURE. /* chooseColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI C-Win  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
@@ -972,50 +1016,6 @@ PROCEDURE enable_UI :
       WITH FRAME FRAME-V IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-FRAME-V}
 END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setColor C-Win 
-PROCEDURE setColor :
-/* Set color for a field, assign colors to widget
-  */
-  DEFINE INPUT PARAMETER phWidget AS HANDLE NO-UNDO.
-
-  DEFINE VARIABLE iBG  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iFG  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iSep AS INTEGER NO-UNDO.
-  DEFINE VARIABLE lOk  AS LOGICAL NO-UNDO.
-  
-  iBg = phWidget:BGCOLOR.
-  iFg = phWidget:FGCOLOR.
-
-  RUN adecomm/_chscolr.p (  "Choose color for " + phWidget:SCREEN-VALUE
-                          , ""
-                          , FALSE
-                          , ?
-                          , ?
-                          , ?
-                          , INPUT-OUTPUT iBG
-                          , INPUT-OUTPUT iFG
-                          , INPUT-OUTPUT iSep
-                          , OUTPUT lOk
-                          ).
-  IF lOk THEN ASSIGN phWidget:FGCOLOR = iFg phWidget:BGCOLOR = iBg.
-  /*
-    ipTitle        - Title for the dialog
-    cipMessage     - Message to write at bottom of screen
-    lipSeparator   - Indicates if separator colors need to display for browse widgets
-    iipDfltBgColor - color number to use as default background
-    iipDfltFgColor - color number to use as default foreground
-    iipDfltSpColor - color number to use as default separator color
-    iiopBgColor    - background color number
-    iiopFgColor    - foreground color number
-    iiopSpColor    - separator color number
-    lOk     - FALSE if cancelled dialog box.
-  */  
-
-END PROCEDURE. /* setColor */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

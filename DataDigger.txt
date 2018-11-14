@@ -19,6 +19,7 @@ DataDigger version 25
 - Solved: Double click on fields excluded from browser gives error (Dirk Vreken)
 
 - Change: File description now shows both label and description (Johan Geerts)
+- Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
 
 =====================================================================================
 
