@@ -12,11 +12,12 @@ DataDigger version 25
 - Solved: User defined color '?' was reset to default value after restart
 - Solved: Fixed SonarCube issues marked as 'bug' (Gilles Querret)
 - Solved: Timer frozen when computer wakes up from hibernate (Richard Kelters)
-- Solved: Character field with format '99999' could not be updated (Damir Pen)
+- Solved: Character field with format '99999' could not be updated (Damir Pem)
 - Solved: UI errors in query tester (Alan Copeland)
 - Solved: Compile error on 64bit when prowin32 is not available (Sergejus Kornejevas)
 - Solved: Frames mixed up when dumping large tables (Dirk Vreken)
 - Solved: Double click on fields excluded from browser gives error (Dirk Vreken)
+- Solved: Characters with format like '9(4)' could not be updated (Damir Pem)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
