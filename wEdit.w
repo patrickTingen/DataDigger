@@ -888,7 +888,6 @@ ON "leave" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
   DO WITH FRAME {&FRAME-NAME}:
     brRecord:TOOLTIP = "fields to edit".
-/*     ttColumn.cNewValue = ttColumn.cOldValue. */
     RUN enableToolbar("").
   END.
 END. /* leave cNewValue */
@@ -1112,6 +1111,13 @@ PROCEDURE btnGoChoose :
 
         FOR EACH bColumn WHERE bColumn.lShow = TRUE
           ON ERROR UNDO #CommitLoop, LEAVE #CommitLoop:
+
+          FIND bField WHERE bField.cFieldName = bColumn.cFieldName NO-ERROR.
+
+          /* Check for unknown value in mandatory field */
+          IF (bColumn.cNewValue = '' OR bColumn.cNewValue = ?) AND bField.cDataType <> 'CHARACTER' THEN 
+            bColumn.cNewValue = bField.cInitial.
+
           /* 2016-08-08 richardk large decimal values are not correctly casted from string,
            * last two digits of a 23 digit decimal are always zero */
           CASE hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):DATA-TYPE:

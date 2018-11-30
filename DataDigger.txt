@@ -18,6 +18,7 @@ DataDigger version 25
 - Solved: Frames mixed up when dumping large tables (Dirk Vreken)
 - Solved: Double click on fields excluded from browser gives error (Dirk Vreken)
 - Solved: Characters with format like '9(4)' could not be updated (Damir Pem)
+- Solved: Setting ? in a mandatory field will back out the update (Johan Geerts)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
