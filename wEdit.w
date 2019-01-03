@@ -1612,6 +1612,8 @@ PROCEDURE initializeObject :
 
   RUN reopenFieldBrowse(?,?).
 
+  /* Treat -RO database the same as read-only mode */
+  IF CAN-DO(DBRESTRICTIONS(picDatabase), "READ-ONLY") = YES THEN plReadOnlyDigger = TRUE.
   IF plReadOnlyDigger THEN btnOk:SENSITIVE = FALSE.
 
   /* Start listener to table changes in main window */

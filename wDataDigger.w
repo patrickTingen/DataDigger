@@ -239,6 +239,7 @@ FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
   , pcLabel   AS CHARACTER
+  , pcName    AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -523,7 +524,7 @@ DEFINE BUTTON btnReset  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnResizeVer  NO-FOCUS FLAT-BUTTON
      LABEL "||||||||||||||||||||||||||" 
-     SIZE 156 BY .24 TOOLTIP "drag me up and down".
+     SIZE 156 BY .24 TOOLTIP "drag me up, Scotty (and down)".
 
 DEFINE BUTTON btnTabFavourites  NO-FOCUS FLAT-BUTTON
      LABEL "Fav" 
@@ -4620,9 +4621,9 @@ PROCEDURE btnDeleteChoose :
   DEFINE VARIABLE lError          AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lEnableTriggers AS LOGICAL NO-UNDO.
 
-  /* In read-only mode, return */
-  IF glReadOnlyDigger THEN RETURN.
-
+  /* In read-only mode, or -RO connection, return */
+  IF glReadOnlyDigger OR (CAN-DO(DBRESTRICTIONS(gcCurrentDatabase), "READ-ONLY") = YES) THEN RETURN. 
+  
   /* If nothing selected, go back */
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0
     OR NOT CAN-FIND(FIRST ttField WHERE ttField.lShow = TRUE) THEN RETURN.
@@ -5552,7 +5553,7 @@ PROCEDURE connectDroppedDatabase :
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE cDatabaseList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iDatabase     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iDatabase     AS INTEGER     NO-UNDO INITIAL 1.
   DEFINE VARIABLE cLdbName      AS CHARACTER   NO-UNDO.
 
   /* Accept one database at a time */
@@ -5569,7 +5570,7 @@ PROCEDURE connectDroppedDatabase :
     iDatabase = iDatabase + 1.
     IF NOT CONNECTED(cLdbName + STRING(iDatabase)) THEN
     DO:
-      cLdbName = cLdbName + STRING(iDatabase).
+      cLdbName = SUBSTITUTE('&1-&2', cLdbName, iDatabase).
       LEAVE #GetNr.
     END.
   END.
@@ -5924,76 +5925,77 @@ PROCEDURE createMenuDataBrowse :
   hMenu = createMenu(ghDataBrowse).
 
   /* Copy to clipboard */
-  hMenuItem = createMenuItem(hMenu,"Item","Copy field to clipboard").
+  hMenuItem = createMenuItem(hMenu,"Item","Copy to clipboard","copyDataToClipboard").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN copyDataToClipboard IN THIS-PROCEDURE.
 
   /* Show value of field */
-  hMenuItem = createMenuItem(hMenu,"Item","Show Value").
+  hMenuItem = createMenuItem(hMenu,"Item","Show Value","showValue").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN showValue IN THIS-PROCEDURE.
 
   /* Add to filter */
-  hMenuItem = createMenuItem(hMenu,"Item","Add to filter").
+  hMenuItem = createMenuItem(hMenu,"Item","Add to filter","addFilter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN setDataFilter IN THIS-PROCEDURE (NO).
 
   /* Filter on this field only */
-  hMenuItem = createMenuItem(hMenu,"Item","Set as only filter").
+  hMenuItem = createMenuItem(hMenu,"Item","Set as only filter","setFilter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN setDataFilter IN THIS-PROCEDURE (YES).
 
   /* Filter on this field only */
-  hMenuItem = createMenuItem(hMenu,"Item","Clear Filters").
+  hMenuItem = createMenuItem(hMenu,"Item","Clear Filters","clearFilter").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnClearDataFilterChoose IN THIS-PROCEDURE.
 
   /* Set data sorting */
-  hMenuItem = createMenuItem(hMenu,"Item","Set Sorting").
+  hMenuItem = createMenuItem(hMenu,"Item","Set Sorting","SortData").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDataSortChoose IN THIS-PROCEDURE.
 
   /* Clear sorting */
-  hMenuItem = createMenuItem(hMenu,"Item","Clear Sorting").
+  hMenuItem = createMenuItem(hMenu,"Item","Clear Sorting","ClearSorting").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearDataSort IN THIS-PROCEDURE.
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","").
+  hMenuItem = createMenuItem(hMenu,"Rule","","").
 
   /* Shortcut to viewing records */
-  hMenuItem = createMenuItem(hMenu,"Item","View selected (SHIFT-ENTER)").
+  hMenuItem = createMenuItem(hMenu,"Item","View selected","view").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnViewChoose IN THIS-PROCEDURE.
 
   /* Shortcut to adding records */
-  hMenuItem = createMenuItem(hMenu,"Item","Add record (INS)").
+  hMenuItem = createMenuItem(hMenu,"Item","Add record","add").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnAddChoose IN THIS-PROCEDURE.
+  IF glReadOnlyDigger OR (CAN-DO(DBRESTRICTIONS(gcCurrentDatabase), "READ-ONLY") = YES) THEN hMenuItem:SENSITIVE = FALSE.
 
   /* Shortcut to cloning records */
-  hMenuItem = createMenuItem(hMenu,"Item","Clone record (ALT-O)").
+  hMenuItem = createMenuItem(hMenu,"Item","Clone record (ALT-O)","clone").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnCloneChoose IN THIS-PROCEDURE.
 
   /* Shortcut to editing records */
-  hMenuItem = createMenuItem(hMenu,"Item","Edit selected (ALT-E)").
+  hMenuItem = createMenuItem(hMenu,"Item","Edit selected (ALT-E)","edit").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnEditChoose IN THIS-PROCEDURE.
 
   /* Shortcut to dumping records */
-  hMenuItem = createMenuItem(hMenu,"Item","Dump selected (CTRL-S)").
+  hMenuItem = createMenuItem(hMenu,"Item","Dump selected (CTRL-S)","dump").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDumpChoose IN THIS-PROCEDURE.
 
   /* Shortcut to loading records */
-  hMenuItem = createMenuItem(hMenu,"Item","Load data (CTRL-L)").
+  hMenuItem = createMenuItem(hMenu,"Item","Load data (CTRL-L)","load").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnLoadChoose IN THIS-PROCEDURE.
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","").
+  hMenuItem = createMenuItem(hMenu,"Rule","","").
 
   /* Shortcut to hiding the column */
-  hMenuItem = createMenuItem(hMenu,"Item","Hide this column").
+  hMenuItem = createMenuItem(hMenu,"Item","Hide this column","hideColumn").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN hideColumn IN THIS-PROCEDURE.
 
   /* Shortcut to unhiding the column */
-  hMenuItem = createMenuItem(hMenu,"Item","Unhide all columns").
+  hMenuItem = createMenuItem(hMenu,"Item","Unhide all columns","unhideColumn").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN showField IN THIS-PROCEDURE('*',TRUE).
 
   /* Rule */
-  hMenuItem = createMenuItem(hMenu,"Rule","").
+  hMenuItem = createMenuItem(hMenu,"Rule","","").
 
   /* Shortcut to deleting records */
-  hMenuItem = createMenuItem(hMenu,"Item","Delete selected (DEL)").
+  hMenuItem = createMenuItem(hMenu,"Item","Delete selected (DEL)","delete").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnDeleteChoose IN THIS-PROCEDURE.
 
 END PROCEDURE. /* createMenuDataBrowse */
@@ -6020,22 +6022,22 @@ PROCEDURE createMenuTableBrowse :
     cProgDir = getProgramDir().
 
     /* Submenu 'Connections' */
-    hSubMenu = createMenuItem(hMenu,"SubMenu","Connections").
+    hSubMenu = createMenuItem(hMenu,"SubMenu","Connections","").
 
     /* Quick Connect */
-    hMenuItem = createMenuItem(hSubMenu,"Item","Quick Connect").
+    hMenuItem = createMenuItem(hSubMenu,"Item","Quick Connect","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN quickConnect IN THIS-PROCEDURE.
 
     /* Disconnect current db */
-    hMenuItem = createMenuItem(hSubMenu,"Item","Disconnect current db").
+    hMenuItem = createMenuItem(hSubMenu,"Item","Disconnect current db","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN disconnectDatabase IN THIS-PROCEDURE.
 
     /* Manage connections */
-    hMenuItem = createMenuItem(hSubMenu,"Item","Manage Connections").
+    hMenuItem = createMenuItem(hSubMenu,"Item","Manage Connections","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnConnectionsChoose IN THIS-PROCEDURE.
 
     /* Rule */
-    hMenuItem = createMenuItem(hSubMenu,"Rule","").
+    hMenuItem = createMenuItem(hSubMenu,"Rule","","").
 
     /* Get list of connections */
     RUN VALUE(cProgDir + 'wConnections.w')
@@ -6051,19 +6053,19 @@ PROCEDURE createMenuTableBrowse :
       /* Skip if already connected */
       IF NOT CONNECTED(cDatabase) THEN
       DO:
-        hMenuItem = createMenuItem(hSubMenu,"Item", cDatabase).
+        hMenuItem = createMenuItem(hSubMenu,"Item", cDatabase, "").
         ON 'CHOOSE' OF hMenuItem PERSISTENT RUN connectDatabase IN THIS-PROCEDURE (cDatabase).
       END.
     END. /* do iConn */
 
     /* Submenu 'Generate' */
-    hSubMenu = createMenuItem(hMenu,"SubMenu","Generate Code").
+    hSubMenu = createMenuItem(hMenu,"SubMenu","Generate Code","").
     INPUT FROM OS-DIR(cProgDir).
     REPEAT:
       IMPORT cFile.
       IF cFile[1] MATCHES 'generate-*.w' THEN
       DO:
-        hMenuItem = createMenuItem(hSubMenu,"Item", REPLACE(ENTRY(1,cFile[1],'.'),'-', ' ')).
+        hMenuItem = createMenuItem(hSubMenu,"Item", REPLACE(ENTRY(1,cFile[1],'.'),'-', ' '),"").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN startGenerateProc IN THIS-PROCEDURE (cFile[2]).
       END.
     END.
@@ -6073,29 +6075,29 @@ PROCEDURE createMenuTableBrowse :
      * will be in DD25, but some people just can't wait :) */
     IF SEARCH('wTemplate.w') <> ? THEN
     DO:
-      hMenuItem = createMenuItem(hSubMenu,"Item","generate via template").
+      hMenuItem = createMenuItem(hSubMenu,"Item","generate via template","").
       ON "CHOOSE" OF hMenuItem PERSISTENT RUN startGenerateProc IN THIS-PROCEDURE ('wTemplate.w').
     END.
 
     /* Set/unset as favourite */
-    hMenuItem = createMenuItem(hMenu,"Item","Set / Unset as Favourite").
+    hMenuItem = createMenuItem(hMenu,"Item","Set / Unset as Favourite","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN toggleFavourite IN THIS-PROCEDURE.
 
     /* Rule */
-    hMenuItem = createMenuItem(hMenu,"Rule","").
+    hMenuItem = createMenuItem(hMenu,"Rule","","").
 
     /* Dump table definitions */
-    hMenuItem = createMenuItem(hMenu,"Item","Dump Definitions").
+    hMenuItem = createMenuItem(hMenu,"Item","Dump Definitions","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN dumpDefinitions IN THIS-PROCEDURE.
 
     /* Clone this Database */
-    hMenuItem = createMenuItem(hMenu,"Item","Clone this Database").
+    hMenuItem = createMenuItem(hMenu,"Item","Clone this Database","").
     ON "CHOOSE" OF hMenuItem PERSISTENT RUN cloneDatabase IN THIS-PROCEDURE.
 
     /* I'm feeling lucky (only once per day) */
     IF getRegistry("DataDigger", "FeelingLucky") < ISO-DATE(TODAY) THEN
     DO:
-      hMenuItem = createMenuItem(hMenu,"Item","I'm feeling lucky").
+      hMenuItem = createMenuItem(hMenu,"Item","I'm feeling lucky","").
       ON "CHOOSE" OF hMenuItem PERSISTENT RUN feelingLucky IN THIS-PROCEDURE.
     END.
 
@@ -8172,7 +8174,7 @@ PROCEDURE initializeFilters :
       .
 
     /* Create menu item for context menu */
-    hMenuItem = createMenuItem(ghFieldMenu,"TOGGLE-BOX",bFilter.hColumn:LABEL).
+    hMenuItem = createMenuItem(ghFieldMenu,"TOGGLE-BOX",bFilter.hColumn:LABEL,"").
     ON "VALUE-CHANGED" OF hMenuItem PERSISTENT
       RUN filterFieldShow IN THIS-PROCEDURE(bFilter.hColumn, hMenuItem).
 
@@ -9988,34 +9990,34 @@ PROCEDURE reopenDataBrowse-create :
         hFilterField:POPUP-MENU = hMenu.
 
         /* Clear all filters */
-        hMenuItem = createMenuItem(hMenu,"Item","Clear All &Filters").
+        hMenuItem = createMenuItem(hMenu,"Item","Clear All &Filters","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN applyEvent IN THIS-PROCEDURE (btnClearDataFilter:handle,"choose").
 
         /* Clear history */
-        hMenuItem = createMenuItem(hMenu,"Item","Clear &History").
+        hMenuItem = createMenuItem(hMenu,"Item","Clear &History","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearDataFilter IN THIS-PROCEDURE (hFilterField).
 
         /* Sort list */
-        hMenuItem = createMenuItem(hMenu,"Item","&Sort List").
+        hMenuItem = createMenuItem(hMenu,"Item","&Sort List","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN sortComboBox IN THIS-PROCEDURE (hFilterField).
 
         /* RULE / Cut / Copy / Paste / Delete */
-        hMenuItem = createMenuItem(hMenu,"RULE","").
+        hMenuItem = createMenuItem(hMenu,"RULE","","").
 
         /* Cut */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Cut").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Cut","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN cutToClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Copy */
-        hMenuItem = createMenuItem(hMenu,"ITEM","C&opy").
+        hMenuItem = createMenuItem(hMenu,"ITEM","C&opy","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN copyToClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Paste */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Paste").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Paste","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN pasteFromClipboard IN THIS-PROCEDURE (hFilterField).
 
         /* Delete */
-        hMenuItem = createMenuItem(hMenu,"ITEM","Delete").
+        hMenuItem = createMenuItem(hMenu,"ITEM","Delete","").
         ON "CHOOSE" OF hMenuItem PERSISTENT RUN clearField IN THIS-PROCEDURE (hFilterField).
 
       END. /* combo */
@@ -11801,7 +11803,7 @@ PROCEDURE setWindowTitle :
   cTitle = TRIM(cTitle,'- ').
 
   /* Add warning for read-only mode */
-  IF glReadOnlyDigger THEN cTitle = cTitle + " ** READ-ONLY **".
+  IF (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcCurrentDataBase), "READ-ONLY") = YES) THEN cTitle = cTitle + " ** READ-ONLY **".
 
   /* Add warning for debug-mode */
   IF glDebugMode THEN cTitle = cTitle + " ** DEBUG MODE **".
@@ -12901,6 +12903,7 @@ FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
   , pcLabel   AS CHARACTER
+  , pcName    AS CHARACTER
   ) :
 
   DEFINE VARIABLE hMenuItem AS HANDLE NO-UNDO.
@@ -12911,6 +12914,7 @@ FUNCTION createMenuItem RETURNS HANDLE
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
+          NAME         = pcName
           PARENT       = phMenu.
 
     WHEN "TOGGLE-BOX" THEN
@@ -12918,6 +12922,7 @@ FUNCTION createMenuItem RETURNS HANDLE
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
+          NAME         = pcName
           TOGGLE-BOX   = TRUE
           CHECKED      = TRUE
           PARENT       = phMenu.
@@ -12933,6 +12938,7 @@ FUNCTION createMenuItem RETURNS HANDLE
         ASSIGN
           LABEL        = pcLabel
           PRIVATE-DATA = pcLabel
+          NAME         = pcName
           PARENT       = phMenu.
 
   END CASE.
@@ -13367,8 +13373,13 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
 ------------------------------------------------------------------------------*/
   DEFINE VARIABLE lHasRecords AS LOGICAL NO-UNDO.
 
+  DEFINE VARIABLE lReadOnly   AS LOGICAL NO-UNDO.
+  
   {&timerStart}
 
+  /* Treat -RO database the same as read-only digger */
+  lReadOnly = (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcCurrentDataBase), "READ-ONLY") = YES).  
+  
   IF pcMode <> ? THEN gcRecordMode = pcMode.
 
   DO WITH FRAME frMain:
@@ -13379,13 +13390,13 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
                    AND ghDataBrowse:QUERY:NUM-RESULTS > 0).
 
     ASSIGN
-      btnAdd:SENSITIVE    = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT glReadOnlyDigger
-      btnClone:SENSITIVE  = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS < 2 AND NOT glReadOnlyDigger
+      btnAdd:SENSITIVE    = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT lReadOnly
+      btnClone:SENSITIVE  = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS < 2 AND NOT lReadOnly
       btnEdit:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
-      btnDelete:SENSITIVE = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT glReadOnlyDigger
+      btnDelete:SENSITIVE = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0 AND NOT lReadOnly
       btnView:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-SELECTED-ROWS > 0
       btnDump:SENSITIVE   = LOOKUP( gcRecordMode, 'display') > 0 AND lHasRecords AND ghDataBrowse:NUM-ITERATIONS > 0
-      btnLoad:SENSITIVE   = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT glReadOnlyDigger
+      btnLoad:SENSITIVE   = LOOKUP( gcRecordMode, 'display,no-record') > 0 AND NOT lReadOnly
       .
 
     /* Hide these when no data browse */
