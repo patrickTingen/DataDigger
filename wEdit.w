@@ -1127,17 +1127,15 @@ PROCEDURE btnGoChoose :
             DO:
               lCommit = YES.
 
-              FIND bField WHERE bField.cFieldName = bColumn.cFieldName NO-ERROR.
-              IF   AVAILABLE bField
-               AND bField.cFormat BEGINS "x(" THEN
+              IF bField.cFormat BEGINS "x(" THEN
               DO:
                 cRealOldValue = hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent).
                 iFormatLength = INTEGER(ENTRY(1, ENTRY(2, bField.cFormat, "("), ")")) NO-ERROR.
 
                 IF   iFormatLength <> ?
                  AND iFormatLength > 0
-                 AND length(cRealOldValue) > iFormatLength
-                 AND length(bColumn.cNewValue) = {&field-maxLength}   /* Betekent dat ie afgekapt is */
+                 AND LENGTH(cRealOldValue) > iFormatLength
+                 AND LENGTH(bColumn.cNewValue) = {&field-maxLength}   /* Betekent dat ie afgekapt is */
                 THEN
                   lCommit = NO.
               END.

@@ -197,6 +197,11 @@ DEFINE TEMP-TABLE ttFilter NO-UNDO RCODE-INFORMATION
   INDEX idxFilter hFilter
   .
 
+/* TT to save filter values */
+DEFINE TEMP-TABLE ttOldFilter NO-UNDO RCODE-INFORMATION
+  FIELD cFieldName AS CHARACTER
+  FIELD cValue     AS CHARACTER.
+
 /* TT for filter on database tables */
 DEFINE TEMP-TABLE ttTableFilter NO-UNDO RCODE-INFORMATION
   FIELD lModified       AS LOGICAL

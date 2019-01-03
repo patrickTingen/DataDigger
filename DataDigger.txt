@@ -21,6 +21,7 @@ DataDigger version 25
 - Solved: Setting ? in a mandatory field will back out the update (Johan Geerts)
 - Solved: Trying to edit records in -RO mode leads to crash (Johan Geerts)
 - Solved: Items in context menu on databrowse not disabled in read-only mode
+- Solved: Changing format in field browse will reset query and column filters (kingOttmar)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)

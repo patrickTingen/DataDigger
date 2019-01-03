@@ -288,6 +288,14 @@ FUNCTION getQueryFromFields RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSafeFormat C-Win 
+FUNCTION getSafeFormat RETURNS CHARACTER
+  ( pcFormat   AS CHARACTER 
+  , pcDataType AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedFields C-Win 
 FUNCTION getSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
@@ -4234,20 +4242,53 @@ END. /* on entry of ttField.cFormat */
 ON LEAVE OF ttField.cFormat IN BROWSE brFields
 DO:
   DO WITH FRAME {&FRAME-NAME}:
-    DEFINE VARIABLE cOrgValue AS CHARACTER NO-UNDO.
-    DEFINE VARIABLE cTable    AS CHARACTER NO-UNDO.
-    DEFINE VARIABLE cField    AS CHARACTER NO-UNDO.
+    DEFINE VARIABLE cOrgValue      AS CHARACTER NO-UNDO.
+    DEFINE VARIABLE cNewFormat     AS CHARACTER NO-UNDO.
+    DEFINE VARIABLE cTable         AS CHARACTER NO-UNDO.
+    DEFINE VARIABLE cField         AS CHARACTER NO-UNDO.
+    DEFINE VARIABLE lSelectAll     AS LOGICAL   NO-UNDO.
+    DEFINE VARIABLE cFieldDatatype AS CHARACTER NO-UNDO.
+    DEFINE BUFFER bColumn FOR ttColumn.
 
+    setWindowFreeze(YES).
     fiWarning:VISIBLE = NO.
     fiWarning:X = 1.
 
-    cTable    = gcCurrentTable.
-    cField    = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):BUFFER-VALUE.
-    cOrgValue = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFormatOrg'):BUFFER-VALUE.
+    cTable          = gcCurrentTable.
+    cField          = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):BUFFER-VALUE.
+    cOrgValue       = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFormatOrg'):BUFFER-VALUE.
+    cFieldDatatype  = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cDatatype'):BUFFER-VALUE.
     glRowEditActive = NO.
+    lSelectAll = (ghDataBrowse:QUERY:NUM-RESULTS > 0 AND ghDataBrowse:NUM-SELECTED-ROWS = 0).
 
+    /* Clearing the field means: "restore original format" */
     IF SELF:SCREEN-VALUE = '' THEN SELF:SCREEN-VALUE = cOrgValue.
     SELF:FGCOLOR = (IF SELF:SCREEN-VALUE <> cOrgValue THEN getColor('CustomFormat:FG') ELSE ?).
+
+    /* Select at least one row otherwise we get errors */
+    IF lSelectAll THEN ghDataBrowse:SELECT-ROW(1).
+
+    #SetFormat:
+    FOR EACH bColumn 
+      WHERE bColumn.cDatabase  = gcCurrentDatabase
+        AND bColumn.cTableName = cTable
+        AND bColumn.cFieldName = cField:
+
+      IF VALID-HANDLE(bColumn.hColumn) THEN 
+      DO:
+        cNewFormat = getSafeFormat(SELF:SCREEN-VALUE, cFieldDatatype).
+        bColumn.hColumn:FORMAT = cNewFormat NO-ERROR. 
+        IF bColumn.hColumn:FORMAT <> cNewFormat THEN 
+        DO:
+          RUN showHelp("FormatError", SELF:SCREEN-VALUE + "," + cOrgValue).
+          SELF:SCREEN-VALUE = cOrgValue.
+          bColumn.hColumn:FORMAT = getSafeFormat(cOrgValue, cFieldDatatype) NO-ERROR. 
+        END.
+      END.
+    END. /* #SetFormat */
+
+    IF lSelectAll THEN ghDataBrowse:DESELECT-ROWS().
+    IF ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
     /* Save changed format. If it is blank, it will be deleted from registry */
     setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
@@ -4258,7 +4299,8 @@ DO:
     /* Track if format is blanked to set it back to default */
     IF SELF:SCREEN-VALUE = "" THEN
       PUBLISH "setUsage" ("restoreFormat"). /* user behaviour */
-
+  
+    setWindowFreeze(NO).
   END.
 END. /* on leave of ttField.cFormat */
 
@@ -9515,8 +9557,11 @@ PROCEDURE reopenDataBrowse :
   DEFINE VARIABLE lPrepare       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
   DEFINE VARIABLE lQueryComplete AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE cOldWhere      AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
+  DEFINE BUFFER bOldFilter FOR ttOldFilter.
+
   {&timerStart}
 
   /* Freeze! */
@@ -9529,10 +9574,31 @@ PROCEDURE reopenDataBrowse :
   RUN incQueriesOfTable(gcCurrentDatabase, gcCurrentTable, +1).
   RUN incQueriesServed(+1).
 
-  /* If the user has changed a format in the field browse, then rebuild the data browse */
+  /* If the user has changed a format in the field browse, then rebuild the data browse 
+  ** but preserve the values for the query and the data filters
+  */
   IF glFormatChanged THEN
   DO:
+    /* Keep old values */
+    EMPTY TEMP-TABLE bOldFilter.
+    cOldWhere = ficWhere:SCREEN-VALUE IN FRAME frMain.
+
+    FOR EACH bColumn:
+      CREATE bOldFilter.
+      ASSIGN bOldFilter.cFieldName = bColumn.cFieldName.
+      IF VALID-HANDLE(bColumn.hFilter) AND bColumn.hFilter:SCREEN-VALUE <> bColumn.hFilter:PRIVATE-DATA THEN bOldFilter.cValue = bColumn.hFilter:SCREEN-VALUE.
+    END.
+
     RUN reopenDataBrowse-create(INPUT gcCurrentDatabase, INPUT gcCurrentTable).
+
+    /* Restore old values */
+    ficWhere:SCREEN-VALUE IN FRAME frMain = cOldWhere.
+    FOR EACH bOldFilter, EACH bColumn WHERE bColumn.cFieldName = bOldFilter.cFieldName:
+      bColumn.hFilter:SCREEN-VALUE = bOldFilter.cValue.
+      filterModified(bColumn.hFilter, YES).
+      RUN filterFieldLeave(bColumn.hFilter, NO).
+    END.
+
     glFormatChanged = FALSE.
   END.
 
@@ -9855,42 +9921,8 @@ PROCEDURE reopenDataBrowse-create :
                                ).
         IF cMyFormat = ? THEN cMyFormat = bField.cFormat.
 
-        /* Autocorrect 2-digit years in date fields */
-        IF bField.cDataType = "DATE"
-          AND cMyFormat MATCHES "99.99.99" THEN cMyFormat = cMyFormat + "99".
-
-        /* Protect against "value could not be displayed using..." errors. */
-        IF (   bField.cDataType = "DECIMAL"
-            OR bField.cDataType = "RECID"
-            OR bField.cDataType BEGINS "INT") /* Use BEGINS to cover integer / int64 and extents of both */
-           AND NOT cMyFormat BEGINS "HH:MM"   /* Skip time fields */ THEN
-        DO:
-          /* Add minus sign if needed. Because a format can contain extra characters like "$"
-           * we need to find out what the right place might be to add it. If the format begins
-           * with extra chars, we add it at the back. But if there are extra chars too, we just
-           * cannot add the extra minus char. So be it :(
-           */
-          IF INDEX(cMyFormat,"-") = 0
-            AND INDEX(cMyFormat,"+") = 0 THEN
-          DO:
-            IF cMyFormat BEGINS '9' OR cMyFormat BEGINS '>' THEN cMyFormat = "-" + cMyFormat.
-            ELSE
-            IF cMyFormat MATCHES '*9' THEN cMyFormat = cMyFormat + "-".
-          END.
-
-          /* Add extra digit placeholders */
-          addDigits:
-          DO iPos = 1 TO LENGTH(cMyFormat):
-            IF LOOKUP(SUBSTRING(cMyFormat,iPos,1),">,Z,9") > 0 THEN
-            DO:
-              IF iPos = 1 THEN
-                cMyFormat = ">>>>>>>>>>>>>>>" + cMyFormat.
-              ELSE
-                cMyFormat = SUBSTRING(cMyFormat,1,iPos - 1) + ">>>>>>>>>>>>>>>" + SUBSTRING(cMyFormat,iPos).
-              LEAVE addDigits.
-            END.
-          END.
-        END.
+        /* Get a format that protects against 'Value X could not be displayed using Y' */
+        cMyFormat = getSafeFormat(cMyFormat, bField.cDataType).
 
         /* Apply the format */
         IF NOT cMyFormat BEGINS "HH:MM" THEN
@@ -13109,6 +13141,57 @@ FUNCTION getQueryFromFields RETURNS CHARACTER
 
   RETURN cQuery.
 END FUNCTION. /* getQueryFromFields */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSafeFormat C-Win 
+FUNCTION getSafeFormat RETURNS CHARACTER
+  ( pcFormat   AS CHARACTER 
+  , pcDataType AS CHARACTER ) :
+
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
+
+  /* Autocorrect 2-digit years in date fields */
+  IF pcDataType = "DATE"
+    AND pcFormat MATCHES "99.99.99" THEN pcFormat = pcFormat + "99".
+
+  /* Protect against "value could not be displayed using..." errors. */
+  IF (   pcDataType = "DECIMAL"
+      OR pcDataType = "RECID"
+      OR pcDataType BEGINS "INT") /* Use BEGINS to cover integer / int64 and extents of both */
+     AND NOT pcFormat BEGINS "HH:MM"   /* Skip time fields */ THEN
+  DO:
+    /* Add minus sign if needed. Because a format can contain extra characters like "$"
+     * we need to find out what the right place might be to add it. If the format begins
+     * with extra chars, we add it at the back. But if there are extra chars too, we just
+     * cannot add the extra minus char. So be it :(
+     */
+    IF INDEX(pcFormat,"-") = 0
+      AND INDEX(pcFormat,"+") = 0 THEN
+    DO:
+      IF pcFormat BEGINS '9' OR pcFormat BEGINS '>' THEN pcFormat = "-" + pcFormat.
+      ELSE
+      IF pcFormat MATCHES '*9' THEN pcFormat = pcFormat + "-".
+    END.
+
+    /* Add extra digit placeholders */
+    addDigits:
+    DO i = 1 TO LENGTH(pcFormat):
+      IF LOOKUP(SUBSTRING(pcFormat,i,1),">,Z,9") > 0 THEN
+      DO:
+        IF i = 1 THEN
+          pcFormat = ">>>>>>>>>>>>>>>" + pcFormat.
+        ELSE
+          pcFormat = SUBSTRING(pcFormat,1,i - 1) + ">>>>>>>>>>>>>>>" + SUBSTRING(pcFormat,i).
+        LEAVE addDigits.
+      END.
+    END.
+  END.
+
+  RETURN pcFormat. /* Function return value. */
+
+END FUNCTION. /* getSafeFormat */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
