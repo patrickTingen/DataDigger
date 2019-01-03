@@ -66,6 +66,34 @@ END FUNCTION. /* getDomainFieldName */
 
 
 /*
+PROCEDURE setWindowTitle:
+  /*
+   * Name: setWindowTitle
+   * Desc: Change the title of the main window
+   *
+   * This hook enables you to change the title of the DataDigger window.
+   *
+   * This is handy if you want to have other information in the title bar
+   * that is not provided by DataDigger (for example user name)
+   *
+   */
+  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER pcTitle AS CHARACTER NO-UNDO.
+
+  /* Example 1: add user name to title bar
+  IF NUM-DBS > 0 THEN pcTitle = pcTitle + ' ' + USERID(LDBNAME(1)).
+  */
+  
+  /* Example 2: replace title with simple version of db + table name
+  pcTitle = SUBSTITUTE('&1.&2', pcDatabase, pcTable).
+  */
+  
+END PROCEDURE. /* setWindowTitle */
+*/
+
+
+/*
 PROCEDURE customShowField:
   /*
    * Name: customShowField

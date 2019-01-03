@@ -11806,6 +11806,9 @@ PROCEDURE setWindowTitle :
   /* Add warning for debug-mode */
   IF glDebugMode THEN cTitle = cTitle + " ** DEBUG MODE **".
 
+  /* Option to set your own title */
+  PUBLISH 'setWindowTitle' (INPUT gcCurrentDatabase, INPUT gcCurrentTable, INPUT-OUTPUT cTitle).
+
   C-Win:TITLE = cTitle.
 
   RUN GetParent (c-win:HWND, OUTPUT hParent).
@@ -12461,6 +12464,7 @@ PROCEDURE startDiggerLib :
     SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
 
+    SUBSCRIBE PROCEDURE hDiggerLib TO "setWindowTitle" ANYWHERE.
 
   END.
 END PROCEDURE. /* startDiggerLib */
