@@ -198,15 +198,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
-btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
-fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
-brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
-btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
-btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
-btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
-btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete ~
-btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
+fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
+fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
+btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite ~
+btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -978,8 +978,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiTableFilter AT Y 3 X 56 NO-LABEL
      btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
+     fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -990,14 +990,14 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -1142,7 +1142,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          HIDDEN             = YES
          TITLE              = "DataDigger"
          HEIGHT-P           = 565
-         WIDTH-P            = 1280
+         WIDTH-P            = 1278
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
          VIRTUAL-HEIGHT-P   = 1134
@@ -1683,26 +1683,46 @@ END.
 ON F11 OF C-Win /* DataDigger */
 ANYWHERE DO:
   /* Ability to set dark mode */
-
   &IF DEFINED (UIB_is_running) &THEN
+  
+  DEFINE VARIABLE iWhite        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iVeryDarkGray AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBlack        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBlue         AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iDarkGray     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iLightGray    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iOffWhite     AS INTEGER     NO-UNDO.
+
+  /* Default colors */
+  iBlack        = getColorByRGB(  0,  0,  0).
+  iWhite        = getColorByRGB(255,255,255).
+  iLightGray    = getColorByRGB(192,192,192).
+  iBlue         = getColorByRGB(  0,  0,255).
+  iOffWhite     = getColorByRGB(240,240,240). /* ButtonFace system color */
+
+  /* Custom colors */
+  iDarkGray     = getColorByRGB( 66, 66, 66).
+  iVeryDarkGray = getColorByRGB( 44, 44, 44).
+
   IF FRAME frMain:BGCOLOR = ? THEN
   DO:
+    FRAME frMain:BGCOLOR     = iVeryDarkGray.
+    FRAME frMain:FGCOLOR     = iLightGray.
+                             
+    FRAME frData:BGCOLOR     = iVeryDarkGray.
+    FRAME frData:FGCOLOR     = iLightGray.
 
-    FRAME frMain:BGCOLOR = 25. /* very dark gray */
-    FRAME frMain:FGCOLOR = 8.  /* light gray */
+    FRAME frSettings:BGCOLOR = iDarkGray.
+    FRAME frSettings:FGCOLOR = iLightGray.
 
-    FRAME frData:BGCOLOR = 25. /* very dark gray */
-    FRAME frData:FGCOLOR = 8.  /* light gray */
+    setRegistry("DataDigger:colors","DataRow:UseSystem","NO").
+    setColor("DataRow:odd:fg" , iLightGray).  
+    setColor("DataRow:odd:bg" , iVeryDarkGray).  
+    setColor("DataRow:even:fg", iLightGray). 
+    setColor("DataRow:even:bg", iDarkGray). 
+    ghDataBrowse:SEPARATOR-FGCOLOR = iDarkGray.
 
-    FRAME frSettings:BGCOLOR = 26. /* BG dark gray */
-    FRAME frSettings:FGCOLOR = 15.
-
-    setColor("DataRow:odd:fg" ,15). /* FG white*/           
-    setColor("DataRow:odd:bg" ,25). /* BG very dark gray */ 
-    setColor("DataRow:even:fg",15). /* FG black */                        
-    setColor("DataRow:even:bg",26). /* BG dark gray */      
-
-    ghDataBrowse:SEPARATOR-FGCOLOR = 25.
+    setColor("FavouriteTable:FG", iWhite).
   END.
   ELSE
   DO:
@@ -1715,15 +1735,20 @@ ANYWHERE DO:
     FRAME frSettings:BGCOLOR = ?.
     FRAME frSettings:FGCOLOR = ?.
 
-    giDataOddRowColor[1]  =  0. /* FG */
-    giDataOddRowColor[2]  = 15. /* white */
-
-    giDataEvenRowColor[1] =  0. /* black */
-    giDataEvenRowColor[2] =  8. /* light gray */
-
+    setRegistry("DataDigger:colors","DataRow:UseSystem","YES").
+    setColor("DataRow:odd:fg" , iBlack).
+    setColor("DataRow:odd:bg" , iOffWhite).     
+    setColor("DataRow:even:fg", iBlack).
+    setColor("DataRow:even:bg", iWhite).
     ghDataBrowse:SEPARATOR-FGCOLOR = ?.
+
+    setColor("FavouriteTable:FG", iBlue).
   END.
 
+  setWindowFreeze(YES).
+  RUN initializeObjects.
+  setWindowFreeze(NO).
+  
   &ENDIF
 END.
 
@@ -5613,7 +5638,7 @@ PROCEDURE connectDroppedDatabase :
     IF NOT CONNECTED(cLdbName + STRING(iDatabase)) THEN
     DO:
       cLdbName = SUBSTITUTE('&1-&2', cLdbName, iDatabase).
-      LEAVE #GetNr.
+      LEAVE #GetNr.                            
     END.
   END.
 
@@ -6004,7 +6029,6 @@ PROCEDURE createMenuDataBrowse :
   /* Shortcut to adding records */
   hMenuItem = createMenuItem(hMenu,"Item","Add record","add").
   ON "CHOOSE" OF hMenuItem PERSISTENT RUN btnAddChoose IN THIS-PROCEDURE.
-  IF glReadOnlyDigger OR (CAN-DO(DBRESTRICTIONS(gcCurrentDatabase), "READ-ONLY") = YES) THEN hMenuItem:SENSITIVE = FALSE.
 
   /* Shortcut to cloning records */
   hMenuItem = createMenuItem(hMenu,"Item","Clone record (ALT-O)","clone").
@@ -6937,10 +6961,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
+  ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
+         btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -8121,8 +8145,8 @@ PROCEDURE initializeColors :
 
   /* Table browse */
   glUseColorsFavouriteTable = LOGICAL(getRegistry("DataDigger:Colors","FavouriteTable:HiLite")).
-  giColorFavouriteTableFG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:FG")).
-  giColorFavouriteTableBG   = INTEGER(getRegistry("DataDigger:Colors","FavouriteTable:BG")).
+  giColorFavouriteTableFG   = getColor("FavouriteTable:FG").
+  giColorFavouriteTableBG   = getColor("FavouriteTable:BG").
 
   /* Colors for fields browse */
   giColorFieldFilterFG  = getColor("FieldFilter:fg").
@@ -8296,7 +8320,7 @@ PROCEDURE initializeObjects :
     FRAME frHint:HIDDEN = TRUE.
 
     /* Show or hide Toggle box for Debug mode */
-    tgDebugMode:HIDDEN  = &IF DEFINED (UIB_is_RUNning) &THEN NO. &ELSE YES. &ENDIF
+    tgDebugMode:HIDDEN  = &IF DEFINED (uib_is_running) &THEN NO. &ELSE YES. &ENDIF
 
     /* Colors for odd/even data rows */
     IF getRegistry("DataDigger:Colors","DataRow:UseSystem") = "YES" THEN
@@ -8908,6 +8932,7 @@ PROCEDURE initializeVisuals :
       COLOR-TABLE:SET-BLUE-VALUE (iColor, INTEGER(ENTRY(3,cSetting))).
     END.
   END.
+
 
   /* Get the RGB value for "ButtonFace" */
   RUN GetSysColor(15, OUTPUT iRgbValue).
@@ -12497,7 +12522,6 @@ PROCEDURE startDiggerLib :
     SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
-
     SUBSCRIBE PROCEDURE hDiggerLib TO "setWindowTitle" ANYWHERE.
 
   END.
@@ -13455,7 +13479,6 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
     update     save,cancel
 ------------------------------------------------------------------------------*/
   DEFINE VARIABLE lHasRecords AS LOGICAL NO-UNDO.
-
   DEFINE VARIABLE lReadOnly   AS LOGICAL NO-UNDO.
   
   {&timerStart}

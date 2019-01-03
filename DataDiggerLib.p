@@ -25,18 +25,18 @@ END PROCEDURE.
 &IF PROVERSION <= '8' &THEN  /* OE 10+ */
   &IF PROVERSION >= '11.3' &THEN   /* PROCESS-ARCHITECTURE function is available */
     &IF PROCESS-ARCHITECTURE = 32 &THEN /* 32-bit pointers */
-      &GLOBAL-DEFINE POINTERTYPE 'LONG'
+      &GLOBAL-DEFINE POINTERTYPE LONG
       &GLOBAL-DEFINE POINTERBYTES 4
     &ELSEIF PROCESS-ARCHITECTURE = 64 &THEN /* 64-bit pointers */
-      &GLOBAL-DEFINE POINTERTYPE 'INT64'
+      &GLOBAL-DEFINE POINTERTYPE INT64
       &GLOBAL-DEFINE POINTERBYTES 8
     &ENDIF  /* PROCESS-ARCHITECTURE */
   &ELSE   /* Can't check architecture pre-11.3 so default to 32-bit */
-    &GLOBAL-DEFINE POINTERTYPE 'LONG'
+    &GLOBAL-DEFINE POINTERTYPE LONG
     &GLOBAL-DEFINE POINTERBYTES 4
   &ENDIF  /* PROVERSION > 11.3 */
 &ELSE   /* pre-OE10 always 32-bit on Windows */
-  &GLOBAL-DEFINE POINTERTYPE 'LONG'
+  &GLOBAL-DEFINE POINTERTYPE LONG
   &GLOBAL-DEFINE POINTERBYTES 4
 &ENDIF  /* PROVERSION < 8 */
 
@@ -216,6 +216,20 @@ FUNCTION formatQueryString RETURNS CHARACTER
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColor Procedure 
 FUNCTION getColor RETURNS INTEGER
   ( pcName AS CHARACTER )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-getColorByRGB) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getColorByRGB Procedure 
+FUNCTION getColorByRGB RETURNS INTEGER
+  ( piRed   AS INTEGER
+  , piGreen AS INTEGER
+  , piBlue  AS INTEGER
+  ) FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -705,7 +719,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 34.38
+         HEIGHT             = 24.91
          WIDTH              = 53.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -3607,6 +3621,43 @@ END FUNCTION. /* getColor */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getColorByRGB) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColorByRGB Procedure 
+FUNCTION getColorByRGB RETURNS INTEGER
+  ( piRed   AS INTEGER
+  , piGreen AS INTEGER
+  , piBlue  AS INTEGER
+  ):
+  /* Return the color number for a RGB combination
+   * if needed, add color to color table.
+   */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
+  
+  /* See if already exists */
+  DO i = 0 TO COLOR-TABLE:NUM-ENTRIES - 1:
+    IF    COLOR-TABLE:GET-RED-VALUE(i)   = piRed
+      AND COLOR-TABLE:GET-GREEN-VALUE(i) = piGreen
+      AND COLOR-TABLE:GET-BLUE-VALUE(i)  = piBlue THEN RETURN i.
+  END.
+
+  /* Define new color */
+  i = COLOR-TABLE:NUM-ENTRIES.
+  COLOR-TABLE:NUM-ENTRIES = COLOR-TABLE:NUM-ENTRIES + 1.
+  COLOR-TABLE:SET-DYNAMIC(i, TRUE).
+  COLOR-TABLE:SET-RED-VALUE  (i, piRed  ).
+  COLOR-TABLE:SET-GREEN-VALUE(i, piGreen).
+  COLOR-TABLE:SET-BLUE-VALUE (i, piBlue ).
+
+  RETURN i.
+
+END FUNCTION. /* getColorByRGB */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getColumnLabel) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getColumnLabel Procedure 
@@ -3953,25 +4004,24 @@ FUNCTION getKeyList RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
   /* Return a list of special keys pressed
   */
-  DEFINE VARIABLE L-KBSTATE AS MEMPTR NO-UNDO.
-  DEFINE VARIABLE L-RETURNVALUE AS INT64 NO-UNDO.
-  DEFINE VARIABLE L-SHIFTLIST AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE mKeyboardState AS MEMPTR    NO-UNDO.
+  DEFINE VARIABLE iReturnValue   AS INT64     NO-UNDO.
+  DEFINE VARIABLE cKeyList       AS CHARACTER NO-UNDO.
 
-  SET-SIZE(L-KBSTATE) = 256.
+  SET-SIZE(mKeyboardState) = 256.
 
   /* Get the current state of the keyboard */
-  RUN GetKeyboardState(GET-POINTER-VALUE(L-KBSTATE), OUTPUT L-RETURNVALUE).
+  RUN GetKeyboardState(GET-POINTER-VALUE(mKeyboardState), OUTPUT iReturnValue) NO-ERROR.
+  IF ERROR-STATUS:ERROR THEN RETURN ''. /* try to suppress error: 'C' Call Stack has been compromised after calling  in  (6069) */
 
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 16), 8, 1) = 1
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",SHIFT",",").
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 17), 8, 1) = 1
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",CTRL",",").
-  IF GET-BITS(GET-BYTE(L-KBSTATE, 1 + 18), 8, 1) = 1
-  THEN L-SHIFTLIST = TRIM(L-SHIFTLIST + ",ALT",",").
+  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 16), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",SHIFT",",").
+  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 17), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",CTRL",",").
+  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 18), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",ALT",",").
 
-  SET-SIZE(L-KBSTATE) = 0.
-
-  RETURN L-SHIFTLIST.   /* Function return value. */
+  FINALLY:
+    SET-SIZE(mKeyboardState) = 0.
+    RETURN cKeyList.   /* Function return value. */
+  END FINALLY.
 
 END FUNCTION. /* getKeyList */
 
