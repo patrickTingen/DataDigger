@@ -4272,7 +4272,7 @@ FUNCTION getTableLabel RETURNS CHARACTER
     WHERE bTable.cDatabase  = pcDatabase
       AND bTable.cTableName = pcTable NO-ERROR.
 
-  RETURN (IF AVAILABLE bTable THEN bTable.cTableLabel ELSE '').
+  RETURN (IF AVAILABLE bTable AND bTable.cTableLabel <> ? THEN bTable.cTableLabel ELSE '').
 
 END FUNCTION. /* getTableLabel */
 
