@@ -52,6 +52,7 @@ DEFINE TEMP-TABLE ttLinkInfo NO-UNDO RCODE-INFORMATION
 
 /* TT for the tables of a db */
 DEFINE TEMP-TABLE ttTable NO-UNDO RCODE-INFORMATION
+  FIELD cSchemaHolder AS CHARACTER LABEL "SH"        FORMAT "X(12)"   
   FIELD cDatabase     AS CHARACTER LABEL "DB"        FORMAT "X(12)"
   FIELD cTableName    AS CHARACTER LABEL "Table"     FORMAT "X(32)"
   FIELD cCrc          AS CHARACTER LABEL "CRC"
@@ -276,6 +277,21 @@ DEFINE TEMP-TABLE ttFavGroup NO-UNDO RCODE-INFORMATION
   INDEX iPrim IS PRIMARY cGroup
   .
 
+/* TT For support dataservers */
+DEFINE TEMP-TABLE ttDataserver NO-UNDO RCODE-INFORMATION
+  FIELD iServerNr           AS INTEGER    FORMAT ">>9"
+  FIELD cLDbNameSchema      AS CHARACTER  FORMAT "x(12)"
+  FIELD cLDbNameDataserver  AS CHARACTER  FORMAT "x(12)"
+  FIELD cPDbNameDataserver  AS CHARACTER  FORMAT "x(12)"
+  FIELD cDbType             AS CHARACTER  FORMAT "x(10)"
+  FIELD cConnectString      AS CHARACTER  FORMAT "x(100)"
+  FIELD lDontShowSchemaHr   AS LOGICAL
+  FIELD lConnected          AS LOGICAL
+  INDEX ttDataserverPrim IS PRIMARY UNIQUE iServerNr
+  INDEX ttDataserverRel1 IS         UNIQUE cLDbNameSchema cLDbNameDataserver
+  INDEX ttDataserverRel2                   cLDbNameSchema
+  INDEX ttDataserverRel3                   cLDbNameDataserver
+  .
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -347,6 +363,10 @@ FUNCTION formatQueryString RETURNS CHARACTER
 
 FUNCTION getDatabaseList RETURNS CHARACTER IN SUPER.
 
+FUNCTION getDataserverType RETURNS CHARACTER
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ) IN SUPER.
+
 FUNCTION getEscapedData RETURNS CHARACTER
   ( INPUT pcTarget AS CHARACTER
   , INPUT pcString AS CHARACTER ) IN SUPER.
@@ -409,6 +429,10 @@ FUNCTION getRegistry RETURNS CHARACTER
 FUNCTION getStackSize RETURNS INTEGER
   () IN SUPER.
 
+FUNCTION getSchemaHolder RETURNS CHARACTER
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ) IN SUPER.
+
 FUNCTION getTableDesc RETURNS CHARACTER
   ( INPUT  pcDatabase AS CHARACTER
   , INPUT  pcTable    AS CHARACTER
@@ -430,6 +454,10 @@ FUNCTION getWidgetUnderMouse RETURNS HANDLE
   ( INPUT phWidget AS HANDLE ) IN SUPER.
 
 FUNCTION getWorkFolder RETURNS CHARACTER IN SUPER.
+
+FUNCTION isDataserver RETURNS LOGICAL
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ) IN SUPER.
 
 FUNCTION isDefaultFontsChanged RETURNS LOGICAL IN SUPER.
 

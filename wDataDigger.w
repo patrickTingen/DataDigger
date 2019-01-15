@@ -994,10 +994,10 @@ DEFINE FRAME frMain
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -1034,46 +1034,17 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1111,17 +1082,46 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1715,7 +1715,7 @@ ANYWHERE DO:
     FRAME frSettings:BGCOLOR = iDarkGray.
     FRAME frSettings:FGCOLOR = iLightGray.
 
-    setRegistry("DataDigger:colors","DataRow:UseSystem","NO").
+    setRegistry("DataDigger:Colors","DataRow:UseSystem","NO").
     setColor("DataRow:odd:fg" , iLightGray).  
     setColor("DataRow:odd:bg" , iVeryDarkGray).  
     setColor("DataRow:even:fg", iLightGray). 
@@ -1735,7 +1735,7 @@ ANYWHERE DO:
     FRAME frSettings:BGCOLOR = ?.
     FRAME frSettings:FGCOLOR = ?.
 
-    setRegistry("DataDigger:colors","DataRow:UseSystem","YES").
+    setRegistry("DataDigger:Colors","DataRow:UseSystem","YES").
     setColor("DataRow:odd:fg" , iBlack).
     setColor("DataRow:odd:bg" , iOffWhite).     
     setColor("DataRow:even:fg", iBlack).
@@ -4703,11 +4703,11 @@ PROCEDURE btnDeleteChoose :
   END.
 
   RUN showHelp('ConfirmDelete', STRING(ghDataBrowse:NUM-SELECTED-ROWS)).
-  IF getRegistry('DataDigger:help', 'ConfirmDelete:answer') <> '1' THEN
+  IF getRegistry('DataDigger:Help', 'ConfirmDelete:answer') <> '1' THEN
   DO:
     /* Don't save 'NO' or 'CANCEL' as answer to this question */
-    setRegistry('DataDigger:help', 'ConfirmDelete:answer', ?).
-    setRegistry('DataDigger:help', 'ConfirmDelete:hidden', ?).
+    setRegistry('DataDigger:Help', 'ConfirmDelete:answer', ?).
+    setRegistry('DataDigger:Help', 'ConfirmDelete:hidden', ?).
     RETURN.
   END.
 
@@ -4869,6 +4869,29 @@ PROCEDURE btnEditChoose :
   DO:
     RUN showHelp('RecordGone', '').
     ghDataBrowse:REFRESH().
+    RETURN.
+  END.
+
+  /* Support dataservers */
+  IF   isDataserver(gcCurrentDatabase)
+   AND NOT ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE
+   AND ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):ROWID = ? THEN
+  DO:
+    MESSAGE
+      SUBSTITUTE( TRIM(
+                  "For this &1 dataserver '&2' data could"              + "~n" +
+                  "could not be updated. This is caused by lack"        + "~n" +
+                  "of rowid's. Please check if table '&3'"              + "~n" +
+                  "has a numeric enumerator field or field"             + "~n" +
+                  "named PROGRESS_RECID. Please check"                  + "~n" +
+                  "knowledgebase.progress.com/articles/Article/20306."  + "~n" +
+                  "Change this and repull schema."                      + "~n" +
+                  "", "~n")
+                , getDataserverType(gcCurrentDatabase)
+                , gcCurrentDatabase
+                , gcCurrentTable
+                )
+      VIEW-AS ALERT-BOX ERROR BUTTONS OK.
     RETURN.
   END.
 
@@ -5291,7 +5314,7 @@ PROCEDURE checkFonts :
       /* Don't accept a choice "YES" in combination with HIDDEN=YES because
        * then the help will pop up everytime automatically. Kinda annoying.
        */
-      setRegistry( "DataDigger:help", "FontsChanged:answer","2").
+      setRegistry( "DataDigger:Help", "FontsChanged:answer","2").
     END.
   END.
 
@@ -5688,7 +5711,7 @@ PROCEDURE connectParamFile :
   IF cDatabaseList <> '' THEN
   DO:
     RUN showHelp("DisconnectGroup", cDatabaseList).
-    IF getRegistry("DataDigger:help", "DisconnectGroup:answer") <> "1" THEN RETURN.
+    IF getRegistry("DataDigger:Help", "DisconnectGroup:answer") <> "1" THEN RETURN.
 
     DO iDb = 1 TO NUM-ENTRIES(cDatabaseList):
       DISCONNECT VALUE(ENTRY(iDb,cDatabaseList)).
@@ -5849,7 +5872,7 @@ PROCEDURE convertSettings :
       setRegistry("DataDigger", "DumpDF:open", ?).
 
       /* Answer to confirm delete should not be saved when NO or CANCEL */
-      setRegistry("DataDigger:help", "ConfirmDelete:hidden", ?).
+      setRegistry("DataDigger:Help", "ConfirmDelete:hidden", ?).
 
       /* Table browse is now slightly wider, so erase old column widths */
       setRegistry("DataDigger", "ColumnWidth:cTableName" , ?).
@@ -6696,7 +6719,7 @@ PROCEDURE disconnectDatabase :
 
   /* Confirm by user */
   RUN showHelp("Disconnect", gcCurrentDatabase).
-  IF getRegistry("DataDigger:help", "Disconnect:answer") <> "1" THEN RETURN.
+  IF getRegistry("DataDigger:Help", "Disconnect:answer") <> "1" THEN RETURN.
 
   DISCONNECT VALUE(gcCurrentDatabase).
 
@@ -7880,7 +7903,9 @@ PROCEDURE getFilterQuery :
                         , IF pcFilterQuery = "" THEN "" ELSE "AND"
                         , bColumn.cFullName
                         , cOperator
-                        , QUOTER(cValue)
+                        , (IF isDataserver(gcCurrentDatabase) 
+                            THEN (IF bField.cDataType = "CHARACTER" THEN QUOTER(cValue) ELSE cValue)
+                            ELSE QUOTER(cValue) )
                         ).
   END.
 
@@ -9163,7 +9188,7 @@ PROCEDURE keepAlive :
       DO:
         RUN unlockWindow(C-Win:HANDLE).
         RUN showHelp("SchemaRestart", cChangedTable ).
-        IF getRegistry("DataDigger:help", "SchemaRestart:answer") = "1" THEN QUIT.
+        IF getRegistry("DataDigger:Help", "SchemaRestart:answer") = "1" THEN QUIT.
       END.
 
       /* We assign the value here again. This way, the user /CAN/ choose to
@@ -9583,6 +9608,8 @@ PROCEDURE reopenDataBrowse :
   DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
   DEFINE VARIABLE lQueryComplete AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cOldWhere      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cTestQuery      AS CHARACTER  NO-UNDO.  
+  DEFINE VARIABLE cFileCompCheck  AS CHARACTER  NO-UNDO.  
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bOldFilter FOR ttOldFilter.
@@ -9690,15 +9717,11 @@ PROCEDURE reopenDataBrowse :
   /* if the QUERY-PREPARE failed because of the where-clause, don't open it */
   IF NOT lPrepare THEN
   DO WITH FRAME {&FRAME-NAME}:
-
-    ficWhere:TOOLTIP = TRIM(ERROR-STATUS:GET-MESSAGE(1)).
-    ficWhere:BGCOLOR = getColor('QueryError:bg'). /* red */
-    ficWhere:FGCOLOR = getColor('QueryError:fg'). /* yellow */
-
-    /* Activate buttons */
-    setUpdatePanel('no-data').
-
-    APPLY "entry" TO ficWhere.
+    RUN setQueryWhereAlert
+      ( INPUT cQuery
+      , INPUT "Query cannot be prepared."
+      , INPUT ERROR-STATUS:GET-MESSAGE(1)
+      ).
   END.
   ELSE
   DO WITH FRAME {&FRAME-NAME}:
@@ -9743,6 +9766,32 @@ PROCEDURE reopenDataBrowse :
     setUpdatePanel('display').
   END.
 
+  /* Support dataservers - Dataservers are very strict in types, formats etc so extra check */
+  IF isDataserver(gcCurrentDatabase) AND LOOKUP(PROGRESS, "Full,Query") > 0 THEN
+  DO:
+    ASSIGN
+      cTestQuery     = cQuery
+      cTestQuery     = TRIM(REPLACE(cTestQuery, "indexed-reposition", ""))
+      cTestQuery     = RIGHT-TRIM(cTestQuery) + ":"
+      cFileCompCheck = SESSION:TEMP-DIRECTORY + "Datadigger-compile-check.p".
+
+    OUTPUT TO VALUE(cFileCompCheck).
+    PUT UNFORMATTED cTestQuery SKIP "end." SKIP.
+    OUTPUT CLOSE.
+    
+    COMPILE VALUE(cFileCompCheck) NO-ERROR.
+    OS-DELETE VALUE(cFileCompCheck).
+
+    IF COMPILER:ERROR THEN
+    DO:
+      RUN setQueryWhereAlert
+        ( INPUT cTestQuery
+        , INPUT "Query cannot be compiled, this is necessary for a dataserver query."
+        , INPUT ERROR-STATUS:GET-MESSAGE(1)
+        ).
+    END. /* IF COMPILER:ERROR */
+  END. /* IF isDataserver( */
+  
   RUN showNumRecords(iNumRecords, lQueryComplete).
   RUN showNumSelected.
 
@@ -9934,7 +9983,7 @@ PROCEDURE reopenDataBrowse-create :
         DO:
           RUN unlockWindow(C-Win:HANDLE).
           RUN showHelp("SchemaRestart", SUBSTITUTE("&1.&2", bColumn.cDatabase, bColumn.cTableName)).
-          IF getRegistry("DataDigger:help", "SchemaRestart:answer") = "1" THEN QUIT.
+          IF getRegistry("DataDigger:Help", "SchemaRestart:answer") = "1" THEN QUIT.
         END.
 
         /* For some strange reason the format is not saved when you change the format in the field browse
@@ -11195,6 +11244,43 @@ PROCEDURE setPage :
   {&timerStop}
 
 END PROCEDURE. /* setPage */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setQueryWhereAlert C-Win 
+PROCEDURE setQueryWhereAlert :
+DEFINE INPUT  PARAMETER pcFailedQuery AS CHARACTER  NO-UNDO.
+  DEFINE INPUT  PARAMETER pcExtraMsg    AS CHARACTER  NO-UNDO.
+  DEFINE INPUT  PARAMETER pcErrorMsg    AS CHARACTER  NO-UNDO.
+  
+  DO WITH FRAME {&frame-name}:
+    ASSIGN
+      ficWhere:BGCOLOR  = getColor('QueryError:bg')   /* red */
+      ficWhere:FGCOLOR  = getColor('QueryError:fg')   /* yellow */
+      ficWhere:tooltip  = SUBSTITUTE( "Open query failed due to this error:"  + "~n" +
+                                      ""                                      + "~n" +
+                                      "&1"                                    + "~n" +
+                                      ""                                      + "~n" +
+                                      "Failed query:"                         + "~n" +
+                                      ""                                      + "~n" +
+                                      "&2"                                    + "~n" +
+                                      ""                                      + "~n" +
+                                      "&3"                                    +
+                                      "Your WHERE-clause will be ignored."
+                                    , TRIM(pcErrorMsg)
+                                    , TRIM(pcFailedQuery)
+                                    , (IF pcExtraMsg <> "" THEN
+                                         pcExtraMsg + "~n"
+                                       ELSE
+                                         "")
+                                    ).
+    /* Activate buttons */
+    setUpdatePanel('no-data').
+
+    APPLY "entry" TO ficWhere.
+  END.
+END PROCEDURE.  /* setQueryWhereAlert */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

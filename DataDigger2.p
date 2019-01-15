@@ -491,21 +491,23 @@ END PROCEDURE. /* recompileDataDigger */
 PROCEDURE recompileSelf :
 /* Recompile all DataDigger procedures
   */
-  DEFINE VARIABLE cDiggerDriveType   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBuildNr           AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDiggerDriveType   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cExpectedDateTime  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cLogFile           AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cLogicalDbName     AS CHARACTER   NO-UNDO.  
   DEFINE VARIABLE cMemory            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cProgressDriveType AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSystem            AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cVersionInfo       AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cWorkfolder        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE hWindow            AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE iCount             AS INTEGER     NO-UNDO.  
+  DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lCompileError      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lCoreFileError     AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE hWindow            AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cFileList          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iFile              AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cWorkfolder        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cLogFile           AS CHARACTER   NO-UNDO.
-
+  
   DEFINE BUFFER bOsFile FOR ttOsFile.
 
   /* Get progress version info */
@@ -621,6 +623,17 @@ PROCEDURE recompileSelf :
   /* Recompile sources */
   PUT UNFORMATTED SKIP(1) "RECOMPILING".
 
+  /* Set the standard dictdb alias to the first Progress db */
+  #SetDictDb:
+  DO iCount = 1 TO NUM-DBS:
+    IF DBTYPE(iCount) = "PROGRESS" THEN
+    DO:
+      cLogicalDbName = LDBNAME(iCount).
+      CREATE ALIAS dictdb FOR DATABASE VALUE(cLogicalDbName).
+      LEAVE #SetDictDb.
+    END.
+  END.
+
   FOR EACH bOsFile
     WHERE bOsFile.cFileType = "p"
        OR bOsFile.cFileType = "cls"
@@ -646,6 +659,9 @@ PROCEDURE recompileSelf :
       IF bOsFile.cFileName <> "myDataDigger.p" THEN lCoreFileError = TRUE.
     END.
   END.
+
+  IF cLogicalDbName <> "" THEN
+    DELETE ALIAS dictdb.
 
   /* Reread dir to catch new date/times of .r files */
   RUN getSourceFiles(INPUT gcProgramDir, OUTPUT TABLE bOsFile).

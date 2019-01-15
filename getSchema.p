@@ -21,9 +21,11 @@ DEFINE BUFFER bTable FOR ttTable.
 FIND FIRST bTable NO-ERROR.
 FIND FIRST bDb NO-ERROR.
 
-FOR EACH bFile NO-LOCK
-  WHERE bFile._File-Number < 32768
-    AND (IF bDb._Db-slave THEN bFile._For-Type = 'TABLE' ELSE TRUE)
+FOR EACH bDb   NO-LOCK
+  , EACH bFile NO-LOCK
+   WHERE bFile._Db-recid    = RECID(bDb)
+     AND bFile._File-Number < 32768
+     AND (IF bDb._Db-slave THEN bFile._For-Type = 'TABLE' ELSE TRUE)
   :
 
   CREATE bTable.

@@ -1092,7 +1092,7 @@ PROCEDURE btnGoChoose :
                                     ) ).
 
             /* 1=yes 2=no 3=yes-all 4=cancel */
-            CASE getRegistry('DataDigger:help', 'DataChanged:answer'):
+            CASE getRegistry('DataDigger:Help', 'DataChanged:answer'):
               WHEN '2' THEN NEXT #RecordLoop. /* no */
               WHEN '4' THEN UNDO #CommitLoop, LEAVE #CommitLoop. /* cancel */
             END CASE.
@@ -1790,4 +1790,3 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

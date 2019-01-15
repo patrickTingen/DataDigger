@@ -62,6 +62,8 @@ winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
 VIEW FRAME infoFrame IN WINDOW winMessage.
 VIEW winMessage.
 
-PROCESS EVENTS.
+/* Avoid input blocking error */
+IF PROGRAM-NAME(2) <> "getDataserver.p" THEN PROCESS EVENTS.
 
 phWindow = winMessage:HANDLE.
+

@@ -9,6 +9,7 @@
 ------------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
+DEFINE VARIABLE gcSaveDatabaseList  AS CHARACTER  NO-UNDO.  
 
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
@@ -17,7 +18,7 @@ PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
   DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER intBufferSize AS LONG NO-UNDO.
   DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
-END PROCEDURE.
+END PROCEDURE. 
 
 /* Detect bitness of running Progress version
  * See Progress kb #54631
@@ -436,6 +437,18 @@ FUNCTION getRegistry RETURNS CHARACTER
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getSchemaHolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSchemaHolder Procedure 
+FUNCTION getSchemaHolder RETURNS CHARACTER
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getStackSize) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getStackSize Procedure 
@@ -450,8 +463,8 @@ FUNCTION getStackSize RETURNS INTEGER() FORWARD.
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableDesc Procedure 
 FUNCTION getTableDesc RETURNS CHARACTER
-  ( INPUT  pcDatabase AS CHARACTER
-  , INPUT  pcTable    AS CHARACTER
+  ( INPUT pcDatabase AS CHARACTER
+  , INPUT pcTable    AS CHARACTER
   )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
@@ -534,6 +547,18 @@ FUNCTION getXmlNodeName RETURNS CHARACTER
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isBrowseChanged Procedure 
 FUNCTION isBrowseChanged RETURNS LOGICAL
   ( INPUT phBrowse AS HANDLE )  FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-isDataServer) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isDataServer Procedure 
+FUNCTION isDataServer RETURNS LOGICAL
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ) FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -872,7 +897,7 @@ PROCEDURE checkDir :
   FILE-INFO:FILE-NAME = cDumpDir.
   IF TRIM(FILE-INFO:FULL-PATHNAME,'\/') = TRIM(getProgramDir(),"/\") THEN
   DO:
-    pcError = getRegistry('DataDigger:help', 'ExportToProgramdir:message').
+    pcError = getRegistry('DataDigger:Help', 'ExportToProgramdir:message').
     RETURN.
   END.
 
@@ -887,12 +912,12 @@ PROCEDURE checkDir :
     IF FILE-INFO:FILE-TYPE MATCHES '*F*' THEN
     DO:
       RUN showHelp('OverwriteDumpFile', pcFileName).
-      IF getRegistry('DataDigger:help', 'OverwriteDumpFile:answer') <> '1' THEN
+      IF getRegistry('DataDigger:Help', 'OverwriteDumpFile:answer') <> '1' THEN
       DO:
         /* Do not remember the answer "No" for this question, otherwise it will be
          * confusing the next time the user encounters this situation
          */
-        setRegistry('DataDigger:help', 'OverwriteDumpFile:answer',?).
+        setRegistry('DataDigger:Help', 'OverwriteDumpFile:answer',?).
         pcError = 'Aborted by user.'.
         RETURN.
       END.
@@ -919,7 +944,7 @@ PROCEDURE checkDir :
     AND FILE-INFO:FULL-PATHNAME = ? THEN
   DO:
     RUN showHelp('CreateDumpDir', cDumpDir).
-    IF getRegistry('DataDigger:help', 'CreateDumpDir:answer') <> '1' THEN
+    IF getRegistry('DataDigger:Help', 'CreateDumpDir:answer') <> '1' THEN
     DO:
       pcError = 'Aborted by user.'.
       RETURN.
@@ -2056,15 +2081,30 @@ PROCEDURE getTables :
   DEFINE INPUT PARAMETER TABLE FOR ttTableFilter.
   DEFINE OUTPUT PARAMETER TABLE FOR ttTable.
 
-  DEFINE VARIABLE cCacheFile      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hDbBuffer       AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hDbStatusBuffer AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hQuery          AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hDbQuery        AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iDatabase       AS INTEGER     NO-UNDO.
-
+  DEFINE VARIABLE cCacheFile       AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE hDbBuffer        AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE hDbStatusBuffer  AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE hQuery           AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE hDbQuery         AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE iDatabase        AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE cCacheTimeStamp  AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cCacheDir        AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cSchemaCacheFile AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cOneCacheFile    AS CHARACTER  NO-UNDO.
+  
+  DEFINE BUFFER bTable    FOR ttTable.
+  DEFINE BUFFER bTableXml FOR ttTableXml.
+  
   {&timerStart}
-
+  
+  /* Dataserver support can be for:
+   *
+   * V9:   "PROGRESS,AS400,ORACLE,MSS,ODBC"
+   * V10:  "PROGRESS,ORACLE,MSS,ODBC"        (from V10 no native support for AS400)
+   * V11:  "PROGRESS,ORACLE,MSS,ODBC"
+   * V12:  "PROGRESS,ORACLE,MSS"             (from V12 no ODBC support anymore)
+   *
+   */
   EMPTY TEMP-TABLE ttTable.
   CREATE WIDGET-POOL "metaInfo".
   CREATE QUERY hQuery IN WIDGET-POOL "metaInfo".
@@ -2078,20 +2118,35 @@ PROCEDURE getTables :
     DO:
       CREATE BUFFER hDbStatusBuffer FOR TABLE LDBNAME(iDatabase) + "._DbStatus" IN WIDGET-POOL "metaInfo".
       hDbStatusBuffer:FIND-FIRST("",NO-LOCK).
-      cCacheFile = SUBSTITUTE("&1cache\db.&2.&3.xml"
-                            , getWorkFolder()
-                            , LDBNAME(iDatabase)
-                            , REPLACE(REPLACE(hDbStatusBuffer::_dbstatus-cachestamp," ","_"),":","")
-                            ).
+      
+      ASSIGN 
+        cCacheTimeStamp = REPLACE(REPLACE(hDbStatusBuffer::_dbstatus-cachestamp," ","_"),":","")
+        cCacheFile = SUBSTITUTE("&1cache\db.&2.&3.xml", getWorkFolder(), LDBNAME(iDatabase), cCacheTimeStamp ).
+        
       DELETE OBJECT hDbStatusBuffer.
     END.
 
     /* If caching enabled and there is a cache file, read it */
-    IF glCacheTableDefs
-      AND SEARCH(cCacheFile) <> ? THEN
+    IF glCacheTableDefs AND SEARCH(cCacheFile) <> ? THEN
     DO:
       PUBLISH "debugInfo" (3, SUBSTITUTE("Get table list from cache file &1", cCacheFile)).
       TEMP-TABLE ttTable:READ-XML("file", cCacheFile, "APPEND", ?, ?, ?, ?).
+      
+      cCacheDir = SUBSTITUTE( "&1cache", getWorkFolder() ).
+      INPUT FROM OS-DIR(cCacheDir).
+      #ReadSchemaCache:
+      REPEAT:
+        IMPORT cSchemaCacheFile.
+        
+        IF cSchemaCacheFile BEGINS SUBSTITUTE("db.&1;", LDBNAME(iDatabase))
+         AND ENTRY(NUM-ENTRIES(cSchemaCacheFile, ".") - 1, cSchemaCacheFile, ".") = ENTRY (NUM-ENTRIES(cCacheFile, ".") - 1, cCacheFile, ".")  /* Check timestamp */
+        THEN
+        DO:
+          cOneCacheFile = SUBSTITUTE( "&1\&2", cCacheDir, cSchemaCacheFile).
+          TEMP-TABLE ttTable:READ-XML("file", cOneCacheFile, "APPEND", ?, ?, ?, ?).
+        END.
+      END.
+      INPUT CLOSE.
     END.
 
     /* Otherwise build it */
@@ -2118,10 +2173,10 @@ PROCEDURE getTables :
           hDbQuery:GET-NEXT().
           IF hDbQuery:QUERY-OFF-END THEN LEAVE #DB.
 
-          FOR EACH ttTable
-            WHERE ttTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
-            CREATE ttTableXml.
-            BUFFER-COPY ttTable TO ttTableXml.
+          FOR EACH bTable
+            WHERE bTable.cDatabase = (IF hDbBuffer::_Db-slave THEN hDbBuffer::_Db-name ELSE LDBNAME(iDatabase)):
+            CREATE bTableXml.
+            BUFFER-COPY bTable TO bTableXml.
           END.
         END.
 
@@ -2131,7 +2186,34 @@ PROCEDURE getTables :
 
         TEMP-TABLE ttTableXml:WRITE-XML("file", cCacheFile, YES, ?, ?, NO, NO).
         EMPTY TEMP-TABLE ttTableXml.
-      END.
+        
+        /* Support Dataservers */
+        FOR EACH bTable 
+          WHERE bTable.cSchemaHolder = LDBNAME(iDatabase)
+          BREAK BY bTable.cDatabase
+                BY bTable.cTableName:
+                  
+          IF FIRST-OF(bTable.cDatabase) THEN
+          DO:
+            cCacheFile  = SUBSTITUTE( "&1cache\db.&2;&3.&4.xml"
+                                    , getWorkFolder()
+                                    , LDBNAME(iDatabase)
+                                    , bTable.cDatabase
+                                    , cCacheTimeStamp
+                                    ).
+            EMPTY TEMP-TABLE bTableXml.
+          END.            
+
+          CREATE bTableXml.
+          BUFFER-COPY bTable TO bTableXml.
+            
+          IF LAST-OF(bTable.cDatabase) THEN
+          DO:
+            TEMP-TABLE bTableXml:WRITE-XML("file", cCacheFile, YES, ?, ?, NO, NO).
+            EMPTY TEMP-TABLE bTableXml.
+          END. /* IF LAST-OF */
+        END. /* FOR EACH bTable */
+      END. /* IF glCacheTableDefs THEN */
     END. /* tt empty */
   END. /* 1 to num-dbs */
 
@@ -2292,7 +2374,7 @@ PROCEDURE getTablesFiltered :
   END. /* for each ttTable */
 
   {&timerStop}
-END PROCEDURE. /* getTablesWithFields */
+END PROCEDURE. /* getTablesFiltered */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -2624,7 +2706,7 @@ PROCEDURE resetAnswers :
   DEFINE BUFFER bfConfig FOR ttConfig.
 
   FOR EACH bfConfig
-    WHERE bfConfig.cSection = 'DataDigger:help'
+    WHERE bfConfig.cSection = 'DataDigger:Help'
       AND (bfConfig.cSetting MATCHES '*:hidden' OR bfConfig.cSetting MATCHES '*:answer'):
     setRegistry(bfConfig.cSection, bfConfig.cSetting, ?).
   END. /* for each bfConfig */
@@ -3189,12 +3271,12 @@ PROCEDURE showHelp :
   DEFINE VARIABLE cUserString    AS CHARACTER   NO-UNDO EXTENT 9.
 
   /* If no message, then just return */
-  cMessage = getRegistry('DataDigger:help', pcTopic + ':message').
+  cMessage = getRegistry('DataDigger:Help', pcTopic + ':message').
 
   /* What to start? */
-  cUrl = getRegistry('DataDigger:help', pcTopic + ':url').
-  cPrg = getRegistry('DataDigger:help', pcTopic + ':program').
-  cCanHide = getRegistry('DataDigger:help', pcTopic + ':canHide').
+  cUrl = getRegistry('DataDigger:Help', pcTopic + ':url').
+  cPrg = getRegistry('DataDigger:Help', pcTopic + ':program').
+  cCanHide = getRegistry('DataDigger:Help', pcTopic + ':canHide').
   cCanHide = TRIM(cCanHide).
   lCanHide = LOGICAL(cCanHide) NO-ERROR.
   IF lCanHide = ? THEN lCanHide = TRUE.
@@ -3207,23 +3289,23 @@ PROCEDURE showHelp :
   END.
 
   /* If type is unknown, set to QUESTION if there is a question mark in the message */
-  cType    = getRegistry('DataDigger:help', pcTopic + ':type').
+  cType    = getRegistry('DataDigger:Help', pcTopic + ':type').
   IF cType = ? THEN cType = (IF cMessage MATCHES '*?*' THEN 'Question' ELSE 'Message').
 
   /* If no button labels defined, set them based on message type */
-  cButtons = getRegistry('DataDigger:help', pcTopic + ':buttons').
+  cButtons = getRegistry('DataDigger:Help', pcTopic + ':buttons').
   IF cButtons = ? THEN cButtons = (IF cType = 'Question' THEN '&Yes,&No,&Cancel' ELSE '&Ok').
 
   /* If title is empty, set it to the type of the message */
-  cTitle   = getRegistry('DataDigger:help', pcTopic + ':title').
+  cTitle   = getRegistry('DataDigger:Help', pcTopic + ':title').
   IF cTitle = ? THEN cTitle = cType.
 
   /* If hidden has strange value, set it to NO */
-  lHidden = LOGICAL(getRegistry('DataDigger:help', pcTopic + ':hidden')) NO-ERROR.
+  lHidden = LOGICAL(getRegistry('DataDigger:Help', pcTopic + ':hidden')) NO-ERROR.
   IF lHidden = ? THEN lHidden = NO.
 
   /* If ButtonPressed has strange value, set hidden to NO */
-  iButtonPressed = INTEGER( getRegistry('DataDigger:help',pcTopic + ':answer') ) NO-ERROR.
+  iButtonPressed = INTEGER( getRegistry('DataDigger:Help',pcTopic + ':answer') ) NO-ERROR.
   IF iButtonPressed = ? THEN lHidden = NO.
 
   /* if we have no message, but we do have an URL or prog, then
@@ -3264,7 +3346,7 @@ PROCEDURE showHelp :
       ).
 
     IF lDontShowAgain THEN
-      setRegistry('DataDigger:help', pcTopic + ':hidden', 'yes').
+      setRegistry('DataDigger:Help', pcTopic + ':hidden', 'yes').
   END.
 
   /* Start external things if needed */
@@ -3275,7 +3357,7 @@ PROCEDURE showHelp :
   END.
 
   /* Save answer */
-  setRegistry('DataDigger:help',pcTopic + ':answer', STRING(iButtonPressed)).
+  setRegistry('DataDigger:Help',pcTopic + ':answer', STRING(iButtonPressed)).
 
 END PROCEDURE. /* showHelp */
 
@@ -3726,28 +3808,97 @@ END FUNCTION. /* getColumnWidthList */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDatabaseList Procedure 
 FUNCTION getDatabaseList RETURNS CHARACTER:
-  /* Return a comma separated list of all connected datbases
+  /* Return a comma separated list of all connected databases
   */
-  DEFINE VARIABLE cDatabaseList  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cSchemaHolders AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iCount         AS INTEGER     NO-UNDO.
-
+  DEFINE VARIABLE cDatabaseList    AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cSchemaHolders   AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE iCount           AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE cDbType          AS CHARACTER  NO-UNDO.  
+  DEFINE VARIABLE cLogicalDbName   AS CHARACTER  NO-UNDO.  
+  DEFINE VARIABLE iPos             AS INTEGER    NO-UNDO.  
+  DEFINE VARIABLE iDataserverNr    AS INTEGER    NO-UNDO.  
+  
+  DEFINE BUFFER bDataserver FOR ttDataserver.
+  
   {&timerStart}
 
-  /* Make a list of schema holders */
-  DO iCount = 1 TO NUM-DBS:
-    IF DBTYPE(iCount) <> 'PROGRESS' THEN cSchemaHolders = cSchemaHolders + ',' + SDBNAME(iCount).
-  END.
+  /* Support Dataservers */
+  IF gcSaveDatabaseList <> ""
+   AND PROGRAM-NAME(2) BEGINS "initializeObjects " THEN RETURN gcSaveDatabaseList.
 
-  /* And a list of all databases. If a database is in the list of schemaholders
-   * we don't want to see it here. */
+  /* Make a list of schema holders */
   #Db:
   DO iCount = 1 TO NUM-DBS:
-    IF LOOKUP(LDBNAME(iCount),cSchemaHolders) > 0 THEN NEXT #Db.
-    cDatabaseList = cDatabaseList + ',' + LDBNAME(iCount).
+    ASSIGN
+      cDbType        = DBTYPE(iCount)
+      cLogicalDbName = LDBNAME(iCount).
+
+    IF cDbType <> 'PROGRESS' THEN
+      cSchemaHolders = cSchemaHolders + ',' + SDBNAME(iCount).
+    
+    cDbType = DBTYPE(iCount).
+    IF cDbType <> "PROGRESS" THEN NEXT #Db.
+    
+    cDatabaseList = cDatabaseList + ',' + cLogicalDbName.
   END.
 
-  RETURN TRIM(cDatabaseList,',').
+  /* Build list of all databases. Skip if already in the list of schemaholders  */
+  #Db:
+  DO iCount = 1 TO NUM-DBS:
+    ASSIGN
+      cDbType         = DBTYPE(iCount)
+      cLogicalDbName  = LDBNAME(iCount).
+
+    IF LOOKUP(LDBNAME(iCount), cSchemaHolders) > 0 OR cDbType <> "PROGRESS" THEN NEXT #Db.
+    
+    CREATE ALIAS dictdb FOR DATABASE VALUE(cLogicalDbName).
+    RUN getDataserver.p
+      ( INPUT              THIS-PROCEDURE
+      , INPUT              cLogicalDbName
+      , INPUT-OUTPUT       iDataserverNr
+      , INPUT-OUTPUT TABLE bDataserver
+      ).
+    DELETE ALIAS dictdb.
+  END.
+  
+  /* Support dataservers */    
+  FOR EACH bDataserver BY bDataserver.cLDbNameSchema:
+    /* Remove schemaholder from database list */
+    IF bDataserver.lDontShowSchemaHr THEN
+    DO:
+      iPos = LOOKUP(bDataserver.cLDbNameSchema, cDatabaseList).
+      IF iPos > 0
+       AND NOT CAN-FIND(FIRST ttTable WHERE ttTable.cDatabase = bDataserver.cLDbNameSchema
+                                        AND ttTable.lHidden   = NO) THEN
+      DO:
+        ENTRY(iPos, cDatabaseList) = "".
+        cDatabaseList = TRIM(REPLACE(cDatabaseList, ",,", ","), ",").
+      END.
+    END.
+
+    /* Add dataserver to database list */
+    iPos = LOOKUP(bDataserver.cLDbNameDataserver, cDatabaseList).
+    IF bDataserver.lConnected THEN
+    DO:
+      IF iPos = 0 THEN cDatabaseList = TRIM(cDatabaseList + "," + bDataserver.cLDbNameDataserver, ",").
+    END. /* IF bDataserver.lConnected */
+    
+    ELSE
+    DO:
+      IF iPos > 0 THEN
+      DO:
+        ENTRY(iPos, cDatabaseList) = "".
+        cDatabaseList = TRIM(REPLACE(cDatabaseList, ",,", ","), ",").
+      END. /* IF iPos > 0 */
+    END. /* else */
+  END. /* FOR EACH bDataserver */
+
+  ASSIGN
+    cDatabaseList      = TRIM(cDatabaseList, ',')
+    gcSaveDatabaseList = cDatabaseList.
+
+  RETURN cDatabaseList.
+  
   {&timerStop}
 END FUNCTION. /* getDatabaseList */
 
@@ -4249,6 +4400,24 @@ END FUNCTION. /* getRegistry */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getSchemaHolder) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSchemaHolder Procedure 
+FUNCTION getSchemaHolder RETURNS CHARACTER
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ):
+  DEFINE BUFFER bDataserver FOR ttDataserver.
+
+  FIND bDataserver WHERE bDataserver.cLDBNameDataserver = pcDataSrNameOrDbName NO-ERROR.
+  RETURN (IF AVAILABLE bDataserver THEN bDataserver.cLDBNameSchema ELSE pcDataSrNameOrDbName).
+  
+END FUNCTION. /* getSchemaHolder */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getStackSize) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getStackSize Procedure 
@@ -4291,8 +4460,8 @@ END FUNCTION. /* getStackSize */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableDesc Procedure 
 FUNCTION getTableDesc RETURNS CHARACTER
-  ( INPUT  pcDatabase AS CHARACTER
-  , INPUT  pcTable    AS CHARACTER
+  ( INPUT pcDatabase AS CHARACTER
+  , INPUT pcTable    AS CHARACTER
   ) :
   DEFINE BUFFER bTable FOR ttTable.
 
@@ -4528,6 +4697,21 @@ FUNCTION isBrowseChanged RETURNS LOGICAL
   RETURN FALSE.
   {&timerStop}
 END FUNCTION. /* isBrowseChanged */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-isDataServer) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isDataServer Procedure 
+FUNCTION isDataServer RETURNS LOGICAL
+  ( INPUT pcDataSrNameOrDbName AS CHARACTER
+  ):
+  RETURN CAN-FIND(ttDataserver WHERE ttDataserver.cLDBNameDataserver = pcDataSrNameOrDbName).
+  
+END FUNCTION. /* isDataServer */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
