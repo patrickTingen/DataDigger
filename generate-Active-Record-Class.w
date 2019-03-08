@@ -183,10 +183,10 @@ DEFINE FRAME frMain
      btnSave AT Y 330 X 15 WIDGET-ID 36
      "Dashes" VIEW-AS TEXT
           SIZE-PIXELS 65 BY 13 AT Y 220 X 25 WIDGET-ID 70
-     "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
      "Field Prefix" VIEW-AS TEXT
           SIZE-PIXELS 75 BY 13 AT Y 100 X 25 WIDGET-ID 48
+     "Indent:" VIEW-AS TEXT
+          SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
      RECT-4 AT Y 105 X 15 WIDGET-ID 46
      RECT-5 AT Y 227 X 15 WIDGET-ID 58
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
@@ -470,7 +470,7 @@ END PROCEDURE. /* fillTT */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateClass C-Win 
 PROCEDURE generateClass :
-  DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
+DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cMask         AS LONGCHAR  NO-UNDO.
   DEFINE VARIABLE cHeader       AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cIndent       AS CHARACTER NO-UNDO.
@@ -506,7 +506,7 @@ PROCEDURE generateClass :
     IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
     cText = SUBSTITUTE(cMask, cHeader).
 
-    cMask = '&1~n&2 data.&3.&4'.
+    cMask = '&1~n&2 data.&3.&4:'.
     cText = SUBSTITUTE(cMask
                       , cText
                       , (IF tgLowerCase:CHECKED THEN 'class' ELSE 'CLASS')
@@ -536,7 +536,7 @@ PROCEDURE generateClass :
         AND bField.cFieldName <> 'ROWID'
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
       
-      cMask = '&1DEFINE PUBLIC PROPERTY &2 AS &3 NO-UNDO. GET. SET.'.
+      cMask = '&1DEFINE PUBLIC PROPERTY &2 AS &3 NO-UNDO GET. SET.'.
       IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
       
       cText = cText + '~n' + SUBSTITUTE(cMask
@@ -812,3 +812,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
