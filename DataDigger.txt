@@ -22,6 +22,7 @@ DataDigger version 25
 - Solved: Trying to edit records in -RO mode leads to crash (Johan Geerts)
 - Solved: Items in context menu on databrowse not disabled in read-only mode
 - Solved: Changing format in field browse will reset query and column filters (kingOttmar)
+- Solved: Strange behaviour when DataDiggerHelp.ini is missing (Albert Flikkema)
 - Solved: Syntax error in generated code for active record class (Steven Peeters)
 
 - Change: File description now shows both label and description (Johan Geerts)

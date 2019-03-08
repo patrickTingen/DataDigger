@@ -90,6 +90,16 @@ FUNCTION getProcessorArchitecture RETURNS INTEGER() FORWARD.
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProwin Procedure 
+FUNCTION getProwin RETURNS CHARACTER() FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getRegistry Procedure 
@@ -143,16 +153,6 @@ FUNCTION setRegistry RETURNS CHARACTER
   ( pcSection AS CHARACTER 
   , pcSetting AS CHARACTER
   , pcValue   AS CHARACTER )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getProwin Procedure
-FUNCTION getProwin RETURNS CHARACTER() FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -398,6 +398,17 @@ PROCEDURE initializeObject :
   /* Add program dir to propath (if not already in) */
   IF SEARCH('datadigger.txt') = ? THEN
     PROPATH = gcProgramDir + ',' + PROPATH.
+
+  /* If the help-ini does not exist, refuse to start */
+  IF SEARCH(gcProgramDir + "DataDiggerHelp.ini") = ? THEN
+  DO:
+    MESSAGE "The file DataDiggerHelp.ini is missing." 
+      SKIP "Please download and reinstall DataDigger again" 
+      SKIP(1) "The program will now quit"
+           VIEW-AS ALERT-BOX INFORMATION.
+    OS-COMMAND NO-WAIT START VALUE("https://datadigger.wordpress.com/download/").
+    QUIT.
+  END.
 
   /* If the general ini file does not exist, create it */
   IF SEARCH(gcProgramDir + "DataDigger.ini") = ? THEN
@@ -812,6 +823,30 @@ END FUNCTION. /* getProcessorArchitecture */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProwin Procedure 
+FUNCTION getProwin RETURNS CHARACTER():
+  /* Return the prowin executable name
+  */
+
+  DEFINE VARIABLE cProwin64 AS CHARACTER NO-UNDO INIT "prowin.exe".
+  DEFINE VARIABLE cProwin32 AS CHARACTER NO-UNDO INIT "prowin32.exe".
+
+  FILE-INFO:FILE-NAME = cProwin64.
+  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin64.
+
+  FILE-INFO:FILE-NAME = cProwin32.
+  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin32.
+
+  RETURN "".
+END FUNCTION. /* getProwin */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getRegistry) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getRegistry Procedure 
@@ -976,26 +1011,3 @@ END FUNCTION. /* setRegistry */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-getProwin) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getProwin Procedure
-FUNCTION getProwin RETURNS CHARACTER():
-  /* Return the prowin executable name
-  */
-
-  DEFINE VARIABLE cProwin64 AS CHARACTER NO-UNDO INIT "prowin.exe".
-  DEFINE VARIABLE cProwin32 AS CHARACTER NO-UNDO INIT "prowin32.exe".
-
-  FILE-INFO:FILE-NAME = cProwin64.
-  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin64.
-
-  FILE-INFO:FILE-NAME = cProwin32.
-  IF FILE-INFO:FULL-PATHNAME > "" THEN RETURN cProwin32.
-
-  RETURN "".
-END FUNCTION. /* getProwin */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
