@@ -51,10 +51,11 @@ CREATE WIDGET-POOL.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-2 RECT-5 RECT-6 edDefinition rsDumpLoad ~
-cbIndent tgLowerCase tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers ~
-btnSave 
+cbIndent cbDelimiter tgLowerCase tgIncludeDb tgSelectedOnly tgDelete ~
+tgLoadInChunks tgDisableTriggers btnSave 
 &Scoped-Define DISPLAYED-OBJECTS edDefinition rsDumpLoad cbIndent ~
-tgLowerCase tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers 
+cbDelimiter tgLowerCase tgIncludeDb tgSelectedOnly tgDelete tgLoadInChunks ~
+tgDisableTriggers 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -74,6 +75,16 @@ DEFINE BUTTON btnSave
      LABEL "&Save program" 
      SIZE-PIXELS 180 BY 24.
 
+DEFINE VARIABLE cbDelimiter AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS COMBO-BOX INNER-LINES 5
+     LIST-ITEM-PAIRS "Default","0",
+                     "Comma","1",
+                     "Semicolon","2",
+                     "Colon","3",
+                     "Tab","4"
+     DROP-DOWN-LIST
+     SIZE-PIXELS 80 BY 21 NO-UNDO.
+
 DEFINE VARIABLE cbIndent AS CHARACTER FORMAT "X(256)":U 
      VIEW-AS COMBO-BOX INNER-LINES 5
      LIST-ITEM-PAIRS "2 Spaces","2",
@@ -85,7 +96,7 @@ DEFINE VARIABLE cbIndent AS CHARACTER FORMAT "X(256)":U
 
 DEFINE VARIABLE edDefinition AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL LARGE
-     SIZE-PIXELS 700 BY 340
+     SIZE-PIXELS 700 BY 335
      FONT 0 NO-UNDO.
 
 DEFINE VARIABLE rsDumpLoad AS CHARACTER 
@@ -97,15 +108,15 @@ DEFINE VARIABLE rsDumpLoad AS CHARACTER
 
 DEFINE RECTANGLE RECT-2
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 73.
+     SIZE-PIXELS 180 BY 56.
 
 DEFINE RECTANGLE RECT-5
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 48.
+     SIZE-PIXELS 180 BY 36.
 
 DEFINE RECTANGLE RECT-6
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 180 BY 130.
+     SIZE-PIXELS 180 BY 170.
 
 DEFINE VARIABLE tgDelete AS LOGICAL INITIAL no 
      LABEL "&Delete record" 
@@ -132,32 +143,41 @@ DEFINE VARIABLE tgLowerCase AS LOGICAL INITIAL no
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 165 BY 17 TOOLTIP "use lower case for keywords" NO-UNDO.
 
+DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no 
+     LABEL "&Selected fields only" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 160 BY 17 TOOLTIP "export only the fields that are selected in the main window" NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
      edDefinition AT Y 5 X 205 NO-LABEL WIDGET-ID 2
      rsDumpLoad AT Y 13 X 30 NO-LABEL WIDGET-ID 78
-     cbIndent AT Y 44 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     tgLowerCase AT Y 75 X 25 WIDGET-ID 84
-     tgIncludeDb AT Y 100 X 25 WIDGET-ID 86
-     tgDelete AT Y 175 X 30 WIDGET-ID 10
-     tgLoadInChunks AT Y 245 X 30 WIDGET-ID 12
-     tgDisableTriggers AT Y 265 X 30 WIDGET-ID 76
-     btnSave AT Y 320 X 15 WIDGET-ID 36
-     "Load" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 220 X 25 WIDGET-ID 74
+     cbIndent AT Y 44 X 70 COLON-ALIGNED NO-LABEL WIDGET-ID 50
+     cbDelimiter AT Y 70 X 70 COLON-ALIGNED NO-LABEL WIDGET-ID 88
+     tgLowerCase AT Y 100 X 25 WIDGET-ID 84
+     tgIncludeDb AT Y 125 X 25 WIDGET-ID 86
+     tgSelectedOnly AT Y 150 X 25 WIDGET-ID 8
+     tgDelete AT Y 205 X 30 WIDGET-ID 10
+     tgLoadInChunks AT Y 258 X 30 WIDGET-ID 12
+     tgDisableTriggers AT Y 278 X 30 WIDGET-ID 76
+     btnSave AT Y 317 X 15 WIDGET-ID 36
+     "Delimiter:" VIEW-AS TEXT
+          SIZE-PIXELS 55 BY 20 AT Y 71 X 25 WIDGET-ID 90
      "Indent:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
      "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 150 X 25 WIDGET-ID 48
-     RECT-2 AT Y 227 X 15 WIDGET-ID 24
-     RECT-5 AT Y 157 X 15 WIDGET-ID 58
+          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
+     "Load" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 238 X 25 WIDGET-ID 74
+     RECT-2 AT Y 245 X 15 WIDGET-ID 24
+     RECT-5 AT Y 192 X 15 WIDGET-ID 58
      RECT-6 AT Y 5 X 15 WIDGET-ID 82
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 182 BY 16.81 WIDGET-ID 100.
+         SIZE 182 BY 16.52 WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -177,7 +197,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "Generate Dump/Load Procedures"
-         HEIGHT             = 16.95
+         HEIGHT             = 16.67
          WIDTH              = 183.4
          MAX-HEIGHT         = 40
          MAX-WIDTH          = 320
@@ -313,7 +333,7 @@ END.
 &Scoped-define SELF-NAME tgDelete
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgDelete C-Win
 ON VALUE-CHANGED OF tgDelete IN FRAME frMain /* Delete record */
-, cbIndent, tgLowerCase, tgDelete, tgLoadInChunks, tgDisableTriggers, tgIncludeDb
+, cbIndent, tgLowerCase, tgDelete, tgLoadInChunks, tgDisableTriggers, tgIncludeDb, tgSelectedOnly, cbDelimiter
 DO:
   RUN generateCode.
 END.
@@ -392,11 +412,12 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edDefinition rsDumpLoad cbIndent tgLowerCase tgIncludeDb tgDelete 
-          tgLoadInChunks tgDisableTriggers 
+  DISPLAY edDefinition rsDumpLoad cbIndent cbDelimiter tgLowerCase tgIncludeDb 
+          tgSelectedOnly tgDelete tgLoadInChunks tgDisableTriggers 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE RECT-2 RECT-5 RECT-6 edDefinition rsDumpLoad cbIndent tgLowerCase 
-         tgIncludeDb tgDelete tgLoadInChunks tgDisableTriggers btnSave 
+  ENABLE RECT-2 RECT-5 RECT-6 edDefinition rsDumpLoad cbIndent cbDelimiter 
+         tgLowerCase tgIncludeDb tgSelectedOnly tgDelete tgLoadInChunks 
+         tgDisableTriggers btnSave 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -427,14 +448,18 @@ END PROCEDURE. /* fillTT */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateCode C-Win 
 PROCEDURE generateCode :
-DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
-  DEFINE VARIABLE cMask         AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cHeader       AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cIndent       AS CHARACTER NO-UNDO.
-  
+DEFINE VARIABLE cText   AS LONGCHAR  NO-UNDO.
+  DEFINE VARIABLE cMask   AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cHeader AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cIndent AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFields AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cDelim  AS CHARACTER NO-UNDO.
+
+  DEFINE BUFFER bField FOR ttField. 
+
   DO WITH FRAME frMain:
     
-    ASSIGN rsDumpLoad cbIndent tgLowerCase tgDelete tgLoadInChunks tgDisableTriggers tgIncludeDb.
+    ASSIGN rsDumpLoad cbIndent tgLowerCase tgDelete tgLoadInChunks tgDisableTriggers tgIncludeDb tgSelectedOnly cbDelimiter.
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -455,40 +480,61 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
             + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
             .
             
+    
+    /* Fill var with all fields */
+    FOR EACH bField WHERE bField.lShow BY bField.iOrder:
+      cFields = cFields + '~n<i><i><db><tbl>.' + bField.cFieldName.
+    END.
+    cFields = cFields + '~n<i><i>.'.
+
+    /* Handle the delimiter */
+    CASE cbDelimiter:
+      WHEN '0' THEN cDelim = ''.
+      WHEN '1' THEN cDelim = 'DELIMITER "," '.
+      WHEN '2' THEN cDelim = 'DELIMITER ";" '.
+      WHEN '3' THEN cDelim = 'DELIMITER ":" '.
+      WHEN '4' THEN cDelim = 'DELIMITER "<tab>" '.
+    END CASE.
+
     CASE rsDumpLoad:
       WHEN 'dump' THEN 
       DO:
-        cMask = '~nOUTPUT TO <folder><table>.<ext>.'
+        cMask = '~nOUTPUT TO <folder><tbl>.<ext>.'
               + '~n'
-              + '~nFOR EACH <db><table> ' + TRIM(STRING(tgDelete,'EXCLUSIVE-LOCK/NO-LOCK')) + ':'
-              + '~n<indent>EXPORT <db><table>.'
-              .
-        IF tgDelete THEN
-          cMask = cMask + '~n<indent>DELETE <db><table> VALIDATE(YES,"").'.
+              + '~nFOR EACH <db><tbl> ' + TRIM(STRING(tgDelete,'EXCLUSIVE-LOCK/NO-LOCK')) + ':'
+            .
 
-        cMask = cMask + '~nEND.'
-              + '~n '
-              + '~nOUTPUT CLOSE.'.
+        IF NOT tgSelectedOnly THEN 
+          cMask = cMask + '~n<i>EXPORT ' + cDelim + '<db><tbl>.'.
+        ELSE
+          cMask = cMask + '~n<i>EXPORT ' + cDelim + '<fld>'.
+              
+        IF tgDelete THEN
+          cMask = cMask + '~n<i>DELETE <db><tbl> VALIDATE(YES,"").'.
+
+        cMask = cMask + '~nEND.' + '~n ' + '~nOUTPUT CLOSE.'.
       END. 
 
       WHEN 'load' THEN
       DO:
+        IF tgLoadInChunks THEN cFields = REPLACE(cFields,'<i><i>','<i><i><i>').
+
         cMask = ( IF tgLoadInChunks 
                     THEN '~nDEFINE VARIABLE <var> AS INTEGER NO-UNDO.~n'
                     ELSE '')
               + ( IF tgDisableTriggers 
-                    THEN '~nDISABLE TRIGGERS FOR LOAD OF <db><table>.~n'
+                    THEN '~nDISABLE TRIGGERS FOR LOAD OF <db><tbl>.~n'
                     ELSE '')
-              + '~nINPUT FROM <folder><table>.<ext>.'
+              + '~nINPUT FROM <folder><tbl>.<ext>.'
               + '~n'
               + '~nREPEAT:'
               + ( IF tgLoadInChunks 
-                    THEN '~n<indent>DO <var> = 1 TO 1000 TRANSACTION:'
-                       + '~n<indent><indent>CREATE <db><table>.'
-                       + '~n<indent><indent>IMPORT <db><table>.'
-                       + '~n<indent>END.'
-                    ELSE '~n<indent><indent>CREATE <db><table>.'
-                       + '~n<indent><indent>IMPORT <db><table>.')
+                    THEN '~n<i>DO <var> = 1 TO 1000 TRANSACTION:'
+                       + '~n<i><i>CREATE <db><tbl>.'
+                       + '~n<i><i>IMPORT ' + cDelim + (IF tgSelectedOnly THEN '<fld>' ELSE '<db><tbl>.')
+                       + '~n<i>END.'
+                    ELSE '~n<i>CREATE <db><tbl>.'
+                       + '~n<i>IMPORT ' + cDelim + (IF tgSelectedOnly THEN '<fld>' ELSE '<db><tbl>.') )
               + '~nEND.'
               + '~n'
               + '~nINPUT CLOSE.'
@@ -501,13 +547,16 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
 
     cText = REPLACE(cText,'<folder>', SESSION:TEMP-DIRECTORY).
     cText = REPLACE(cText,'<ext>'   , 'd').
+    cText = REPLACE(cText,'<fld>' , cFields).
+
     IF tgIncludeDb 
       THEN cText = REPLACE(cText,'<db>', pcDatabase + '.').
       ELSE cText = REPLACE(cText,'<db>', '').
 
-    cText = REPLACE(cText,'<table>' , pcTable).
-    cText = REPLACE(cText,'<indent>', cIndent).
-    cText = REPLACE(cText,'<var>'   , 'i').
+    cText = REPLACE(cText,'<tbl>' , pcTable).
+    cText = REPLACE(cText,'<i>'   , cIndent).
+    cText = REPLACE(cText,'<var>' , 'i').
+    cText = REPLACE(cText,'<tab>' , '~~t').
 
     edDefinition:SCREEN-VALUE = cText.
   END.
@@ -549,6 +598,8 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord')    = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord','no').
     IF getRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks')    = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks','no').
     IF getRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers') = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers','no').
+    IF getRegistry('DataDigger:GenerateDumpLoad', 'SelectedOnly')    = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'SelectedOnly','no').
+    IF getRegistry('DataDigger:GenerateDumpLoad', 'Delimiter')       = ? THEN setRegistry('DataDigger:GenerateDumpLoad', 'Delimiter','0').
 
     /* Get user settings */
     rsDumpLoad:SCREEN-VALUE   = getRegistry('DataDigger:GenerateDumpLoad', 'DumpLoad').
@@ -558,6 +609,8 @@ PROCEDURE initObject :
     tgDelete:CHECKED          = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord')).
     tgLoadInChunks:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks')).
     tgDisableTriggers:CHECKED = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers')).
+    tgSelectedOnly:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateDumpLoad', 'SelectedOnly')).
+    cbDelimiter:SCREEN-VALUE  = getRegistry('DataDigger:GenerateDumpLoad', 'Delimiter').
 
     APPLY 'VALUE-CHANGED' TO rsDumpLoad.
     
@@ -596,6 +649,8 @@ PROCEDURE saveSettings :
     setRegistry('DataDigger:GenerateDumpLoad', 'DeleteRecord'   , STRING(tgDelete:CHECKED         )).
     setRegistry('DataDigger:GenerateDumpLoad', 'LoadInChunks'   , STRING(tgLoadInChunks:CHECKED   )).
     setRegistry('DataDigger:GenerateDumpLoad', 'DisableTriggers', STRING(tgDisableTriggers:CHECKED)).
+    setRegistry('DataDigger:GenerateDumpLoad', 'SelectedOnly'   , STRING(tgSelectedOnly:CHECKED) ).
+    setRegistry('DataDigger:GenerateDumpLoad', 'Delimiter'      , STRING(cbDelimiter:SCREEN-VALUE)).
 
   END.
 

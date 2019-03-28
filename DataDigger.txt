@@ -32,6 +32,8 @@ DataDigger version 25
 - Change: Save-as Excel file now uses .xlsx format instead of .xls
 
 - New   : Option to change window title via myDataDigger.p (Johan Geerts)
+- New   : Generate dump/load: toggle for selected fields only (Dirk Vreken)
+- New   : Generate dump/load: set delimiter (Dirk Vreken)
 
 =====================================================================================
 
