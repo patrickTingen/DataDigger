@@ -666,8 +666,10 @@ PROCEDURE generateCode :
           
         IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
 
-        cUnique = STRING(bIndex.cIndexFlags MATCHES '*u*','UNIQUE/').
-        cUnique = TRIM(cUnique).
+        IF bIndex.cIndexFlags MATCHES '*u*' THEN 
+          cUnique = (IF NOT bIndex.cIndexFlags MATCHES '*P*' THEN 'IS UNIQUE' ELSE 'UNIQUE').
+        ELSE 
+          cUnique = ''.
         IF tgLowerCase:CHECKED THEN cUnique = LC(cUnique).
 
         cText = SUBSTITUTE(cMask
@@ -1038,4 +1040,3 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
