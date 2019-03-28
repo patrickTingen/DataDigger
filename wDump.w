@@ -1614,7 +1614,7 @@ PROCEDURE DumpDataExcel :
 
   /* Perform housekeeping and cleanup steps */
   hExcel:DisplayAlerts = FALSE.  /* don't show confirmation dialog from excel */
-  hWorkbook:SaveAs(picFileName,1,?,?,?,?,?).
+  hWorkbook:SaveAs(picFileName,51,?,?,?,?,?).
   hExcel:application:Workbooks:close() NO-ERROR.
   hExcel:application:quit NO-ERROR.
 
