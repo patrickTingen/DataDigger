@@ -26,6 +26,7 @@ DataDigger version 25
 - Solved: Syntax error in generated code for active record class (Steven Peeters)
 - Solved: Max 65535 records were exported to Excel (Damir Pen)
 - Solved: Error in generated code for temp-tables with index definition
+- Solved: Conflict with definitions of getCursorPos in RTB (Jean-Christophe Cardot)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)

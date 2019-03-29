@@ -993,8 +993,8 @@ DEFINE FRAME frMain
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnTableFilter AT Y 3 X 257 WIDGET-ID 38
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
@@ -2108,23 +2108,13 @@ END.
 ON SCROLL-NOTIFY OF brFields IN FRAME frMain
 , brIndexes, brTables
 DO:
-  DEFINE VARIABLE lp AS MEMPTR  NO-UNDO.
-  DEFINE VARIABLE X  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE Y  AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMouseX AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iMouseY AS INTEGER NO-UNDO.
 
   {&timerStart}
 
-  PUBLISH "debugInfo" (1, "scroll-notify of brFields").
-  PUBLISH "debugInfo" (1, "scroll-notify last-event: " + LAST-EVENT:LABEL).
-
-  SET-SIZE(lp) = 16.
-
   /* Get the x,y location of the mouse relative to the frame */
-  RUN GetCursorPos(INPUT-OUTPUT lp).
-  RUN ScreenToClient(INPUT FRAME {&FRAME-NAME}:HWND, INPUT lp).
-
-  X = GET-LONG(lp, 1).
-  Y = GET-LONG(lp, 5).
+  RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HWND, OUTPUT iMouseX, OUTPUT iMouseY).
 
   /* Ignore when we clicked on the vertical scrollbar or
    * above the horizontal to avoid flashing
@@ -2132,12 +2122,10 @@ DO:
   IF   SELF:NAME = 'brFields'
     OR SELF:NAME = 'brIndexes' THEN
   DO:
-    IF   X > (SELF:X + SELF:WIDTH-PIXELS - 15)
-      OR Y < (SELF:Y + SELF:HEIGHT-PIXELS - 15)
-      OR Y > (SELF:Y + SELF:HEIGHT-PIXELS) THEN RETURN.
+    IF   iMouseX > (SELF:X + SELF:WIDTH-PIXELS - 15)
+      OR iMouseY < (SELF:Y + SELF:HEIGHT-PIXELS - 15)
+      OR iMouseY > (SELF:Y + SELF:HEIGHT-PIXELS) THEN RETURN.
   END.
-
-  SET-SIZE(lp) = 0.
 
   /* Redraw filters on fields browse and table browse
    * - table and favs is the same browse
@@ -2146,11 +2134,7 @@ DO:
   RUN resizeFilters(INPUT {&PAGE-TABLES}).
   RUN resizeFilters(INPUT {&PAGE-FIELDS}).
 
-  FINALLY:
-    SET-SIZE(lp) = 0.
-    {&timerStop2}
-  END FINALLY.
-
+  {&timerStop}
 END. /* scroll-notify */
 
 /* _UIB-CODE-BLOCK-END */

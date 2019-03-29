@@ -18,10 +18,7 @@
 
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 &GLOBAL-DEFINE timerStart PUBLISH "DD:Timer" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
-&GLOBAL-DEFINE timerStop  FINALLY: ~
-                            PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). ~
-                          END FINALLY.
-&GLOBAL-DEFINE timerStop2 PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")).
+&GLOBAL-DEFINE timerStop  FINALLY: PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). END FINALLY.
 
 /* Constant values for update channels */
 &GLOBAL-DEFINE CHECK-MANUAL 0
