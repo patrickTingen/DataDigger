@@ -2114,7 +2114,7 @@ DO:
   {&timerStart}
 
   /* Get the x,y location of the mouse relative to the frame */
-  RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HWND, OUTPUT iMouseX, OUTPUT iMouseY).
+  RUN getMouseXY(INPUT FRAME {&FRAME-NAME}:HANDLE, OUTPUT iMouseX, OUTPUT iMouseY).
 
   /* Ignore when we clicked on the vertical scrollbar or
    * above the horizontal to avoid flashing
@@ -6784,7 +6784,7 @@ PROCEDURE dropFieldMenu :
   DEFINE VARIABLE iRet       AS INTEGER NO-UNDO.
 
   /* See if we clicked on the browse column */
-  RUN getMouseXY(INPUT brFields:handle IN FRAME frMain, OUTPUT iMouseX, OUTPUT iMouseY).
+  RUN getMouseXY(INPUT brFields:HANDLE IN FRAME frMain, OUTPUT iMouseX, OUTPUT iMouseY).
   IF iMouseY < 18 THEN
   DO:
     RUN SendMessageA (tgSelAll:HWND, 517, 0, 0, OUTPUT iRet).
