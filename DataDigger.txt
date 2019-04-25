@@ -29,6 +29,7 @@ DataDigger version 25
 - Solved: Conflict with definitions of getCursorPos in RTB (Jean-Christophe Cardot)
 - Solved: Error on table browse context menu when no db connected (Sil Boydens)
 - Solved: Table browse context menu not updated after connection maintenance
+- solved: Generate Assign statement did not handle extent fields (Dirk Vreken)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)

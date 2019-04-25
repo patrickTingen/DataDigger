@@ -403,6 +403,8 @@ PROCEDURE generateCode :
   DEFINE VARIABLE cIndent   AS CHARACTER NO-UNDO.
   DEFINE VARIABLE iMaxName  AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cTable    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE iExt      AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cExt      AS CHARACTER NO-UNDO.
   
   DEFINE BUFFER bField FOR ttField.
 
@@ -436,7 +438,7 @@ PROCEDURE generateCode :
       WHERE bField.cFieldName <> 'RECID'
         AND bField.cFieldName <> 'ROWID'
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
-      iMaxName = MAXIMUM(iMaxName, LENGTH(bField.cFieldName)).
+      iMaxName = MAXIMUM(iMaxName, LENGTH(bField.cFieldName) + (IF bField.iExtent = 0 THEN 0 ELSE LENGTH(STRING(bField.iExtent)) + 2)).
     END. 
 
     /* Add the fields */
@@ -445,13 +447,17 @@ PROCEDURE generateCode :
         AND bField.cFieldName <> 'ROWID'
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
 
-      cMask = '&1~n&2&3.&4 = '.
-      cText = SUBSTITUTE(cMask
-                        , cText 
-                        , cIndent
-                        , cTable
-                        , STRING(bField.cFieldName, FILL('X',iMaxName))
-                        ).
+      DO iExt = (IF bField.iExtent = 0 THEN 0 ELSE 1) TO (IF bField.iExtent = 0 THEN 0 ELSE bField.iExtent):
+
+        cMask = '&1~n&2&3.&4 = '.
+        cExt  = (IF iExt = 0 THEN '' ELSE SUBSTITUTE('[&1]', iExt)).
+        cText = SUBSTITUTE(cMask
+                          , cText 
+                          , cIndent
+                          , cTable
+                          , STRING(bField.cFieldName + cExt, FILL('X',iMaxName))
+                          ).
+      END.
     END. 
 
     cMask = '&1~n&2.~n'.
@@ -578,3 +584,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
