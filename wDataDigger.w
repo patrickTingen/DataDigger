@@ -1,15 +1,12 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
+/* Connected Databases 
+*/
 &Scoped-define WINDOW-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
-/*------------------------------------------------------------------------
-
-  Name: wDataDigger.w
-  Desc: Main program for DataDigger
-
-  ----------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.      */
-/*----------------------------------------------------------------------*/
+/*
+ * Main program for DataDigger
+ */
 
 /* Parameter tells if we are in read-only mode */
 &IF "{&uib_is_running}" = "" &THEN
@@ -19,6 +16,8 @@
 &ENDIF
 
 CREATE WIDGET-POOL.
+
+/* ***************************  Definitions  ************************** */
 
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
@@ -202,7 +201,7 @@ END PROCEDURE. /* URLDownloadToFileA */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
 btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
 fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
-brIndexes tgDebugMode fiTableDesc cbFavouriteGroup btnTableFilter ficWhere ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
 btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
 btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
 btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
@@ -993,9 +992,9 @@ DEFINE FRAME frMain
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
@@ -5079,8 +5078,9 @@ PROCEDURE btnViewChoose :
   DEFINE VARIABLE iRecord      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iRowNr       AS INTEGER     NO-UNDO.
 
-  DEFINE BUFFER bView  FOR ttView.
-  DEFINE BUFFER bField FOR ttField.
+  DEFINE BUFFER bView   FOR ttView.
+  DEFINE BUFFER bField  FOR ttField.
+  DEFINE BUFFER bColumn FOR ttColumn.
 
   /* If there is no record selected, select the focused one */
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0 THEN
@@ -5107,9 +5107,13 @@ PROCEDURE btnViewChoose :
 
   collectLoop:
   FOR EACH bField
-    WHERE bField.lShow      = TRUE
+    WHERE bField.lShow = TRUE
+    , 
+     EACH bColumn 
+    WHERE bColumn.cFieldName = bField.cFieldName
+      
     BREAK BY bField.iOrder
-          BY bField.iExtent:
+          BY bColumn.iExtent:
 
     /* Move it one down */
     iRowNr = iRowNr + 1.
@@ -5118,8 +5122,9 @@ PROCEDURE btnViewChoose :
     CREATE bView.
     ASSIGN bView.iHor   = 0
            bView.iVer   = iRowNr
-           bView.cValue = bField.cFullName
-           .
+           bView.cValue = bField.cFullName.
+
+    IF bColumn.iExtent > 0 THEN bView.cValue = SUBSTITUTE('&1[&2]', bView.cValue, bColumn.iExtent).
 
     /* Walk thru all selected records */
     DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
@@ -5128,7 +5133,7 @@ PROCEDURE btnViewChoose :
       CREATE bView.
       ASSIGN bView.iHor   = iRecord
              bView.iVer   = iRowNr
-             bView.cValue = TRIM(STRING(hDataBuffer:BUFFER-FIELD(bField.cFieldName):BUFFER-VALUE(bField.iExtent), bField.cFormat )) NO-ERROR.
+             bView.cValue = TRIM(STRING(hDataBuffer:BUFFER-FIELD(bField.cFieldName):BUFFER-VALUE(bColumn.iExtent), bField.cFormat )) NO-ERROR.
 
       /* Time-formatted fields */
       IF bField.cFormat BEGINS "HH:MM" THEN
@@ -6975,7 +6980,7 @@ PROCEDURE enable_UI :
   ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup btnTableFilter ficWhere btnFavourite 
+         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -13697,3 +13702,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
