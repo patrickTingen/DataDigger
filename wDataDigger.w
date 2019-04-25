@@ -1,7 +1,5 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER UIB_v9r12 GUI
 &ANALYZE-RESUME
-/* Connected Databases 
-*/
 &Scoped-define WINDOW-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
 /*
@@ -201,7 +199,7 @@ END PROCEDURE. /* URLDownloadToFileA */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
 btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
 fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
-brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup btnTableFilter ficWhere ~
 btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
 btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
 btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
@@ -992,8 +990,8 @@ DEFINE FRAME frMain
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     ficWhere AT Y 266 X 80 NO-LABEL
      btnTableFilter AT Y 3 X 257 WIDGET-ID 38
+     ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
@@ -4602,6 +4600,9 @@ PROCEDURE btnConnectionsChoose :
   cDatabasesOld = getDatabaseList().
   RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
 
+  /* Rebuild context menu for table browse */
+  RUN createMenuTableBrowse.
+
   /* Get all connected databases */
   cDatabases = getDatabaseList().
 
@@ -6971,7 +6972,7 @@ PROCEDURE enable_UI :
   ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
+         fiTableDesc cbFavouriteGroup btnTableFilter ficWhere btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -9251,6 +9252,9 @@ PROCEDURE menuDropDataBrowse :
   DEFINE VARIABLE cColumnClicked AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lColumnsHidden AS LOGICAL     NO-UNDO.
 
+  /* If no databases, then no databrowse */
+  IF NOT VALID-HANDLE(ghDataBrowse) THEN RETURN. 
+
   /* Select the row we clicked on */
   RUN selectClickedRow(ghDataBrowse, OUTPUT cColumnClicked).
   setUpdatePanel('display'). /* Activate buttons */
@@ -9275,13 +9279,13 @@ PROCEDURE menuDropDataBrowse :
       ELSE
       DO WITH FRAME {&FRAME-NAME}:
         CASE hMenuItem:NAME:
-          WHEN "add"    THEN hMenuItem:SENSITIVE = btnAdd:SENSITIVE    .
-          WHEN "clone"  THEN hMenuItem:SENSITIVE = btnClone:SENSITIVE  .
-          WHEN "edit"   THEN hMenuItem:SENSITIVE = btnEdit:SENSITIVE   .
-          WHEN "view"   THEN hMenuItem:SENSITIVE = btnView:SENSITIVE   .
-          WHEN "delete" THEN hMenuItem:SENSITIVE = btnDelete:SENSITIVE .
-          WHEN "dump"   THEN hMenuItem:SENSITIVE = btnDump:SENSITIVE .
-          WHEN "load"   THEN hMenuItem:SENSITIVE = btnLoad:SENSITIVE .
+          WHEN "add"    THEN hMenuItem:SENSITIVE = btnAdd:SENSITIVE.
+          WHEN "clone"  THEN hMenuItem:SENSITIVE = btnClone:SENSITIVE.
+          WHEN "edit"   THEN hMenuItem:SENSITIVE = btnEdit:SENSITIVE.
+          WHEN "view"   THEN hMenuItem:SENSITIVE = btnView:SENSITIVE.
+          WHEN "delete" THEN hMenuItem:SENSITIVE = btnDelete:SENSITIVE.
+          WHEN "dump"   THEN hMenuItem:SENSITIVE = btnDump:SENSITIVE.
+          WHEN "load"   THEN hMenuItem:SENSITIVE = btnLoad:SENSITIVE.
           OTHERWISE hMenuItem:SENSITIVE = TRUE.
         END CASE.
       END.
