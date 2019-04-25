@@ -8,15 +8,11 @@
   Desc: View on the data from query-tester.w
 
   Author: M.C. Fiere (fiere1@zonnet.nl)
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
-/* Parameters Definitions ---                                           */
 
 /* Local Variable Definitions ---                                       */
 &IF DEFINED(AppBuilder_is_Running) NE 0
@@ -28,7 +24,6 @@ CREATE WIDGET-POOL.
   DEFINE INPUT PARAMETER pcDataString AS CHARACTER NO-UNDO.
 &ENDIF
 
-/* DataDigger */
 { DataDigger.i }
 
 /* _UIB-CODE-BLOCK-END */
@@ -347,4 +342,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

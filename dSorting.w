@@ -8,14 +8,12 @@
   Name: dSorting.w
   Desc: Let user maintain data sort
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
 { DataDigger.i }
 
-/* Parameters Definitions ---                                           */
 DEFINE INPUT PARAMETER TABLE FOR ttColumn.
 DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttQuerySort.
 DEFINE OUTPUT PARAMETER plSortChanged AS LOGICAL NO-UNDO.

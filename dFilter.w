@@ -8,14 +8,12 @@
   Name: dFilter.w
   Desc: Let user select what files to show
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
 { DataDigger.i }
 
-/* Parameters Definitions */
 DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTableFilter.
 
 /* _UIB-CODE-BLOCK-END */

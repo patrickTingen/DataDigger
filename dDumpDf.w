@@ -8,14 +8,12 @@
   Name: dDumpDf.w
   Desc: Dump definitions of table or complete database
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
 { DataDigger.i }
 
-/* Parameters Definitions ---                                           */
 DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
 DEFINE INPUT  PARAMETER pcTable    AS CHARACTER   NO-UNDO.
 DEFINE INPUT  PARAMETER pcOptions  AS CHARACTER   NO-UNDO.
@@ -341,4 +339,3 @@ END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

@@ -2,22 +2,19 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
-/*
--------------------------------------------------------------------
-Copyright (c) 2001 and later Netsetup B.V.
--------------------------------------------------------------------
-Name         : wDebugger.w
-Purpose      : Debugger for DataDigger
+/* -------------------------------------------------------------------
 
-15/04/13 PT    Changed to 'light' version for DataDigger, originating
-               from the DWP Debugger.
+  Name : wDebugger.w
+  Desc : Debugger for DataDigger
 
-----------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.    */
-/*--------------------------------------------------------------------*/
+  15/04/2013 Changed to 'light' version for DataDigger, originating
+             from the DWP Debugger of NetSetup.
+
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
+/*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
 { DataDigger.i }
 
 /* Local Variable Definitions */

@@ -5,16 +5,13 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
-        Name : wLister.w
-        Desc : Edit comma separated list
+  Name : wLister.w
+  Desc : Edit comma separated list
 
-        ----------------------------------------------------------------------*/
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
-
-/* Parameters Definitions ---                                           */
 DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
 DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
 DEFINE INPUT-OUTPUT PARAMETER pcList AS CHARACTER NO-UNDO.

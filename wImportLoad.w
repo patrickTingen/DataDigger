@@ -12,9 +12,6 @@
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */
@@ -810,4 +807,3 @@ END PROCEDURE. /* loadData */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

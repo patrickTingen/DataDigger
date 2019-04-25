@@ -13,8 +13,6 @@
 
 CREATE WIDGET-POOL.
 
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */

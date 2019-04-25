@@ -7,17 +7,12 @@
   Name: generate-Assign-Statement.w
   Desc: Generate assign statement for current file
 
-------------------------------------------------------------------------*/
+  ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
-
-/* Parameters Definitions ---                                           */
 
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
@@ -583,4 +578,3 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

@@ -8,11 +8,9 @@
   Name: dQuestion.w
   Desc: Show window to user and give back which button was pressed
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* ***************************  Definitions  ************************** */
 
 &IF DEFINED(UIB_is_Running) NE 0  &THEN
   DEFINE VARIABLE pcTitle         AS CHARACTER  NO-UNDO INITIAL 'Disconnect user'.

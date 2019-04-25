@@ -8,15 +8,11 @@
   Desc: Analyzes queries and displays the result in an other window
 
   Author: M.C. Fiere (fiere1@zonnet.nl)
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
-/* Datadigger */
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */
@@ -1039,4 +1035,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

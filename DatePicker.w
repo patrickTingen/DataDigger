@@ -8,15 +8,12 @@
   Name: DatePicker.w
   Desc: Show calender and let user select a date
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* ***************************  Definitions  ************************** */
 
 { DataDigger.i }
 
-/* Parameters Definitions ---                                           */
 &IF "{&uib_is_running}" = "" &THEN
   DEFINE INPUT-OUTPUT PARAMETER pdCalendarDate AS DATE NO-UNDO.
 &ELSE

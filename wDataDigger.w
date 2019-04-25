@@ -2,9 +2,14 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME C-Win
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
-/*
- * Main program for DataDigger
- */
+/*------------------------------------------------------------------------
+
+  Name: wDataDigger.w
+  Desc: Main program for DataDigger
+
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
+/*----------------------------------------------------------------------*/
 
 /* Parameter tells if we are in read-only mode */
 &IF "{&uib_is_running}" = "" &THEN
@@ -14,8 +19,6 @@
 &ENDIF
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
 
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
@@ -13694,4 +13697,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

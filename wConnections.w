@@ -10,11 +10,9 @@
   Name: wConnections.w
   Desc: Maintain connections for DataDigger
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
-
-/* Parameters Definitions ---                                           */
 
 &IF DEFINED(UIB_is_running)=0 &THEN
   DEFINE INPUT PARAMETER pcCommand   AS CHARACTER NO-UNDO.
@@ -1316,4 +1314,3 @@ END FUNCTION. /* getNewConnectionNr */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

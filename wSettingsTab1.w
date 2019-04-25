@@ -6,8 +6,8 @@
   Name: wSettingsTab1.w
   Desc: Settings tab for Behaviour
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
@@ -968,4 +968,3 @@ END PROCEDURE. /* localInitialize */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

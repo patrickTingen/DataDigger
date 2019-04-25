@@ -8,15 +8,11 @@
   Name: dQueries.w
   Desc: Let user maintain previously used queries
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
-
-/* Parameters Definitions ---                                           */
 
 DEFINE INPUT PARAMETER  pcDatabase     AS CHARACTER NO-UNDO.
 DEFINE INPUT PARAMETER  pcTable        AS CHARACTER NO-UNDO.
@@ -812,4 +808,3 @@ END PROCEDURE. /* showQueries */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

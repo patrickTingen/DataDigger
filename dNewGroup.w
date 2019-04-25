@@ -8,14 +8,11 @@
   Name: dNewGroup.w
   Desc: Ask name for new group of favourites
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
-/* ***************************  Definitions  ************************** */
 { DataDigger.i }
-
-/* Parameters Definitions --- */
 
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
   DEFINE INPUT PARAMETER TABLE FOR ttFavGroup.

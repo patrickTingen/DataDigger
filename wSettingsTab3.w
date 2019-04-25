@@ -7,15 +7,11 @@
   Name: wSettingsTab3.w
   Desc: Settings tab for Backup
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
-/* Parameters Definitions ---                                           */
 
 DEFINE INPUT  PARAMETER phParent    AS HANDLE      NO-UNDO.
 DEFINE INPUT  PARAMETER phRectangle AS HANDLE      NO-UNDO.
@@ -689,4 +685,3 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

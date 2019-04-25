@@ -4,17 +4,14 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wSettings 
 /*------------------------------------------------------------------------
 
-        Name: wSettings.w
-        Desc: Container window for settings tabs
+  Name: wSettings.w
+  Desc: Container window for settings tabs
 
-------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
+  ----------------------------------------------------------------------*/
+/*          This .W file was created with the Progress AppBuilder.      */
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
 
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
@@ -975,4 +972,3 @@ END PROCEDURE. /* showFrames */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
