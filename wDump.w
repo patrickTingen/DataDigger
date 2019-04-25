@@ -12,9 +12,6 @@
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-
-/* ***************************  Definitions  ************************** */
-
 { DataDigger.i }
 
 /* Parameters Definitions ---                                           */
@@ -147,7 +144,7 @@ DEFINE VARIABLE cbDumpType AS CHARACTER FORMAT "X(32)":U
      LABEL "&Export as" 
      VIEW-AS COMBO-BOX INNER-LINES 8
      LIST-ITEM-PAIRS "Comma Separated","CSV",
-                     "Excel","XLS",
+                     "Excel","XLSX",
                      "HTML","HTML",
                      "Progress dumpfile (*.d)","D",
                      "Text file","TXT",
@@ -1230,7 +1227,7 @@ PROCEDURE dumpData :
     WHEN "D"    THEN RUN DumpDataProgressD(picFile, hExportTt, iNumRecs, cbCodePage).
     WHEN "HTML" THEN RUN DumpDataHtml     (picFile, hExportTt, iNumRecs, cbCodePage).
     WHEN "TXT"  THEN RUN DumpDataTxt      (picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "XLS"  THEN RUN DumpDataExcel    (picFile, hExportTt, iNumRecs, cbCodePage).
+    WHEN "XLSX" THEN RUN DumpDataExcel    (picFile, hExportTt, iNumRecs, cbCodePage).
     WHEN "XML"  THEN RUN dumpDataXml      (picFile, hExportTt, iNumRecs).
     WHEN "P"    THEN RUN dumpData4GL      (picFile, hExportTt, iNumRecs, cbCodePage).
     WHEN "CSV"  THEN RUN dumpDataCSV      (picFile, hExportTt, iNumRecs, cbCodePage).
@@ -2562,4 +2559,3 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
