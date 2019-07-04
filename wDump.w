@@ -1817,6 +1817,8 @@ PROCEDURE DumpDataProgressD :
     #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
 
+      IF hTTBuffer:BUFFER-FIELD(iCurField):DATA-TYPE = 'RECID' THEN NEXT.
+
       IF cbiFieldSelection = 2 THEN
       DO:
         cField = hTTBuffer:BUFFER-FIELD(iCurField):NAME.
@@ -2559,3 +2561,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
