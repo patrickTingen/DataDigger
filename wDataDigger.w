@@ -5408,6 +5408,10 @@ PROCEDURE clearIndexFilter :
     fiFlagsFilter    :screen-value = fiFlagsFilter    :PRIVATE-DATA.
     fiFieldsFilter   :screen-value = fiFieldsFilter   :PRIVATE-DATA.
 
+    FilterModified(fiIndexNameFilter:handle,NO).
+    FilterModified(fiFlagsFilter    :handle,NO).
+    FilterModified(fiFieldsFilter   :handle,NO).
+
     setFilterFieldColor(fiIndexNameFilter:handle).
     setFilterFieldColor(fiFlagsFilter    :handle).
     setFilterFieldColor(fiFieldsFilter   :handle).
