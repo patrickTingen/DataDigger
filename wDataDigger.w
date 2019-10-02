@@ -10016,7 +10016,6 @@ PROCEDURE reopenDataBrowse-create :
       IF CAN-DO("RECID,ROWID", bColumn.cFieldName) THEN
       DO:
         bColumn.hColumn = ghDataBrowse:ADD-CALC-COLUMN(bField.cDataType, bField.cFormat, "", bColumn.cFullName).
-
         bColumn.hColumn:NAME      = bColumn.cFieldName.
         bColumn.hColumn:VISIBLE   = bField.lShow.
         bColumn.hColumn:READ-ONLY = TRUE.
@@ -10233,13 +10232,17 @@ PROCEDURE reopenDataBrowse-create :
    */
   adjustFilterLoop:
   FOR EACH bColumn WHERE VALID-HANDLE(bColumn.hColumn):
-
+    
     /* Get last defined width from registry. Might have been set by user */
     iColumnWidth = INTEGER(getRegistry( SUBSTITUTE("DB:&1",pcDatabase)
                                       , SUBSTITUTE("&1.&2:width", pcTable, bColumn.cFullname)) ) NO-ERROR.
 
-    /* Make sure it is not wider than 300px */
-    IF iColumnWidth = ? THEN iColumnWidth = MINIMUM(300, bColumn.hColumn:WIDTH-PIXELS).
+    IF iColumnWidth = ? THEN 
+    CASE bColumn.cFullname:
+      WHEN 'recid' THEN iColumnWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS("000000000000",getFont("fixed")).
+      WHEN 'rowid' THEN iColumnWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS("0x0000000000000000",getFont("fixed")).
+      OTHERWISE iColumnWidth = MINIMUM(300, bColumn.hColumn:WIDTH-PIXELS).
+    END.
 
     /* Make sure the column is at least as wide as its name */
     /* And if the filter is of type COMBO, reserve some extra space for the arrow down */
@@ -12566,7 +12569,12 @@ PROCEDURE showValue :
   DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
     ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
 
-    cColumnValue = hDataBuffer:BUFFER-FIELD(cColumnName):BUFFER-VALUE(iExtentNr).
+    CASE cColumnName:
+      WHEN 'RECID' THEN cColumnValue = STRING(hDataBuffer:RECID).
+      WHEN 'ROWID' THEN cColumnValue = STRING(hDataBuffer:ROWID).
+      OTHERWISE cColumnValue = hDataBuffer:BUFFER-FIELD(cColumnName):BUFFER-VALUE(iExtentNr).
+    END CASE.
+    
     dColumnValue = DECIMAL(cColumnValue) NO-ERROR.
 
     /* Min/Max */
