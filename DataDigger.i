@@ -41,6 +41,9 @@
 
 DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
 
+Tiny little thing called bug
+
+
 /* TT for field data to link DataDiggers to each other */
 DEFINE TEMP-TABLE ttLinkInfo NO-UNDO RCODE-INFORMATION
   FIELD cField AS CHARACTER
