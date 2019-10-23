@@ -1186,8 +1186,10 @@ PROCEDURE correctFilterList :
     END.
 
     /* Remove empty elements */
-    pcPositive = REPLACE(pcPositive,',,',',').
     pcPositive = TRIM(pcPositive,',').
+    REPEAT WHILE INDEX(pcPositive,',,') > 0:
+      pcPositive = REPLACE(pcPositive,',,',',').
+    END.
   END.
 
 END PROCEDURE. /* correctFilterList */
@@ -1954,7 +1956,7 @@ PROCEDURE getFields :
       bField.cFullName     = bField.cFieldName
       bField.cDataType     = 'character'
       bField.cInitial      = ''
-      bField.cFormat       = ENTRY(i,"X(14),X(30)")
+      bField.cFormat       = ENTRY(i,"X(20),X(24)")
       bField.cFormatOrg    = bField.cFormat
       bField.cLabel        = bField.cFieldName
       bField.lPrimary      = NO
@@ -2029,7 +2031,6 @@ PROCEDURE getMouseXY :
 
   /* Get the location of the mouse relative to the frame */
   RUN ScreenToClient ( INPUT phFrame:HWND, INPUT lp ).
-
   piMouseX = GET-LONG( lp, 1 ).
   piMouseY = GET-LONG( lp, 5 ).
   SET-SIZE( LP ) = 0.
@@ -3944,7 +3945,7 @@ FUNCTION getEscapedData RETURNS CHARACTER
     END.
   END CASE.
 
-  RETURN pcString.
+  RETURN cOutput.
   {&timerStop}
 
 END FUNCTION. /* getEscapedData */
