@@ -34,6 +34,7 @@ DataDigger version 25
 - Solved: When dumping to .d format, fields of type RECID should be skipped (Steven Peeters)
 - Solved: Error when showing value of RECID or ROWID in data browse (Dirk Vreken)
 - Solved: Default width for RECID column is too small (Dirk Vreken)
+- Solved: Errors when compiling in 10.1B (Pieter Datema)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)

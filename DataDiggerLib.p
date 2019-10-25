@@ -87,7 +87,7 @@ PROCEDURE GetParent EXTERNAL "user32.dll" :
 END PROCEDURE.
 
 PROCEDURE GetCursorPos EXTERNAL "user32":
-  DEFINE INPUT  PARAMETER  lpPoint     AS MEMPTR.
+  DEFINE INPUT  PARAMETER  lpPoint     AS {&POINTERTYPE}. /* memptr */
   DEFINE RETURN PARAMETER  ReturnValue AS LONG.
 END PROCEDURE.
 
@@ -2027,9 +2027,7 @@ PROCEDURE getMouseXY :
   DEFINE VARIABLE iRet AS INT64  NO-UNDO.
 
   SET-SIZE( LP ) = 16.
-  RUN GetCursorPos(INPUT lp, OUTPUT iRet).
-
-  /* Get the location of the mouse relative to the frame */
+  RUN GetCursorPos(INPUT GET-POINTER-VALUE(lp), OUTPUT iRet).
   RUN ScreenToClient ( INPUT phFrame:HWND, INPUT lp ).
   piMouseX = GET-LONG( lp, 1 ).
   piMouseY = GET-LONG( lp, 5 ).
@@ -2838,7 +2836,7 @@ PROCEDURE resizeFilterFields :
   END.
   PUBLISH "DD:Timer" ("stop", "resizeFilterFields:#Field").
 
-  /* Finally, set the lead button to the utmost left */
+  /* Set the lead button to the utmost left */
   IF VALID-HANDLE(phLeadButton) THEN
     ASSIGN
       phLeadButton:X = phBrowse:X
@@ -3984,14 +3982,12 @@ FUNCTION getFieldList RETURNS CHARACTER
     cFields = cFields + "," + hField::_Field-name.
   END. /* #CollectFields */
 
+  hQuery:QUERY-CLOSE().
+  DELETE OBJECT hField.
+  DELETE OBJECT hFile.
+  DELETE OBJECT hQuery.
+  
   RETURN TRIM(cFields, ",").
-
-  FINALLY:
-    hQuery:QUERY-CLOSE().
-    DELETE OBJECT hField.
-    DELETE OBJECT hFile.
-    DELETE OBJECT hQuery.
-  END FINALLY.
 
 END FUNCTION. /* getFieldList */
 
@@ -4166,16 +4162,16 @@ FUNCTION getKeyList RETURNS CHARACTER
 
   /* Get the current state of the keyboard */
   RUN GetKeyboardState(GET-POINTER-VALUE(mKeyboardState), OUTPUT iReturnValue) NO-ERROR.
-  IF ERROR-STATUS:ERROR THEN RETURN ''. /* try to suppress error: 'C' Call Stack has been compromised after calling  in  (6069) */
-
-  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 16), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",SHIFT",",").
-  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 17), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",CTRL",",").
-  IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 18), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",ALT",",").
-
-  FINALLY:
-    SET-SIZE(mKeyboardState) = 0.
-    RETURN cKeyList.   /* Function return value. */
-  END FINALLY.
+  /* try to suppress error: 'C' Call Stack has been compromised after calling  in  (6069) */
+  IF NOT ERROR-STATUS:ERROR THEN
+  DO:
+    IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 16), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",SHIFT",",").
+    IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 17), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",CTRL",",").
+    IF GET-BITS(GET-BYTE(mKeyboardState, 1 + 18), 8, 1) = 1 THEN cKeyList = TRIM(cKeyList + ",ALT",",").
+  END.
+  
+  SET-SIZE(mKeyboardState) = 0.
+  RETURN cKeyList.   /* Function return value. */
 
 END FUNCTION. /* getKeyList */
 
