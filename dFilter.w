@@ -486,7 +486,6 @@ PROCEDURE saveComboValue :
     cNewList = TRIM(cNewList,cDelim).
   END. /* #AddEntry */
 
-  /* and finally, save it */
   setRegistry('DataDigger:Tables',pcSetting,cNewList).
 
 END PROCEDURE. /* saveComboValue */

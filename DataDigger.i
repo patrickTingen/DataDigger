@@ -17,8 +17,12 @@
 &GLOBAL-DEFINE build {build.i}
 
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
-&GLOBAL-DEFINE timerStart PUBLISH "DD:Timer" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
-&GLOBAL-DEFINE timerStop  FINALLY: PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). END FINALLY.
+
+/* FINALLY statement was introduced in 10.1C */
+&IF PROVERSION >= "10.1C" &THEN
+  &GLOBAL-DEFINE timerStart PUBLISH "DD:Timer" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
+  &GLOBAL-DEFINE timerStop  FINALLY: PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). END FINALLY.
+&ENDIF
 
 /* Constant values for update channels */
 &GLOBAL-DEFINE CHECK-MANUAL 0

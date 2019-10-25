@@ -43,6 +43,4 @@ IF SEARCH(cTempFile) <> ? THEN COPY-LOB FILE cTempFile TO pcContents.
 pcContents = TRIM(pcContents).
 
 /* Cleanup */
-FINALLY:
-  OS-DELETE VALUE(cTempFile).
-END FINALLY.
+OS-DELETE VALUE(cTempFile).
