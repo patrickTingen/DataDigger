@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : getOsErrorDesc.cls
+    File        : test_getOsErrorDesc.cls
     Purpose     : Test function getOsErrorDesc in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -10,7 +10,7 @@ USING Progress.Lang.*.
 USING OpenEdge.Core.*.
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS getOsErrorDesc:
+CLASS test_getOsErrorDesc:
   
   FUNCTION getOsErrorDesc RETURNS CHARACTER
     ( piOsError AS INTEGER ) IN SUPER. 

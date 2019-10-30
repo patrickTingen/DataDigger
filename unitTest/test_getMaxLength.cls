@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : getMaxLength.cls
+    File        : test_etMaxLength.cls
     Purpose     : Test function getMaxLength in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -10,7 +10,7 @@ USING Progress.Lang.*.
 USING OpenEdge.Core.*.
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS getMaxLength:
+CLASS test_getMaxLength:
   
   FUNCTION getMaxLength RETURNS INTEGER
     ( cFieldList AS CHARACTER ) IN SUPER. 

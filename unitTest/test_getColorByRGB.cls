@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : getColorByRGB.cls
+    File        : test_getColorByRGB.cls
     Purpose     : Test function getColorByRGB in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -10,7 +10,7 @@ USING Progress.Lang.*.
 USING OpenEdge.Core.*.
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS getColorByRGB:
+CLASS test_getColorByRGB:
  
   FUNCTION getColorByRGB RETURNS INTEGER
     ( piRed   AS INTEGER

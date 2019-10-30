@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : correctFilterList.cls
+    File        : test_correctFilterList.cls
     Purpose     : Test procedure correctFilterList in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -10,7 +10,7 @@ USING Progress.Lang.*.
 USING OpenEdge.Core.*.
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS correctFilterList:
+CLASS test_correctFilterList:
   
   DEFINE VARIABLE ghLib AS HANDLE    NO-UNDO.
  

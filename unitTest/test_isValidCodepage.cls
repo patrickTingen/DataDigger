@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : isValidCodepage.cls
+    File        : test_isValidCodepage.cls
     Purpose     : Test function isValidCodepage in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -10,7 +10,7 @@ USING Progress.Lang.*.
 USING OpenEdge.Core.*.
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS isValidCodepage:
+CLASS test_isValidCodepage:
   
   FUNCTION isValidCodePage RETURNS LOGICAL
     (pcCodepage AS CHARACTER) IN SUPER. 

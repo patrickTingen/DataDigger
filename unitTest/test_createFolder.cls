@@ -1,5 +1,5 @@
  /*------------------------------------------------------------------------
-    File        : createFolder.cls
+    File        : test_createFolder.cls
     Purpose     : Test procedure createFolder in DataDiggerLib.p  
  
     Author(s)   : Patrick.Tingen
@@ -11,7 +11,7 @@ USING OpenEdge.Core.*.
 
 BLOCK-LEVEL ON ERROR UNDO, THROW.
 
-CLASS createFolder:
+CLASS test_createFolder:
   
   DEFINE VARIABLE ghLib        AS HANDLE    NO-UNDO.
   DEFINE VARIABLE gcMainFolder AS CHARACTER NO-UNDO.
