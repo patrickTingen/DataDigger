@@ -27,7 +27,7 @@ CREATE WIDGET-POOL.
   RUN datadiggerlib.p PERSISTENT SET hLib.
   THIS-PROCEDURE:ADD-SUPER-PROCEDURE(hLib,SEARCH-TARGET).
   
-  RUN fillTT.
+  RUN getDummyScheme.p(OUTPUT TABLE ttField, OUTPUT TABLE ttIndex).
 &ENDIF
 
 /* _UIB-CODE-BLOCK-END */
@@ -160,12 +160,12 @@ DEFINE FRAME frMain
      btnSave AT Y 317 X 15 WIDGET-ID 36
      "Delimiter:" VIEW-AS TEXT
           SIZE-PIXELS 55 BY 20 AT Y 71 X 25 WIDGET-ID 90
-     "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
-     "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
      "Load" VIEW-AS TEXT
           SIZE-PIXELS 50 BY 13 AT Y 238 X 25 WIDGET-ID 74
+     "Dump" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
+     "Indent:" VIEW-AS TEXT
+          SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
      RECT-2 AT Y 245 X 15 WIDGET-ID 24
      RECT-5 AT Y 192 X 15 WIDGET-ID 58
      RECT-6 AT Y 5 X 15 WIDGET-ID 82
@@ -421,26 +421,6 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fillTT C-Win 
-PROCEDURE fillTT :
-/* Fill tt for testing in UIB
-  */
-  DEFINE BUFFER bField FOR ttField.
-  DEFINE BUFFER bIndex FOR ttIndex.
-  
-  CREATE bField. ASSIGN bField.cFieldName = 'rep-nr'      bField.lShow = TRUE bField.cDataType = 'INTEGER'   bField.cFormat = '>>>9'  bField.cLabel = 'Rep nr'.
-  CREATE bField. ASSIGN bField.cFieldName = 'rep-name'    bField.lShow = TRUE bField.cDataType = 'CHARACTER' bField.cFormat = 'x(30)' bField.cLabel = 'Rep name'.
-  CREATE bField. ASSIGN bField.cFieldName = 'region'      bField.lShow = FALSE bField.cDataType = 'CHARACTER' bField.cFormat = 'x(8)'  bField.cLabel = 'Region'.
-  CREATE bField. ASSIGN bField.cFieldName = 'month-quota' bField.lShow = FALSE bField.cDataType = 'INTEGER'   bField.cFormat = '->,>>>,>>9' bField.cLabel = 'Rep name' bField.iExtent = 12.
-         
-  CREATE bIndex. ASSIGN bIndex.cIndexName  = 'iPrim'   bIndex.cIndexFlags = 'P U' bIndex.cFieldList  = 'rep-nr'.
-  CREATE bIndex. ASSIGN bIndex.cIndexName  = 'iRegion' bIndex.cIndexFlags = ''    bIndex.cFieldList  = 'region,rep-name'.   
-
-END PROCEDURE. /* fillTT */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE generateCode C-Win 
 PROCEDURE generateCode :
 DEFINE VARIABLE cText   AS LONGCHAR  NO-UNDO.
@@ -678,3 +658,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -446,6 +446,7 @@ PROCEDURE applyFilter :
   DEFINE VARIABLE iReturnCode AS INTEGER    NO-UNDO.
 
   /* Avoid flashing */
+  {&_proparse_prolint-nowarn(varusage)}
   RUN lockWindowUpdate (INPUT FRAME {&frame-name}:hwnd, OUTPUT iReturnCode).
 
   /* clear viewport */
@@ -470,6 +471,7 @@ PROCEDURE applyFilter :
   END.
 
   /* Unlock window */
+  {&_proparse_prolint-nowarn(varusage)}
   RUN lockWindowUpdate (INPUT 0, OUTPUT iReturnCode).
 
   /* Set focus to editor */

@@ -36,6 +36,8 @@ END.
 
 /* Download */
 RUN DeleteURLCacheEntry (INPUT pcRemoteFile).
+
+{&_proparse_prolint-nowarn(varusage)}
 RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
 
 /* Read */

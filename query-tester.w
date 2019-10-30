@@ -144,7 +144,7 @@ DEFINE FRAME DEFAULT-FRAME
      btnRunQuery AT Y 165 X 510
      resultset AT Y 290 X 5 NO-LABEL
      btnPopOut AT Y 290 X 510 WIDGET-ID 2
-     RECT-1 AT ROW 1.24 COL 2 WIDGET-ID 4
+     RECT-1 AT Y 0 X 0 WIDGET-ID 4
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -450,29 +450,34 @@ END PROCEDURE. /* ask-table-from-user */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clean-temp-table C-Win 
-PROCEDURE clean-temp-table PRIVATE :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cleanUp C-Win 
+PROCEDURE cleanUp PRIVATE :
 /* Clean up internal temp-tables
   */
-  DEFINE BUFFER bf-ttBuffer FOR ttBuffer.
-  DEFINE BUFFER bf-ttVstTableInfo FOR ttVstTableInfo.
-  DEFINE BUFFER bf-ttVstIndexInfo FOR ttVstIndexInfo.
+  DEFINE INPUT PARAMETER phQuery AS HANDLE NO-UNDO.
 
-  FOR EACH bf-ttBuffer:
-    DELETE OBJECT bf-ttBuffer.hBuffer NO-ERROR.
-    DELETE bf-ttBuffer.
+  DEFINE BUFFER bBuffer       FOR ttBuffer.
+  DEFINE BUFFER bVstTableInfo FOR ttVstTableInfo.
+  DEFINE BUFFER bVstIndexInfo FOR ttVstIndexInfo.
+
+  DELETE OBJECT phQuery NO-ERROR.
+
+  FOR EACH bBuffer:
+    DELETE OBJECT bBuffer.hBuffer NO-ERROR.
+    DELETE bBuffer.
   END.
 
-  FOR EACH bf-ttVstTableInfo:
-    DELETE bf-ttVstTableInfo.
+  FOR EACH bVstTableInfo:
+    DELETE bVstTableInfo.
   END.
 
-  FOR EACH bf-ttVstIndexInfo:
-    DELETE bf-ttVstIndexInfo.
+  FOR EACH bVstIndexInfo:
+    DELETE bVstIndexInfo.
   END.
 
   RUN enableButtons IN THIS-PROCEDURE.
-END PROCEDURE. /* clean-temp-table */
+
+END PROCEDURE. /* cleanUp */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -891,7 +896,7 @@ PROCEDURE test-query PRIVATE :
         IF NOT VALID-HANDLE(bf-ttBuffer.hBuffer) THEN
         DO:
           DELETE bf-ttBuffer. /* it's invalid so no need to bother deleting the object */
-          {&CleanUp}
+          RUN cleanUp(hQry).
           SESSION:SET-WAIT-STATE("").
           RETURN.
         END.
@@ -916,8 +921,7 @@ PROCEDURE test-query PRIVATE :
                              + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                              + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
                              .
-      {&CleanUp}
-      ASSIGN hQry = ?.
+      RUN cleanUp(hQry).
       RETURN.
     END.
 
@@ -941,8 +945,7 @@ PROCEDURE test-query PRIVATE :
                                + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                                + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
                                .
-        {&CleanUp}
-        ASSIGN hQry = ?.
+        RUN cleanUp(hQry).
         RETURN.
       END.
 
@@ -1012,7 +1015,7 @@ PROCEDURE test-query PRIVATE :
                                                , bf-ttVstTableInfo.iTableRead
                                                ) NO-ERROR.
 
-          {&_proparse_ prolint-nowarn(oflink)}
+          {&_proparse_prolint-nowarn(oflink)}
           FOR EACH bf-ttVstIndexInfo OF bf-ttVstTableInfo:
             ASSIGN resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("-  index &1 has &2 reads~n",bf-ttVstIndexInfo.cIndexName,bf-ttVstIndexInfo.iIndexRead) NO-ERROR.
             DELETE bf-ttVstIndexInfo.
@@ -1025,7 +1028,7 @@ PROCEDURE test-query PRIVATE :
       hQry:QUERY-CLOSE.
     END.
 
-    {&CleanUp}
+    RUN cleanUp(hQry).
     SESSION:SET-WAIT-STATE("").
     ASSIGN oplErrorOccured = FALSE.
 

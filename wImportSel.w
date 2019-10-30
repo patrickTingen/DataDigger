@@ -1,7 +1,7 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wImportSel
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImportSel
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImportSel 
 /*------------------------------------------------------------------------
 
   Name : wImportSel.w
@@ -35,7 +35,7 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -47,8 +47,8 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS fcFilename btnGetFile btnAddFile edFileList ~
-btnBack BtnNext fiText
-&Scoped-Define DISPLAYED-OBJECTS fcFilename edFileList fiText
+btnBack BtnNext fiText 
+&Scoped-Define DISPLAYED-OBJECTS fcFilename edFileList fiText 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -61,38 +61,38 @@ btnBack BtnNext fiText
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE wImportSel AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR wImportSel AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnAddFile
-     LABEL "+"
+DEFINE BUTTON btnAddFile 
+     LABEL "+" 
      SIZE-PIXELS 25 BY 21 TOOLTIP "add file".
 
-DEFINE BUTTON btnBack DEFAULT
-     LABEL "&Back"
+DEFINE BUTTON btnBack DEFAULT 
+     LABEL "&Back" 
      SIZE-PIXELS 75 BY 24 TOOLTIP "cancel load data"
      BGCOLOR 8 .
 
-DEFINE BUTTON btnGetFile
-     LABEL "..."
+DEFINE BUTTON btnGetFile 
+     LABEL "..." 
      SIZE-PIXELS 25 BY 21 TOOLTIP "add one or more files".
 
-DEFINE BUTTON BtnNext
-     LABEL "&Next"
+DEFINE BUTTON BtnNext 
+     LABEL "&Next" 
      SIZE-PIXELS 75 BY 24 TOOLTIP "analyze files"
      BGCOLOR 8 .
 
-DEFINE VARIABLE edFileList AS CHARACTER
+DEFINE VARIABLE edFileList AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL
      SIZE 100 BY 7.14 TOOLTIP "the files to load" NO-UNDO.
 
-DEFINE VARIABLE fcFilename AS CHARACTER FORMAT "X(256)":U
-     LABEL "File"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fcFilename AS CHARACTER FORMAT "X(256)":U 
+     LABEL "File" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 415 BY 21 TOOLTIP "the name of the file to load" NO-UNDO.
 
-DEFINE VARIABLE fiText AS CHARACTER FORMAT "X(256)":U INITIAL "Select the files you want to load or drag them onto this window"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiText AS CHARACTER FORMAT "X(256)":U INITIAL "Select the files you want to load or drag them onto this window" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 380 BY 19 NO-UNDO.
 
 
@@ -106,8 +106,8 @@ DEFINE FRAME frMain
      btnBack AT Y 213 X 340 WIDGET-ID 8
      BtnNext AT Y 213 X 423 WIDGET-ID 6
      fiText AT Y 6 X 9 NO-LABEL WIDGET-ID 4
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 500 BY 239
          CANCEL-BUTTON btnBack DROP-TARGET WIDGET-ID 100.
@@ -136,15 +136,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1400
          VIRTUAL-HEIGHT-P   = 1000
          VIRTUAL-WIDTH-P    = 1400
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -161,12 +161,12 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* SETTINGS FOR FILL-IN fiText IN FRAME frMain
    ALIGN-L                                                              */
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wImportSel)
-THEN wImportSel:HIDDEN = NO.
+THEN wImportSel:HIDDEN = no.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -251,7 +251,10 @@ DO:
   DEFINE VARIABLE lAdded AS LOGICAL     NO-UNDO.
 
   DO iFile = 1 TO SELF:NUM-DROPPED-FILES:
+
+    {&_proparse_prolint-nowarn(varusage)}
     RUN addFile(SELF:GET-DROPPED-FILE(iFile),OUTPUT lAdded).
+
   END.
 END.
 
@@ -315,7 +318,10 @@ DO:
     UPDATE lOKpressed.
 
   IF lOKpressed THEN
+  DO:
+    {&_proparse_prolint-nowarn(varusage)}
     RUN addFile(cDataFile,OUTPUT lAdded).
+  END.
 
 END.
 
@@ -362,7 +368,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImportSel
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImportSel 
 
 
 /* ***************************  Main Block  *************************** */
@@ -406,9 +412,9 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImportSel
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImportSel 
 PROCEDURE addFile :
-  /* Add a file to the queue of files to load
+/* Add a file to the queue of files to load
   */
   DEFINE INPUT PARAMETER pcFileName AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER plAdded   AS LOGICAL     NO-UNDO.
@@ -450,7 +456,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -471,12 +477,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fcFilename edFileList fiText
+  DISPLAY fcFilename edFileList fiText 
       WITH FRAME frMain IN WINDOW wImportSel.
-  ENABLE fcFilename btnGetFile btnAddFile edFileList btnBack BtnNext fiText
+  ENABLE fcFilename btnGetFile btnAddFile edFileList btnBack BtnNext fiText 
       WITH FRAME frMain IN WINDOW wImportSel.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
 END PROCEDURE.
@@ -484,9 +490,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImportSel
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImportSel 
 PROCEDURE initializeObject :
-  /* Setup
+/* Setup
   */
   DO WITH FRAME {&FRAME-NAME}:
 

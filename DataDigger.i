@@ -19,7 +19,7 @@
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 
 /* FINALLY statement was introduced in 10.1C */
-&IF PROVERSION >= "10.1C" &THEN
+&IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN
   &GLOBAL-DEFINE timerStart PUBLISH "DD:Timer" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
   &GLOBAL-DEFINE timerStop  FINALLY: PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). END FINALLY.
 &ENDIF
@@ -326,8 +326,8 @@ DEFINE TEMP-TABLE ttDataserver NO-UNDO RCODE-INFORMATION
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Include ASSIGN
-         HEIGHT             = 6
-         WIDTH              = 35.8.
+         HEIGHT             = 18.43
+         WIDTH              = 95.8.
 /* END WINDOW DEFINITION */
                                                                         */
 &ANALYZE-RESUME
@@ -530,3 +530,4 @@ END PROCEDURE. /* getProcHandle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

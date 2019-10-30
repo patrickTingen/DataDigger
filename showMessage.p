@@ -30,9 +30,9 @@ CREATE WINDOW winMessage ASSIGN
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
 ASSIGN
-  CURRENT-WINDOW              = winMessage.
+  CURRENT-WINDOW                = winMessage.
   THIS-PROCEDURE:CURRENT-WINDOW = winMessage.
-  default-window = winMessage.
+  DEFAULT-WINDOW                = winMessage.
 
 /* Find a decent font */
 #FindFont:
@@ -46,12 +46,13 @@ DO iFont = 0 TO FONT-TABLE:NUM-ENTRIES - 1:
 END.
 
 /* How wide should the text be? */
-iWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(pcMessage,iFont) + cMessage:x + 30.
+cMessage = pcMessage.
+iWidth = FONT-TABLE:GET-TEXT-WIDTH-PIXELS(cMessage,iFont) + cMessage:x + 30.
 iWidth = MAXIMUM(iWidth,150).
 
 winMessage:WIDTH-PIXELS = iWidth .
 cMessage:WIDTH-PIXELS = iWidth - 10.
-cMessage:SCREEN-VALUE = pcMessage.
+cMessage:SCREEN-VALUE = cMessage.
 FRAME infoFrame:WIDTH-PIXELS = iWidth.
 
 /* Center the window */

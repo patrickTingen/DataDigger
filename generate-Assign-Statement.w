@@ -27,7 +27,7 @@ CREATE WIDGET-POOL.
   RUN datadiggerlib.p PERSISTENT SET hLib.
   THIS-PROCEDURE:ADD-SUPER-PROCEDURE(hLib,SEARCH-TARGET).
   
-  RUN fillTT.
+  RUN getDummyScheme.p(OUTPUT TABLE ttField, OUTPUT TABLE ttIndex).
 &ENDIF
 
 /* _UIB-CODE-BLOCK-END */
@@ -370,26 +370,6 @@ PROCEDURE enable_UI :
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
 END PROCEDURE.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fillTT C-Win 
-PROCEDURE fillTT :
-/* Fill tt for testing in UIB
-  */
-  DEFINE BUFFER bField FOR ttField.
-  DEFINE BUFFER bIndex FOR ttIndex.
-  
-  CREATE bField. ASSIGN bField.cFieldName = 'rep-nr'      bField.lShow = TRUE bField.cDataType = 'INTEGER'   bField.cFormat = '>>>9'  bField.cLabel = 'Rep nr'.
-  CREATE bField. ASSIGN bField.cFieldName = 'rep-name'    bField.lShow = TRUE bField.cDataType = 'CHARACTER' bField.cFormat = 'x(30)' bField.cLabel = 'Rep name'.
-  CREATE bField. ASSIGN bField.cFieldName = 'region'      bField.lShow = FALSE bField.cDataType = 'CHARACTER' bField.cFormat = 'x(8)'  bField.cLabel = 'Region'.
-  CREATE bField. ASSIGN bField.cFieldName = 'month-quota' bField.lShow = FALSE bField.cDataType = 'INTEGER'   bField.cFormat = '->,>>>,>>9' bField.cLabel = 'Rep name' bField.iExtent = 12.
-         
-  CREATE bIndex. ASSIGN bIndex.cIndexName  = 'iPrim'   bIndex.cIndexFlags = 'P U' bIndex.cFieldList  = 'rep-nr'.
-  CREATE bIndex. ASSIGN bIndex.cIndexName  = 'iRegion' bIndex.cIndexFlags = ''    bIndex.cFieldList  = 'region,rep-name'.   
-
-END PROCEDURE. /* fillTT */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

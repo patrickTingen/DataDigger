@@ -1817,7 +1817,7 @@ PROCEDURE DumpDataProgressD :
     #FieldLoop:
     DO iCurField = 1 TO hTTBuffer:NUM-FIELDS:
 
-      IF hTTBuffer:BUFFER-FIELD(iCurField):DATA-TYPE = 'RECID' THEN NEXT.
+      IF hTTBuffer:BUFFER-FIELD(iCurField):DATA-TYPE = 'RECID' THEN NEXT #FieldLoop.
 
       IF cbiFieldSelection = 2 THEN
       DO:
