@@ -54,10 +54,14 @@ fiWebsite
 /* Define the widget handle for the window                              */
 DEFINE VAR wAbout AS WIDGET-HANDLE NO-UNDO.
 
+/* Definitions of handles for OCX Containers                            */
+DEFINE VARIABLE CtrlFrame AS WIDGET-HANDLE NO-UNDO.
+DEFINE VARIABLE chCtrlFrame AS COMPONENT-HANDLE NO-UNDO.
+
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnDataDigger  NO-FOCUS FLAT-BUTTON
      LABEL "D" 
-     SIZE 6.4 BY 1.52.
+     SIZE 6.4 BY 1.52 TOOLTIP "click me ....".
 
 DEFINE BUTTON BtnOK AUTO-GO DEFAULT 
      LABEL "OK" 
@@ -185,6 +189,28 @@ THEN wAbout:HIDDEN = yes.
  
 
 
+/* **********************  Create OCX Containers  ********************** */
+
+&ANALYZE-SUSPEND _CREATE-DYNAMIC
+
+&IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
+
+CREATE CONTROL-FRAME CtrlFrame ASSIGN
+       FRAME           = FRAME DEFAULT-FRAME:HANDLE
+       ROW             = 1.71
+       COLUMN          = 85
+       HEIGHT          = 1.67
+       WIDTH           = 7
+       WIDGET-ID       = 336
+       HIDDEN          = yes
+       SENSITIVE       = yes.
+/* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
+      CtrlFrame:MOVE-AFTER(BtnOK:HANDLE IN FRAME DEFAULT-FRAME).
+
+&ENDIF
+
+&ANALYZE-RESUME /* End of _CREATE-DYNAMIC */
+
 
 /* ************************  Control Triggers  ************************ */
 
@@ -232,7 +258,10 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
+  {&WINDOW-NAME}:SENSITIVE = FALSE.
+  chCtrlFrame:PSTimer:ENABLED = FALSE.
   RUN SokoDigger.w.
+  {&WINDOW-NAME}:SENSITIVE = TRUE.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -245,6 +274,28 @@ ON CHOOSE OF BtnOK IN FRAME DEFAULT-FRAME /* OK */
 DO:
   APPLY 'CLOSE' TO THIS-PROCEDURE.
 END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME CtrlFrame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame wAbout OCX.Tick
+PROCEDURE CtrlFrame.PSTimer.Tick .
+/* Blink the logo every now and then
+*/
+  DO WITH FRAME {&FRAME-NAME}:
+
+    btnDataDigger:SENSITIVE = NOT btnDataDigger:SENSITIVE.
+
+    IF NOT btnDataDigger:SENSITIVE THEN 
+      chCtrlFrame:PSTimer:INTERVAL = 400.
+    ELSE
+      chCtrlFrame:PSTimer:INTERVAL = 2000.
+  
+  END.
+
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -351,7 +402,7 @@ PROCEDURE blinkLogo :
     btnDataDigger:MOVE-TO-TOP().
     RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
 
-    RUN justWait(10).
+    RUN justWait(9).
   END.
 
   btnDataDigger:X = 10.
@@ -381,7 +432,7 @@ PROCEDURE blinkLogo :
       RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
     END.
 
-    RUN justWait(10).
+    RUN justWait(9).
   END.
 
   BtnOK:VISIBLE = TRUE.
@@ -393,6 +444,44 @@ PROCEDURE blinkLogo :
   glIntroRunning = FALSE.
 
 END PROCEDURE. /* blinkLogo */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load wAbout  _CONTROL-LOAD
+PROCEDURE control_load :
+/*------------------------------------------------------------------------------
+  Purpose:     Load the OCXs    
+  Parameters:  <none>
+  Notes:       Here we load, initialize and make visible the 
+               OCXs in the interface.                        
+------------------------------------------------------------------------------*/
+
+&IF "{&OPSYS}" = "WIN32":U AND "{&WINDOW-SYSTEM}" NE "TTY":U &THEN
+DEFINE VARIABLE UIB_S    AS LOGICAL    NO-UNDO.
+DEFINE VARIABLE OCXFile  AS CHARACTER  NO-UNDO.
+
+OCXFile = SEARCH( "wAbout.wrx":U ).
+IF OCXFile = ? THEN
+  OCXFile = SEARCH(SUBSTRING(THIS-PROCEDURE:FILE-NAME, 1,
+                     R-INDEX(THIS-PROCEDURE:FILE-NAME, ".":U), "CHARACTER":U) + "wrx":U).
+
+IF OCXFile <> ? THEN
+DO:
+  ASSIGN
+    chCtrlFrame = CtrlFrame:COM-HANDLE
+    UIB_S = chCtrlFrame:LoadControls( OCXFile, "CtrlFrame":U)
+    CtrlFrame:NAME = "CtrlFrame":U
+  .
+  RUN initialize-controls IN THIS-PROCEDURE NO-ERROR.
+END.
+ELSE MESSAGE "wAbout.wrx":U SKIP(1)
+             "The binary control file could not be found. The controls cannot be loaded."
+             VIEW-AS ALERT-BOX TITLE "Controls Not Loaded".
+
+&ENDIF
+
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -463,6 +552,9 @@ PROCEDURE initializeObject :
     wAbout:VISIBLE = TRUE.
 
     RUN blinkLogo.
+
+    chCtrlFrame:PSTimer:ENABLED = TRUE.
+    chCtrlFrame:PSTimer:INTERVAL = 400.
   END.
 
 END PROCEDURE. /* initializeObject. */
@@ -476,6 +568,7 @@ PROCEDURE initializeUi :
  */
 
   /* From enable_ui */
+  RUN control_load.
   DISPLAY edChangelog fiDataDigger-1 fiDataDigger-2 fiWebsite
       WITH FRAME DEFAULT-FRAME IN WINDOW wAbout.
 
@@ -507,3 +600,4 @@ END PROCEDURE. /* justWait */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

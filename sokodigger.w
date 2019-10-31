@@ -48,7 +48,7 @@ DEFINE TEMP-TABLE ttMove NO-UNDO
 DEFINE TEMP-TABLE ttLevel NO-UNDO
   FIELD iLevelNr AS INTEGER
   FIELD cData    AS CHARACTER
-  INDEX iPrim IS PRIMARY iLevelNr
+  INDEX iPrim IS PRIMARY UNIQUE iLevelNr
   .
 
 DEFINE TEMP-TABLE ttImage NO-UNDO
@@ -63,6 +63,7 @@ DEFINE VARIABLE giBlockHeight    AS INTEGER   NO-UNDO.
 DEFINE VARIABLE giMaxWidth       AS INTEGER   NO-UNDO.
 DEFINE VARIABLE giMaxHeight      AS INTEGER   NO-UNDO.
 DEFINE VARIABLE giNumMoves       AS INTEGER   NO-UNDO.
+DEFINE VARIABLE giNumLevels      AS INTEGER   NO-UNDO.
 DEFINE VARIABLE giCurrentLevel   AS INTEGER   NO-UNDO INITIAL 1.
 DEFINE VARIABLE glLevelComplete  AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE giLockCounter    AS INTEGER   NO-UNDO.
@@ -97,6 +98,10 @@ END PROCEDURE.
 /* Name of designated FRAME-NAME and/or first browse and/or first query */
 &Scoped-define FRAME-NAME frMain
 
+/* Standard List Definitions                                            */
+&Scoped-Define ENABLED-OBJECTS fiFocus 
+&Scoped-Define DISPLAYED-OBJECTS fiFocus 
+
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
 
@@ -128,14 +133,20 @@ DEFINE MENU mainMenu MENUBAR
 
 
 /* Definitions of the field level widgets                               */
+DEFINE VARIABLE fiFocus AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0 
+     VIEW-AS FILL-IN 
+     SIZE 7 BY 1
+     FGCOLOR 7 FONT 0 NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
+     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL WIDGET-ID 4
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 98.8 BY 21.24 WIDGET-ID 100.
+         SIZE 160 BY 28.57 WIDGET-ID 100.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -155,15 +166,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wSokoDigger ASSIGN
          HIDDEN             = YES
          TITLE              = "SokoDigger"
-         HEIGHT             = 21.24
-         WIDTH              = 98.8
+         HEIGHT             = 28.57
+         WIDTH              = 160
          MAX-HEIGHT         = 100
          MAX-WIDTH          = 200
          VIRTUAL-HEIGHT     = 100
          VIRTUAL-WIDTH      = 200
          RESIZE             = yes
          SCROLL-BARS        = no
-         STATUS-AREA        = no
+         STATUS-AREA        = yes
          BGCOLOR            = ?
          FGCOLOR            = ?
          KEEP-FRAME-Z-ORDER = yes
@@ -185,6 +196,9 @@ ASSIGN {&WINDOW-NAME}:MENUBAR    = MENU mainMenu:HANDLE.
   VISIBLE,,RUN-PERSISTENT                                               */
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
+ASSIGN 
+       fiFocus:READ-ONLY IN FRAME frMain        = TRUE.
+
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wSokoDigger)
 THEN wSokoDigger:HIDDEN = no.
 
@@ -319,6 +333,18 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME fiFocus
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFocus wSokoDigger
+ON END-ERROR OF fiFocus IN FRAME frMain /* Dummy field to get focus */
+ANYWHERE 
+DO:
+  APPLY 'window-close' TO {&WINDOW-NAME}.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME m_Redo
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Redo wSokoDigger
 ON CHOOSE OF MENU-ITEM m_Redo /* Redo */
@@ -404,8 +430,6 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
 
   RUN initObject.
   RUN startLevel.
-
-  APPLY 'entry' TO FRAME {&FRAME-NAME}.
 
   IF NOT THIS-PROCEDURE:PERSISTENT THEN
     WAIT-FOR CLOSE OF THIS-PROCEDURE.
@@ -594,7 +618,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  VIEW FRAME frMain IN WINDOW wSokoDigger.
+  DISPLAY fiFocus 
+      WITH FRAME frMain IN WINDOW wSokoDigger.
+  ENABLE fiFocus 
+      WITH FRAME frMain IN WINDOW wSokoDigger.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW wSokoDigger.
 END PROCEDURE.
@@ -612,7 +639,7 @@ PROCEDURE initObject :
 
   /* Set max dimensions for the window to that of the monitor */
   THIS-PROCEDURE:CURRENT-WINDOW = {&WINDOW-NAME}.
-  {&WINDOW-NAME}:MAX-WIDTH-PIXELS = SESSION:WIDTH-PIXELS.
+  {&WINDOW-NAME}:MAX-WIDTH-PIXELS  = SESSION:WIDTH-PIXELS.
   {&WINDOW-NAME}:MAX-HEIGHT-PIXELS = SESSION:HEIGHT-PIXELS.
 
   /* Set bg color of frame to a kind of sand color */
@@ -629,6 +656,8 @@ PROCEDURE initObject :
     PROPATH = PROPATH + ',c:\Data\DropBox\progress\Sokoban'.
   
   RUN readLevelFile(SEARCH('SokoDigger.txt')).
+  RUN readLevelFile(SEARCH('Sokodigger2.txt')).
+  
   RUN calcBlockSize.
 
   /* Get last completed level */
@@ -785,6 +814,8 @@ PROCEDURE movePlayer :
       bPlayer.hBlock:HEIGHT-PIXELS = giBlockHeight
       bPlayer.hBlock:VISIBLE       = TRUE
       .
+
+    STATUS INPUT SUBSTITUTE('Moves: &1', giNumMoves).
   END.
 
 END PROCEDURE. /* movePlayer */
@@ -901,22 +932,18 @@ PROCEDURE readLevelFile :
 */
   DEFINE INPUT PARAMETER pcLevelFile AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE cLine   AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iLevNum AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cLine AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bLevel FOR ttLevel.
-
-  FIND LAST bLevel NO-ERROR.
-  ASSIGN iLevNum = (IF AVAILABLE bLevel THEN bLevel.iLevelNr ELSE 0).
 
   INPUT FROM VALUE(pcLevelFile).
 
   #ReadCollection:
   REPEAT:
     /* New level */
-    iLevNum = iLevNum + 1.
+    giNumLevels = giNumLevels + 1.
     CREATE bLevel.
-    ASSIGN bLevel.iLevelNr = iLevNum.
+    ASSIGN bLevel.iLevelNr = giNumLevels.
 
     /* Read until level starts */
     #HeaderBlock:
@@ -1058,7 +1085,7 @@ END PROCEDURE. /* saveImage */
 PROCEDURE showLevel :
 /* Read a level from an ascii file and put it in the temp-table.
   */
-  DEFINE INPUT PARAMETER piLevel  AS INTEGER NO-UNDO.
+  DEFINE INPUT PARAMETER piLevel AS INTEGER NO-UNDO.
 
   DEFINE VARIABLE iPosY    AS INTEGER            NO-UNDO.
   DEFINE VARIABLE iPosX    AS INTEGER            NO-UNDO.
@@ -1166,8 +1193,16 @@ PROCEDURE showLevel :
       bBlock.iPosY = bBlock.iPosY + ROUND((giMaxHeight - (iMaxY - iMinY + 1)) / 2,0).
   END.
 
-  ASSIGN {&WINDOW-NAME}:TITLE = 'Sokoban level ' + STRING(giCurrentLevel).
+  ASSIGN {&WINDOW-NAME}:TITLE = SUBSTITUTE('Sokoban level &1 / &2', giCurrentLevel, giNumLevels).
 
+  /* We want to have focus on the screen but all elements 
+  ** are defined as flat, so nothing has focus. Trick Progress into 
+  ** giving focus to the screen by enabling a field that is not 
+  ** visible on the screen.  
+  */
+  DO WITH FRAME {&FRAME-NAME}:
+    fiFocus:Y = -30 NO-ERROR.
+  END.
 END PROCEDURE. /* showLevel */
 
 /* _UIB-CODE-BLOCK-END */
@@ -1277,3 +1312,4 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
