@@ -362,6 +362,16 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel C-Win 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER )  FORWARD.
@@ -12579,6 +12589,7 @@ PROCEDURE showValue :
   DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
     ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
 
+    {&_proparse_prolint-nowarn(recidkeyword)}
     CASE cColumnName:
       WHEN 'RECID' THEN cColumnValue = STRING(hDataBuffer:RECID).
       WHEN 'ROWID' THEN cColumnValue = STRING(hDataBuffer:ROWID).
