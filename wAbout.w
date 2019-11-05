@@ -286,13 +286,10 @@ PROCEDURE CtrlFrame.PSTimer.Tick .
 */
   DO WITH FRAME {&FRAME-NAME}:
 
-    btnDataDigger:SENSITIVE = NOT btnDataDigger:SENSITIVE.
+    btnDataDigger:X = RANDOM( 5,15).
+    btnDataDigger:Y = RANDOM(10,20).
 
-    IF NOT btnDataDigger:SENSITIVE THEN 
-      chCtrlFrame:PSTimer:INTERVAL = 400.
-    ELSE
-      chCtrlFrame:PSTimer:INTERVAL = 2000.
-  
+    chCtrlFrame:PSTimer:INTERVAL = 500.
   END.
 
 END PROCEDURE.
