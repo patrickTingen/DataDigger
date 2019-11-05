@@ -30,6 +30,7 @@ FOR EACH bDb   NO-LOCK
 
   CREATE bTable.
   ASSIGN
+    bTable.cSchemaHolder = (IF bDb._Db-slave THEN LDBNAME('dictdb') ELSE '')            /* [JAG 01-11-2019] */
     bTable.cDatabase   = (IF bDb._Db-slave THEN bDb._Db-name ELSE LDBNAME('dictdb'))
     bTable.cTableName  = bFile._file-name
     bTable.cTableDesc  = TRIM( (IF bFile._file-label <> ? AND bFile._file-label <> '' THEN bFile._file-label + ', ' ELSE '')

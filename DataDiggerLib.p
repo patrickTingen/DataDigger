@@ -10,6 +10,7 @@
 /*          This .W file was created with the Progress AppBuilder.       */
 /*----------------------------------------------------------------------*/
 DEFINE VARIABLE gcSaveDatabaseList  AS CHARACTER  NO-UNDO.  
+DEFINE VARIABLE giDataserverNr      AS INTEGER    NO-UNDO.  /* [JAG 01-11-2019] */
 
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
@@ -3830,8 +3831,7 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
   DEFINE VARIABLE cDbType          AS CHARACTER  NO-UNDO.  
   DEFINE VARIABLE cLogicalDbName   AS CHARACTER  NO-UNDO.  
   DEFINE VARIABLE iPos             AS INTEGER    NO-UNDO.  
-  DEFINE VARIABLE iDataserverNr    AS INTEGER    NO-UNDO.  
-  
+
   DEFINE BUFFER bDataserver FOR ttDataserver.
   
   {&timerStart}
@@ -3869,7 +3869,7 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
     RUN getDataserver.p
       ( INPUT              THIS-PROCEDURE
       , INPUT              cLogicalDbName
-      , INPUT-OUTPUT       iDataserverNr
+      , INPUT-OUTPUT       giDataserverNr
       , INPUT-OUTPUT TABLE bDataserver
       ).
     DELETE ALIAS dictdb.
