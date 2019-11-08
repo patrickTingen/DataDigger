@@ -77,6 +77,12 @@ FUNCTION allFieldsInList RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD formatExcelString wDump 
+FUNCTION formatExcelString RETURNS CHARACTER (phField AS HANDLE, piIndex AS INTEGER) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getExcelCol wDump 
 FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER )  FORWARD.
@@ -1067,50 +1073,50 @@ END PROCEDURE.
 PROCEDURE dumpData :
 /* Actual dump of the data
   */
-  DEFINE INPUT PARAMETER pihDdBrowse         AS HANDLE      NO-UNDO.
-  DEFINE INPUT PARAMETER picFormat           AS CHARACTER   NO-UNDO.
-  DEFINE INPUT PARAMETER piiRecordSelection  AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER piiFieldSelection   AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER picFile             AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER phDdBrowse         AS HANDLE      NO-UNDO.
+  DEFINE INPUT PARAMETER pcFormat           AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER piRecordSelection  AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER piFieldSelection   AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER pcFile             AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE iNumRecs            AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cTtField            AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDbField            AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iNumRecs        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iCurField       AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cTtField        AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDbField        AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE hExportTT           AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hExportTtBuffer     AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hExportQuery        AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hExportQueryBuffer  AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cExportQueryString  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE hTempTable      AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hBuffer         AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hQuery          AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE hQueryBuffer    AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cQueryString    AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE iCurSelectedRow     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cStatus             AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iCurIndex           AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE cIndexInfo          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cIndexName          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cIndexFields        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iCurSelectedRow AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iCurIndex       AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cStatus         AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cIndexInfo      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cIndexName      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cIndexFields    AS CHARACTER   NO-UNDO.
 
   glAborted = FALSE.
   RUN setStatusMessage(NOW, SUBSTITUTE("Dumping records from table &1.&2 in progres...", gcDb, gcTable) ).
 
   /* Construct the Query-string... */
-  CASE piiRecordSelection:
-    WHEN 1 THEN cExportQueryString = SUBSTITUTE("for each &1.&2 no-lock", gcDb, gcTable ).
-    WHEN 2 THEN cExportQueryString = pihDdBrowse:QUERY:prepare-string.
-  END CASE. /* case piiRecordSelection: */
+  CASE piRecordSelection:
+    WHEN 1 THEN cQueryString = SUBSTITUTE("for each &1.&2 no-lock", gcDb, gcTable ).
+    WHEN 2 THEN cQueryString = phDdBrowse:QUERY:prepare-string.
+  END CASE. /* case piRecordSelection: */
 
   /* Create temptable-handle... */
-  CREATE TEMP-TABLE hExportTt.
+  CREATE TEMP-TABLE hTempTable.
 
   /* Add fields & indexes to TempTable... */
-  CASE piiFieldSelection:
+  CASE piFieldSelection:
 
     /* Add all fields & indexes from the db-table... */
     WHEN 1 THEN
     DO:
-      hExportTt:CREATE-LIKE(SUBSTITUTE("&1.&2",gcDb,gcTable)).
+      hTempTable:CREATE-LIKE(SUBSTITUTE("&1.&2",gcDb,gcTable)).
     END. /* when 1 then  */
 
 
@@ -1128,19 +1134,19 @@ PROCEDURE dumpData :
 
         /* skip ROWID and RECID fields as they don't exist in the table */
         IF LOOKUP(cTtField,"ROWID,RECID") > 0 THEN NEXT #FieldLoop.
-        hExportTt:ADD-LIKE-FIELD(cTtField,cDbField).
+        hTempTable:ADD-LIKE-FIELD(cTtField,cDbField).
 
       END. /* do iCurField */
 
       /* add all indexes to the temp-table layout which consists of selected fields  */
-      CREATE BUFFER hExportQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
+      CREATE BUFFER hQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
 
       iCurIndex = 0.
       #AddIndex:
       DO WHILE TRUE:
         ASSIGN
           iCurIndex  = iCurIndex + 1
-          cIndexInfo = hExportQueryBuffer:INDEX-INFORMATION(iCurIndex)
+          cIndexInfo = hQueryBuffer:INDEX-INFORMATION(iCurIndex)
           .
 
         IF cIndexInfo = ? THEN LEAVE #AddIndex.
@@ -1151,35 +1157,35 @@ PROCEDURE dumpData :
           .
 
         IF allFieldsInList(cIndexFields,picSelectedFields) THEN
-          hExportTt:ADD-LIKE-INDEX(cIndexName,cIndexName,SUBSTITUTE("&1.&2", gcDB, gcTable)).
+          hTempTable:ADD-LIKE-INDEX(cIndexName,cIndexName,SUBSTITUTE("&1.&2", gcDB, gcTable)).
 
       END. /* do while true: */
 
-      DELETE OBJECT hExportQueryBuffer.
+      DELETE OBJECT hQueryBuffer.
     END. /* when 2 then */
-  END CASE. /* case piiFieldSelection: */
+  END CASE. /* case piFieldSelection: */
 
   /* Prepare the TempTable... */
-  hExportTt:TEMP-TABLE-PREPARE(SUBSTITUTE("&1",gcTable)).
-  hExportTtBuffer = hExportTt:DEFAULT-BUFFER-HANDLE.
+  hTempTable:TEMP-TABLE-PREPARE(SUBSTITUTE("&1",gcTable)).
+  hBuffer = hTempTable:DEFAULT-BUFFER-HANDLE.
 
   /* Populate the TempTable... */
-  CASE piiRecordSelection:
+  CASE piRecordSelection:
 
     /* All records from table(1) or browse(2) */
     WHEN 1 OR WHEN 2 THEN
     DO:
-      CREATE BUFFER hExportQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
-      CREATE QUERY hExportQuery.
-      hExportQuery:SET-BUFFERS(hExportQueryBuffer).
-      hExportQuery:QUERY-PREPARE(cExportQueryString).
+      CREATE BUFFER hQueryBuffer FOR TABLE SUBSTITUTE("&1.&2",gcDb,gcTable).
+      CREATE QUERY hQuery.
+      hQuery:SET-BUFFERS(hQueryBuffer).
+      hQuery:QUERY-PREPARE(cQueryString).
 
-      hExportQuery:QUERY-OPEN().
+      hQuery:QUERY-OPEN().
 
-      #DumpRecord:
+      #CollectData:
       REPEAT:
-        hExportQuery:GET-NEXT().
-        IF hExportQuery:QUERY-OFF-END THEN LEAVE #DumpRecord.
+        hQuery:GET-NEXT().
+        IF hQuery:QUERY-OFF-END THEN LEAVE #CollectData.
 
         ASSIGN iNumRecs = iNumRecs + 1.
         IF (ETIME - iTimeStarted) > 1000 THEN
@@ -1187,13 +1193,14 @@ PROCEDURE dumpData :
           iTimeStarted = ETIME.
           RUN showProgressBar(SUBSTITUTE('Collected &1 records',iNumRecs), 0).
           PROCESS EVENTS.
-          IF glAborted THEN LEAVE #DumpRecord.
+          IF glAborted THEN LEAVE #CollectData.
         END.
 
-        hExportTtBuffer:BUFFER-CREATE.
-        hExportTtBuffer:BUFFER-COPY(hExportQuery:GET-BUFFER-HANDLE(1)).
+        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-COPY(hQuery:GET-BUFFER-HANDLE(1)).
       END.
-      hExportQuery:QUERY-CLOSE().
+      hQuery:QUERY-CLOSE().
+      RUN showProgressBar(SUBSTITUTE('Collected &1 records',iNumRecs), 0).
 
     END. /* when 1 or when 2 then */
 
@@ -1201,10 +1208,10 @@ PROCEDURE dumpData :
     WHEN 3 THEN
     DO:
       #DumpSelectedRow:
-      DO iCurSelectedRow = 1 TO pihDdBrowse:NUM-SELECTED-ROWS:
-        pihDdBrowse:FETCH-SELECTED-ROW(iCurSelectedRow).
-        hExportTtBuffer:BUFFER-CREATE.
-        hExportTtBuffer:BUFFER-COPY(pihDdBrowse:QUERY:get-buffer-handle()).
+      DO iCurSelectedRow = 1 TO phDdBrowse:NUM-SELECTED-ROWS:
+        phDdBrowse:FETCH-SELECTED-ROW(iCurSelectedRow).
+        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-COPY(phDdBrowse:QUERY:get-buffer-handle()).
 
         ASSIGN iNumRecs = iNumRecs + 1.
         IF (ETIME - iTimeStarted) > 1000 THEN
@@ -1214,55 +1221,58 @@ PROCEDURE dumpData :
           PROCESS EVENTS.
           IF glAborted THEN LEAVE #DumpSelectedRow.
         END.
-
       END. /* when 3 then */
+      RUN showProgressBar(SUBSTITUTE('Collected &1 records',iNumRecs), 0).
     END.
-  END CASE. /* case piiRecordSelection: */
+  END CASE. /* case piRecordSelection: */
 
   /* Dump the TempTable... */
   SESSION:NUMERIC-FORMAT = cbNumericFormat.
-  SESSION:DATE-FORMAT = cbDateFormat.
+  SESSION:DATE-FORMAT    = cbDateFormat.
 
-  CASE picFormat:
-    WHEN "D"    THEN RUN DumpDataProgressD(picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "HTML" THEN RUN DumpDataHtml     (picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "TXT"  THEN RUN DumpDataTxt      (picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "XLSX" THEN RUN DumpDataExcel    (picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "XML"  THEN RUN dumpDataXml      (picFile, hExportTt, iNumRecs).
-    WHEN "P"    THEN RUN dumpData4GL      (picFile, hExportTt, iNumRecs, cbCodePage).
-    WHEN "CSV"  THEN RUN dumpDataCSV      (picFile, hExportTt, iNumRecs, cbCodePage).
-  END CASE. /* case picFormat: */
+  CASE pcFormat:
+    WHEN "D"    THEN RUN dumpDataProgressD(pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "HTML" THEN RUN dumpDataHtml     (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "TXT"  THEN RUN dumpDataTxt      (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "XLSX" THEN RUN dumpDataExcel    (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "XML"  THEN RUN dumpDataXml      (pcFile, hTempTable, iNumRecs).
+    WHEN "P"    THEN RUN dumpData4GL      (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "CSV"  THEN RUN dumpDataCSV      (pcFile, hTempTable, iNumRecs, cbCodePage).
+  END CASE. /* case pcFormat: */
 
   SESSION:NUMERIC-FORMAT = gcSessionNumericFormat.
-  SESSION:DATE-FORMAT = gcSessionDateFormat.
+  SESSION:DATE-FORMAT    = gcSessionDateFormat.
 
   /* Clean up */
-  IF VALID-HANDLE(hExportQueryBuffer) THEN DELETE OBJECT hExportQueryBuffer.
-  IF VALID-HANDLE(hExportQuery      ) THEN DELETE OBJECT hExportQuery.
-  IF VALID-HANDLE(hExportTt         ) THEN DELETE OBJECT hExportTt.
+  IF VALID-HANDLE(hQueryBuffer) THEN DELETE OBJECT hQueryBuffer.
+  IF VALID-HANDLE(hQuery      ) THEN DELETE OBJECT hQuery.
+  IF VALID-HANDLE(hTempTable  ) THEN DELETE OBJECT hTempTable.
 
   DO WITH FRAME {&frame-name}:
 
+    /* Hide progress bar frame */
+    RUN showProgressBar("", ?).
+
     IF glAborted THEN
     DO:
-      cStatus = SUBSTITUTE( "Dumping table &1 aborted", gcTable ).
+      cStatus = SUBSTITUTE("Dumping table &1 aborted", gcTable ).
       RUN showHelp('DumpAborted', gcTable).
     END.
     ELSE
-      cStatus = SUBSTITUTE( "&1 records dumped from table &2.&3 to &4", iNumRecs, gcDb, gcTable, picFile).
+      cStatus = SUBSTITUTE("&1 records dumped from table &2.&3 to &4", iNumRecs, gcDb, gcTable, pcFile).
 
-    RUN setStatusMessage( INPUT NOW, INPUT cStatus ).
+    RUN setStatusMessage(INPUT NOW, INPUT cStatus ).
 
-    setRegistry( "DumpAndLoad", "DumpExportType"      , cbDumpType).
-    setRegistry( "DumpAndLoad", "DumpFilter"          , STRING(cbiRecordSelection) ).
-    setRegistry( "DumpAndLoad", "DumpFilterFields"    , STRING(cbiFieldSelection) ).
-    setRegistry( "DumpAndLoad", "DumpXmlSchema"       , STRING(tbExportSchema) ).
-    setRegistry( "DumpAndLoad", "DumpMinimalXmlSchema", STRING(tbMinimalSchema) ).
-    setRegistry( "DumpAndLoad", "DumpLastFileName"    , picFile ).
-    setRegistry( "DumpAndLoad", "DumpActionTimeStamp" , ficMessageNow ).
-    setRegistry( "DumpAndLoad", "DumpActionResult"    , ficMessage ).
+    setRegistry("DumpAndLoad", "DumpExportType"      , cbDumpType).
+    setRegistry("DumpAndLoad", "DumpFilter"          , STRING(cbiRecordSelection) ).
+    setRegistry("DumpAndLoad", "DumpFilterFields"    , STRING(cbiFieldSelection) ).
+    setRegistry("DumpAndLoad", "DumpXmlSchema"       , STRING(tbExportSchema) ).
+    setRegistry("DumpAndLoad", "DumpMinimalXmlSchema", STRING(tbMinimalSchema) ).
+    setRegistry("DumpAndLoad", "DumpLastFileName"    , pcFile ).
+    setRegistry("DumpAndLoad", "DumpActionTimeStamp" , ficMessageNow ).
+    setRegistry("DumpAndLoad", "DumpActionResult"    , ficMessage ).
 
-    gcLastFile = picFile.
+    gcLastFile = pcFile.
   END. /* do with frame {&frame-name}: */
 
   RUN btnViewLastDumpEnable.
@@ -1272,8 +1282,8 @@ END PROCEDURE. /* dumpData */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpData4GL wDump 
-PROCEDURE DumpData4GL :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpData4GL wDump 
+PROCEDURE dumpData4GL :
 /*------------------------------------------------------------------------------
   Purpose:     Dump Data as 4GL code
   2012-09-14 JEE Created
@@ -1428,10 +1438,6 @@ PROCEDURE DumpData4GL :
   END. /* pumpDataLoop */
 
   OUTPUT STREAM strDump close.
-
-  /* Hide progress bar frame */
-  RUN showProgressBar("", ?).
-
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpData4GL */
@@ -1439,8 +1445,8 @@ END PROCEDURE. /* DumpData4GL */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataCSV wDump 
-PROCEDURE DumpDataCSV :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataCSV wDump 
+PROCEDURE dumpDataCSV :
 /* Dump data as csv file
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
@@ -1555,11 +1561,7 @@ PROCEDURE DumpDataCSV :
 
   END. /* pumpDataLoop */
 
-  OUTPUT stream strDump close.
-
-  /* Hide progress bar frame */
-  RUN showProgressBar('',?).
-
+  OUTPUT STREAM strDump close.
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataCSV */
@@ -1567,65 +1569,196 @@ END PROCEDURE. /* DumpDataCSV */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataExcel wDump 
-PROCEDURE DumpDataExcel :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataExcel wDump 
+PROCEDURE dumpDataExcel :
 /*------------------------------------------------------------------------------
-  Purpose:
-  Parameters:  <none>
-  Notes:
+ * Original author: Rodolfo Goncalves
+ * Adapted from https://github.com/rodolfoag/4gl-excel
 ------------------------------------------------------------------------------*/
 
-  DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
-  DEFINE INPUT PARAMETER pihTempTable AS HANDLE      NO-UNDO.
-  DEFINE INPUT PARAMETER piNumRecords AS INTEGER     NO-UNDO.
-  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcXlsFile    AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER phTempTable  AS HANDLE    NO-UNDO.
+  DEFINE INPUT PARAMETER piNumRecords AS INTEGER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER NO-UNDO.
+  
+  DEFINE VARIABLE hBuffer     AS HANDLE           NO-UNDO.
+  DEFINE VARIABLE iField      AS INTEGER          NO-UNDO.
+  DEFINE VARIABLE hQuery      AS HANDLE           NO-UNDO.
+  DEFINE VARIABLE hField      AS HANDLE           NO-UNDO.
+  DEFINE VARIABLE cCsvFile    AS CHARACTER        NO-UNDO.
+  DEFINE VARIABLE chExcel     AS COMPONENT-HANDLE NO-UNDO.
+  DEFINE VARIABLE chWorkbook  AS COMPONENT-HANDLE NO-UNDO.
+  DEFINE VARIABLE chQuery     AS COMPONENT-HANDLE NO-UNDO.
+  DEFINE VARIABLE raw-array   AS RAW              NO-UNDO.
+  DEFINE VARIABLE iNumColumns AS INTEGER          NO-UNDO.
+  DEFINE VARIABLE iExtent     AS INTEGER          NO-UNDO.
+  DEFINE VARIABLE iBegin      AS INTEGER          NO-UNDO.
+  DEFINE VARIABLE iEnd        AS INTEGER          NO-UNDO.
+  
+  hBuffer = phTempTable:DEFAULT-BUFFER-HANDLE.
 
-  DEFINE VARIABLE hExcel              AS COM-HANDLE  NO-UNDO.
-  DEFINE VARIABLE hWorkbook           AS COM-HANDLE  NO-UNDO.
-  DEFINE VARIABLE hWorksheet          AS COM-HANDLE  NO-UNDO.
+  /* Create a CSV file */
+  cCsvFile = REPLACE(pcXlsFile,'xlsx','csv').
+  OUTPUT STREAM strDump TO VALUE(cCsvFile).
+  
+  /* Header */
+  RUN showProgressBar('Dumping to Excel', 0).
+  DO iField = 1 TO hBuffer:NUM-FIELDS:
 
-  /* First, dump the file as HTML */
-  RUN DumpDataHtml(picFileName, pihTempTable, piNumRecords, pcCodePage).
-  IF glAborted THEN RETURN.
+    hField = hBuffer:BUFFER-FIELD(iField).
 
-  FILE-INFO:FILE-NAME = picFileName.
+    IF hField:EXTENT > 1 THEN
+    DO iExtent = 1 TO hField:EXTENT:
+      PUT STREAM strDump UNFORMATTED
+        (IF iField = 1 AND iExtent = 1 THEN "" ELSE ";") SUBSTITUTE('&1[&2]',hField:NAME, iExtent).
+    END.
+    ELSE
+    DO:
+      PUT STREAM strDump UNFORMATTED
+       (IF iField = 1 THEN "" ELSE ";") hField:NAME.
+    END.
+  END.
+  PUT STREAM strDump SKIP.
+  
+  /* Data */
+  CREATE QUERY hQuery.
+  hQuery:SET-BUFFERS(hBuffer).
+  hQuery:QUERY-PREPARE("for each " + hBuffer:NAME).
+  hQuery:QUERY-OPEN().
+  
+  hQuery:GET-FIRST().
+  DO WHILE NOT hQuery:QUERY-OFF-END:
+    DO iField = 1 TO hBuffer:NUM-FIELDS:
 
-  /* Open Excel and initialize variables */
-  CREATE "Excel.Application" hExcel.
+      hField = hBuffer:BUFFER-FIELD(iField).
+
+      IF hField:EXTENT > 1 THEN
+      DO iExtent = 1 TO hField:EXTENT:
+        PUT STREAM strDump UNFORMATTED
+          (IF iField = 1 AND iExtent = 1 THEN "" ELSE ";") formatExcelString(hField, iExtent).
+      END.
+      ELSE
+      DO:
+        PUT STREAM strDump UNFORMATTED
+         (IF iField = 1 THEN "" ELSE ";") formatExcelString(hField, 0).
+      END.
+    END.
+    PUT STREAM strDump SKIP.
+  
+    hQuery:GET-NEXT().
+  END.
+  
+  hQuery:QUERY-CLOSE() NO-ERROR.
+  OUTPUT STREAM strDump CLOSE.
+  
+  /* Start excel */
+  RUN showProgressBar('Formatting data in Excel', 0).
+  CREATE "Excel.Application" chExcel NO-ERROR.
+  chExcel:visible       = NO.
+  chExcel:DisplayAlerts = NO.
+  
+  chWorkbook = chExcel:workbooks:add.
+  
+  /* Import the CSV */
+  chQuery = chWorkbook:ActiveSheet:QueryTables:add("TEXT;" + cCsvFile, chExcel:Range("$A$1")).
   ASSIGN
-    hExcel:visible = FALSE
-    hWorkbook      = hExcel:Workbooks:open(FILE-INFO:FULL-PATHNAME)
-    hWorkSheet     = hExcel:Sheets:item(1)
-    .
+    chQuery:name                         = "data"
+    chQuery:FieldNames                   = TRUE
+    chQuery:RowNumbers                   = FALSE
+    chQuery:FillAdjacentFormulas         = FALSE
+    chQuery:PreserveFormatting           = TRUE
+    chQuery:RefreshOnFileOpen            = FALSE
+    chQuery:RefreshStyle                 = 1 /* xlInsertDeleteCells */
+    chQuery:SavePassword                 = FALSE
+    chQuery:SaveData                     = TRUE
+    chQuery:AdjustColumnWidth            = TRUE
+    chQuery:RefreshPeriod                = 0
+    chQuery:TextFilePromptOnRefresh      = FALSE
+    chQuery:TextFilePlatform             = 850
+    chQuery:TextFileStartRow             = 1
+    chQuery:TextFileParseType            = 1 /* xlDelimited */
+    chQuery:TextFileTextQualifier        = -4142 /* xlTextQualifierNone */
+    chQuery:TextFileConsecutiveDelimiter = FALSE
+    chQuery:TextFileTabDelimiter         = FALSE
+    chQuery:TextFileSemicolonDelimiter   = TRUE
+    chQuery:TextFileCommaDelimiter       = FALSE
+    chQuery:TextFileSpaceDelimiter       = FALSE
+    chQuery:TextFileTrailingMinusNumbers = TRUE.
+  
+  /* Set the type of formatting of the columns, uses raw variable to pass array of types to Excel */
+  DO iField = 1 TO hBuffer:NUM-FIELDS:
+  
+    RUN showProgressBar('Formatting data in Excel', MAXIMUM(0, iField / hBuffer:NUM-FIELDS * 100) ).
+    
+    hField = hBuffer:BUFFER-FIELD(iField).
+    iBegin = (IF hField:EXTENT = 0 THEN 0 ELSE 1).
+    iEnd   = (IF hField:EXTENT = 0 THEN 0 ELSE hField:EXTENT).
 
-  /* Adjust column sizes */
-  hExcel:columns("A:ZZ"):select.
-  hExcel:selection:columns:Autofit.
+    #DataColumn:
+    DO iExtent = iBegin TO iEnd:
 
-  /* Set first row as title row with autofilter */
-  hWorksheet:Range("A1:A1"):Select.
-  hWorkbook:Windows(1):SplitColumn = 0.
-  hWorkbook:Windows(1):SplitRow    = 1.
-  hWorkbook:Windows(1):FreezePanes = TRUE.
-  hWorksheet:Range("A1:A1"):AutoFilter(1,?,?).
+      IF hBuffer:BUFFER-FIELD(iField):COLUMN-LABEL = "" THEN
+      DO:
+        PUT-BYTE(raw-array, iField) = 9. /* 9 = xlSkipColumn */
+        NEXT #DataColumn.
+      END.
 
-  /* Perform housekeeping and cleanup steps */
-  hExcel:DisplayAlerts = FALSE.  /* don't show confirmation dialog from excel */
-  hWorkbook:SaveAs(picFileName,51,?,?,?,?,?).
-  hExcel:application:Workbooks:close() NO-ERROR.
-  hExcel:application:quit NO-ERROR.
+      CASE hBuffer:BUFFER-FIELD(iField):DATA-TYPE:
+        WHEN "character" THEN PUT-BYTE(raw-array, iField) = 2. /* 2 = xlTextFormat Excel */
+        WHEN "date"      THEN PUT-BYTE(raw-array, iField) = 4. /* 4 = xlDMYFormat */
+        OTHERWISE PUT-BYTE(raw-array, iField) = 1. /* 1 = xlGeneralFormat */
+      END CASE.
 
-  RELEASE OBJECT hWorksheet.
-  RELEASE OBJECT hWorkbook.
-  RELEASE OBJECT hExcel.
+      ASSIGN
+        iNumColumns = iNumColumns + 1.
+    END.
+  END. /* do iField */
+  
+  ASSIGN chQuery:TextFileColumnDataTypes = raw-array.
+  chQuery:REFRESH().
+  
+  /* First line bold */
+  chExcel:range("A1", chExcel:cells(1, iNumColumns)):select().
+  chExcel:selection:font:bold = TRUE.
+  chExcel:selection:Interior:ColorIndex = 34.
+  chExcel:selection:Interior:Pattern = 1.
+  
+  /* Autofilter */
+  chExcel:selection:AutoFilter(,,).
+  
+  /* Adjust width of columns */
+  chExcel:Cells:select().
+  chExcel:selection:columns:AutoFit().
+  chExcel:Range("A1"):select(). /* tira selecao */
+  
+  /* Freeze first row */
+  chWorkbook:Windows(1):SplitColumn = 0.
+  chWorkbook:Windows(1):SplitRow    = 1.
+  chWorkbook:Windows(1):FreezePanes = TRUE.
 
-END PROCEDURE. /* DumpDataExcel */
+  /* Save as XLSX */
+  ASSIGN pcXlsFile = REPLACE(cCsvFile, ".csv", ".xlsx").
+  chWorkbook:SaveAs(pcXlsFile,51,"","",FALSE,FALSE,). /* 51 = xlOpenXMLWorkbook */
+  
+  /* Cleanup */
+  FINALLY:
+    chExcel:DisplayAlerts = YES.
+    chExcel:quit().
+
+    RELEASE OBJECT chWorkbook.
+    RELEASE OBJECT chQuery.
+    RELEASE OBJECT chExcel.
+  
+    .OS-DELETE VALUE(cCsvFile) NO-ERROR.
+  END FINALLY.
+
+END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataHtml wDump 
-PROCEDURE DumpDataHtml :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataHtml wDump 
+PROCEDURE dumpDataHtml :
 /* Dump data as HTML
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
@@ -1743,9 +1876,6 @@ PROCEDURE DumpDataHtml :
   PUT STREAM strDump UNFORMATTED '</table></body></html>'.
   OUTPUT STREAM strDump CLOSE.
 
-  /* Hide progress bar frame */
-  RUN showProgressBar('',?).
-
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataExcel */
@@ -1753,8 +1883,8 @@ END PROCEDURE. /* DumpDataExcel */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataProgressD wDump 
-PROCEDURE DumpDataProgressD :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataProgressD wDump 
+PROCEDURE dumpDataProgressD :
 /* Dump as Progress .d file
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
@@ -1874,18 +2004,15 @@ PROCEDURE DumpDataProgressD :
       SKIP.
   END.
 
-  OUTPUT stream strDump close.
-
-  /* Hide progress bar frame */
-  RUN showProgressBar('',?).
+  OUTPUT STREAM strDump CLOSE.
 
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataTxt wDump 
-PROCEDURE DumpDataTxt :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataTxt wDump 
+PROCEDURE dumpDataTxt :
 /* Dump data as plain txt
   */
   DEFINE INPUT PARAMETER picFileName  AS CHARACTER   NO-UNDO.
@@ -1917,7 +2044,7 @@ PROCEDURE DumpDataTxt :
     .
 
   /* Open outputfile */
-  OUTPUT stream strDump to value(picFileName) convert target cCodePage.
+  OUTPUT STREAM strDump TO VALUE(picFileName) CONVERT TARGET cCodePage.
 
   /* Pump field names as column headers*/
   iField = 0.
@@ -2034,11 +2161,7 @@ PROCEDURE DumpDataTxt :
 
   END. /* pumpDataLoop */
 
-  OUTPUT stream strDump close.
-
-  /* Hide progress bar frame */
-  RUN showProgressBar('',?).
-
+  OUTPUT STREAM strDump CLOSE.
   DELETE OBJECT hQuery.
 
 END PROCEDURE. /* DumpDataText */
@@ -2046,8 +2169,8 @@ END PROCEDURE. /* DumpDataText */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DumpDataXml wDump 
-PROCEDURE DumpDataXml :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDataXml wDump 
+PROCEDURE dumpDataXml :
 /*------------------------------------------------------------------------------
   Purpose:
   Parameters:  <none>
@@ -2076,8 +2199,8 @@ PROCEDURE DumpDataXml :
       lFormatted      = YES
       cEncoding       = ?
       cSchemaLocation = ?
-      lWriteSchema    = tbExportSchema:checked
-      lMinSchema      = tbMinimalSchema:checked
+      lWriteSchema    = tbExportSchema:CHECKED 
+      lMinSchema      = tbMinimalSchema:CHECKED 
       .
 
     /* Fix XML Node Names for fields in the tt */
@@ -2092,8 +2215,6 @@ PROCEDURE DumpDataXml :
       , lWriteSchema
       , lMinSchema
       ).
-
-    RUN showProgressBar( '', ? ).
   END. /* do with frame {&frame-name}: */
 
 END PROCEDURE.
@@ -2339,7 +2460,7 @@ PROCEDURE showProgressBar :
 
   IF piPrcDone = ? THEN
   DO:
-    FRAME infoFrame:visible = NO.
+    FRAME infoFrame:VISIBLE = NO.
   END.
   ELSE
   DO:
@@ -2458,6 +2579,28 @@ FUNCTION allFieldsInList RETURNS LOGICAL
   RETURN TRUE.
 
 END FUNCTION. /* allFieldsInList */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION formatExcelString wDump 
+FUNCTION formatExcelString RETURNS CHARACTER (phField AS HANDLE, piIndex AS INTEGER):
+
+  /* Return a formatted version of the string */
+  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.
+
+  IF STRING(phField:BUFFER-VALUE) = ? THEN ASSIGN cValue = "".
+
+  ELSE
+  IF phField:DATA-TYPE = "decimal" OR phField:DATA-TYPE = "logical" THEN
+    ASSIGN cValue = STRING(phField:BUFFER-VALUE(piIndex), phField:FORMAT).
+
+  ELSE
+    ASSIGN cValue = STRING(phField:BUFFER-VALUE(piIndex)).
+
+  RETURN cValue.
+
+END FUNCTION. /* formatExcelString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
