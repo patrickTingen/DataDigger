@@ -36,6 +36,8 @@ DataDigger version 25
 - Solved: Default width for RECID column is too small (Dirk Vreken)
 - Solved: Errors when compiling in 10.1B (Pieter Datema)
 - Solved: CTRL-INS/SHIFT-INS/SHIFT-DEL did not work in where-box (Johan Geerts)
+- Solved: Filters of field browse were not aligned after double-click (Dirk Vreken)
+- Solved: Warnings when exporting to Excel (Dirk Vreken)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
