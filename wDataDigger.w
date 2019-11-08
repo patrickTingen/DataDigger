@@ -1990,6 +1990,7 @@ DO:
     /* Set last used filterfield to this field. */
     ghLastFilterField = bColumn.hFilter.
 
+    RUN resizeFilters(INPUT {&PAGE-FIELDS}).
     APPLY "entry" TO bColumn.hColumn.
   END.
 END.
