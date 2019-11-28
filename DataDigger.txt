@@ -38,6 +38,7 @@ DataDigger version 25
 - Solved: CTRL-INS/SHIFT-INS/SHIFT-DEL did not work in where-box (Johan Geerts)
 - Solved: Filters of field browse were not aligned after double-click (Dirk Vreken)
 - Solved: Warnings when exporting to Excel (Dirk Vreken)
+- Solved: ADM errors when running DD during session
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
