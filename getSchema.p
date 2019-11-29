@@ -58,7 +58,8 @@ FOR EACH bDb   NO-LOCK
   ELSE IF bFile._file-number >= -16384 AND bFile._file-number <= -80  THEN bTable.cCategory = 'Other'.
   ELSE IF bFile._file-number < -16384                                 THEN bTable.cCategory = 'VST'.
 
-  FOR EACH dictdb._Field OF bFile NO-LOCK:
+  FOR EACH dictdb._Field 
+    WHERE dictdb._Field._File-recid = RECID(bFile) NO-LOCK:
     bTable.cFields = bTable.cFields + ',' + dictdb._Field._Field-name.
   END.
   bTable.cFields = TRIM(bTable.cFields,',').
