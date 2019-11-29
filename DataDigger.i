@@ -21,7 +21,9 @@
 /* FINALLY statement was introduced in 10.1C */
 &IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN
   &GLOBAL-DEFINE timerStart PUBLISH "DD:Timer" ("start", ENTRY(1,PROGRAM-NAME(1)," ")).
-  &GLOBAL-DEFINE timerStop  FINALLY: PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). END FINALLY.
+  &GLOBAL-DEFINE timerStop  FINALLY: ~
+                              PUBLISH "DD:Timer" ("stop", ENTRY(1,PROGRAM-NAME(1)," ")). ~
+                            END FINALLY.
 &ENDIF
 
 /* Constant values for update channels */
