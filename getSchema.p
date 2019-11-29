@@ -16,10 +16,11 @@ DEFINE INPUT PARAMETER TABLE FOR ttTable.
 
 DEFINE BUFFER bDb    FOR dictdb._Db.
 DEFINE BUFFER bFile  FOR dictdb._File.
+DEFINE BUFFER bField FOR dictdb._Field.
 DEFINE BUFFER bTable FOR ttTable.
 
 FIND FIRST bTable NO-ERROR.
-FIND FIRST bDb NO-ERROR.
+FIND FIRST bDb NO-LOCK NO-ERROR.
 
 FOR EACH bDb   NO-LOCK
   , EACH bFile NO-LOCK
@@ -58,9 +59,9 @@ FOR EACH bDb   NO-LOCK
   ELSE IF bFile._file-number >= -16384 AND bFile._file-number <= -80  THEN bTable.cCategory = 'Other'.
   ELSE IF bFile._file-number < -16384                                 THEN bTable.cCategory = 'VST'.
 
-  FOR EACH dictdb._Field 
-    WHERE dictdb._Field._File-recid = RECID(bFile) NO-LOCK:
-    bTable.cFields = bTable.cFields + ',' + dictdb._Field._Field-name.
+  FOR EACH bField 
+    WHERE bField._File-recid = RECID(bFile) NO-LOCK:
+    bTable.cFields = bTable.cFields + ',' + bField._Field-name.
   END.
   bTable.cFields = TRIM(bTable.cFields,',').
 END.
