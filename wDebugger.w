@@ -18,9 +18,8 @@ CREATE WIDGET-POOL.
 { DataDigger.i }
 
 /* Local Variable Definitions */
-DEFINE VARIABLE giPrevTime AS INTEGER     NO-UNDO. /* remember last TIME */.
-DEFINE VARIABLE gnPrevProg AS CHARACTER   NO-UNDO. /* program-name(2) */.
-
+DEFINE VARIABLE giPrevTime AS INTEGER     NO-UNDO. /* remember last TIME */
+DEFINE VARIABLE gnPrevProg AS CHARACTER   NO-UNDO. /* program-name(2) */
 /* Temptable to keep track of all published messages. */
 DEFINE TEMP-TABLE ttMessage NO-UNDO
   FIELD dtEvent   AS DATETIME
