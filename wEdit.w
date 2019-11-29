@@ -33,7 +33,6 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
 DEFINE VARIABLE gcUniqueFields AS CHARACTER NO-UNDO.
-DEFINE VARIABLE glInEditMode   AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE ghBackupTable  AS HANDLE    NO-UNDO.
 
 /* This table holds the actual values of the selected records */
@@ -1787,3 +1786,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -788,6 +788,9 @@ PROCEDURE loadData :
         NEXT XmlLoop.
       END.
 
+      /* Save rowid of first loaded record so DD can reposition to that */
+      IF porRepositionId = ? THEN porRepositionId = hDbBuffer:ROWID.
+
       /* Let it go ... */
       hXmlBuffer:BUFFER-RELEASE.
     END. /* XmlLoop */
@@ -807,3 +810,4 @@ END PROCEDURE. /* loadData */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

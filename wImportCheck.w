@@ -1,10 +1,10 @@
 &ANALYZE-SUSPEND _VERSION-NUMBER AB_v10r12 GUI
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME wImport
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wImport 
 /*------------------------------------------------------------------------
 
-  Name : wImportLoad.w
+  Name : wImportCheck.w
   Desc : Check if files can be loaded
 
   ----------------------------------------------------------------------*/
@@ -30,8 +30,6 @@ DEFINE {&outvar} polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
 DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
-DEFINE VARIABLE gcUniqueFields AS CHARACTER NO-UNDO.
-DEFINE VARIABLE glInEditMode   AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE ghXmlTable     AS HANDLE    NO-UNDO.
 
 /* Table to hold all xml file names */
@@ -55,7 +53,7 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -66,8 +64,8 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 &Scoped-define FRAME-NAME frMain
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS edSummary btnBack btnNext
-&Scoped-Define DISPLAYED-OBJECTS edSummary
+&Scoped-Define ENABLED-OBJECTS edSummary btnBack btnNext 
+&Scoped-Define DISPLAYED-OBJECTS edSummary 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -78,7 +76,7 @@ DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addError wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addError wImport 
 FUNCTION addError RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -87,7 +85,7 @@ FUNCTION addError RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addInfo wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addInfo wImport 
 FUNCTION addInfo RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -96,7 +94,7 @@ FUNCTION addInfo RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addMessage wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addMessage wImport 
 FUNCTION addMessage RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , piType    AS INTEGER
@@ -106,7 +104,7 @@ FUNCTION addMessage RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addWarning wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD addWarning wImport 
 FUNCTION addWarning RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -115,7 +113,7 @@ FUNCTION addWarning RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD hasWarnings wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD hasWarnings wImport 
 FUNCTION hasWarnings RETURNS LOGICAL
   ( /* parameter-definitions */ )  FORWARD.
 
@@ -126,18 +124,18 @@ FUNCTION hasWarnings RETURNS LOGICAL
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VARIABLE wImport AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR wImport AS WIDGET-HANDLE NO-UNDO.
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnBack
-     LABEL "&Back"
+DEFINE BUTTON btnBack 
+     LABEL "&Back" 
      SIZE-PIXELS 74 BY 24 TOOLTIP "cancel load data".
 
-DEFINE BUTTON btnNext AUTO-GO
-     LABEL "&Next"
+DEFINE BUTTON btnNext AUTO-GO 
+     LABEL "&Next" 
      SIZE-PIXELS 74 BY 24.
 
-DEFINE VARIABLE edSummary AS CHARACTER
+DEFINE VARIABLE edSummary AS CHARACTER 
      VIEW-AS EDITOR NO-WORD-WRAP SCROLLBAR-HORIZONTAL SCROLLBAR-VERTICAL
      SIZE-PIXELS 500 BY 365
      FONT 0 NO-UNDO.
@@ -149,9 +147,9 @@ DEFINE FRAME frMain
      edSummary AT Y 0 X 0 NO-LABEL WIDGET-ID 22
      btnBack AT Y 370 X 340 WIDGET-ID 6
      btnNext AT Y 370 X 420 WIDGET-ID 4
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY
-         SIDE-LABELS NO-UNDERLINE THREE-D
-         AT COL 1 ROW 1 SCROLLABLE
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 1 ROW 1 SCROLLABLE 
          CANCEL-BUTTON btnBack WIDGET-ID 100.
 
 
@@ -178,15 +176,15 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          MAX-WIDTH-P        = 1920
          VIRTUAL-HEIGHT-P   = 1134
          VIRTUAL-WIDTH-P    = 1920
-         RESIZE             = YES
-         SCROLL-BARS        = NO
-         STATUS-AREA        = NO
+         RESIZE             = yes
+         SCROLL-BARS        = no
+         STATUS-AREA        = no
          BGCOLOR            = ?
          FGCOLOR            = ?
-         KEEP-FRAME-Z-ORDER = YES
-         THREE-D            = YES
-         MESSAGE-AREA       = NO
-         SENSITIVE          = YES.
+         KEEP-FRAME-Z-ORDER = yes
+         THREE-D            = yes
+         MESSAGE-AREA       = no
+         SENSITIVE          = yes.
 ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* END WINDOW DEFINITION                                                */
 &ANALYZE-RESUME
@@ -200,17 +198,17 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
   NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* SETTINGS FOR FRAME frMain
    NOT-VISIBLE FRAME-NAME Size-to-Fit                                   */
-ASSIGN
+ASSIGN 
        FRAME frMain:SCROLLABLE       = FALSE
        FRAME frMain:RESIZABLE        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wImport)
-THEN wImport:HIDDEN = YES.
+THEN wImport:HIDDEN = yes.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -312,7 +310,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wImport 
 
 
 /* ***************************  Main Block  *************************** */
@@ -369,9 +367,9 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE addFile wImport 
 PROCEDURE addFile :
-  /* Add one file to the tt, do some basic checking
+/* Add one file to the tt, do some basic checking
   */
   DEFINE INPUT PARAMETER pcFileName AS CHARACTER NO-UNDO.
 
@@ -451,9 +449,9 @@ END PROCEDURE. /* addFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnNextChoose wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnNextChoose wImport 
 PROCEDURE btnNextChoose :
-  /* Proceed to procedure that shows a preview of the load
+/* Proceed to procedure that shows a preview of the load
   */
   DEFINE VARIABLE lContinue      AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lOldVisibility AS LOGICAL     NO-UNDO.
@@ -490,9 +488,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFiles wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFiles wImport 
 PROCEDURE checkFiles :
-  /* Check contents of the files
+/* Check contents of the files
   */
   DEFINE VARIABLE hBuffer          AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hQuery           AS HANDLE    NO-UNDO.
@@ -649,7 +647,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -670,12 +668,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edSummary
+  DISPLAY edSummary 
       WITH FRAME frMain IN WINDOW wImport.
-  ENABLE edSummary btnBack btnNext
+  ENABLE edSummary btnBack btnNext 
       WITH FRAME frMain IN WINDOW wImport.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
 END PROCEDURE.
@@ -683,9 +681,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject wImport 
 PROCEDURE initializeObject :
-  /* Setup
+/* Setup
   */
   VIEW wImport.
 
@@ -717,9 +715,9 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadFiles wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE loadFiles wImport 
 PROCEDURE loadFiles :
-  /* Add files, check and show summary
+/* Add files, check and show summary
   */
   DEFINE INPUT PARAMETER pcFileList AS CHARACTER NO-UNDO.
 
@@ -734,9 +732,9 @@ END PROCEDURE. /* loadFiles */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showSummary wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showSummary wImport 
 PROCEDURE showSummary :
-  /* Show summary before loading the data
+/* Show summary before loading the data
   */
   DEFINE VARIABLE cSummary AS CHARACTER   NO-UNDO.
 
@@ -774,7 +772,7 @@ END PROCEDURE. /* showSummary */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addError wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addError wImport 
 FUNCTION addError RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -787,7 +785,7 @@ END FUNCTION. /* addError */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addInfo wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addInfo wImport 
 FUNCTION addInfo RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -800,7 +798,7 @@ END FUNCTION. /* addInfo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addMessage wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addMessage wImport 
 FUNCTION addMessage RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , piType    AS INTEGER
@@ -823,7 +821,7 @@ END FUNCTION. /* addMessage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addWarning wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION addWarning wImport 
 FUNCTION addWarning RETURNS LOGICAL
   ( piFileNr  AS INTEGER
   , pcMessage AS CHARACTER
@@ -836,7 +834,7 @@ END FUNCTION. /* addWarning */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION hasWarnings wImport
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION hasWarnings wImport 
 FUNCTION hasWarnings RETURNS LOGICAL
   ( /* parameter-definitions */ ) :
 
