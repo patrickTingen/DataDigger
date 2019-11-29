@@ -10,7 +10,6 @@
 /* If set to YES, then support >1 dataservers per schemaholder */
 &scoped-define support-more-dataservers yes
 
-DEFINE INPUT        PARAMETER phCaller        AS HANDLE     NO-UNDO.
 DEFINE INPUT        PARAMETER pcLDbNameSchema AS CHARACTER  NO-UNDO.
 DEFINE INPUT-OUTPUT PARAMETER piDataserverNr  AS INTEGER    NO-UNDO.
 DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttDataserver.
@@ -26,19 +25,20 @@ DEFINE VARIABLE cPhysNameDS           AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cDatabaseType         AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cStatus               AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cAddParams            AS CHARACTER  NO-UNDO.
-DEFINE VARIABLE cTitle                AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cDontShow             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE lDontShowSchemaHr     AS LOGICAL    NO-UNDO.
 DEFINE VARIABLE iStartTime            AS INTEGER    NO-UNDO.
 DEFINE VARIABLE hWindow               AS HANDLE     NO-UNDO.
 
+DEFINE BUFFER bDb FOR dictdb._db.
+
 #GetDataserverInfo:
-FOR EACH dictdb._db 
-  WHERE dictdb._db._db-slave = YES NO-LOCK 
-     BY dictdb._db._db-name:
+FOR EACH bDb 
+  WHERE bDb._db-slave = YES NO-LOCK 
+     BY bDb._db-name:
 
   /* Avoid error: "Could not create buffer object for table TPROGRESS._Db. (7334)" */
-  FIND FIRST ttDataserver WHERE ttDataserver.cLDbNameDataserver = dictdb._db._db-name NO-ERROR.
+  FIND FIRST ttDataserver WHERE ttDataserver.cLDbNameDataserver = bDb._db-name NO-ERROR.
   
   IF AVAILABLE ttDataserver
     AND NOT ttDataserver.lConnected
@@ -51,10 +51,10 @@ FOR EACH dictdb._db
     iDataserverCount  = iDataserverCount + 1
     cUserName         = ""
     cPassword         = ""
-    cLogNameDS        = dictdb._db._db-name
-    cPhysNameDS       = dictdb._db._db-addr
-    cDatabaseType     = dictdb._db._db-type
-    cDbComm           = dictdb._db._db-comm
+    cLogNameDS        = bDb._db-name
+    cPhysNameDS       = bDb._db-addr
+    cDatabaseType     = bDb._db-type
+    cDbComm           = bDb._db-comm
     lDontShowSchemaHr = NO.
 
   RUN removeWhiteSpace(INPUT-OUTPUT cDbComm).
@@ -115,7 +115,7 @@ FOR EACH dictdb._db
       ttDataserver.lDontShowSchemaHr  = lDontShowSchemaHr
       .
   END. /* IF NOT AVAILABLE ttDataserver */
-END. /* FOR EACH dictdb._db  */
+END. /* FOR EACH bDb  */
 
 &if "{&support-more-dataservers}" <> "yes" &then
   IF iDataserverCount > 1 THEN
@@ -145,11 +145,6 @@ FOR EACH ttDataserver BY ttDataserver.iServerNr:
   IF NOT CONNECTED(ttDataserver.cLDbNameDataserver) THEN
   DO:
     ASSIGN
-      cTitle  = (IF iDataserverCount > 1 THEN
-                   SUBSTITUTE("&1 of &2: ", ttDataserver.iServerNr, iDataserverCount)
-                 ELSE
-                   "") +
-                "DataDigger"
       cStatus = SUBSTITUTE(  "Connecting &1 (&2) ..."
                            , ttDataserver.cLDbNameDataserver
                            , ttDataserver.cDbType
@@ -159,7 +154,7 @@ FOR EACH ttDataserver BY ttDataserver.iServerNr:
     
     /* Enforce small delay */
     iStartTime = ETIME.
-    REPEAT WHILE ETIME < iStartTime + 1000. END.
+    REPEAT WHILE ETIME < iStartTime + 1000. /* small delay */ END.
 
     CONNECT VALUE(ttDataserver.cConnectString) NO-ERROR.
 

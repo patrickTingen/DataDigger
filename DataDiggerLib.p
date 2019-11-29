@@ -3867,8 +3867,7 @@ FUNCTION getDatabaseList RETURNS CHARACTER:
     
     CREATE ALIAS dictdb FOR DATABASE VALUE(cLogicalDbName).
     RUN getDataserver.p
-      ( INPUT              THIS-PROCEDURE
-      , INPUT              cLogicalDbName
+      ( INPUT              cLogicalDbName
       , INPUT-OUTPUT       giDataserverNr
       , INPUT-OUTPUT TABLE bDataserver
       ).
