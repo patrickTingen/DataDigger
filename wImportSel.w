@@ -252,7 +252,7 @@ DO:
 
   DO iFile = 1 TO SELF:NUM-DROPPED-FILES:
 
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN addFile(SELF:GET-DROPPED-FILE(iFile),OUTPUT lAdded).
 
   END.
@@ -319,7 +319,7 @@ DO:
 
   IF lOKpressed THEN
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN addFile(cDataFile,OUTPUT lAdded).
   END.
 

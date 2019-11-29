@@ -198,15 +198,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
-fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
-btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite ~
-btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
-btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
+btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
+fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
+btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
+btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
+btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
+btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete ~
+btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -978,8 +978,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -990,14 +990,14 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -2167,7 +2167,7 @@ DO:
   PUBLISH "setUsage" ("useIndexAsWhere"). /* user behaviour */
 
   /* Select the row we clicked on */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN selectClickedRow(brIndexes:HANDLE, OUTPUT cColumnClicked).
 
   /* Create a query expression from all the fields in the index */
@@ -2211,7 +2211,7 @@ DO:
   PUBLISH "setUsage" ("use-index"). /* user behaviour */
 
   /* Select the row we clicked on */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN selectClickedRow(brIndexes:HANDLE, OUTPUT cColumn).
 
   hIndexName = brIndexes:query:get-buffer-handle(1):buffer-field('cIndexName'):handle.
@@ -4634,7 +4634,7 @@ PROCEDURE btnConnectionsChoose :
 
   cDatabasesOld = getDatabaseList().
 
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
 
   /* Rebuild context menu for table browse */
@@ -4922,7 +4922,7 @@ PROCEDURE btnEditChoose :
     RUN btnViewChoose.
   ELSE
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
 
     RUN VALUE(getProgramDir() + 'wEdit.w')
       ( INPUT glReadOnlyDigger
@@ -5183,7 +5183,7 @@ PROCEDURE btnViewChoose :
           bView.cValue = STRING(hDataBuffer:BUFFER-FIELD(bField.cFieldName):BUFFER-VALUE(bField.iExtent)).
       END.
 
-      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_ prolint-nowarn(recidkeyword)}
       IF bField.cFieldName = 'RECID' THEN bView.cValue = STRING(hDataBuffer:RECID).
 
       IF bField.cFieldName = 'ROWID' THEN bView.cValue = STRING(hDataBuffer:ROWID).
@@ -5580,7 +5580,7 @@ PROCEDURE collectIndexInfo :
 
       bIndex.cIndexName  = hBufferIndex:BUFFER-FIELD('_index-name'):BUFFER-VALUE.
 
-      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_ prolint-nowarn(recidkeyword)}
       bIndex.cIndexFlags = STRING( hBufferFile:BUFFER-FIELD('_prime-index'):BUFFER-VALUE = hBufferIndex:RECID, 'P/')
                           + STRING( hBufferIndex:BUFFER-FIELD('_unique'):BUFFER-VALUE, ' U/')
                           + STRING( hBufferIndex:BUFFER-FIELD('_WordIdx'):BUFFER-VALUE <> ?, ' W/')
@@ -6459,7 +6459,7 @@ PROCEDURE dataRowDisplay :
     cCurrentValues = ''.
     FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 0:
 
-      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_ prolint-nowarn(recidkeyword)}
       CASE bfQuerySort.cSortField:
         WHEN 'RECID' THEN cFieldValue = STRING(phBrowseBuffer:RECID).
         WHEN 'ROWID' THEN cFieldValue = STRING(phBrowseBuffer:ROWID).
@@ -6489,7 +6489,7 @@ PROCEDURE dataRowDisplay :
     IF bColumn.cFieldName = "RECID" THEN
     DO:
       bColumn.hColumn:FONT = giFixedFont.
-      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_ prolint-nowarn(recidkeyword)}
       bColumn.hColumn:SCREEN-VALUE = STRING( phBrowseBuffer:RECID, "zzzzzzzzzzz9" ).
     END.
 
@@ -6834,11 +6834,11 @@ PROCEDURE dropFieldMenu :
   DEFINE VARIABLE iRet       AS INTEGER NO-UNDO.
 
   /* See if we clicked on the browse column */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN getMouseXY(INPUT brFields:HANDLE IN FRAME frMain, OUTPUT iMouseX, OUTPUT iMouseY).
   IF iMouseY < 18 THEN
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN SendMessageA (tgSelAll:HWND, 517, 0, 0, OUTPUT iRet).
     RETURN.
   END.
@@ -6850,7 +6850,7 @@ PROCEDURE dropFieldMenu :
     PUBLISH "setUsage" ("showFieldMenu"). /* user behaviour */
 
     /* Select the row we clicked on */
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN selectClickedRow(brFields:HANDLE, OUTPUT cColumn).
 
     hFieldName = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):HANDLE.
@@ -6986,7 +6986,7 @@ PROCEDURE editFavourites :
         END.
       END.
 
-      {&_proparse_prolint-nowarn(where-cando)}
+      {&_proparse_ prolint-nowarn(where-cando)}
       IF NOT CAN-FIND(FIRST bTable WHERE CAN-DO(bTable.cFavourites, cGroup)) THEN
         RUN showHelp('FavouriteGroupEmpty','').
 
@@ -7021,10 +7021,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
+  ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite 
+         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -7672,7 +7672,7 @@ PROCEDURE flushKeyBuffer :
 /* Make sure the keyboard buffer is empty
 */
   DO WHILE LASTKEY <> -1:
-    {&_proparse_prolint-nowarn(readkeykeyword)}
+    {&_proparse_ prolint-nowarn(readkeykeyword)}
     READKEY PAUSE 0.
   END.
 
@@ -8870,7 +8870,7 @@ PROCEDURE initializeSettingsFile :
     OR getRegistry("DataDigger:Backup", "BackupDir") = '' THEN setRegistry("DataDigger:Backup", "BackupDir", "<WORKDIR>\Backup\").
 
   /* If backup is on, create a folder for it */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN checkBackupFolder(OUTPUT lOk).
 
   /* Update check, set to check on STABLE */
@@ -10637,7 +10637,7 @@ PROCEDURE reopenTableBrowse :
      * in the database (say "order" in sports) then focus on that table, even if another
      * table (say "order-line" might have been selected.
      */
-    {&_proparse_prolint-nowarn(where-cando)}
+    {&_proparse_ prolint-nowarn(where-cando)}
     FIND bTable
       WHERE bTable.cTableName  = fiTableFilter:SCREEN-VALUE
         AND bTable.lShowInList = TRUE
@@ -11022,7 +11022,7 @@ PROCEDURE selectClickedRow :
         DO:
           hBuffer = phBrowse:QUERY:GET-BUFFER-HANDLE(1).
 
-          {&_proparse_prolint-nowarn(recidkeyword)}
+          {&_proparse_ prolint-nowarn(recidkeyword)}
           CASE pcColumnName:
             WHEN 'RECID' THEN cColumnValue = STRING( hBuffer:RECID ).
             WHEN 'ROWID' THEN cColumnValue = STRING( hBuffer:ROWID ).
@@ -12121,7 +12121,7 @@ PROCEDURE showField :
 
   DO WITH FRAME {&FRAME-NAME}:
 
-    {&_proparse_prolint-nowarn(where-cando)}
+    {&_proparse_ prolint-nowarn(where-cando)}
     FOR EACH bColumn WHERE CAN-DO(pcFieldList,bColumn.cFullName)
       , EACH bField WHERE bField.cFieldName = bColumn.cFieldName:
 
@@ -12610,7 +12610,7 @@ PROCEDURE showValue :
   DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
     ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
 
-    {&_proparse_prolint-nowarn(recidkeyword)}
+    {&_proparse_ prolint-nowarn(recidkeyword)}
     CASE cColumnName:
       WHEN 'RECID' THEN cColumnValue = STRING(hDataBuffer:RECID).
       WHEN 'ROWID' THEN cColumnValue = STRING(hDataBuffer:ROWID).
@@ -13756,4 +13756,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

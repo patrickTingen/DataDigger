@@ -2029,7 +2029,7 @@ PROCEDURE getMouseXY :
 
   SET-SIZE( LP ) = 16.
 
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN GetCursorPos(INPUT GET-POINTER-VALUE(lp), OUTPUT iRet).
 
   RUN ScreenToClient ( INPUT phFrame:HWND, INPUT lp ).
@@ -2586,7 +2586,7 @@ PROCEDURE lockWindow :
   /* Now, only lock when the semaphore is increased to 1 */
   IF plLock AND ttWindowLock.iLockCounter = 1 THEN
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
                     , {&WM_SETREDRAW}
                     , 0
@@ -2598,7 +2598,7 @@ PROCEDURE lockWindow :
   /* And only unlock after the last unlock command */
   ELSE IF ttWindowLock.iLockCounter <= 0 THEN
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
                     , {&WM_SETREDRAW}
                     , 1
@@ -2606,7 +2606,7 @@ PROCEDURE lockWindow :
                     , OUTPUT iRet
                     ).
 
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN RedrawWindow( phWindow:HWND /* {&window-name}:hwnd */
                     , 0
                     , 0
@@ -3195,11 +3195,11 @@ PROCEDURE setTransparency :
   DEFINE VARIABLE stat AS INTEGER    NO-UNDO.
 
   /* Set WS_EX_LAYERED on this window  */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN SetWindowLongA(phFrame:HWND, {&GWL_EXSTYLE}, {&WS_EX_LAYERED}, OUTPUT stat).
 
   /* Make this window transparent (0 - 255) */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN SetLayeredWindowAttributes(phFrame:HWND, 0, piLevel, {&LWA_ALPHA}, OUTPUT stat).
 
 END PROCEDURE. /* setTransparency */
@@ -3395,13 +3395,13 @@ PROCEDURE showScrollbars :
   &scoped-define SB_BOTH 3
   &scoped-define SB_THUMBPOSITION 4
 
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN ShowScrollBar ( ip-Frame:HWND,
                       {&SB_HORZ},
                       IF ip-horizontal THEN -1 ELSE 0,
                       OUTPUT iv-retint ).
 
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN ShowScrollBar ( ip-Frame:HWND,
                       {&SB_VERT},
                       IF ip-vertical  THEN -1 ELSE 0,
@@ -3439,10 +3439,10 @@ PROCEDURE unlockWindow :
 
   IF ttWindowLock.iLockCounter > 0 THEN
   DO:
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
 
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
 
     DELETE ttWindowLock.
@@ -4120,7 +4120,7 @@ FUNCTION getIndexFields RETURNS CHARACTER
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hFileBuffer,hIndexBuffer,hIndexFieldBuffer,hFieldBuffer).
 
-  {&_proparse_prolint-nowarn(longstrings)}
+  {&_proparse_ prolint-nowarn(longstrings)}
   cWhere = SUBSTITUTE("FOR EACH &1._file WHERE &1._file._file-name = &2 AND _File._File-Number < 32768, ~
                           EACH &1._index       OF &1._file WHERE TRUE &3 &4,  ~
                           EACH &1._index-field OF &1._index,            ~
@@ -4174,7 +4174,7 @@ FUNCTION getKeyList RETURNS CHARACTER
   SET-SIZE(mKeyboardState) = 256.
 
   /* Get the current state of the keyboard */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN GetKeyboardState(GET-POINTER-VALUE(mKeyboardState), OUTPUT iReturnValue) NO-ERROR.
 
   /* try to suppress error: 'C' Call Stack has been compromised after calling  in  (6069) */
@@ -4791,7 +4791,7 @@ FUNCTION isFileLocked RETURNS LOGICAL
                   ).
 
   /* Release file handle */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   RUN CloseHandle (INPUT iFileHandle, OUTPUT nReturn).
 
   RETURN (iFileHandle = -1).
@@ -4882,7 +4882,7 @@ FUNCTION isValidCodePage RETURNS LOGICAL
   (pcCodepage AS CHARACTER):
   /* Returns whether pcCodePage is valid
   */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cDummy AS LONGCHAR NO-UNDO.
 
   IF pcCodePage = '' THEN RETURN TRUE.
@@ -5202,4 +5202,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

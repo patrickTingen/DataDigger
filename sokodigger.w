@@ -708,16 +708,16 @@ PROCEDURE lockWindow :
   DO:
     IF giLockCounter > 0 THEN
     DO:
-      {&_proparse_prolint-nowarn(varusage)}
+      {&_proparse_ prolint-nowarn(varusage)}
       RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
     END.
     
     ELSE
     DO:
-      {&_proparse_prolint-nowarn(varusage)}
+      {&_proparse_ prolint-nowarn(varusage)}
       RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
       
-      {&_proparse_prolint-nowarn(varusage)}
+      {&_proparse_ prolint-nowarn(varusage)}
       RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
     END.
   END.
@@ -1312,4 +1312,3 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
