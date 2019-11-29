@@ -261,7 +261,7 @@ PROCEDURE initObject :
     FRAME {&FRAME-NAME}:FONT = getFont('Default').
     edDefinition:FONT = getFont('Fixed').
 
-    edDefinition:INSERT-STRING('Create your own code').
+    edDefinition:INSERT-STRING(SUBSTITUTE('Create your own code for table &1.&2', pcDatabase, pcTable)).
     edDefinition:INSERT-STRING('~n').
     edDefinition:INSERT-STRING('~nYou can create your own code-creation program by creating a program in the DataDigger').
     edDefinition:INSERT-STRING('~nfolder that has a name that starts with "generate-" and a signature that looks like:').
@@ -290,3 +290,4 @@ END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
