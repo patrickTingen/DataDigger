@@ -362,6 +362,26 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry Procedure
+FUNCTION setRegistry RETURNS CHARACTER
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel C-Win 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER )  FORWARD.
@@ -2161,6 +2181,7 @@ DO:
   DEFINE VARIABLE cFieldList     AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER NO-UNDO.
   DEFINE VARIABLE hEditor        AS HANDLE    NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumnClicked AS CHARACTER NO-UNDO.
 
   IF NOT brIndexes:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN.
@@ -2200,6 +2221,7 @@ DO:
   DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hIndexName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cIndex     AS CHARACTER   NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumn    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lUseIndex  AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cQuery     AS CHARACTER   NO-UNDO.
@@ -4624,6 +4646,7 @@ END PROCEDURE. /* btnCloneChoose */
 PROCEDURE btnConnectionsChoose :
 /* Maintenance of database connection settings
  */
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
@@ -4876,6 +4899,7 @@ PROCEDURE btnEditChoose :
 /* Edit one or more records in a separate window
  */
   DEFINE VARIABLE lRecordsUpdated AS LOGICAL NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE rNewRecord      AS ROWID   NO-UNDO.
 
   /* If no data then go back */
@@ -5183,7 +5207,8 @@ PROCEDURE btnViewChoose :
           bView.cValue = STRING(hDataBuffer:BUFFER-FIELD(bField.cFieldName):BUFFER-VALUE(bField.iExtent)).
       END.
 
-      {&_proparse_ prolint-nowarn(recidkeyword)}
+      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_prolint-nowarn(recidkeyword)}
       IF bField.cFieldName = 'RECID' THEN bView.cValue = STRING(hDataBuffer:RECID).
 
       IF bField.cFieldName = 'ROWID' THEN bView.cValue = STRING(hDataBuffer:ROWID).
@@ -6459,7 +6484,8 @@ PROCEDURE dataRowDisplay :
     cCurrentValues = ''.
     FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 0:
 
-      {&_proparse_ prolint-nowarn(recidkeyword)}
+      {&_proparse_prolint-nowarn(recidkeyword)}
+      {&_proparse_prolint-nowarn(recidkeyword)}
       CASE bfQuerySort.cSortField:
         WHEN 'RECID' THEN cFieldValue = STRING(phBrowseBuffer:RECID).
         WHEN 'ROWID' THEN cFieldValue = STRING(phBrowseBuffer:ROWID).
@@ -6826,11 +6852,14 @@ PROCEDURE dropFieldMenu :
   DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cField     AS CHARACTER   NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumn    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iOldPos    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iLength    AS INTEGER     NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iRet       AS INTEGER NO-UNDO.
 
   /* See if we clicked on the browse column */
@@ -6850,7 +6879,7 @@ PROCEDURE dropFieldMenu :
     PUBLISH "setUsage" ("showFieldMenu"). /* user behaviour */
 
     /* Select the row we clicked on */
-    {&_proparse_ prolint-nowarn(varusage)}
+    {&_proparse_prolint-nowarn(varusage)}
     RUN selectClickedRow(brFields:HANDLE, OUTPUT cColumn).
 
     hFieldName = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):HANDLE.
@@ -8726,6 +8755,7 @@ PROCEDURE initializeSettingsFile :
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lNewIniFile  AS LOGICAL     NO-UNDO.
 
@@ -11022,7 +11052,8 @@ PROCEDURE selectClickedRow :
         DO:
           hBuffer = phBrowse:QUERY:GET-BUFFER-HANDLE(1).
 
-          {&_proparse_ prolint-nowarn(recidkeyword)}
+          {&_proparse_prolint-nowarn(recidkeyword)}
+          {&_proparse_prolint-nowarn(recidkeyword)}
           CASE pcColumnName:
             WHEN 'RECID' THEN cColumnValue = STRING( hBuffer:RECID ).
             WHEN 'ROWID' THEN cColumnValue = STRING( hBuffer:ROWID ).

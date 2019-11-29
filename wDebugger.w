@@ -442,6 +442,7 @@ PROCEDURE applyFilter :
   Desc: Refilter all messages
 ------------------------------------------------------------------------------*/
 
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iReturnCode AS INTEGER    NO-UNDO.
 
   /* Avoid flashing */
@@ -470,7 +471,7 @@ PROCEDURE applyFilter :
   END.
 
   /* Unlock window */
-  {&_proparse_ prolint-nowarn(varusage)}
+  {&_proparse_prolint-nowarn(varusage)}
   RUN lockWindowUpdate (INPUT 0, OUTPUT iReturnCode).
 
   /* Set focus to editor */
@@ -493,6 +494,7 @@ PROCEDURE debugInfo :
   DEFINE INPUT PARAMETER piLevel    AS INTEGER   NO-UNDO.
   DEFINE INPUT PARAMETER pcMessage  AS CHARACTER NO-UNDO.
 
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iReturnCode AS INTEGER    NO-UNDO.
 
   /* Avoid flashing */

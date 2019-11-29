@@ -248,11 +248,12 @@ END.
 ON DROP-FILE-NOTIFY OF FRAME frMain
 DO:
   DEFINE VARIABLE iFile  AS INTEGER     NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE lAdded AS LOGICAL     NO-UNDO.
 
   DO iFile = 1 TO SELF:NUM-DROPPED-FILES:
 
-    {&_proparse_ prolint-nowarn(varusage)}
+    {&_proparse_prolint-nowarn(varusage)}
     RUN addFile(SELF:GET-DROPPED-FILE(iFile),OUTPUT lAdded).
 
   END.
@@ -306,6 +307,7 @@ ON CHOOSE OF btnGetFile IN FRAME frMain /* ... */
 DO:
 
   DEFINE VARIABLE lOKpressed AS LOGICAL     NO-UNDO.
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE lAdded     AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cDataFile  AS CHARACTER   NO-UNDO.
 
@@ -319,7 +321,7 @@ DO:
 
   IF lOKpressed THEN
   DO:
-    {&_proparse_ prolint-nowarn(varusage)}
+    {&_proparse_prolint-nowarn(varusage)}
     RUN addFile(cDataFile,OUTPUT lAdded).
   END.
 

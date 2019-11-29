@@ -690,6 +690,7 @@ PROCEDURE lockWindow :
   DEFINE INPUT PARAMETER phWindow AS HANDLE  NO-UNDO.
   DEFINE INPUT PARAMETER plLock   AS LOGICAL NO-UNDO.
 
+  {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iRet AS INTEGER NO-UNDO.
 
   /* Locking / unlocking windows */
@@ -708,16 +709,16 @@ PROCEDURE lockWindow :
   DO:
     IF giLockCounter > 0 THEN
     DO:
-      {&_proparse_ prolint-nowarn(varusage)}
+      {&_proparse_prolint-nowarn(varusage)}
       RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
     END.
     
     ELSE
     DO:
-      {&_proparse_ prolint-nowarn(varusage)}
+      {&_proparse_prolint-nowarn(varusage)}
       RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
       
-      {&_proparse_ prolint-nowarn(varusage)}
+      {&_proparse_prolint-nowarn(varusage)}
       RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
     END.
   END.

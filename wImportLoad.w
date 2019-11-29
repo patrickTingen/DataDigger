@@ -25,6 +25,7 @@ DEFINE OUTPUT PARAMETER polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
 DEFINE OUTPUT PARAMETER porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
+{&_proparse_prolint-nowarn(varusage)}
 DEFINE VARIABLE giNumRecords       AS INTEGER NO-UNDO.
 DEFINE VARIABLE ghXmlBuffer        AS HANDLE  NO-UNDO.
 DEFINE VARIABLE ghXmlQuery         AS HANDLE  NO-UNDO.

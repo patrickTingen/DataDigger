@@ -24,6 +24,7 @@ END PROCEDURE. /* DeleteUrlCacheEntry */
 
 /* Main 
 */
+{&_proparse_prolint-nowarn(varusage)}
 DEFINE VARIABLE iResult   AS INTEGER   NO-UNDO.
 DEFINE VARIABLE cTempFile AS CHARACTER   NO-UNDO.
 
@@ -37,7 +38,7 @@ END.
 /* Download */
 RUN DeleteURLCacheEntry (INPUT pcRemoteFile).
 
-{&_proparse_ prolint-nowarn(varusage)}
+{&_proparse_prolint-nowarn(varusage)}
 RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
 
 /* Read */
