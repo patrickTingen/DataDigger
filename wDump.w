@@ -23,7 +23,6 @@ DEFINE INPUT PARAMETER table FOR ttField.
 /* Global Variable Definitions ---                                      */
 DEFINE VARIABLE gcDB                   AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE gcTable                AS CHARACTER  NO-UNDO.
-DEFINE VARIABLE gcFileName             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE gcLastFile             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE gcFileViewCmd          AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE glNoRecordsWarning     AS LOGICAL    NO-UNDO.
@@ -1234,7 +1233,7 @@ PROCEDURE dumpData :
     WHEN "D"    THEN RUN dumpDataProgressD(pcFile, hTempTable, iNumRecs, cbCodePage).
     WHEN "HTML" THEN RUN dumpDataHtml     (pcFile, hTempTable, iNumRecs, cbCodePage).
     WHEN "TXT"  THEN RUN dumpDataTxt      (pcFile, hTempTable, iNumRecs, cbCodePage).
-    WHEN "XLSX" THEN RUN dumpDataExcel    (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "XLSX" THEN RUN dumpDataExcel    (pcFile, hTempTable).
     WHEN "XML"  THEN RUN dumpDataXml      (pcFile, hTempTable, iNumRecs).
     WHEN "P"    THEN RUN dumpData4GL      (pcFile, hTempTable, iNumRecs, cbCodePage).
     WHEN "CSV"  THEN RUN dumpDataCSV      (pcFile, hTempTable, iNumRecs, cbCodePage).
@@ -1578,8 +1577,6 @@ PROCEDURE dumpDataExcel :
 
   DEFINE INPUT PARAMETER pcXlsFile    AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER phTempTable  AS HANDLE    NO-UNDO.
-  DEFINE INPUT PARAMETER piNumRecords AS INTEGER   NO-UNDO.
-  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER NO-UNDO.
   
   DEFINE VARIABLE hBuffer     AS HANDLE           NO-UNDO.
   DEFINE VARIABLE iField      AS INTEGER          NO-UNDO.
@@ -1752,7 +1749,7 @@ PROCEDURE dumpDataExcel :
     OS-DELETE VALUE(cCsvFile) NO-ERROR.
   END FINALLY.
 
-END PROCEDURE.
+END PROCEDURE. /* dumpDataExcel */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1857,17 +1854,6 @@ PROCEDURE dumpDataHtml :
         PUT STREAM strDump UNFORMATTED
           SKIP SUBSTITUTE('<td>&1</td>', cData).
       END.
-/*       ELSE                                                               */
-/*       DO:                                                                */
-/*         cData = IF tbUseCustomizedFormats                                */
-/*                   THEN TRIM(STRING(hField:BUFFER-VALUE,ttField.cFormat)) */
-/*                   ELSE hField:BUFFER-VALUE.                              */
-/*                                                                          */
-/*         cData = getEscapedData("HTML", cData).                           */
-/*                                                                          */
-/*         PUT STREAM strDump UNFORMATTED                                   */
-/*           SKIP SUBSTITUTE('<td>&1</td>', cData).                         */
-/*       END.                                                               */
     END.
     PUT STREAM strDump UNFORMATTED '</tr>'.
 
@@ -1878,7 +1864,7 @@ PROCEDURE dumpDataHtml :
 
   DELETE OBJECT hQuery.
 
-END PROCEDURE. /* DumpDataExcel */
+END PROCEDURE. /* DumpDataHtml */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
