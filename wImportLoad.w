@@ -25,7 +25,6 @@ DEFINE OUTPUT PARAMETER polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
 DEFINE OUTPUT PARAMETER porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
-DEFINE VARIABLE giCurrentRecord    AS INTEGER NO-UNDO.
 DEFINE VARIABLE giNumRecords       AS INTEGER NO-UNDO.
 DEFINE VARIABLE ghXmlBuffer        AS HANDLE  NO-UNDO.
 DEFINE VARIABLE ghXmlQuery         AS HANDLE  NO-UNDO.
