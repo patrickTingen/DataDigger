@@ -2,7 +2,7 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME frCalendarDays
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS frCalendarDays 
 /*------------------------------------------------------------------------
 
   Name: DatePicker.w
@@ -25,7 +25,6 @@ DEFINE VARIABLE gtCalendarDate  AS DATE             NO-UNDO .
 DEFINE VARIABLE ghDayField      AS HANDLE EXTENT 42 NO-UNDO.
 DEFINE VARIABLE ghDayName       AS HANDLE EXTENT 7  NO-UNDO.
 DEFINE VARIABLE ghWeekNum       AS HANDLE EXTENT 6  NO-UNDO.
-DEFINE VARIABLE gcDayNames      AS CHARACTER        NO-UNDO.
 DEFINE VARIABLE gcMonthNames    AS CHARACTER        NO-UNDO.
 DEFINE VARIABLE ghPrevDay       AS HANDLE           NO-UNDO.
 
@@ -40,7 +39,7 @@ END PROCEDURE. /* LockWindowUpdate */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -52,9 +51,9 @@ END PROCEDURE. /* LockWindowUpdate */
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnNextMonth reBorderIn reBorderOut ~
-reSelectedDay btnHome btnNextYear btnPrevMonth btnPrevYear
+reSelectedDay btnNextYear btnHome btnPrevMonth btnPrevYear 
 &Scoped-Define DISPLAYED-OBJECTS fiMonth fiDayName-1 fiDayName-2 ~
-fiDayName-3 fiDayName-4 fiDayName-5 fiDayName-6 fiDayName-7
+fiDayName-3 fiDayName-4 fiDayName-5 fiDayName-6 fiDayName-7 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -65,21 +64,21 @@ fiDayName-3 fiDayName-4 fiDayName-5 fiDayName-6 fiDayName-7
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getIsoWeekday frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getIsoWeekday frCalendarDays 
 FUNCTION getIsoWeekday RETURNS INTEGER
   ( ptDate AS DATE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMonthName frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMonthName frCalendarDays 
 FUNCTION getMonthName RETURNS CHARACTER
   ( INPUT ptDate AS DATE)  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWeekNum frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getWeekNum frCalendarDays 
 FUNCTION getWeekNum RETURNS INTEGER
   (ptDate AS DATE) FORWARD.
 
@@ -92,107 +91,107 @@ FUNCTION getWeekNum RETURNS INTEGER
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnHome
-     LABEL "Today"
+DEFINE BUTTON btnHome 
+     LABEL "Today" 
      SIZE-PIXELS 125 BY 21.
 
 DEFINE BUTTON btnNextMonth  NO-FOCUS FLAT-BUTTON
-     LABEL ">"
+     LABEL ">" 
      SIZE-PIXELS 13 BY 20.
 
 DEFINE BUTTON btnNextYear  NO-FOCUS FLAT-BUTTON
-     LABEL ">>"
+     LABEL ">>" 
      SIZE-PIXELS 20 BY 20.
 
 DEFINE BUTTON btnPrevMonth  NO-FOCUS FLAT-BUTTON
-     LABEL "<"
+     LABEL "<" 
      SIZE-PIXELS 13 BY 20.
 
 DEFINE BUTTON btnPrevYear  NO-FOCUS FLAT-BUTTON
-     LABEL "<<"
+     LABEL "<<" 
      SIZE-PIXELS 20 BY 20.
 
-DEFINE VARIABLE fiDayName-1 AS CHARACTER FORMAT "XX":U INITIAL "M"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-1 AS CHARACTER FORMAT "XX":U INITIAL "M" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 13 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-2 AS CHARACTER FORMAT "XX":U INITIAL "T"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-2 AS CHARACTER FORMAT "XX":U INITIAL "T" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-3 AS CHARACTER FORMAT "XX":U INITIAL "W"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-3 AS CHARACTER FORMAT "XX":U INITIAL "W" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-4 AS CHARACTER FORMAT "XX":U INITIAL "T"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-4 AS CHARACTER FORMAT "XX":U INITIAL "T" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-5 AS CHARACTER FORMAT "XX":U INITIAL "F"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-5 AS CHARACTER FORMAT "XX":U INITIAL "F" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-6 AS CHARACTER FORMAT "XX":U INITIAL "S"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-6 AS CHARACTER FORMAT "XX":U INITIAL "S" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiDayName-7 AS CHARACTER FORMAT "XX":U INITIAL "S"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiDayName-7 AS CHARACTER FORMAT "XX":U INITIAL "S" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 14 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiMonth AS CHARACTER FORMAT "X(256)":U INITIAL "January"
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiMonth AS CHARACTER FORMAT "X(256)":U INITIAL "January" 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 85 BY 20 NO-UNDO.
 
-DEFINE VARIABLE fiWeek-1 AS CHARACTER FORMAT "XX":U INITIAL "01"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-1 AS CHARACTER FORMAT "XX":U INITIAL "01" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiWeek-2 AS CHARACTER FORMAT "XX":U INITIAL "02"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-2 AS CHARACTER FORMAT "XX":U INITIAL "02" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiWeek-3 AS CHARACTER FORMAT "XX":U INITIAL "03"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-3 AS CHARACTER FORMAT "XX":U INITIAL "03" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiWeek-4 AS CHARACTER FORMAT "XX":U INITIAL "04"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-4 AS CHARACTER FORMAT "XX":U INITIAL "04" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiWeek-5 AS CHARACTER FORMAT "XX":U INITIAL "05"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-5 AS CHARACTER FORMAT "XX":U INITIAL "05" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
-DEFINE VARIABLE fiWeek-6 AS CHARACTER FORMAT "XX":U INITIAL "06"
-      VIEW-AS TEXT
+DEFINE VARIABLE fiWeek-6 AS CHARACTER FORMAT "XX":U INITIAL "06" 
+      VIEW-AS TEXT 
      SIZE-PIXELS 15 BY 12
      BGCOLOR 8 FGCOLOR 1  NO-UNDO.
 
 DEFINE RECTANGLE reBorderIn
-     EDGE-PIXELS 0
+     EDGE-PIXELS 0    
      SIZE-PIXELS 142 BY 120
      BGCOLOR 15 .
 
 DEFINE RECTANGLE reBorderOut
-     EDGE-PIXELS 0
+     EDGE-PIXELS 0    
      SIZE-PIXELS 172 BY 148
      BGCOLOR 8 FGCOLOR 14 .
 
 DEFINE RECTANGLE reSelectedDay
-     EDGE-PIXELS 0
+     EDGE-PIXELS 0    
      SIZE-PIXELS 20 BY 20
      BGCOLOR 1 FGCOLOR 1 .
 
@@ -201,9 +200,9 @@ DEFINE RECTANGLE reSelectedDay
 
 DEFINE FRAME frCalendarDays
      btnNextMonth AT Y 1 X 139
-     btnHome AT Y 178 X 30
-     fiMonth AT Y 0 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 2
      btnNextYear AT Y 1 X 152
+     fiMonth AT Y 0 X 35 COLON-ALIGNED NO-LABEL WIDGET-ID 2
+     btnHome AT Y 178 X 30
      btnPrevMonth AT Y 1 X 20
      btnPrevYear AT Y 1 X 0
      fiDayName-1 AT Y 29 X 13 COLON-ALIGNED NO-LABEL WIDGET-ID 34
@@ -222,8 +221,8 @@ DEFINE FRAME frCalendarDays
      reBorderIn AT Y 45 X 18 WIDGET-ID 28
      reBorderOut AT Y 25 X 0 WIDGET-ID 30
      reSelectedDay AT Y 100 X 105 WIDGET-ID 32
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 186 BY 233
          TITLE "Calendar".
 
@@ -245,84 +244,84 @@ DEFINE FRAME frCalendarDays
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX frCalendarDays
    FRAME-NAME                                                           */
-ASSIGN
+ASSIGN 
        FRAME frCalendarDays:SCROLLABLE       = FALSE
        FRAME frCalendarDays:HIDDEN           = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-1 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-1:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-2 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-2:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-3 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-3:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-4 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-4:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-5 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-5:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-6 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-6:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiDayName-7 IN FRAME frCalendarDays
    NO-ENABLE                                                            */
-ASSIGN
+ASSIGN 
        fiDayName-7:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiMonth IN FRAME frCalendarDays
    NO-ENABLE                                                            */
 /* SETTINGS FOR FILL-IN fiWeek-1 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-1:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiWeek-2 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-2:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiWeek-3 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-3:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiWeek-4 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-4:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiWeek-5 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-5:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
 /* SETTINGS FOR FILL-IN fiWeek-6 IN FRAME frCalendarDays
    NO-DISPLAY NO-ENABLE ALIGN-L                                         */
-ASSIGN
+ASSIGN 
        fiWeek-6:READ-ONLY IN FRAME frCalendarDays        = TRUE.
 
-ASSIGN
+ASSIGN 
        reSelectedDay:HIDDEN IN FRAME frCalendarDays           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -463,7 +462,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK frCalendarDays 
 
 
 /* ***************************  Main Block  *************************** */
@@ -499,9 +498,9 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEndChoose frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEndChoose frCalendarDays 
 PROCEDURE btnEndChoose :
-  /* Jump to end of month
+/* Jump to end of month
   */
   DEFINE VARIABLE dtNewDate AS DATE NO-UNDO.
 
@@ -526,9 +525,9 @@ END PROCEDURE. /* btnEndChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnHomeChoose frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnHomeChoose frCalendarDays 
 PROCEDURE btnHomeChoose :
-  /* Jump to either today or first of month
+/* Jump to either today or first of month
   */
   IF DAY(gtCalendarDate) = 1 THEN
     RUN setDate (TODAY).
@@ -540,9 +539,9 @@ END PROCEDURE. /* btnHomeChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOkChoose frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnOkChoose frCalendarDays 
 PROCEDURE btnOkChoose :
-  /* Pass back date to calling program
+/* Pass back date to calling program
   */
   pdCalendarDate = gtCalendarDate.
   APPLY 'GO' TO FRAME {&FRAME-NAME}.
@@ -552,9 +551,9 @@ END PROCEDURE. /* btnOkChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE changeMonth frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE changeMonth frCalendarDays 
 PROCEDURE changeMonth :
-  /* Change year of the current calendar date
+/* Change year of the current calendar date
   */
   DEFINE INPUT PARAMETER ptBaseDate  AS DATE    NO-UNDO.
   DEFINE INPUT PARAMETER piDeltaDays AS INTEGER NO-UNDO.
@@ -578,9 +577,9 @@ END PROCEDURE. /* changeMonth */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE changeYear frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE changeYear frCalendarDays 
 PROCEDURE changeYear :
-  /* Change year of the current calendar date
+/* Change year of the current calendar date
   */
   DEFINE INPUT PARAMETER ptBaseDate   AS DATE    NO-UNDO.
   DEFINE INPUT PARAMETER piChangeYear AS INTEGER NO-UNDO.
@@ -612,7 +611,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -623,9 +622,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE drawCalendar frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE drawCalendar frCalendarDays 
 PROCEDURE drawCalendar :
-  /* Build the screen for a specific month.
+/* Build the screen for a specific month.
   */
   DEFINE INPUT PARAMETER ptNewDate AS DATE NO-UNDO.
 
@@ -730,14 +729,14 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiMonth fiDayName-1 fiDayName-2 fiDayName-3 fiDayName-4 fiDayName-5
-          fiDayName-6 fiDayName-7
+  DISPLAY fiMonth fiDayName-1 fiDayName-2 fiDayName-3 fiDayName-4 fiDayName-5 
+          fiDayName-6 fiDayName-7 
       WITH FRAME frCalendarDays.
-  ENABLE btnNextMonth reBorderIn reBorderOut reSelectedDay btnHome btnNextYear
-         btnPrevMonth btnPrevYear
+  ENABLE btnNextMonth reBorderIn reBorderOut reSelectedDay btnNextYear btnHome 
+         btnPrevMonth btnPrevYear 
       WITH FRAME frCalendarDays.
   VIEW FRAME frCalendarDays.
   {&OPEN-BROWSERS-IN-QUERY-frCalendarDays}
@@ -746,9 +745,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject frCalendarDays 
 PROCEDURE initializeObject :
-  /* Set up global vars and create widgets
+/* Set up global vars and create widgets
   */
   DEFINE VARIABLE hWidget   AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iButtonNr AS INTEGER NO-UNDO.
@@ -757,7 +756,6 @@ PROCEDURE initializeObject :
   DEFINE VARIABLE tTempDate AS DATE    NO-UNDO.
 
   ASSIGN
-    gcDayNames   = 'Sunday,Monday,Tueday,Wednesday,Thursday,Friday,Saturday'
     gcMonthNames = 'January,February,March,April,May,June,July,August,September,October,November,December'
     .
 
@@ -856,9 +854,9 @@ END PROCEDURE. /* initializeObject */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectDate frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectDate frCalendarDays 
 PROCEDURE selectDate :
-  /* Give back the selected date to the calling program
+/* Give back the selected date to the calling program
   */
   DEFINE INPUT PARAMETER ptDate AS DATE NO-UNDO.
 
@@ -870,9 +868,9 @@ END PROCEDURE. /* selectDate */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDate frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDate frCalendarDays 
 PROCEDURE setDate :
-  /* Point the calendar to a specific date. If needed, redraw screen
+/* Point the calendar to a specific date. If needed, redraw screen
   */
   DEFINE INPUT PARAMETER ptNewDate AS DATE NO-UNDO.
 
@@ -919,7 +917,7 @@ END PROCEDURE. /* setDate */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getIsoWeekday frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getIsoWeekday frCalendarDays 
 FUNCTION getIsoWeekday RETURNS INTEGER
   ( ptDate AS DATE ) :
   /* Return the weekday number as of the ISO 8601 standard
@@ -933,7 +931,7 @@ END FUNCTION. /* getIsoWeekday */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMonthName frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMonthName frCalendarDays 
 FUNCTION getMonthName RETURNS CHARACTER
   ( INPUT ptDate AS DATE) :
   /* Get name of month
@@ -945,7 +943,7 @@ END FUNCTION. /* getMonthName */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWeekNum frCalendarDays
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getWeekNum frCalendarDays 
 FUNCTION getWeekNum RETURNS INTEGER
   (ptDate AS DATE):
   /* Returns the ISO 8601 week number
@@ -975,3 +973,4 @@ END FUNCTION. /* getWeekNum */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
