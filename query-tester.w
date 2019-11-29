@@ -29,7 +29,6 @@ DEFINE TEMP-TABLE ttBuffer NO-UNDO
 &SCOPED-DEFINE CleanUp DELETE OBJECT hQry NO-ERROR. ~~n~
                        RUN clean-temp-table IN THIS-PROCEDURE.
 
-DEFINE VARIABLE lShowError     AS LOGICAL INITIAL TRUE NO-UNDO.
 DEFINE VARIABLE lErrorDetected AS LOGICAL NO-UNDO.
 DEFINE VARIABLE h-browser      AS HANDLE  NO-UNDO.
 DEFINE VARIABLE h-ProgName     AS HANDLE  NO-UNDO.
@@ -568,13 +567,11 @@ PROCEDURE processQuery :
   DO WITH FRAME {&FRAME-NAME}:
 
     ASSIGN
-      lShowError = FALSE
       lcOldString = ed-qry:SCREEN-VALUE
       ed-qry:SCREEN-VALUE = REPLACE(SUBSTRING(ipcQueryString,INDEX(ipcQueryString,"FOR EACH":U)),",",",~n").
 
     RUN test-query IN THIS-PROCEDURE (INPUT FALSE,
                                       OUTPUT lErrorDetected).
-    ASSIGN lShowError = TRUE.
 
     IF NOT lErrorDetected THEN
     DO:
@@ -1038,3 +1035,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
