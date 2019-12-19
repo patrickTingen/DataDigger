@@ -50,6 +50,7 @@ DataDigger version 25
 - New   : Generate dump/load: set delimiter (Dirk Vreken)
 - New   : Set main BGCOLOR to x via -param "color=x" or "color=r,g,b" (Dirk Vreken)
 - New   : Extra levels for the easter egg
+- New   : Option to generate bulk delete routine
 
 =====================================================================================
 

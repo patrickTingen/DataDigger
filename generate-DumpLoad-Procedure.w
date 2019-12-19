@@ -21,7 +21,7 @@ CREATE WIDGET-POOL.
   DEFINE INPUT PARAMETER TABLE FOR ttIndex.
 &ELSE
   DEFINE VARIABLE pcDatabase AS CHARACTER   NO-UNDO INITIAL 'sports'.
-  DEFINE VARIABLE pcTable    AS CHARACTER   NO-UNDO INITIAL 'sales-rep'.
+  DEFINE VARIABLE pcTable    AS CHARACTER   NO-UNDO INITIAL 'customer'.
   
   DEFINE VARIABLE hLib AS HANDLE NO-UNDO.
   RUN datadiggerlib.p PERSISTENT SET hLib.
@@ -160,12 +160,12 @@ DEFINE FRAME frMain
      btnSave AT Y 317 X 15 WIDGET-ID 36
      "Delimiter:" VIEW-AS TEXT
           SIZE-PIXELS 55 BY 20 AT Y 71 X 25 WIDGET-ID 90
-     "Load" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 238 X 25 WIDGET-ID 74
-     "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
      "Indent:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
+     "Dump" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
+     "Load" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 238 X 25 WIDGET-ID 74
      RECT-2 AT Y 245 X 15 WIDGET-ID 24
      RECT-5 AT Y 192 X 15 WIDGET-ID 58
      RECT-6 AT Y 5 X 15 WIDGET-ID 82
@@ -448,7 +448,7 @@ DEFINE VARIABLE cText   AS LONGCHAR  NO-UNDO.
             + SUBSTITUTE('    Description : &1 program for &2.&3 ~n', rsDumpLoad, pcDatabase, pcTable )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('    History: ~n' )
-            + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
+            + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('  ----------------------------------------------------------------------   ~n' )
             + SUBSTITUTE('            This file was generated with the DataDigger                    ~n' )
@@ -658,4 +658,3 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

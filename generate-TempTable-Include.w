@@ -571,7 +571,7 @@ PROCEDURE generateCode :
             + SUBSTITUTE('    Description : TT definition for &1.&2 ~n', pcDatabase, pcTable )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('    History: ~n' )
-            + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99/99/9999'), getUserName() )
+            + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
             + SUBSTITUTE(' ~n' )
             + SUBSTITUTE('  ---------------------------------------------------------------------- ~n' )
             + SUBSTITUTE('            This file was generated with the DataDigger                  ~n' )
@@ -1015,4 +1015,3 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
