@@ -2513,6 +2513,9 @@ DO:
     ELSE
       RUN showFavouriteIcon(CAN-DO(hBuffer::cFavourites,cbFavouriteGroup:SCREEN-VALUE)).
 
+    /* Set dictdb alias always to currently selected table */
+    CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).  
+
     PUBLISH "debugInfo" (2,SUBSTITUTE("Select table &1.&2", gcCurrentDatabase, gcCurrentTable)).
   END.
   ELSE
