@@ -727,6 +727,20 @@ PROCEDURE btnDumpChoose :
       RETURN.
     END.
 
+    /* For Excel, we need a 12-something codepage */
+    IF cbDumpType:SCREEN-VALUE = "XLSX" THEN 
+    DO:
+      IF cbCodePage:SCREEN-VALUE = ? AND SESSION:CPSTREAM BEGINS '12' THEN 
+        cbCodePage:SCREEN-VALUE = SESSION:CPSTREAM.
+
+      IF NOT cbCodePage:SCREEN-VALUE BEGINS '12' THEN 
+      DO:
+        MESSAGE 'For Excel, use a Windows codepage like 1250,1251,1252 etc' SKIP
+                'Your current CPSTREAM codepage is' SESSION:CPSTREAM VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+        RETURN.
+      END.
+    END.
+
     RUN checkDir(INPUT ficFileName:SCREEN-VALUE, OUTPUT cError).
     IF cError <> '' THEN
     DO:
@@ -735,11 +749,12 @@ PROCEDURE btnDumpChoose :
     END.
 
     RUN dumpData
-      ( INPUT pihBrowse                       /*   input  pihDdBrowse         as handle    */
-      , INPUT cbDumpType:SCREEN-VALUE         /*   input  picFormat           as character */
-      , INPUT cbiRecordSelection:SCREEN-VALUE /*   input  piiRecordSelection  as integer   */
-      , INPUT cbiFieldSelection:SCREEN-VALUE  /*   input  piiRecordSelection  as integer   */
-      , INPUT ficFileName:SCREEN-VALUE        /*   input  picFile             as character */
+      ( INPUT pihBrowse                       /* phDdBrowse        */
+      , INPUT cbDumpType:SCREEN-VALUE         /* pcFormat          */
+      , INPUT cbiRecordSelection:SCREEN-VALUE /* piRecordSelection */
+      , INPUT cbiFieldSelection:SCREEN-VALUE  /* piRecordSelection */
+      , INPUT ficFileName:SCREEN-VALUE        /* pcFile            */
+      , INPUT cbCodePage:SCREEN-VALUE         /* pcCodePage        */
       ).
 
     cAction = getRegistry('DumpAndLoad','DumpReadyAction').
@@ -1077,6 +1092,7 @@ PROCEDURE dumpData :
   DEFINE INPUT PARAMETER piRecordSelection  AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER piFieldSelection   AS INTEGER     NO-UNDO.
   DEFINE INPUT PARAMETER pcFile             AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcCodePage         AS CHARACTER   NO-UNDO.
 
   DEFINE VARIABLE iNumRecs        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iCurField       AS INTEGER     NO-UNDO.
@@ -1230,13 +1246,13 @@ PROCEDURE dumpData :
   SESSION:DATE-FORMAT    = cbDateFormat.
 
   CASE pcFormat:
-    WHEN "D"    THEN RUN dumpDataProgressD(pcFile, hTempTable, iNumRecs, cbCodePage).
-    WHEN "HTML" THEN RUN dumpDataHtml     (pcFile, hTempTable, iNumRecs, cbCodePage).
-    WHEN "TXT"  THEN RUN dumpDataTxt      (pcFile, hTempTable, iNumRecs, cbCodePage).
-    WHEN "XLSX" THEN RUN dumpDataExcel    (pcFile, hTempTable).
+    WHEN "D"    THEN RUN dumpDataProgressD(pcFile, hTempTable, iNumRecs, pcCodePage).
+    WHEN "HTML" THEN RUN dumpDataHtml     (pcFile, hTempTable, iNumRecs, pcCodePage).
+    WHEN "TXT"  THEN RUN dumpDataTxt      (pcFile, hTempTable, iNumRecs, pcCodePage).
+    WHEN "XLSX" THEN RUN dumpDataExcel    (pcFile, hTempTable, pcCodePage).
     WHEN "XML"  THEN RUN dumpDataXml      (pcFile, hTempTable, iNumRecs).
-    WHEN "P"    THEN RUN dumpData4GL      (pcFile, hTempTable, iNumRecs, cbCodePage).
-    WHEN "CSV"  THEN RUN dumpDataCSV      (pcFile, hTempTable, iNumRecs, cbCodePage).
+    WHEN "P"    THEN RUN dumpData4GL      (pcFile, hTempTable, iNumRecs, pcCodePage).
+    WHEN "CSV"  THEN RUN dumpDataCSV      (pcFile, hTempTable, iNumRecs, pcCodePage).
   END CASE. /* case pcFormat: */
 
   SESSION:NUMERIC-FORMAT = gcSessionNumericFormat.
@@ -1577,6 +1593,7 @@ PROCEDURE dumpDataExcel :
 
   DEFINE INPUT PARAMETER pcXlsFile    AS CHARACTER NO-UNDO.
   DEFINE INPUT PARAMETER phTempTable  AS HANDLE    NO-UNDO.
+  DEFINE INPUT PARAMETER pcCodePage   AS CHARACTER   NO-UNDO.
   
   DEFINE VARIABLE hBuffer     AS HANDLE           NO-UNDO.
   DEFINE VARIABLE iField      AS INTEGER          NO-UNDO.
@@ -1671,7 +1688,7 @@ PROCEDURE dumpDataExcel :
     chQuery:AdjustColumnWidth            = TRUE
     chQuery:RefreshPeriod                = 0
     chQuery:TextFilePromptOnRefresh      = FALSE
-    chQuery:TextFilePlatform             = 850
+    chQuery:TextFilePlatform             = pcCodePage
     chQuery:TextFileStartRow             = 1
     chQuery:TextFileParseType            = 1 /* xlDelimited */
     chQuery:TextFileTextQualifier        = -4142 /* xlTextQualifierNone */
