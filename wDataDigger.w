@@ -200,13 +200,13 @@ END PROCEDURE. /* URLDownloadToFileA */
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
 fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables brFields btnTableFilter ~
-brIndexes tgDebugMode btnFavourite btnAddFavGroup fiTableDesc btnWhere ~
-cbFavouriteGroup ficWhere btnQueries btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
-btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+fiFieldsFilter btnClearIndexFilter brTables btnTableFilter brFields ~
+brIndexes tgDebugMode btnFavourite fiTableDesc btnAddFavGroup ~
+cbFavouriteGroup btnWhere ficWhere btnQueries btnView btnTools btnTabTables ~
+btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown ~
+btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone ~
+btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -987,20 +987,20 @@ DEFINE FRAME frMain
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL WIDGET-ID 166
      btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
      brTables AT Y 27 X 56 WIDGET-ID 300
-     brFields AT Y 27 X 325 WIDGET-ID 100
      btnTableFilter AT Y 3 X 257 WIDGET-ID 38
+     brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
      ficWhere AT Y 266 X 80 NO-LABEL
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnTabTables AT Y 45 X 34 WIDGET-ID 300
      btnClear AT Y 265 X 725 WIDGET-ID 30
      btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
@@ -1034,17 +1034,46 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1082,46 +1111,17 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1196,8 +1196,8 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables btnClearIndexFilter frMain */
-/* BROWSE-TAB brFields brTables frMain */
-/* BROWSE-TAB brIndexes btnTableFilter frMain */
+/* BROWSE-TAB brFields btnTableFilter frMain */
+/* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -2161,7 +2161,7 @@ DO:
   DEFINE VARIABLE cFieldList     AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER NO-UNDO.
   DEFINE VARIABLE hEditor        AS HANDLE    NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumnClicked AS CHARACTER NO-UNDO.
 
   IF NOT brIndexes:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN.
@@ -2201,7 +2201,7 @@ DO:
   DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hIndexName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cIndex     AS CHARACTER   NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumn    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE lUseIndex  AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cQuery     AS CHARACTER   NO-UNDO.
@@ -4629,7 +4629,7 @@ END PROCEDURE. /* btnCloneChoose */
 PROCEDURE btnConnectionsChoose :
 /* Maintenance of database connection settings
  */
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
@@ -4882,7 +4882,7 @@ PROCEDURE btnEditChoose :
 /* Edit one or more records in a separate window
  */
   DEFINE VARIABLE lRecordsUpdated AS LOGICAL NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE rNewRecord      AS ROWID   NO-UNDO.
 
   /* If no data then go back */
@@ -5190,9 +5190,11 @@ PROCEDURE btnViewChoose :
           bView.cValue = STRING(hDataBuffer:BUFFER-FIELD(bField.cFieldName):BUFFER-VALUE(bField.iExtent)).
       END.
 
-      {&_proparse_prolint-nowarn(recidkeyword)}
-      {&_proparse_prolint-nowarn(recidkeyword)}
-      IF bField.cFieldName = 'RECID' THEN bView.cValue = STRING(hDataBuffer:RECID).
+      IF bField.cFieldName = 'RECID' THEN 
+      DO:
+        {&_proparse_ prolint-nowarn(recidkeyword)}
+        bView.cValue = STRING(hDataBuffer:RECID).
+      END.
 
       IF bField.cFieldName = 'ROWID' THEN bView.cValue = STRING(hDataBuffer:ROWID).
 
@@ -6467,10 +6469,8 @@ PROCEDURE dataRowDisplay :
     cCurrentValues = ''.
     FOR EACH bfQuerySort WHERE bfQuerySort.iGroup = 0:
 
-      {&_proparse_prolint-nowarn(recidkeyword)}
-      {&_proparse_prolint-nowarn(recidkeyword)}
       CASE bfQuerySort.cSortField:
-        WHEN 'RECID' THEN cFieldValue = STRING(phBrowseBuffer:RECID).
+        WHEN 'RECID' THEN {&_proparse_ prolint-nowarn(recidkeyword)} cFieldValue = STRING(phBrowseBuffer:RECID).
         WHEN 'ROWID' THEN cFieldValue = STRING(phBrowseBuffer:ROWID).
         OTHERWISE cFieldValue = phBrowseBuffer:BUFFER-FIELD(ENTRY(1,bfQuerySort.cSortField,'[')):STRING-VALUE(bfQuerySort.iExt).
       END CASE.
@@ -6835,14 +6835,14 @@ PROCEDURE dropFieldMenu :
   DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cField     AS CHARACTER   NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumn    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iOldPos    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iLength    AS INTEGER     NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE iMouseX    AS INTEGER NO-UNDO.
   DEFINE VARIABLE iMouseY    AS INTEGER NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE iRet       AS INTEGER NO-UNDO.
 
   /* See if we clicked on the browse column */
@@ -6862,7 +6862,7 @@ PROCEDURE dropFieldMenu :
     PUBLISH "setUsage" ("showFieldMenu"). /* user behaviour */
 
     /* Select the row we clicked on */
-    {&_proparse_prolint-nowarn(varusage)}
+    {&_proparse_ prolint-nowarn(varusage)}
     RUN selectClickedRow(brFields:HANDLE, OUTPUT cColumn).
 
     hFieldName = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):HANDLE.
@@ -7035,13 +7035,13 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
-         btnClearIndexFilter brTables brFields btnTableFilter brIndexes 
-         tgDebugMode btnFavourite btnAddFavGroup fiTableDesc btnWhere 
-         cbFavouriteGroup ficWhere btnQueries btnView btnTools btnTabTables 
-         btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
-         btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
-         btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
-         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+         btnClearIndexFilter brTables btnTableFilter brFields brIndexes 
+         tgDebugMode btnFavourite fiTableDesc btnAddFavGroup cbFavouriteGroup 
+         btnWhere ficWhere btnQueries btnView btnTools btnTabTables btnClear 
+         btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
+         btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
+         btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
+         btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -8693,7 +8693,7 @@ PROCEDURE initializeSettingsFile :
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iColumn      AS INTEGER     NO-UNDO.
   DEFINE VARIABLE hColumn      AS HANDLE      NO-UNDO.
-  {&_proparse_prolint-nowarn(varusage)}
+  {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lNewIniFile  AS LOGICAL     NO-UNDO.
 
@@ -10990,10 +10990,8 @@ PROCEDURE selectClickedRow :
         DO:
           hBuffer = phBrowse:QUERY:GET-BUFFER-HANDLE(1).
 
-          {&_proparse_prolint-nowarn(recidkeyword)}
-          {&_proparse_prolint-nowarn(recidkeyword)}
           CASE pcColumnName:
-            WHEN 'RECID' THEN cColumnValue = STRING( hBuffer:RECID ).
+            WHEN 'RECID' THEN {&_proparse_ prolint-nowarn(recidkeyword)} cColumnValue = STRING( hBuffer:RECID ).
             WHEN 'ROWID' THEN cColumnValue = STRING( hBuffer:ROWID ).
             OTHERWISE cColumnValue = hBrowseColumn:SCREEN-VALUE.
           END CASE.
