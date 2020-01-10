@@ -201,8 +201,8 @@ END PROCEDURE. /* URLDownloadToFileA */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
 fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
 fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
-btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite ~
-btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
+btnTableFilter fiTableDesc cbFavouriteGroup btnFavourite btnAddFavGroup ~
+ficWhere btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
 btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
@@ -993,11 +993,11 @@ DEFINE FRAME frMain
      btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     ficWhere AT Y 266 X 80 NO-LABEL
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
+     ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -7036,12 +7036,12 @@ PROCEDURE enable_UI :
   ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite 
-         btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
-         btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
-         btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
-         btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
-         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+         btnTableFilter fiTableDesc cbFavouriteGroup btnFavourite 
+         btnAddFavGroup ficWhere btnWhere btnQueries btnView btnTools 
+         btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom 
+         btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites 
+         btnTabFields btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad 
+         btnDelete btnResizeVer btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -12579,8 +12579,8 @@ PROCEDURE showValue :
   DO iRecord = 1 TO ghDataBrowse:NUM-SELECTED-ROWS:
     ghDataBrowse:FETCH-SELECTED-ROW(iRecord).
 
-    {&_proparse_ prolint-nowarn(recidkeyword)}
     CASE cColumnName:
+      {&_proparse_ prolint-nowarn(recidkeyword)}
       WHEN 'RECID' THEN cColumnValue = STRING(hDataBuffer:RECID).
       WHEN 'ROWID' THEN cColumnValue = STRING(hDataBuffer:ROWID).
       OTHERWISE cColumnValue = hDataBuffer:BUFFER-FIELD(cColumnName):BUFFER-VALUE(iExtentNr).
