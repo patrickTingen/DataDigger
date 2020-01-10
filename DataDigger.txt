@@ -11,7 +11,7 @@ DataDigger version 25
 - Solved: Error when deleting record while in edit mode (Johan Geerts)
 - Solved: User defined color '?' was reset to default value after restart
 - Solved: Fixed SonarCube issues marked as 'bug' (Gilles Querret)
-- Solved: Timer frozen when computer wakes up from hibernate (Richard Kelters)
+- Solved: Timer frozen when computer wakes up from hibernate #40 (Richard Kelters)
 - Solved: Character field with format '99999' could not be updated (Damir Pem)
 - Solved: UI errors in query tester (Alan Copeland)
 - Solved: Compile error on 64bit when prowin32 is not available (Sergejus Kornejevas)
@@ -21,13 +21,14 @@ DataDigger version 25
 - Solved: Setting ? in a mandatory field will back out the update (Johan Geerts)
 - Solved: Trying to edit records in -RO mode leads to crash (Johan Geerts)
 - Solved: Items in context menu on databrowse not disabled in read-only mode
-- Solved: Changing format in field browse will reset query and column filters (kingOttmar)
+- Solved: Changing format in field browse will reset query and column filters #46 (kingOttmar)
 - Solved: Strange behaviour when DataDiggerHelp.ini is missing (Albert Flikkema)
 - Solved: Syntax error in generated code for active record class (Steven Peeters)
 - Solved: Max 65535 records were exported to Excel (Damir Pen)
 - Solved: Error in generated code for temp-tables with index definition
 - Solved: Conflict with definitions of getCursorPos in RTB (Jean-Christophe Cardot)
-- Solved: Error on table browse context menu when no db connected (Sil Boydens)
+- Solved: Syntax for resulting code not correct #47 (kingOttmar)
+- Solved: Error on table browse context menu when no db connected #49 (Sil Boydens)
 - Solved: Table browse context menu not updated after connection maintenance
 - Solved: Generate Assign statement does not show extent fields (Dirk Vreken)
 - Solved: Quick Data View does not show extent fields (Dirk Vreken)
@@ -39,8 +40,8 @@ DataDigger version 25
 - Solved: Filters of field browse were not aligned after double-click (Dirk Vreken)
 - Solved: Warnings when exporting to Excel (Dirk Vreken)
 - Solved: ADM errors when running DD during session
-- Solved: DICTDB alias not set while running DD (Dubravko Labaš)
-- Solved: Codepage errors on exporting to Excel (Dubravko Labaš)
+- Solved: DICTDB alias not set while running DD #51 (Dubravko Labaš)
+- Solved: Codepage errors on exporting to Excel #52 (Dubravko Labaš)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
