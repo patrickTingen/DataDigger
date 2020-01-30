@@ -1034,46 +1034,17 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 91 X 72 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 35
-         SIZE-PIXELS 220 BY 120
-         BGCOLOR 14  WIDGET-ID 600.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1111,17 +1082,46 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 91 X 72 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 35
+         SIZE-PIXELS 220 BY 120
+         BGCOLOR 14  WIDGET-ID 600.
+
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -4293,7 +4293,7 @@ DO:
     DEFINE VARIABLE cNewFormat     AS CHARACTER NO-UNDO.
     DEFINE VARIABLE cTable         AS CHARACTER NO-UNDO.
     DEFINE VARIABLE cField         AS CHARACTER NO-UNDO.
-    DEFINE VARIABLE lSelectAll     AS LOGICAL   NO-UNDO.
+    DEFINE VARIABLE lSelectRecord  AS LOGICAL   NO-UNDO.
     DEFINE VARIABLE cFieldDatatype AS CHARACTER NO-UNDO.
     DEFINE BUFFER bColumn FOR ttColumn.
 
@@ -4306,14 +4306,21 @@ DO:
     cOrgValue       = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFormatOrg'):BUFFER-VALUE.
     cFieldDatatype  = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cDatatype'):BUFFER-VALUE.
     glRowEditActive = NO.
-    lSelectAll = (ghDataBrowse:QUERY:NUM-RESULTS > 0 AND ghDataBrowse:NUM-SELECTED-ROWS = 0).
+    lSelectRecord   = (ghDataBrowse:QUERY:NUM-RESULTS > 0 AND ghDataBrowse:QUERY:IS-OPEN AND ghDataBrowse:NUM-SELECTED-ROWS = 0).
 
     /* Clearing the field means: "restore original format" */
     IF SELF:SCREEN-VALUE = '' THEN SELF:SCREEN-VALUE = cOrgValue.
     SELF:FGCOLOR = (IF SELF:SCREEN-VALUE <> cOrgValue THEN getColor('CustomFormat:FG') ELSE ?).
 
+    /* Check on two entries for logical value */
+    IF cFieldDatatype = 'LOGICAL' AND NUM-ENTRIES(SELF:SCREEN-VALUE,'/') <> 2 THEN 
+    DO:
+      RUN showHelp("FormatError", SELF:SCREEN-VALUE + "," + cOrgValue).
+      SELF:SCREEN-VALUE = cOrgValue.
+    END.
+
     /* Select at least one row otherwise we get errors */
-    IF lSelectAll THEN ghDataBrowse:SELECT-ROW(1).
+    IF lSelectRecord THEN ghDataBrowse:SELECT-ROW(1).
 
     #SetFormat:
     FOR EACH bColumn 
@@ -4321,7 +4328,10 @@ DO:
         AND bColumn.cTableName = cTable
         AND bColumn.cFieldName = cField:
 
-      IF VALID-HANDLE(bColumn.hColumn) THEN 
+      /* Adjust records currently in the data browse */
+      IF VALID-HANDLE(bColumn.hColumn) 
+        AND ghDataBrowse:QUERY:IS-OPEN 
+        AND ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN 
       DO:
         cNewFormat = getSafeFormat(SELF:SCREEN-VALUE, cFieldDatatype).
         bColumn.hColumn:FORMAT = cNewFormat NO-ERROR. 
@@ -4334,7 +4344,7 @@ DO:
       END.
     END. /* #SetFormat */
 
-    IF lSelectAll THEN ghDataBrowse:DESELECT-ROWS().
+    IF lSelectRecord THEN ghDataBrowse:DESELECT-ROWS().
     IF ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
     /* Save changed format. If it is blank, it will be deleted from registry */
@@ -7816,7 +7826,6 @@ PROCEDURE getFilterQuery :
 
   DEFINE VARIABLE cOperator  AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cValue     AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE lValue     AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE cValueList AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
@@ -7888,9 +7897,7 @@ PROCEDURE getFilterQuery :
         /* If the field format is different from a simple YES/NO and the user 
         ** has used one of this custom values to filter, translate it back to YES or NO
         */
-        lValue = LOGICAL(cValue) NO-ERROR.
-        IF ERROR-STATUS:GET-NUMBER(1) = 87 /* "Input value should be yes/no. (87)" */
-          AND LOOKUP(cValue, bField.cFormat,'/') > 0 THEN 
+        IF LOOKUP(cValue, bField.cFormat,'/') > 0 THEN 
           cValue = ENTRY(LOOKUP(cValue, bField.cFormat,'/'), 'TRUE,FALSE').
       END.
     END CASE. 

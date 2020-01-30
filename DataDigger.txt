@@ -42,6 +42,7 @@ DataDigger version 25
 - Solved: ADM errors when running DD during session
 - Solved: DICTDB alias not set while running DD #51 (Dubravko Labaš)
 - Solved: Codepage errors on exporting to Excel #52 (Dubravko Labaš)
+- Solved: Error when changing field format when query was not yet opened (Didier Dujardin)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
