@@ -54,6 +54,7 @@ DataDigger version 25
 - New   : Set main BGCOLOR to x via -param "color=x" or "color=r,g,b" (Dirk Vreken)
 - New   : Extra levels for the easter egg
 - New   : Option to generate bulk delete routine
+- New   : Logical fields can be filtered on non-standard format values (Hans Kaman)
 
 =====================================================================================
 

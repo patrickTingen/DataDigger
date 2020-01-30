@@ -198,15 +198,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
-fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
-fiFieldsFilter btnClearIndexFilter brTables btnTableFilter brFields ~
-brIndexes tgDebugMode btnFavourite fiTableDesc btnAddFavGroup ~
-cbFavouriteGroup btnWhere ficWhere btnQueries btnView btnTools btnTabTables ~
-btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown ~
-btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes ~
-btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone ~
-btnAdd btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
+btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
+fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
+brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
+btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
+btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
+btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
+btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete ~
+btnResizeVer btnClone btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -978,8 +978,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      fiTableFilter AT Y 3 X 56 NO-LABEL
+     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -987,17 +987,17 @@ DEFINE FRAME frMain
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL WIDGET-ID 166
      btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
      brTables AT Y 27 X 56 WIDGET-ID 300
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
+     btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
      btnTools AT Y 0 X 1 WIDGET-ID 264
@@ -1196,7 +1196,7 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables btnClearIndexFilter frMain */
-/* BROWSE-TAB brFields btnTableFilter frMain */
+/* BROWSE-TAB brFields brTables frMain */
 /* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
@@ -7033,15 +7033,15 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
+  ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
-         btnClearIndexFilter brTables btnTableFilter brFields brIndexes 
-         tgDebugMode btnFavourite fiTableDesc btnAddFavGroup cbFavouriteGroup 
-         btnWhere ficWhere btnQueries btnView btnTools btnTabTables btnClear 
-         btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
-         btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
-         btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
-         btnClone btnAdd btnEdit fiFeedback 
+         btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
+         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
+         btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
+         btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
+         btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
+         btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete 
+         btnResizeVer btnClone btnAdd btnEdit fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
@@ -7816,6 +7816,7 @@ PROCEDURE getFilterQuery :
 
   DEFINE VARIABLE cOperator  AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cValue     AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE lValue     AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE cValueList AS CHARACTER NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
@@ -7867,21 +7868,34 @@ PROCEDURE getFilterQuery :
       cOperator = REPLACE(cOperator, "!", "<>")
       .
 
-    IF bField.cDataType = "CHARACTER" THEN
-    DO:
-      /* If user wants to search with matches, then ignore
-       * this if the asterisk is at the end. In that case
-       * a BEGINS is better because it might use an index.
-       */
-      IF INDEX( RIGHT-TRIM(cValue,"*") ,"*") > 0 THEN
-        ASSIGN cOperator = "MATCHES".
-      ELSE
-        ASSIGN cValue = RIGHT-TRIM(cValue,"*").
+    CASE bField.cDataType:
+      WHEN "CHARACTER" THEN
+      DO:
+        /* If user wants to search with matches, then ignore
+         * this if the asterisk is at the end. In that case
+         * a BEGINS is better because it might use an index.
+         */
+        IF INDEX( RIGHT-TRIM(cValue,"*") ,"*") > 0 THEN
+          ASSIGN cOperator = "MATCHES".
+        ELSE
+          ASSIGN cValue = RIGHT-TRIM(cValue,"*").
+  
+        IF cOperator = "" THEN cOperator = "BEGINS".
+      END.
 
-      IF cOperator = "" THEN cOperator = "BEGINS".
-    END.
-    ELSE
-      IF cOperator = "" THEN cOperator = "=".
+      WHEN "LOGICAL" THEN
+      DO:
+        /* If the field format is different from a simple YES/NO and the user 
+        ** has used one of this custom values to filter, translate it back to YES or NO
+        */
+        lValue = LOGICAL(cValue) NO-ERROR.
+        IF ERROR-STATUS:GET-NUMBER(1) = 87 /* "Input value should be yes/no. (87)" */
+          AND LOOKUP(cValue, bField.cFormat,'/') > 0 THEN 
+          cValue = ENTRY(LOOKUP(cValue, bField.cFormat,'/'), 'TRUE,FALSE').
+      END.
+    END CASE. 
+
+    IF cOperator = "" THEN cOperator = "=".
 
     /* Overrule for RECID and ROWID */
     IF bColumn.cFullName = "RECID" THEN
@@ -10378,26 +10392,27 @@ PROCEDURE reopenFieldBrowse :
 
     #FilterField:
     FOR EACH bFilter
-      WHERE bFilter.hBrowse = brFields:handle:
+      WHERE bFilter.hBrowse = brFields:HANDLE:
 
       IF FilterModified(bFilter.hFilter:HANDLE,?) = FALSE THEN NEXT #FilterField.
 
-      IF bFilter.hColumn:DATA-TYPE = "CHARACTER" THEN
-        ASSIGN
-          cFilterValue = getMatchesValue(bFilter.hFilter)
-          cOperator    = "MATCHES".
-      ELSE
-        ASSIGN
-          cFilterValue = SUBSTITUTE("&1", bFilter.hFilter:screen-value)
-          cOperator    = "=".
+      CASE bFilter.hColumn:DATA-TYPE:
+        WHEN "CHARACTER" THEN
+          ASSIGN
+            cFilterValue = getMatchesValue(bFilter.hFilter)
+            cOperator    = "MATCHES".
+        OTHERWISE 
+          ASSIGN
+            cFilterValue = SUBSTITUTE("&1", bFilter.hFilter:SCREEN-VALUE)
+            cOperator    = "=".
+      END CASE.
 
       /* Only add to the query if it has a real value */
       IF  cFilterValue <> ""
           AND cFilterValue <> "*"
           AND cFilterValue <> ? THEN
-/*           AND cFilterValue <> bFilter.hFilter:PRIVATE-DATA THEN */
       DO:
-        cQuery = SUBSTITUTE("&1 and substitute('&6',ttField.&2) &3 &4 /* &5 */"
+        cQuery = SUBSTITUTE("&1 AND SUBSTITUTE('&6',ttField.&2) &3 &4 /* &5 */"
                            , cQuery
                            , bFilter.cFieldName
                            , cOperator
