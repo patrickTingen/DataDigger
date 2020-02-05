@@ -198,15 +198,15 @@ END PROCEDURE. /* URLDownloadToFileA */
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
-btnClearTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter ~
-fiFlagsFilter fiFieldsFilter btnClearIndexFilter brTables brFields ~
-brIndexes tgDebugMode fiTableDesc cbFavouriteGroup ficWhere btnTableFilter ~
-btnFavourite btnAddFavGroup btnWhere btnQueries btnView btnTools ~
-btnTabTables btnClear btnClearFieldFilter btnClipboard btnMoveBottom ~
-btnMoveDown btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields ~
-btnTabIndexes btnNextQuery btnPrevQuery btnDump btnLoad btnDelete ~
-btnResizeVer btnClone btnAdd btnEdit fiFeedback 
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnClearTableFilter ~
+fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter ~
+fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
+btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite ~
+btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -699,7 +699,7 @@ DEFINE BUTTON btnDataDigger-txt  NO-FOCUS FLAT-BUTTON
      SIZE-PIXELS 100 BY 30 TOOLTIP "start a new DataDigger window #(CTRL-SHIFT-N)".
 
 DEFINE BUTTON btnDict 
-     LABEL "&DD" 
+     LABEL "&Dict" 
      SIZE-PIXELS 30 BY 30 TOOLTIP "start the Data Dictionary #(CTRL-SHIFT-D)".
 
 DEFINE BUTTON btnDict-txt  NO-FOCUS FLAT-BUTTON
@@ -978,8 +978,8 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiTableFilter AT Y 3 X 56 NO-LABEL
      btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
+     fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
      tgSelAll AT Y 5 X 345 WIDGET-ID 6
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
@@ -990,13 +990,13 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325 WIDGET-ID 100
      brIndexes AT Y 28 X 829 WIDGET-ID 200
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
+     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnFavourite AT Y 236 X 269 WIDGET-ID 310
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
      btnWhere AT Y 265 X 683 WIDGET-ID 236
      btnQueries AT Y 265 X 745 WIDGET-ID 190
      btnView AT Y 520 X 200 WIDGET-ID 4
@@ -1141,7 +1141,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger"
-         HEIGHT-P           = 565
+         HEIGHT-P           = 561
          WIDTH-P            = 1278
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
@@ -2935,11 +2935,16 @@ END. /* choose of btnDelete */
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnDict
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict C-Win
-ON CHOOSE OF btnDict IN FRAME frSettings /* DD */
+ON CHOOSE OF btnDict IN FRAME frSettings /* Dict */
 OR "CHOOSE" OF btnDict-txt
 DO:
 
   RUN startTool('Dict').
+
+  /* Get list of all tables of all databases */
+  RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+  RUN filterTables.
+
 
 END.
 
@@ -7043,10 +7048,10 @@ PROCEDURE enable_UI :
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit fiTableFilter btnClearTableFilter cbDatabaseFilter 
+  ENABLE rctQuery rctEdit btnClearTableFilter fiTableFilter cbDatabaseFilter 
          tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter 
          btnClearIndexFilter brTables brFields brIndexes tgDebugMode 
-         fiTableDesc cbFavouriteGroup ficWhere btnTableFilter btnFavourite 
+         btnTableFilter fiTableDesc cbFavouriteGroup ficWhere btnFavourite 
          btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables 
          btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown 
          btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields 
@@ -11854,19 +11859,6 @@ PROCEDURE setTimerInterval :
   FOR FIRST bTimer BY bTimer.tNext:
     chCtrlFrame:pstimer:INTERVAL = MAXIMUM(1,MTIME(bTimer.tNext) - MTIME(NOW)).
   END.
-
-  /* DEBUG
-  IF CONNECTED('pkf') THEN
-  DO:
-    OUTPUT TO c:\temp\timers.txt APPEND.
-    FOR EACH bTimer:
-      DISPLAY bTimer.cProc FORMAT 'x(20)'
-              bTimer.iTime FORMAT '>>>>>>9'
-              bTimer.tNext WITH STREAM-IO.
-    END.
-    OUTPUT CLOSE.
-  END.
-  */
 
 END PROCEDURE. /* setTimerInterval */
 
