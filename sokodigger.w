@@ -282,6 +282,28 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain wSokoDigger
+ON CTRL-PAGE-DOWN OF FRAME frMain
+ANYWHERE DO:
+  IF giCurrentLevel > 1 THEN giCurrentLevel = giCurrentLevel - 1.
+  RUN startLevel.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain wSokoDigger
+ON CTRL-PAGE-UP OF FRAME frMain
+ANYWHERE DO:
+  IF giCurrentLevel < giNumLevels THEN giCurrentLevel = giCurrentLevel + 1.
+  RUN startLevel.
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain wSokoDigger
 ON CURSOR-DOWN OF FRAME frMain
 ANYWHERE
 DO:
@@ -335,7 +357,7 @@ END.
 
 &Scoped-define SELF-NAME fiFocus
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFocus wSokoDigger
-ON END-ERROR OF fiFocus IN FRAME frMain /* Dummy field to get focus */
+ON END-ERROR OF fiFocus IN FRAME frMain
 ANYWHERE 
 DO:
   APPLY 'window-close' TO {&WINDOW-NAME}.
@@ -477,8 +499,8 @@ PROCEDURE calcBlockSize :
   ASSIGN
     giMaxWidth    = (iMaxX - iMinX)
     giMaxHeight   = (iMaxY - iMinY)
-    giBlockWidth  = TRUNCATE(FRAME frMain:WIDTH-PIXELS  / giMaxWidth ,0)
-    giBlockHeight = TRUNCATE(FRAME frMain:HEIGHT-PIXELS / giMaxHeight,0)
+    giBlockWidth  = TRUNCATE(FRAME frMain:WIDTH-PIXELS  / giMaxWidth ,0) - 1
+    giBlockHeight = TRUNCATE(FRAME frMain:HEIGHT-PIXELS / giMaxHeight,0) - 1
     .
 
 END PROCEDURE. /* calcBlockSize */
@@ -556,14 +578,13 @@ PROCEDURE drawElement :
 /* Draw a single element.
   */
   DEFINE INPUT PARAMETER prBlock AS ROWID NO-UNDO.
-
   DEFINE BUFFER bBlock FOR ttBlock.
 
   FIND bBlock WHERE ROWID(bBlock) = prBlock NO-ERROR.
   IF AVAILABLE bBlock THEN 
     ASSIGN
-      bBlock.hBlock:X             = ( bBlock.iPosX - 1) * giBlockWidth + 1 
-      bBlock.hBlock:Y             = ( bBlock.iPosY - 1) * giBlockHeight + 1
+      bBlock.hBlock:X             = ( bBlock.iPosX - 1) * giBlockWidth + 5 
+      bBlock.hBlock:Y             = ( bBlock.iPosY - 1) * giBlockHeight + 5
       bBlock.hBlock:WIDTH-PIXELS  = giBlockWidth
       bBlock.hBlock:HEIGHT-PIXELS = giBlockHeight.
 
@@ -574,13 +595,12 @@ END PROCEDURE. /* drawElement */
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpData wSokoDigger 
 PROCEDURE dumpData :
-DEFINE VARIABLE cLine AS CHARACTER   NO-UNDO.
+/* Dump data for debugging 
+*/  
+  DEFINE VARIABLE cLine AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cChar AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFile AS CHARACTER   NO-UNDO.
 
-  cFile = SESSION:TEMP-DIR + 'SokoDigger.txt'.
-  OUTPUT TO VALUE(cFile).
-
+  OUTPUT TO VALUE(SESSION:TEMP-DIR + 'SokoDigger.txt').
   FOR EACH ttBlock BREAK BY ttBlock.iPosY BY ttBlock.iPosX:
 
     IF FIRST-OF(ttBlock.iPosY) THEN cLine = FILL(' ',20).
@@ -599,7 +619,19 @@ DEFINE VARIABLE cLine AS CHARACTER   NO-UNDO.
     SUBSTRING(cLine,ttBlock.iPosX,1) = cChar.
     IF LAST-OF(ttBlock.iPosY) THEN PUT UNFORMATTED cLine SKIP.
   END.
+  OUTPUT CLOSE. 
 
+  OUTPUT TO VALUE(SESSION:TEMP-DIR + 'SokoLevels.txt').
+  FOR EACH ttLevel BREAK BY ttLevel.iLevelNr:
+
+    IF FIRST-OF(ttLevel.iLevelNr) THEN 
+      PUT UNFORMATTED "Level " ttLevel.iLevelNr SKIP(1).
+
+    PUT UNFORMATTED REPLACE(ttLevel.cData,'|','~n') SKIP.
+
+    IF LAST-OF(ttLevel.iLevelNr) THEN 
+      PUT UNFORMATTED FILL('-',80) SKIP.
+  END.
   OUTPUT CLOSE. 
 
 END PROCEDURE.
@@ -673,9 +705,20 @@ END PROCEDURE. /* initObject */
 PROCEDURE levelCompleted :
 /* Level has been completed.
   */
-  MESSAGE "Congratulations, you have completed level" giCurrentLevel "in" giNumMoves " moves." VIEW-AS ALERT-BOX INFORMATION.
+  MESSAGE SUBSTITUTE("Congratulations, you have completed level &1 in &2 moves.", giCurrentLevel, giNumMoves)
+     VIEW-AS ALERT-BOX INFORMATION.
 
   giCurrentLevel = giCurrentLevel + 1.
+
+  IF giCurrentLevel > giNumLevels THEN 
+  DO:
+    MESSAGE "You have played them all; good job!" SKIP(1)
+            "Talking about 'job'... Isn't it time to get back to your job?"
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+
+    APPLY 'window-close' TO {&WINDOW-NAME}.
+  END.
+  
   RUN startLevel.
 
 END PROCEDURE. /* levelCompleted */
@@ -809,8 +852,8 @@ PROCEDURE movePlayer :
     /* Place the player's image */
     ASSIGN
       bPlayer.hBlock:VISIBLE       = FALSE
-      bPlayer.hBlock:X             = (bPlayer.iPosX - 1) * giBlockWidth + 1
-      bPlayer.hBlock:Y             = (bPlayer.iPosY - 1) * giBlockHeight + 1
+      bPlayer.hBlock:X             = (bPlayer.iPosX - 1) * giBlockWidth + 5
+      bPlayer.hBlock:Y             = (bPlayer.iPosY - 1) * giBlockHeight + 5
       bPlayer.hBlock:WIDTH-PIXELS  = giBlockWidth
       bPlayer.hBlock:HEIGHT-PIXELS = giBlockHeight
       bPlayer.hBlock:VISIBLE       = TRUE
@@ -934,7 +977,6 @@ PROCEDURE readLevelFile :
   DEFINE INPUT PARAMETER pcLevelFile AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE cLine AS CHARACTER NO-UNDO.
-
   DEFINE BUFFER bLevel FOR ttLevel.
 
   INPUT FROM VALUE(pcLevelFile).
@@ -970,6 +1012,8 @@ PROCEDURE readLevelFile :
   END. 
 
   DELETE bLevel.
+  giNumLevels = giNumLevels - 1.
+
   INPUT CLOSE. 
 
 END PROCEDURE. /* readLevelFile */
@@ -1313,3 +1357,4 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
