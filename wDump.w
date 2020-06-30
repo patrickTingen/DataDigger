@@ -1864,7 +1864,7 @@ PROCEDURE dumpDataHtml :
         
         /* "** Value X cannot be displayed using Y. (74) " */
         IF ERROR-STATUS:GET-NUMBER(1) = 74 THEN 
-          ASSIGN cData = TRIM(STRING(hField:BUFFER-VALUE(iExtent)))
+          ASSIGN cData = TRIM(STRING(hField:BUFFER-VALUE(iExtent))).
 
         cData = getEscapedData("HTML", cData).
 
@@ -2707,4 +2707,3 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

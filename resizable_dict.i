@@ -11,7 +11,6 @@
 DEFINE VARIABLE hDictFrame     AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_Browse_Stat AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_btn_Create  AS HANDLE  NO-UNDO.
-DEFINE VARIABLE hs_btn_Dbs     AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_btn_Delete  AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_btn_Flds    AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_btn_Idxs    AS HANDLE  NO-UNDO.
@@ -30,8 +29,6 @@ DEFINE VARIABLE hs_lst_Seqs    AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_lst_Tbls    AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_txt_DBs     AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_txt_Flds    AS HANDLE  NO-UNDO.
-DEFINE VARIABLE hs_txt_Idxs    AS HANDLE  NO-UNDO.
-DEFINE VARIABLE hs_txt_Seqs    AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hs_txt_Tbls    AS HANDLE  NO-UNDO.
 DEFINE VARIABLE hwDict         AS HANDLE  NO-UNDO.
 
@@ -43,14 +40,15 @@ PROCEDURE resizeDictWindow:
   cActiveWindowTitle = ACTIVE-WINDOW:TITLE NO-ERROR.
 
   IF VALID-HANDLE(hwDict) AND hwDict:TITLE BEGINS "Data Dictionary " THEN DO:
-      /*05-DEC-2006 sla: get rid off scrollbar that may come when choosing index/field or buttons*/
+      /* 05-DEC-2006 sla: get rid off scrollbar that may come when choosing index/field or buttons */
+      {&_proparse_ prolint-nowarn(varusage)}
       DEFINE VARIABLE iDontCare AS INTEGER    NO-UNDO.
       IF VALID-HANDLE(hDictFrame) THEN RUN ShowScrollBar (hDictFrame:HWND, 3, 0, OUTPUT iDontCare).
       RETURN.
   END.
 
   IF cActiveWindowTitle = "Data Dictionary" THEN DO:
-      /*06-DEC-2006 sla: Error if not connected to any database => wait until we leave the dialog-box*/
+      /* 06-DEC-2006 sla: Error if not connected to any database => wait until we leave the dialog-box */
       DEFINE VARIABLE hDictionaryDialog AS HANDLE NO-UNDO.
       hDictionaryDialog = FOCUS:FRAME NO-ERROR.
       IF VALID-HANDLE(hDictionaryDialog)
@@ -188,7 +186,6 @@ PROCEDURE refineDictWidget :
           WHEN "s_IdxFill"        THEN  hs_fil_Idxs    = h.
           WHEN "s_lst_Idxs"       THEN  hs_lst_Idxs    = h.
 
-          WHEN "s_icn_Dbs"        THEN  hs_btn_Dbs     = h.
           WHEN "s_icn_Tbls"       THEN  hs_btn_Tbls    = h.
           WHEN "s_icn_Seqs"       THEN  hs_btn_Seqs    = h.
           WHEN "s_icn_Flds"       THEN  hs_btn_Flds    = h.
