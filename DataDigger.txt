@@ -46,6 +46,7 @@ DataDigger version 25
 - Solved: List of tables is refreshed after change in dictionary
 - Solved: Drawing error in easter egg
 - Solved: Missing level in easter egg
+- Solved: HTML dumpfile not properly escaped (Gilles Querret)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
