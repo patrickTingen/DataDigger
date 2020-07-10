@@ -743,10 +743,6 @@ DO:
   UNLOAD cEnvironment     NO-ERROR.
 END. /* CLOSE OF THIS-PROCEDURE  */
 
-/* Subscribe to setUsage event to track user behaviour */
-SUBSCRIBE TO "setUsage" ANYWHERE.
-
-
 /* Caching settings must be set from within UI.
  * Since the library might be started from DataDigger.p
  * we cannot rely on the registry being loaded yet
@@ -3173,32 +3169,6 @@ PROCEDURE setTransparency :
   RUN SetLayeredWindowAttributes(phFrame:HWND, 0, piLevel, {&LWA_ALPHA}, OUTPUT stat).
 
 END PROCEDURE. /* setTransparency */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-setUsage) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setUsage Procedure 
-PROCEDURE setUsage :
-/* Save DataDigger usage in the INI file
-  */
-  DEFINE INPUT PARAMETER pcName AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE i AS INTEGER NO-UNDO.
-
-  {&timerStart}
-
-  i = INTEGER(getRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName))).
-  IF i = ? THEN i = 0.
-
-  i = i + 1.
-  setRegistry("DataDigger:Usage", SUBSTITUTE("&1:numUsed", pcName), STRING(i)).
-
-  {&timerStop}
-
-END PROCEDURE. /* setUsage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

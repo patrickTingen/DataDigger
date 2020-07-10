@@ -87,9 +87,9 @@ DEFINE TEMP-TABLE temp-widget NO-UNDO
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS RECT-1 btnClearQuery ed-qry btnTestQuery ~
-btnRunQuery resultset btnPopOut 
-&Scoped-Define DISPLAYED-OBJECTS ed-qry resultset 
+&Scoped-Define ENABLED-OBJECTS RECT-1 btnClearQuery btnTestQuery edQuery ~
+btnRunQuery btnPopOut edResult 
+&Scoped-Define DISPLAYED-OBJECTS edQuery edResult 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -107,47 +107,47 @@ DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnClearQuery 
      LABEL "&Clear" 
-     SIZE-PIXELS 60 BY 21.
+     SIZE-PIXELS 60 BY 24.
 
 DEFINE BUTTON btnPopOut 
      LABEL "&Pop out" 
-     SIZE-PIXELS 60 BY 21 TOOLTIP "Show text in separate window".
+     SIZE-PIXELS 60 BY 24 TOOLTIP "Show text in separate window".
 
 DEFINE BUTTON btnRunQuery 
      LABEL "&Run" 
-     SIZE-PIXELS 60 BY 21 TOOLTIP "Run the query".
+     SIZE-PIXELS 60 BY 24 TOOLTIP "Run the query".
 
 DEFINE BUTTON btnTestQuery 
      LABEL "&Test" 
-     SIZE-PIXELS 60 BY 21 TOOLTIP "Test the query".
+     SIZE-PIXELS 60 BY 24 TOOLTIP "Test the query".
 
-DEFINE VARIABLE ed-qry AS CHARACTER 
+DEFINE VARIABLE edQuery AS CHARACTER 
      VIEW-AS EDITOR MAX-CHARS 4000 SCROLLBAR-VERTICAL LARGE
-     SIZE-PIXELS 500 BY 150 NO-UNDO.
+     SIZE-PIXELS 630 BY 150 NO-UNDO.
 
-DEFINE VARIABLE resultset AS CHARACTER 
+DEFINE VARIABLE edResult AS CHARACTER 
      VIEW-AS EDITOR SCROLLBAR-VERTICAL
-     SIZE-PIXELS 500 BY 150 TOOLTIP "result previous analyze" NO-UNDO.
+     SIZE-PIXELS 630 BY 150 TOOLTIP "result previous analyze" NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 500 BY 125.
+     SIZE-PIXELS 630 BY 125.
 
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnClearQuery AT Y 5 X 510
-     ed-qry AT Y 135 X 5 NO-LABEL
-     btnTestQuery AT Y 135 X 510
-     btnRunQuery AT Y 165 X 510
-     resultset AT Y 290 X 5 NO-LABEL
-     btnPopOut AT Y 290 X 510 WIDGET-ID 2
-     RECT-1 AT Y 0 X 0 WIDGET-ID 4
+     btnClearQuery AT Y 5 X 640
+     btnTestQuery AT Y 134 X 640
+     edQuery AT Y 135 X 5 NO-LABEL
+     btnRunQuery AT Y 165 X 640
+     btnPopOut AT Y 289 X 640 WIDGET-ID 2
+     edResult AT Y 290 X 5 NO-LABEL
+     RECT-1 AT Y 6 X 5 WIDGET-ID 4
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 580 BY 453.
+         SIZE-PIXELS 707 BY 453.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -168,7 +168,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
          HIDDEN             = YES
          TITLE              = "MCF's Query Tester"
          HEIGHT-P           = 455
-         WIDTH-P            = 580
+         WIDTH-P            = 711
          MAX-HEIGHT-P       = 817
          MAX-WIDTH-P        = 1152
          VIRTUAL-HEIGHT-P   = 817
@@ -196,10 +196,10 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* SETTINGS FOR FRAME DEFAULT-FRAME
    FRAME-NAME                                                           */
 ASSIGN 
-       ed-qry:RETURN-INSERTED IN FRAME DEFAULT-FRAME  = TRUE.
+       edQuery:RETURN-INSERTED IN FRAME DEFAULT-FRAME  = TRUE.
 
 ASSIGN 
-       resultset:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
+       edResult:READ-ONLY IN FRAME DEFAULT-FRAME        = TRUE.
 
 IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
 THEN C-Win:HIDDEN = no.
@@ -261,8 +261,8 @@ DO:
   CLOSE QUERY q1.
   OPEN QUERY q1 FOR EACH ttTestQuery.
   ASSIGN 
-    ed-qry:SCREEN-VALUE = ""
-    resultset:SCREEN-VALUE = "".
+    edQuery:SCREEN-VALUE = ""
+    edResult:SCREEN-VALUE = "".
 
   RUN enableButtons IN THIS-PROCEDURE.
 END.
@@ -277,8 +277,8 @@ ON CHOOSE OF btnPopOut IN FRAME DEFAULT-FRAME /* Pop out */
 DO:
   SESSION:SET-WAIT-STATE("GENERAL":U).
   RUN value(REPLACE(THIS-PROCEDURE:FILE-NAME,"query-tester","query-data")) PERSISTENT
-    (INPUT ed-qry,
-     INPUT resultset:SCREEN-VALUE).
+    (INPUT edQuery,
+     INPUT edResult:SCREEN-VALUE).
   SESSION:SET-WAIT-STATE("":U).
 END.
 
@@ -341,6 +341,7 @@ SUBSCRIBE TO "query" ANYWHERE RUN-PROCEDURE "processQuery".
 SUBSCRIBE TO "Melding" ANYWHERE RUN-PROCEDURE "processMessage".
 SUBSCRIBE TO "Message" ANYWHERE RUN-PROCEDURE "processMessage".
 SUBSCRIBE TO "getScreenMessage" ANYWHERE RUN-PROCEDURE "processMessage".
+SUBSCRIBE TO "DataDiggerClose" ANYWHERE.
 
 /* Now enable the interface and wait for the exit condition.            */
 /* (NOTE: handle ERROR and END-KEY so cleanup code will always fire.    */
@@ -351,7 +352,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   /* Datadigger */
   c-win:FONT = getFont("Default").
   FRAME {&frame-name}:font = getFont("Default").
-  ed-qry:font = getFont("Fixed").
+  edQuery:font = getFont("Fixed").
 
   RUN enable_UI.
 
@@ -376,7 +377,7 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
            READ-ONLY        = TRUE
     TRIGGERS:
       ON "value-changed":U ANYWHERE DO:
-        ASSIGN ed-qry:SCREEN-VALUE IN FRAME {&FRAME-NAME} = REPLACE(ttTestQuery.cQueryTxt,",",",~n").
+        ASSIGN edQuery:SCREEN-VALUE IN FRAME {&FRAME-NAME} = getReadableQuery(ttTestQuery.cQueryTxt).
         RUN test-query IN THIS-PROCEDURE (INPUT FALSE, OUTPUT lErrorDetected).
       END.
 
@@ -481,6 +482,19 @@ END PROCEDURE. /* cleanUp */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDiggerClose C-Win 
+PROCEDURE DataDiggerClose :
+/* Close DataDigger after event 'DataDiggerClose'
+ */
+ MESSAGE 33
+   VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
+  APPLY 'close' TO THIS-PROCEDURE.
+
+END PROCEDURE. /* DataDiggerClose */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI C-Win  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
@@ -527,10 +541,10 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY ed-qry resultset 
+  DISPLAY edQuery edResult 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
-  ENABLE RECT-1 btnClearQuery ed-qry btnTestQuery btnRunQuery resultset 
-         btnPopOut 
+  ENABLE RECT-1 btnClearQuery btnTestQuery edQuery btnRunQuery btnPopOut 
+         edResult 
       WITH FRAME DEFAULT-FRAME IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}
   VIEW C-Win.
@@ -567,8 +581,8 @@ PROCEDURE processQuery :
   DO WITH FRAME {&FRAME-NAME}:
 
     ASSIGN
-      lcOldString = ed-qry:SCREEN-VALUE
-      ed-qry:SCREEN-VALUE = REPLACE(SUBSTRING(ipcQueryString,INDEX(ipcQueryString,"FOR EACH":U)),",",",~n").
+      lcOldString = edQuery:SCREEN-VALUE
+      edQuery:SCREEN-VALUE = REPLACE(SUBSTRING(ipcQueryString,INDEX(ipcQueryString,"FOR EACH":U)),",",",~n").
 
     RUN test-query IN THIS-PROCEDURE (INPUT FALSE,
                                       OUTPUT lErrorDetected).
@@ -584,7 +598,7 @@ PROCEDURE processQuery :
         REPOSITION q1 TO ROWID ROWID(bf-ttTestQuery) NO-ERROR.
     END.
     ELSE
-      ASSIGN ed-qry:SCREEN-VALUE = lcOldString.
+      ASSIGN edQuery:SCREEN-VALUE = lcOldString.
   END.
 
   RUN enableButtons.
@@ -609,9 +623,7 @@ PROCEDURE resizeFrame :
          afactvert# = {&WINDOW-NAME}:HEIGHT-PIXELS / wfram#:HEIGHT-PIXELS.
 
   /* prevent multiple calls of this procedure on window-maximized event */
-
-  IF afacthori# = 1 AND afactvert# = 1 THEN
-    RETURN.
+  IF afacthori# = 1 AND afactvert# = 1 THEN RETURN.
 
   IF afacthori# > 1 THEN
     ASSIGN wfram#:WIDTH-PIXELS = {&window-name}:WIDTH-PIXELS.
@@ -625,7 +637,6 @@ PROCEDURE resizeFrame :
   DO WHILE VALID-HANDLE(whand#):
 
     /* find the last calculated positions */
-
     FIND temp-widget WHERE temp-widget.whand = whand# NO-ERROR.
 
     IF NOT AVAILABLE temp-widget THEN DO:
@@ -804,90 +815,87 @@ PROCEDURE test-query PRIVATE :
   DEFINE BUFFER bf-ttVstIndexInfo FOR ttVstIndexInfo.
   DEFINE BUFFER bf-ttBuffer       FOR ttBuffer.
 
-  DEFINE VARIABLE hQry          AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE lc-old-string AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lcBufferName  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lcCurrentName AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lcPrevName    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE lhBuffer      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE liNumWords    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE liSeconds     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE liWord        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lOk           AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE liNumResults  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lStop         AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE liDelayStart  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE liDelayTime   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE hQry         AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE cString      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cBufferName  AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cCurrentName AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cPrevName    AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE hBuffer      AS HANDLE      NO-UNDO.
+  DEFINE VARIABLE iNumWords    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iSeconds     AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iWord        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE iNumResults  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE lStop        AS LOGICAL     NO-UNDO.
+  DEFINE VARIABLE iDelayStart  AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iDelayTime   AS INTEGER     NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
-
-    IF TRIM(ed-qry:SCREEN-VALUE) = "" THEN RETURN.
 
     SESSION:SET-WAIT-STATE("general").
 
     ASSIGN
-      ed-qry = REPLACE(ed-qry:SCREEN-VALUE,CHR(10)," ")
-      ed-qry = REPLACE(ed-qry,CHR(13)," ")
-      ed-qry = REPLACE(ed-qry,","," ")
-      ed-qry = REPLACE(ed-qry,"exclusive-lock":U,"no-lock":U)
-      ed-qry = REPLACE(ed-qry,"share-lock":U,"no-lock":U) NO-ERROR.
+      edQuery = REPLACE(edQuery:SCREEN-VALUE,CHR(10)," ")
+      edQuery = REPLACE(edQuery,CHR(13)," ")
+      edQuery = REPLACE(edQuery,"INDEXED-REPOSITION","")
+      edQuery = REPLACE(edQuery,"exclusive-lock","no-lock")
+      edQuery = REPLACE(edQuery,"share-lock","no-lock") NO-ERROR.
 
-    DO WHILE ed-qry NE lc-old-string:
+    /* Remove double spaces */
+    DO WHILE edQuery NE cString:
       ASSIGN
-        lc-old-string = ed-qry
-        ed-qry        = REPLACE(ed-qry,"  "," ").
+        cString = edQuery
+        edQuery  = TRIM(REPLACE(edQuery,"  "," ")).
     END.
+    IF edQuery = "" THEN RETURN.
 
     /* determine the buffers used by this query */
-    /* it's assummed we don't use any duplicate tables in multiple databases */
+    /* it's assumed we don't use any duplicate tables in multiple databases */
     ASSIGN
-      liNumWords    = NUM-ENTRIES(ed-qry," ")
-      lcCurrentName = "".
+      iNumWords    = NUM-ENTRIES(edQuery," ")
+      cCurrentName = "".
 
     CREATE QUERY hQry.
     
-    /* If user specifies INDEXED-REPOSITION in 
-     * the query, we cannot use FORWARD-ONLY. 
-     */
-    hQry:FORWARD-ONLY = ( LOOKUP('INDEXED-REPOSITION', ed-qry,' ') = 0 ).
-    ed-qry = REPLACE(ed-qry,'INDEXED-REPOSITION','').
+    /* BREAK-BY cannot use FORWARD-ONLY. */
+    hQry:FORWARD-ONLY = ( INDEX(edQuery,' BREAK BY ') = 0 ).
     
-    DO FOR bf-ttBuffer liWord = 1 TO liNumWords:
+    DO FOR bf-ttBuffer iWord = 1 TO iNumWords:
       ASSIGN
-        lcPrevName    = lcCurrentName
-        lcCurrentName = TRIM(ENTRY(liWord,ed-qry," "))
-        lcBufferName  = "".
+        cPrevName    = cCurrentName
+        cCurrentName = TRIM(ENTRY(iWord,edQuery," "))
+        cBufferName  = "".
 
-      IF CAN-DO("EACH,LAST,FIRST",lcPrevName) THEN
+      IF CAN-DO("EACH,LAST,FIRST",cPrevName) THEN
       DO:
         CREATE bf-ttBuffer.
-        ASSIGN bf-ttBuffer.cTableName = lcCurrentName.
-        CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE lcCurrentName NO-ERROR.
+        ASSIGN bf-ttBuffer.cTableName = cCurrentName.
+        CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE cCurrentName NO-ERROR.
 
         /* using a buffer ? */
         IF NOT VALID-HANDLE(bf-ttBuffer.hBuffer) THEN
         DO:
-          IF   lcCurrentName BEGINS "bf-"
-            OR lcCurrentName BEGINS "buf" THEN
-            ASSIGN lcBufferName = TRIM(SUBSTRING(lcCurrentName,4),"-").
+          IF   cCurrentName BEGINS "bf-"
+            OR cCurrentName BEGINS "buf" THEN
+            ASSIGN cBufferName = TRIM(SUBSTRING(cCurrentName,4),"-").
 
           ELSE
-          IF lcCurrentName BEGINS "b":U
-            AND lcCurrentName NE "b":U THEN
-            ASSIGN lcBufferName = TRIM(SUBSTRING(lcCurrentName,2),"-").
+          IF cCurrentName BEGINS "b"
+            AND cCurrentName NE "b" THEN
+            ASSIGN cBufferName = TRIM(SUBSTRING(cCurrentName,2),"-").
 
-          CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE lcBufferName BUFFER-NAME lcCurrentName NO-ERROR.
+          CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE cBufferName BUFFER-NAME cCurrentName NO-ERROR.
         END.
 
         /* if it is still a not valid table ask the user which table he means */
         IF NOT VALID-HANDLE(bf-ttBuffer.hBuffer)
-          AND KEYWORD-ALL(lcCurrentName) EQ ? THEN
+          AND KEYWORD-ALL(cCurrentName) EQ ? THEN
         DO:
-          ASSIGN lcBufferName = "".
+          ASSIGN cBufferName = "".
           SESSION:SET-WAIT-STATE("").
-          RUN ask-table-from-user (INPUT lcCurrentName, OUTPUT lcBufferName).
+          RUN ask-table-from-user (INPUT cCurrentName, OUTPUT cBufferName).
           SESSION:SET-WAIT-STATE("general").
-          CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE lcBufferName BUFFER-NAME lcCurrentName NO-ERROR.
+          CREATE BUFFER bf-ttBuffer.hBuffer FOR TABLE cBufferName BUFFER-NAME cCurrentName NO-ERROR.
         END.
 
         IF NOT VALID-HANDLE(bf-ttBuffer.hBuffer) THEN
@@ -903,18 +911,14 @@ PROCEDURE test-query PRIVATE :
     END.
 
     ASSIGN
-      ed-qry = REPLACE(ed-qry:SCREEN-VALUE,CHR(10)," ")
-      ed-qry = REPLACE(ed-qry,CHR(13)," ").
+      edResult:SCREEN-VALUE = "Preparing Query".
 
-    ASSIGN
-      resultset:SCREEN-VALUE = "Preparing Query".
-
-    ASSIGN lOk = hQry:QUERY-PREPARE(ed-qry) NO-ERROR.
+    ASSIGN lOk = hQry:QUERY-PREPARE(edQuery) NO-ERROR.
     IF NOT lOk OR ERROR-STATUS:ERROR THEN
     DO:
       SESSION:SET-WAIT-STATE("").
-      resultset:SCREEN-VALUE = SUBSTITUTE("Unable to prepare the query ~n")
-                             + SUBSTITUTE("Query string : &1 ~n", ed-qry )
+      edResult:SCREEN-VALUE = SUBSTITUTE("Unable to prepare the query ~n")
+                             + SUBSTITUTE("Query string : &1 ~n", edQuery )
                              + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                              + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
                              .
@@ -923,13 +927,13 @@ PROCEDURE test-query PRIVATE :
     END.
 
     ASSIGN
-      liNumWords = hQry:NUM-BUFFERS
+      iNumWords = hQry:NUM-BUFFERS
       .
 
     IF iplPerfromQuery THEN
     DO:
       ASSIGN
-        resultset:SCREEN-VALUE = "Opening Query".
+        edResult:SCREEN-VALUE = "Opening Query".
 
       RUN scanVST IN THIS-PROCEDURE (TRUE). /* what are the current values in the VST's */
 
@@ -937,8 +941,8 @@ PROCEDURE test-query PRIVATE :
       IF NOT lOk OR ERROR-STATUS:ERROR THEN
       DO:
         SESSION:SET-WAIT-STATE("").
-        resultset:SCREEN-VALUE = SUBSTITUTE("Unable to open the query ~n")
-                               + SUBSTITUTE("Query string : &1 ~n", ed-qry )
+        edResult:SCREEN-VALUE = SUBSTITUTE("Unable to open the query ~n")
+                               + SUBSTITUTE("Query string : &1 ~n", edQuery )
                                + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                                + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
                                .
@@ -947,45 +951,45 @@ PROCEDURE test-query PRIVATE :
       END.
 
       ASSIGN
-        resultset:SCREEN-VALUE = "Performing Query".
+        edResult:SCREEN-VALUE = "Performing Query".
 
       ETIME(TRUE).
       hQry:GET-FIRST.
-      liNumResults = 0.
+      iNumResults = 0.
       lStop = ?.
 
       #QueryLoop:
       DO WHILE NOT hQry:QUERY-OFF-END:
-        liNumResults = liNumResults + 1.
+        iNumResults = iNumResults + 1.
         hQry:GET-NEXT.
 
         IF ETIME > 5000 AND lStop = ? THEN
         DO:
-          liDelayStart = ETIME.
+          iDelayStart = ETIME.
           MESSAGE 'This is taking quite some time, do you want to stop the query?' VIEW-AS ALERT-BOX INFO BUTTONS YES-NO UPDATE lStop.
           IF lStop THEN LEAVE #QueryLoop.
-          liDelayTime = ETIME - liDelayStart.
+          iDelayTime = ETIME - iDelayStart.
         END.
       END.
 
       ASSIGN
-        liSeconds = ETIME(FALSE) - liDelayTime.
+        iSeconds = ETIME(FALSE) - iDelayTime.
 
       RUN scanVST IN THIS-PROCEDURE (FALSE). /* the data coming from this query, assuming there were no other activities on the table */
     END.
 
     ASSIGN
-      resultset:SCREEN-VALUE = SUBSTITUTE("Test finished at &1 on &2~n~n&3~n~n":U,TODAY,STRING(TIME,"hh:mm:ss":U),ed-qry:SCREEN-VALUE).
+      edResult:SCREEN-VALUE = SUBSTITUTE("Test finished at &1 on &2~n~n&3~n~n",TODAY,STRING(TIME,"hh:mm:ss"),edQuery).
 
-    DO liWord = 1 TO liNumWords:
-      ASSIGN lhBuffer = hQry:GET-BUFFER-HANDLE(liWord)
-        resultset:SCREEN-VALUE = resultset:SCREEN-VALUE +
+    DO iWord = 1 TO iNumWords:
+      ASSIGN hBuffer = hQry:GET-BUFFER-HANDLE(iWord)
+        edResult:SCREEN-VALUE = edResult:SCREEN-VALUE +
                                  SUBSTITUTE("Buffer &1&2 uses index&3 &4.~n"
-                                           , CAPS(lhBuffer:NAME)
-                                           , (IF lhBuffer:NAME <> lhBuffer:TABLE 
-                                                THEN SUBSTITUTE(' (table name &1)', CAPS(lhBuffer:TABLE)) ELSE '')
+                                           , CAPS(hBuffer:NAME)
+                                           , (IF hBuffer:NAME <> hBuffer:TABLE 
+                                                THEN SUBSTITUTE(' (table name &1)', CAPS(hBuffer:TABLE)) ELSE '')
                                            , (IF NUM-ENTRIES(hQry:INDEX-INFORMATION) > 1 THEN "es" ELSE "")
-                                           , hQry:INDEX-INFORMATION(liWord)
+                                           , hQry:INDEX-INFORMATION(iWord)
                                            )
         NO-ERROR. 
     END.
@@ -993,20 +997,20 @@ PROCEDURE test-query PRIVATE :
     IF iplPerfromQuery THEN
     DO:
       ASSIGN
-        resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("~nNumber of query results is &1 in &2 seconds.~n"
-                                                                    , liNumResults
-                                                                    , TRIM(STRING(liSeconds / 1000,">>,>>9.99")))
+        edResult:SCREEN-VALUE = edResult:SCREEN-VALUE + SUBSTITUTE("~nNumber of query results is &1 in &2 seconds.~n"
+                                                                    , iNumResults
+                                                                    , TRIM(STRING(iSeconds / 1000,">>,>>9.99")))
       NO-ERROR.
 
-      DO liWord = 1 TO liNumWords:
-        ASSIGN lhBuffer = hQry:GET-BUFFER-HANDLE(liWord).
+      DO iWord = 1 TO iNumWords:
+        ASSIGN hBuffer = hQry:GET-BUFFER-HANDLE(iWord).
 
         FOR EACH bf-ttVstTableInfo
-          WHERE bf-ttVstTableInfo.cDatabase EQ lhBuffer:DBNAME
-            AND bf-ttVstTableInfo.cTableName EQ lhBuffer:TABLE:
+          WHERE bf-ttVstTableInfo.cDatabase EQ hBuffer:DBNAME
+            AND bf-ttVstTableInfo.cTableName EQ hBuffer:TABLE:
 
           ASSIGN
-            resultset:SCREEN-VALUE = resultset:SCREEN-VALUE
+            edResult:SCREEN-VALUE = edResult:SCREEN-VALUE
                                    + SUBSTITUTE("~ntable &1 has &2 reads~n"
                                                , SUBSTITUTE("&1.&2",bf-ttVstTableInfo.cDatabase,bf-ttVstTableInfo.cTableName)
                                                , bf-ttVstTableInfo.iTableRead
@@ -1014,7 +1018,7 @@ PROCEDURE test-query PRIVATE :
 
           {&_proparse_ prolint-nowarn(oflink)}
           FOR EACH bf-ttVstIndexInfo OF bf-ttVstTableInfo:
-            ASSIGN resultset:SCREEN-VALUE = resultset:SCREEN-VALUE + SUBSTITUTE("-  index &1 has &2 reads~n",bf-ttVstIndexInfo.cIndexName,bf-ttVstIndexInfo.iIndexRead) NO-ERROR.
+            ASSIGN edResult:SCREEN-VALUE = edResult:SCREEN-VALUE + SUBSTITUTE("-  index &1 has &2 reads~n",bf-ttVstIndexInfo.cIndexName,bf-ttVstIndexInfo.iIndexRead) NO-ERROR.
             DELETE bf-ttVstIndexInfo.
           END.
 

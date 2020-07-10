@@ -16,6 +16,9 @@
 
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 
+/* Maximum field length for editing char fields */
+&GLOBAL-DEFINE field-maxLength 200
+
 /* FINALLY statement was introduced in 10.1C */
 &IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN
   &GLOBAL-DEFINE timerStart ~{timerStart.i~}
@@ -31,9 +34,11 @@
  * changed from https://goo.gl/24deK3 to is.gd because google has ended the service
  * get analytics for the is.gd link by adding a - (minus) to it
 */
-&GLOBAL-DEFINE PINGBACKURL https://is.gd/DataDigger
-&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger
-/* https://is.gd/DataDigger- */
+&GLOBAL-DEFINE PINGBACKURL   https://is.gd/DataDigger25
+&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger25
+/* DataDigger 24: https://is.gd/stats.php?url=DataDigger
+   DataDigger 25: https://is.gd/stats.php?url=DataDigger25
+*/
 
 /* Table scan is not available for pre-v11 */
 &IF PROVERSION >= '11' &THEN
@@ -522,4 +527,3 @@ END PROCEDURE. /* getProcHandle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

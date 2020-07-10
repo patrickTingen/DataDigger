@@ -30,6 +30,11 @@
 define new global shared variable global_domain as character.
 */
 
+/* If your database is password-enabled, uncomment next line for login window.
+*/
+/* RUN _prostar.p. */
+
+
 /* #QAD users might use this function to determine the 
  *       domain-field in a table 
  */ 

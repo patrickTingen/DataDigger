@@ -32,8 +32,9 @@ DEFINE {&outvar} polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
 DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
-DEFINE VARIABLE gcUniqueFields AS CHARACTER NO-UNDO.
-DEFINE VARIABLE ghBackupTable  AS HANDLE    NO-UNDO.
+DEFINE VARIABLE gcUniqueFields    AS CHARACTER NO-UNDO.
+DEFINE VARIABLE ghBackupTable     AS HANDLE    NO-UNDO.
+DEFINE VARIABLE gcLargeFields     AS CHARACTER NO-UNDO.
 
 /* This table holds the actual values of the selected records */
 DEFINE TEMP-TABLE ttData NO-UNDO RCODE-INFORMATION
@@ -46,7 +47,6 @@ DEFINE TEMP-TABLE ttData NO-UNDO RCODE-INFORMATION
 &GLOBAL-DEFINE field-cFullName 3
 &GLOBAL-DEFINE field-cLabel    4
 &GLOBAL-DEFINE field-cNewValue 5
-&GLOBAL-DEFINE field-maxLength 10000
 
 /* TT to keep track of records we are editing */
 DEFINE TEMP-TABLE ttRecordMapping NO-UNDO
@@ -240,8 +240,8 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW wEdit ASSIGN
          HIDDEN             = YES
          TITLE              = "Edit records"
-         HEIGHT-P           = 455
-         WIDTH-P            = 668
+         HEIGHT-P           = 454
+         WIDTH-P            = 664
          MAX-HEIGHT-P       = 2079
          MAX-WIDTH-P        = 1600
          VIRTUAL-HEIGHT-P   = 2079
@@ -421,14 +421,14 @@ DO:
 
   /* Change color when it has been changed */
   IF ttColumn.cNewValue <> ttColumn.cOldValue THEN
-    ttColumn.cNewValue:FGCOLOR IN BROWSE brRecord = 12.
+    ttColumn.cNewValue:FGCOLOR IN BROWSE brRecord = 12. /* red */
   ELSE
-    ttColumn.cNewValue:FGCOLOR IN BROWSE brRecord = 9.
+    ttColumn.cNewValue:FGCOLOR IN BROWSE brRecord = 9. /* blue */
 
   /* Set bgcolor of the new value field if it is mandatory */
   IF ttField.lMandatory = TRUE THEN
     ASSIGN
-      ttColumn.lShow    :BGCOLOR IN BROWSE brRecord = 8
+      ttColumn.lShow    :BGCOLOR IN BROWSE brRecord = 8 /* gray */
       ttColumn.iOrder   :BGCOLOR IN BROWSE brRecord = 8
       ttColumn.cFullName:BGCOLOR IN BROWSE brRecord = 8
       ttColumn.cLabel   :BGCOLOR IN BROWSE brRecord = 8.
@@ -438,6 +438,17 @@ DO:
       ttColumn.iOrder   :BGCOLOR IN BROWSE brRecord = ?
       ttColumn.cFullName:BGCOLOR IN BROWSE brRecord = ?
       ttColumn.cLabel   :BGCOLOR IN BROWSE brRecord = ?.
+
+  /* Set fgcolor for fields that are too large */
+  IF ttField.cDatatype = 'character' 
+    AND LOOKUP(ttColumn.cFullName, gcLargeFields) > 0 THEN 
+    ASSIGN
+      ttColumn.cFullName:FGCOLOR IN BROWSE brRecord = 12
+      ttColumn.cLabel   :FGCOLOR IN BROWSE brRecord = 12.
+  ELSE
+    ASSIGN
+      ttColumn.cFullName:FGCOLOR IN BROWSE brRecord = ?
+      ttColumn.cLabel   :FGCOLOR IN BROWSE brRecord = ?.
 
 END.
 
@@ -818,8 +829,8 @@ DO:
     findNext:
     FOR EACH bData
       WHERE bData.cFieldName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE
-        AND bData.cValue     > SELF:SCREEN-VALUE
-         BY bData.cValue:
+        AND SUBSTRING(bData.cValue,1,100) > SELF:SCREEN-VALUE
+         BY SUBSTRING(bData.cValue,1,100):
 
       SELF:SCREEN-VALUE = bData.cValue.
       APPLY "value-changed" TO SELF.
@@ -839,7 +850,7 @@ DO:
     FOR EACH bData
       WHERE bData.cFieldName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE
         AND bData.cValue     < SELF:SCREEN-VALUE
-         BY bData.cValue DESCENDING:
+         BY SUBSTRING(bData.cValue,1,100) DESCENDING:
 
       SELF:SCREEN-VALUE = bData.cValue.
       APPLY "value-changed" TO SELF.
@@ -1128,11 +1139,7 @@ PROCEDURE btnGoChoose :
                 cRealOldValue = hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent).
                 iFormatLength = INTEGER(ENTRY(1, ENTRY(2, bField.cFormat, "("), ")")) NO-ERROR.
 
-                IF   iFormatLength <> ?
-                 AND iFormatLength > 0
-                 AND LENGTH(cRealOldValue) > iFormatLength
-                 AND LENGTH(bColumn.cNewValue) = {&field-maxLength}   /* Betekent dat ie afgekapt is */
-                THEN
+                IF LENGTH(bColumn.cOldValue) > {&field-maxLength} THEN
                   lCommit = NO.
               END.
 
@@ -1281,9 +1288,10 @@ PROCEDURE getDataValues :
   DEFINE INPUT PARAMETER pcColumn AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER piExtent AS INTEGER     NO-UNDO.
 
-  DEFINE VARIABLE cRowValue AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer   AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iRow      AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE cRowValue            AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hBuffer              AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iRow                 AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lLargeCharacterFound AS LOGICAL   NO-UNDO.
 
   DEFINE BUFFER bData FOR ttData.
 
@@ -1291,6 +1299,7 @@ PROCEDURE getDataValues :
 
   addValue:
   DO iRow = 1 TO phBrowse:NUM-SELECTED-ROWS:
+
     phBrowse:FETCH-SELECTED-ROW(iRow).
     cRowValue = hBuffer:BUFFER-FIELD(ENTRY(1,pcColumn,'[')):BUFFER-VALUE(piExtent).
 
@@ -1305,6 +1314,9 @@ PROCEDURE getDataValues :
       CREATE bData.
       ASSIGN bData.cFieldName = pcColumn
              bData.cValue     = cRowValue.
+
+      IF LENGTH(cRowValue) > {&field-maxLength} THEN 
+        gcLargeFields = TRIM(SUBSTITUTE('&1,&2', gcLargeFields, pcColumn),',').
     END.
   END.
 
@@ -1415,14 +1427,12 @@ END PROCEDURE. /* increaseValue */
 PROCEDURE initializeObject :
 /* Setup
   */
-  DEFINE VARIABLE cExtFormat      AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cSetting        AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE iMaxNameLength  AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iMaxLabelLength AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iValue          AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iDefaultFont    AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iMaxLength      AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iFieldLength    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cExtFormat           AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cSetting             AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE iMaxNameLength       AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iMaxLabelLength      AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iValue               AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iDefaultFont         AS INTEGER   NO-UNDO.
 
   DEFINE BUFFER bField  FOR ttField.
   DEFINE BUFFER bColumn FOR ttColumn.
@@ -1439,8 +1449,7 @@ PROCEDURE initializeObject :
    */
   IF CAN-DO('Add,Clone',picMode) THEN
   FOR EACH bField
-    WHERE bField.lMandatory = TRUE
-       OR bField.lUniqueIdx = TRUE
+    WHERE bField.lMandatory = TRUE OR bField.lUniqueIdx = TRUE
    , EACH bColumn
     WHERE bColumn.cFieldName = bField.cFieldname:
 
@@ -1466,7 +1475,6 @@ PROCEDURE initializeObject :
     DELETE bColumn.
   END.
 
-  /* Find out max fieldname length */
   FOR EACH bColumn:
     bColumn.cFilterValue = ''.    /* cFilterValue is now the list of currently used values */
     bColumn.lShow        = FALSE. /* lShow now means: "Change this field" */
@@ -1492,45 +1500,41 @@ PROCEDURE initializeObject :
    */
   FOR EACH bField:
 
-    /* Set max length for chars */
-    IF bField.cDatatype = 'character' THEN iMaxLength = 1.
-
     FOR EACH bColumn WHERE bColumn.cFieldname = bField.cFieldname:
 
       IF CAN-DO('Clone,Edit',picMode) THEN
         RUN getDataValues(pihBrowse,bColumn.cFullName, bColumn.iExtent).
 
-      IF bField.cDatatype = 'character' THEN
-      DO:
-        IF NUM-ENTRIES(bField.cFormat,'(') > 1 THEN
-          iFieldLength = INTEGER(TRIM(bField.cFormat,'9X()')) NO-ERROR.
-        ELSE
-          iFieldLength = LENGTH(bField.cFormat).
-
-        IF iFieldLength = ? THEN iFieldLength = MAXIMUM(8,bField.iWidth).
-        iMaxLength = MAXIMUM(iMaxLength, iFieldLength).
-      END.
-
       FIND ttData WHERE ttData.cFieldName = bColumn.cFullName NO-ERROR.
       IF AVAILABLE ttData THEN
       DO:
-        IF   bField.cDatatype = "character"
-         AND iMaxLength <> ?
-         AND iMaxLength  > 0
-         AND length(ttData.cValue) > {&field-maxLength} THEN
-          ttData.cValue = SUBSTRING(ttData.cValue, 1, {&field-maxLength}).
-
         ASSIGN
           bColumn.cOldValue = ttData.cValue /* so we can revert to the old value */
           bColumn.cNewValue = ttData.cValue
           bColumn.lShow     = TRUE.
-      END.
-     END.
 
-    /* If the data is longer than the format allows, adjust format up to a max of 10k */
+        /* Fields that contain too long string */
+        IF   bField.cDatatype = "character"
+         AND LENGTH(ttData.cValue) > {&field-maxLength} THEN
+        DO:
+          ttData.cValue = SUBSTRING(ttData.cValue, 1, {&field-maxLength}).
+          bColumn.cNewValue = ttData.cValue.
+        END.
+      END.
+    END.
+
+    /* If the data is longer than the format allows, adjust format up to the max of 20k */
     IF bField.cDatatype = 'character' THEN
-      bField.cFormat = SUBSTITUTE('x(&1)', MINIMUM(iMaxLength * 2, {&field-maxLength})).
+      bField.cFormat = SUBSTITUTE('x(&1)', {&field-maxLength}).
   END.
+
+  IF gcLargeFields <> '' THEN 
+    MESSAGE 'Warning!' SKIP(1)
+            'Your data contains one or more fields that holds more' SKIP
+            'than {&field-maxLength} characters of data.' SKIP(1)
+            'If you commit this screen, your data may get truncated.' SKIP(1)
+            'Affected fieldnames appear in RED'
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
   /* When editing records, keep a copy of the original data */
   IF picMode = 'Edit' THEN

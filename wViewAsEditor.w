@@ -284,6 +284,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
   ASSIGN edValue = pcValue.
+  edValue:MAX-CHARS = {&field-maxLength}.
+
   RUN enable_UI.
   RUN initializeObject.
 
@@ -371,3 +373,4 @@ END PROCEDURE. /* initializeObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
