@@ -53,6 +53,7 @@ DataDigger version 25
 - Change: Better naming for connecting db with a name that already is connected
 - Change: Save-as Excel file now uses .xlsx format instead of .xls
 - Change: Removed unused tracking of DD functions
+- Change: Minimum window size much smaller now
 
 - New   : Option to change window title via myDataDigger.p (Johan Geerts)
 - New   : Generate dump/load: toggle for selected fields only (Dirk Vreken)

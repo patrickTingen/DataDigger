@@ -5566,7 +5566,7 @@ PROCEDURE connectDatabase :
     cProgDir   = getProgramDir().
 
     cDatabasesOld = getDatabaseList().
-    RUN value(cProgDir + 'wConnections.w') (INPUT 'CONNECT', INPUT pcDatabase, OUTPUT cError).
+    RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'CONNECT', INPUT pcDatabase, OUTPUT cError).
     IF cError <> '' THEN
       MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
@@ -9112,8 +9112,8 @@ PROCEDURE initializeVisuals :
     btnMoveBottom:MOVE-TO-TOP().
 
     /* Set minimum size of the window */
-    C-Win:MIN-WIDTH-PIXELS  = 650.
-    C-Win:MIN-HEIGHT-PIXELS = 460.
+    C-Win:MIN-WIDTH-PIXELS  = 200.
+    C-Win:MIN-HEIGHT-PIXELS = 330.
 
     /* To avoid scrollbars on the frame */
     FRAME {&FRAME-NAME}:SCROLLABLE = FALSE.
@@ -13072,7 +13072,6 @@ FUNCTION createMenuItem RETURNS HANDLE
           PARENT       = phMenu.
 
   END CASE.
-
 
   RETURN hMenuItem.
 
