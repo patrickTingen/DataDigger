@@ -718,7 +718,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 24.91
+         HEIGHT             = 30.19
          WIDTH              = 53.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -1658,6 +1658,43 @@ END PROCEDURE. /* getDumpFileName */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-getFavourites) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFavourites Procedure 
+PROCEDURE getFavourites :
+/* Extract favourites from config table into own tt
+*/
+  DEFINE OUTPUT PARAMETER TABLE FOR ttFavGroup.
+
+  DEFINE BUFFER bfConfig   FOR ttConfig.
+  DEFINE BUFFER btFavGroup FOR ttFavGroup.
+
+  EMPTY TEMP-TABLE ttFavGroup.
+
+  FOR EACH bfConfig
+    WHERE bfConfig.cSection = 'DataDigger:Favourites'
+      AND bfConfig.cSetting > "":
+
+    CREATE btFavGroup.
+    ASSIGN 
+      btFavGroup.cGroup  = bfConfig.cSetting
+      btFavGroup.cTables = bfConfig.cValue.
+  END. 
+
+  /* If no groups are found, create a default one */
+  IF NOT CAN-FIND(FIRST btFavGroup) THEN
+  DO:
+    CREATE btFavGroup.
+    ASSIGN btFavGroup.cGroup = 'MyFavourites'.
+  END.
+
+END PROCEDURE. /* getFavourites */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-getFields) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFields Procedure 
@@ -2427,18 +2464,6 @@ PROCEDURE getTableStats :
 
     END. /* lastUsed */
 
-    ELSE
-    IF cLine MATCHES "*:Favourites=*" THEN
-    DO:
-      FIND FIRST ttTable
-        WHERE ttTable.cDatabase = cDatabase
-          AND ttTable.cTableName = ENTRY(1,cLine,':') NO-ERROR.
-
-      IF AVAILABLE ttTable THEN
-        ttTable.cFavourites = ENTRY(2,cLine,'=') NO-ERROR.
-
-    END. /* favourite */
-
   END. /* repeat */
   INPUT CLOSE.
 
@@ -3066,6 +3091,47 @@ PROCEDURE setCaching :
   glCacheFieldDefs = LOGICAL( getRegistry("DataDigger:Cache","FieldDefs") ).
 
 END PROCEDURE. /* setCaching */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-setFavourite) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFavourite Procedure 
+PROCEDURE setFavourite :
+/* Set / unset / toggle a table as favourite
+*/
+  DEFINE INPUT PARAMETER pcTable     AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcGroupName AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER plFavourite AS LOGICAL   NO-UNDO.
+
+  DEFINE VARIABLE i     AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cList AS CHARACTER NO-UNDO.
+
+  cList = getRegistry("DataDigger:Favourites", pcGroupName).
+  IF cList = ? THEN cList = ''.
+  i = LOOKUP(pcTable, cList).
+
+  /* Toggle setting? */
+  IF plFavourite = ? THEN plFavourite = (i = 0).
+
+  /* Add to favourites */
+  IF NOT plFavourite AND i > 0 THEN 
+  DO:
+    ENTRY(i, cList) = ''.
+    cList = REPLACE(cList,',,',',').
+    cList = TRIM(cList,',').
+  END.
+
+  /* Remove from favourites */
+  IF plFavourite AND i = 0 THEN 
+    cList = TRIM(SUBSTITUTE('&1,&2', cList, pcTable),',').
+
+  setRegistry("DataDigger:Favourites", pcGroupName, cList).
+
+END PROCEDURE. /* setFavourite */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -5068,4 +5134,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

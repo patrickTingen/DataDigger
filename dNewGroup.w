@@ -131,11 +131,7 @@ DO:
     RETURN NO-APPLY.
   END.
 
-  CREATE ttFavGroup.
-  ASSIGN ttFavGroup.cGroup = fiGroupname:SCREEN-VALUE.
-
-  ASSIGN pcNewName = ttFavGroup.cGroup.
-
+  pcNewName = fiGroupname:SCREEN-VALUE.
   APPLY 'close' TO THIS-PROCEDURE.
 END.
 

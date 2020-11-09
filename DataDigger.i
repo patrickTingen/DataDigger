@@ -72,8 +72,7 @@ DEFINE TEMP-TABLE ttTable NO-UNDO RCODE-INFORMATION
   FIELD lCached       AS LOGICAL   LABEL "" /* for preCaching */
   FIELD iFileNumber   AS INTEGER   LABEL "_File-Number"
   FIELD cCategory     AS CHARACTER LABEL "Category"
-  FIELD lFavourite    AS LOGICAL   LABEL "" /* favourite table */
-  FIELD cFavourites   AS CHARACTER LABEL "" /* favourite groups */
+  FIELD lFavourite    AS LOGICAL   LABEL "" /* for editing favourites */
   INDEX idxPrim IS PRIMARY cDatabase cTableName
   INDEX idxSec cTableName
   .
@@ -277,7 +276,8 @@ DEFINE TEMP-TABLE ttQuerySort NO-UNDO RCODE-INFORMATION
 
 /* TT for favourite groups */
 DEFINE TEMP-TABLE ttFavGroup NO-UNDO RCODE-INFORMATION
-  FIELD cGroup AS CHARACTER
+  FIELD cGroup  AS CHARACTER
+  FIELD cTables AS CHARACTER
   INDEX iPrim IS PRIMARY cGroup
   .
 

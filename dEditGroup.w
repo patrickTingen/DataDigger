@@ -7,8 +7,8 @@
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
-  Name: dNewGroup.w
-  Desc: Ask name for new group of favourites
+  Name: dEditGroup.w
+  Desc: Edit a group of favourite tables
 
   ----------------------------------------------------------------------*/
 /*          This .W file was created with the Progress AppBuilder.      */
@@ -19,20 +19,20 @@
 &IF DEFINED(UIB_IS_RUNNING) = 0 &THEN
   DEFINE INPUT-OUTPUT PARAMETER pcGroup AS CHARACTER NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttTable.
-  DEFINE INPUT PARAMETER pcGroupList AS CHARACTER NO-UNDO.
-  DEFINE OUTPUT PARAMETER plOk       AS LOGICAL NO-UNDO.
+  DEFINE OUTPUT PARAMETER plOk AS LOGICAL NO-UNDO.
 &ELSE
 
-  DEFINE VARIABLE pcGroup     AS CHARACTER NO-UNDO INITIAL 'myFavourites'.
-  DEFINE VARIABLE pcGroupList AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hLib        AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE plOk        AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE pcGroup AS CHARACTER NO-UNDO INITIAL 'myFavourites'.
+  DEFINE VARIABLE hLib    AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE plOk    AS LOGICAL   NO-UNDO.
   
   RUN datadiggerlib.p PERSISTENT SET hLib.
   THIS-PROCEDURE:ADD-SUPER-PROCEDURE(hLib,SEARCH-TARGET).
   RUN fillTT.
 
 &ENDIF
+
+DEFINE VARIABLE gcFavouriteTables AS CHARACTER   NO-UNDO.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -113,7 +113,7 @@ DEFINE BUTTON Btn_OK AUTO-GO
      BGCOLOR 8 .
 
 DEFINE VARIABLE cbDatabase AS CHARACTER FORMAT "X(256)":U 
-     VIEW-AS COMBO-BOX INNER-LINES 5
+     VIEW-AS COMBO-BOX INNER-LINES 10
      LIST-ITEMS "Item 1" 
      DROP-DOWN-LIST
      SIZE-PIXELS 125 BY 21 NO-UNDO.
@@ -136,9 +136,9 @@ DEFINE QUERY brTables FOR
 DEFINE BROWSE brTables
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brTables Dialog-Frame _FREEFORM
   QUERY brTables DISPLAY
-      ttTable.lFavourite    COLUMN-LABEL "" VIEW-AS TOGGLE-BOX
-ttTable.cTableName    COLUMN-LABEL "Table"
-ttTable.cDatabase     COLUMN-LABEL "DB"
+      ttTable.lFavourite COLUMN-LABEL "" VIEW-AS TOGGLE-BOX
+ttTable.cTableName COLUMN-LABEL "Table"
+ttTable.cDatabase  COLUMN-LABEL "DB"
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
     WITH NO-ROW-MARKERS SEPARATORS
@@ -232,21 +232,59 @@ END.
 
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
+ON ENDKEY OF FRAME Dialog-Frame /* Edit favourites group */
+DO:
+  DEFINE BUFFER bTable FOR ttTable.
+
+  FOR EACH bTable:
+    bTable.lFavourite = CAN-DO(gcFavouriteTables, bTable.cTableName).
+  END.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL Dialog-Frame Dialog-Frame
 ON GO OF FRAME Dialog-Frame /* Edit favourites group */
 DO:
-  DEFINE VARIABLE lMerge  AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE lMerge   AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE cNewName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cOldName AS CHARACTER NO-UNDO.
 
+  DEFINE BUFFER bTable FOR ttTable.
+
+  /* Changing the name of the group might cause a conflict */
   IF pcGroup <> fiGroupname:SCREEN-VALUE 
-    AND CAN-DO(pcGroupList, fiGroupname:SCREEN-VALUE) THEN
+    AND getRegistry('DataDigger:Favourites', fiGroupname:SCREEN-VALUE) <> ? THEN  
   DO:
-    MESSAGE 'There is another group with this name. Do you want to merge the groups?'
+    MESSAGE 'There is another group with this name.' SKIP 'Do you want to merge them?'
       VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lMerge.
 
     IF lMerge <> YES THEN RETURN NO-APPLY.
   END.
 
+  cOldName = pcGroup.
+  cNewName = fiGroupname:SCREEN-VALUE.
+
+  FOR EACH bTable:
+
+    /* Changed fav status */
+    IF bTable.lFavourite <> CAN-DO(gcFavouriteTables, bTable.cTableName) THEN
+      RUN setFavourite(bTable.cTableName, pcGroup, bTable.lFavourite).
+
+    /* Changed group name */
+    IF bTable.lFavourite AND cOldName <> cNewName THEN
+    DO:
+      /* Remove from old group and add to new one */
+      RUN setFavourite(bTable.cTableName, cOldName, NO).
+      RUN setFavourite(bTable.cTableName, cNewName, YES).
+    END.
+  END.
+
+  pcGroup  = cNewName.
   plOk = TRUE.
-  pcGroup = fiGroupname:SCREEN-VALUE.
 
 END.
 
@@ -343,7 +381,7 @@ DO:
 
   IF lDelete THEN
   DO:
-    FOR EACH bTable WHERE (bTable.lShowInList = TRUE OR bTable.lFavourite = TRUE):
+    FOR EACH bTable:
       bTable.lFavourite = NO.
     END. 
 
@@ -447,15 +485,7 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  /* Set databases */
-  cbDatabase:LIST-ITEMS = ',' + getDatabaseList().
-  cbDatabase:SCREEN-VALUE = getRegistry('DataDigger','Database') NO-ERROR.
-
-  btnEdit:LOAD-IMAGE(getImagePath('edit.gif')).
-  btnDelete:LOAD-IMAGE(getImagePath('delete.gif')).
-  fiGroupName = pcGroup.
-
-  RUN enable_UI.
+  RUN initObject.
   WAIT-FOR GO OF FRAME {&FRAME-NAME} FOCUS fiTableFilter.
 
 END.
@@ -517,6 +547,34 @@ PROCEDURE fillTT :
   RUN getTables(INPUT TABLE bTableFilter, OUTPUT TABLE bTable).
 
 END PROCEDURE.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initObject Dialog-Frame 
+PROCEDURE initObject :
+/* Init
+*/
+  DEFINE BUFFER bTable FOR ttTable.
+
+  DO WITH FRAME {&FRAME-NAME}:
+
+    /* Set databases */
+    cbDatabase:LIST-ITEMS = ',' + getDatabaseList().
+    cbDatabase:SCREEN-VALUE = getRegistry('DataDigger','Database') NO-ERROR.
+
+    btnEdit:LOAD-IMAGE(getImagePath('edit.gif')).
+    btnDelete:LOAD-IMAGE(getImagePath('delete.gif')).
+    fiGroupName = pcGroup.
+
+    RUN enable_UI.
+
+    FOR EACH bTable WHERE bTable.lFavourite = TRUE:
+      gcFavouriteTables = TRIM(gcFavouriteTables + ',' + bTable.cTableName,',').
+    END.
+  END.
+
+END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
