@@ -47,6 +47,8 @@ DataDigger version 25
 - Solved: Drawing error in easter egg
 - Solved: Missing level in easter egg
 - Solved: HTML dumpfile not properly escaped (Gilles Querret)
+- Solved: Username sometimes not retrieved properly #54 (Movedoa)
+- Solved: Deprecated option RCODE-INFORMATION on TT definitions removed #53 (Movedoa)
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
@@ -55,6 +57,7 @@ DataDigger version 25
 - Change: Removed unused tracking of DD functions
 - Change: Minimum window size much smaller now
 - Change: Favourites are now stored db-independent
+- Change: No hardcoded limit for maximum window width #55 (Tipe)
 
 - New   : Option to change window title via myDataDigger.p (Johan Geerts)
 - New   : Generate dump/load: toggle for selected fields only (Dirk Vreken)

@@ -33,7 +33,7 @@ DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
 DEFINE VARIABLE ghXmlTable     AS HANDLE    NO-UNDO.
 
 /* Table to hold all xml file names */
-DEFINE TEMP-TABLE ttXmlFile NO-UNDO RCODE-INFORMATION
+DEFINE TEMP-TABLE ttXmlFile NO-UNDO
   FIELD iFileNr     AS INTEGER
   FIELD cFileName   AS CHARACTER
   FIELD lValidFile  AS LOGICAL
@@ -43,7 +43,7 @@ DEFINE TEMP-TABLE ttXmlFile NO-UNDO RCODE-INFORMATION
   FIELD cFields     AS CHARACTER FORMAT "X(140)"
   .
 
-DEFINE TEMP-TABLE ttMessage NO-UNDO RCODE-INFORMATION
+DEFINE TEMP-TABLE ttMessage NO-UNDO
   FIELD iFileNr     AS INTEGER
   FIELD iType       AS INTEGER /* 1=info 2=warning 3=error */
   FIELD cMessage    AS CHARACTER

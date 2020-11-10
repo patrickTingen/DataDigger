@@ -141,12 +141,12 @@ PROCEDURE CloseHandle EXTERNAL "kernel32" :
   DEFINE RETURN PARAMETER ReturnValue AS LONG.
 END PROCEDURE.
 
-DEFINE TEMP-TABLE ttColor NO-UNDO RCODE-INFORMATION
+DEFINE TEMP-TABLE ttColor NO-UNDO
   FIELD cName  AS CHARACTER
   FIELD iColor AS INTEGER
   INDEX iPrim AS PRIMARY cName.
 
-DEFINE TEMP-TABLE ttFont NO-UNDO RCODE-INFORMATION
+DEFINE TEMP-TABLE ttFont NO-UNDO
   FIELD cName  AS CHARACTER
   FIELD iFont  AS INTEGER
   INDEX iPrim AS PRIMARY cName.
@@ -4587,7 +4587,7 @@ FUNCTION getUserName RETURNS CHARACTER
   RUN GetUserNameA(INPUT mUserId, INPUT-OUTPUT intSize, OUTPUT intResult).
   COPY-LOB mUserId FOR (intSize - 1) TO cUserName NO-CONVERT.
 
-  IF intResult <> 1 THEN
+  IF intResult <> 1 OR cUserName = "" OR cUserName = ? THEN
     cUserName = "default".
   ELSE
     cUserName = REPLACE(cUserName,".","").

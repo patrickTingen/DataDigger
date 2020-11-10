@@ -37,7 +37,7 @@ DEFINE VARIABLE ghBackupTable     AS HANDLE    NO-UNDO.
 DEFINE VARIABLE gcLargeFields     AS CHARACTER NO-UNDO.
 
 /* This table holds the actual values of the selected records */
-DEFINE TEMP-TABLE ttData NO-UNDO RCODE-INFORMATION
+DEFINE TEMP-TABLE ttData NO-UNDO
   FIELD cFieldName AS CHARACTER
   FIELD cValue     AS CHARACTER FORMAT 'x(80)'
   INDEX iPrim IS PRIMARY cFieldName /* cValue */.
@@ -1790,4 +1790,3 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

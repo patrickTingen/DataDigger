@@ -578,7 +578,7 @@ PROCEDURE generateCode :
             + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
             .
             
-    cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO&3&4 RCODE-INFORMATION'.
+    cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO&3&4'.
     IF tgLowerCase:CHECKED THEN cMask = LC(cMask).
     cText = SUBSTITUTE(cMask
                       , cHeader
