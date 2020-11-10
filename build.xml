@@ -45,6 +45,7 @@
       <rename path="//file/@name" to="path" />
       <rename path="//testcase" to="testCase" />
       <remove path="//testCase/@time" />
+      <remove path="//file/properties" />
       <attr path="//testCase" attr="duration" value="0" />
     </xmltask>
   </target>
