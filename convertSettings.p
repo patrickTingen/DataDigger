@@ -78,7 +78,6 @@ SESSION:SET-WAIT-STATE("").
 PROCEDURE convertFrom-19 :
 /* v19 -> 20
 */
-  DEFINE VARIABLE cValue AS CHARACTER   NO-UNDO.
   DEFINE BUFFER bfConfig FOR ttConfig.
 
   /* Obsolete files */

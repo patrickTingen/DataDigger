@@ -976,9 +976,8 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
   DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
-  DEFINE VARIABLE cRealOldValue   AS CHARACTER  NO-UNDO.
-  DEFINE VARIABLE lCommit         AS LOGICAL    NO-UNDO.
-  DEFINE VARIABLE iFormatLength   AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE lCommit         AS LOGICAL NO-UNDO.
+  DEFINE VARIABLE iFormatLength   AS INTEGER NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
@@ -1136,9 +1135,6 @@ PROCEDURE btnGoChoose :
 
               IF bField.cFormat BEGINS "x(" THEN
               DO:
-                cRealOldValue = hSourceBuffer:BUFFER-FIELD(bColumn.cFieldName):BUFFER-VALUE(bColumn.iExtent).
-                iFormatLength = INTEGER(ENTRY(1, ENTRY(2, bField.cFormat, "("), ")")) NO-ERROR.
-
                 IF LENGTH(bColumn.cOldValue) > {&field-maxLength} THEN
                   lCommit = NO.
               END.
@@ -1288,10 +1284,9 @@ PROCEDURE getDataValues :
   DEFINE INPUT PARAMETER pcColumn AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER piExtent AS INTEGER     NO-UNDO.
 
-  DEFINE VARIABLE cRowValue            AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hBuffer              AS HANDLE    NO-UNDO.
-  DEFINE VARIABLE iRow                 AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE lLargeCharacterFound AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE cRowValue AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hBuffer   AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iRow      AS INTEGER   NO-UNDO.
 
   DEFINE BUFFER bData FOR ttData.
 

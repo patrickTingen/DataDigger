@@ -8032,7 +8032,6 @@ PROCEDURE initializeObjects :
   DEFINE VARIABLE iField     AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iStackSize AS INTEGER   NO-UNDO.
 
-  DEFINE BUFFER bFavGroup     FOR ttFavGroup.
   DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
 
   {&timerStart}
@@ -10254,7 +10253,6 @@ PROCEDURE reopenTableBrowse :
   DEFINE VARIABLE rCurrentRecord    AS ROWID       NO-UNDO.
   DEFINE VARIABLE cDatabaseFilter   AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSetting          AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cFavouriteGroup   AS CHARACTER   NO-UNDO.
 
   DEFINE BUFFER bTable FOR ttTable.
 
@@ -10264,7 +10262,6 @@ PROCEDURE reopenTableBrowse :
 
     cTableFilter = getTableFilter().
     cDatabaseFilter = cbDatabaseFilter:SCREEN-VALUE.
-    cFavouriteGroup = cbFavouriteGroup:SCREEN-VALUE.
 
     RUN setRedLines.
 
@@ -13336,4 +13333,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
