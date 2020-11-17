@@ -50,6 +50,7 @@ DataDigger version 25
 - Solved: Username sometimes not retrieved properly #54 (Movedoa)
 - Solved: Deprecated option RCODE-INFORMATION on TT definitions removed #53 (Movedoa)
 - Solved: Conversion procedure not found
+- Solved: Pingback restriction not always respected
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)

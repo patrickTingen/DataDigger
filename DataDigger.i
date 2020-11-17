@@ -36,6 +36,9 @@
 */
 &GLOBAL-DEFINE PINGBACKURL   https://is.gd/DataDigger25
 &GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger25
+&GLOBAL-DEFINE EASTEREGG     https://is.gd/EasterEgg
+&GLOBAL-DEFINE FEELINGLUCKY  https://is.gd/FeelingLucky
+
 /* DataDigger 24: https://is.gd/stats.php?url=DataDigger
    DataDigger 25: https://is.gd/stats.php?url=DataDigger25
 */

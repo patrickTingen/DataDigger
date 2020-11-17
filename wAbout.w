@@ -109,10 +109,10 @@ DEFINE FRAME DEFAULT-FRAME
      btnDataDigger AT ROW 1.71 COL 3 WIDGET-ID 324
      BtnOK AT Y 10 X 540 WIDGET-ID 48
      edChangelog AT Y 60 X 5 NO-LABEL WIDGET-ID 72
-     fiDataDigger-1 AT Y 15 X 40 COLON-ALIGNED NO-LABEL WIDGET-ID 74
-     fiDataDigger-2 AT Y 32 X 40 COLON-ALIGNED NO-LABEL WIDGET-ID 76
+     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 74
+     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 76
      fiWebsite AT Y 425 X 227 NO-LABEL WIDGET-ID 298
-     imgPlayer AT ROW 2.43 COL 60.6 WIDGET-ID 328
+     imgPlayer AT ROW 2.43 COL 61.2 WIDGET-ID 328
      imgBall AT ROW 5.43 COL 59.8 WIDGET-ID 330
      rcCord AT ROW 4.05 COL 60.6 WIDGET-ID 332
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
@@ -258,8 +258,14 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
+  DEFINE VARIABLE iResult AS INTEGER NO-UNDO.
+
   {&WINDOW-NAME}:SENSITIVE = FALSE.
   chCtrlFrame:PSTimer:ENABLED = FALSE.
+
+  IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE THEN 
+    RUN urlDownloadToFileA (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+
   RUN SokoDigger.w.
   {&WINDOW-NAME}:SENSITIVE = TRUE.
 END.
@@ -393,11 +399,8 @@ PROCEDURE blinkLogo :
     END.
     IF xx <= 5 THEN LEAVE #Bounce.
 
-    RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, YES).
     btnDataDigger:X = xx.
     btnDataDigger:Y = yy.
-    btnDataDigger:MOVE-TO-TOP().
-    RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
 
     RUN justWait(9).
   END.
@@ -406,7 +409,7 @@ PROCEDURE blinkLogo :
   btnDataDigger:Y = 15.
 
   /* Blink logo */
-  DO ii = 1 TO 2:
+  DO ii = 1 TO 3:
     btnDataDigger:SENSITIVE = NO.
     RUN justWait(300).
     btnDataDigger:SENSITIVE = YES.
@@ -422,11 +425,9 @@ PROCEDURE blinkLogo :
     imgPlayer:Y = ii.
     IF ii > 90 THEN 
     DO: 
-      RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, YES).
       imgBall:Y = imgBall:Y + 4.
       rcCord:Y = rcCord:Y + 4.
       edChangelog:HEIGHT-PIXELS = edChangelog:HEIGHT-PIXELS + 4.
-      RUN lockWindow(FRAME {&FRAME-NAME}:HANDLE, NO).
     END.
 
     RUN justWait(9).
