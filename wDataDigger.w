@@ -6538,8 +6538,6 @@ END PROCEDURE.
 PROCEDURE disconnectDatabase :
 /* Disconnect the current database and rebuild table table
   */
-  DEFINE VARIABLE cDatabases  AS CHARACTER NO-UNDO.
-
   /* Confirm by user */
   RUN showHelp("Disconnect", gcCurrentDatabase).
   IF getRegistry("DataDigger:Help", "Disconnect:answer") <> "1" THEN RETURN.
@@ -10863,7 +10861,6 @@ PROCEDURE setFrameColor :
   DEFINE INPUT PARAMETER pcColor AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE iColor AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iRed   AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iGreen AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iBlue  AS INTEGER   NO-UNDO.
@@ -12025,7 +12022,6 @@ PROCEDURE showNewFeatures :
 /* Highlight some new features
    */
   DEFINE VARIABLE cOldTitle AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
 
   demoLoop:
   DO WITH FRAME frMain:
@@ -13442,4 +13438,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
