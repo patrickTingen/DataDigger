@@ -19,25 +19,23 @@
            DD20: customShowField added
            DD21: customSaveFilterValue / customGetFilterValue added, customFilter removed
            DD24: added support for events 'query' and 'datadigger'
+           DD25: added example for setFrameColor, updated with wiki links
 
  *************************************************************************/
 
 /* All functions of DataDigger, see DataDiggerLib for a full list */
 {datadigger.i}
 
-/* #QAD
-/* You might like to set global_domain based on (for example) database name */
+/* 
+/* global_domain definition for #QAD usage */
 define new global shared variable global_domain as character.
 */
 
-/* If your database is password-enabled, uncomment next line for login window.
-*/
+/* Uncomment this for password-enabled db to get login window. */
 /* RUN _prostar.p. */
 
-
-/* #QAD users might use this function to determine the 
- *       domain-field in a table 
- */ 
+/*
+/* Function for #QAD to determine the domain-field in a table */ 
 FUNCTION getDomainFieldName RETURNS CHARACTER
   ( pcDatabase AS CHARACTER
   , pcTable    AS CHARACTER ):
@@ -68,109 +66,39 @@ FUNCTION getDomainFieldName RETURNS CHARACTER
   RETURN cDomainFieldName.
 
 END FUNCTION. /* getDomainFieldName */
+*/
 
 
 /*
-PROCEDURE setWindowTitle:
+PROCEDURE DataDigger:
   /*
-   * Name: setWindowTitle
-   * Desc: Change the title of the main window
-   *
-   * This hook enables you to change the title of the DataDigger window.
-   *
-   * This is handy if you want to have other information in the title bar
-   * that is not provided by DataDigger (for example user name)
-   *
+   * Name: DataDigger
+   * Desc: Called on open and close of a DataDigger window.
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-StartDataDigger
+   * 
+   * When DD is started and closed, this event is published 
+   * with piNumber = 1 for opening and -1 for closing. 
    */
-  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER pcTitle AS CHARACTER NO-UNDO.
-
-  /* Example 1: add user name to title bar
-  IF NUM-DBS > 0 THEN pcTitle = pcTitle + ' ' + USERID(LDBNAME(1)).
-  */
+  DEFINE INPUT PARAMETER piNumber AS INTEGER.
+                                      
+  /* Check if we are allowed to start */
+  IF piNumber = 1 
+    AND SEARCH('db-maintenance.txt') <> ? THEN 
+  DO:
+    MESSAGE 'Sorry, db is in maintenance, please try again later' VIEW-AS ALERT-BOX.
+    QUIT.
+  END.  
   
-  /* Example 2: replace title with simple version of db + table name
-  pcTitle = SUBSTITUTE('&1.&2', pcDatabase, pcTable).
-  */
-  
-END PROCEDURE. /* setWindowTitle */
+END PROCEDURE. /* DataDigger */
 */
 
 
 /*
-PROCEDURE customShowField:
-  /*
-   * Name: customShowField
-   * Desc: Change the visibility for a field
-   *
-   * This hook enables you to change the default visibility of a field.
-   *
-   * This is handy if you have some fields in your database that
-   * you never want to select, for example fields that have been added by
-   * your framework to all tables but which do not hold value for you.
-   *
-   * Note that this is just the default visibility. During run-time you
-   * can always change the visibility.
-   */
-  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
-  DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
-
-  /* Example 1: hide the cust-num field except on the customer table
-  IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
-  */
-
-  /* Example 2: hide the default RECID and ROWID field
-  IF pcField = 'RECID' OR pcField = 'ROWID' THEN plShow = FALSE.
-  */
-
-  /* Example 3: By default, do not show extra #QAD fields */
-  /* IF pcField MATCHES '*__*' THEN plShow = FALSE. */
-
-END PROCEDURE. /* customShowField */
-*/
-
-
-/*
-PROCEDURE customFormat:
-  /*
-   * Name: customFormat
-   * Desc: Change the format for a field
-   *
-   * Depending on the input parameters you are able to adjust
-   * the format of a field. This routine is called after the
-   * custom format is fetched from the user settings.
-   *
-   * This is handy if - for example - all userid fields in your
-   * database have the wrong format. Or if you want to show
-   * all decimal fields with 4 decimals instead of 3.
-   */
-  DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER NO-UNDO.
-  DEFINE INPUT  PARAMETER pcTable    AS CHARACTER NO-UNDO.
-  DEFINE INPUT  PARAMETER pcField    AS CHARACTER NO-UNDO.
-  DEFINE INPUT  PARAMETER pcDatatype AS CHARACTER NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER pcFormat AS CHARACTER NO-UNDO.
-
-  /* Example code: set minus sign at the front of an decimal field */
-  /* IF pcDataType = "DECIMAL"                                     */
-  /*  AND NOT pcFormat BEGINS "-" THEN pcFormat = "-" + pcFormat.  */
-
-  /* Example code: Use at least 3 decimals for price field */
-  /* IF pcDataType = 'DECIMAL'                                       */
-  /*  AND pcField = 'Price'                                          */
-  /*  AND pcFormat MATCHES '*~~.99' THEN pcFormat = pcFormat + '9'.  */
-
-END PROCEDURE. /* customFormat */
-*/
-
-
-/*
-PROCEDURE CustomDump:
+PROCEDURE customDump:
   /*
    * Name: customDump.p
    * Desc: Customized dump data from DataDigger
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomDump
    *
    * DataDigger will call this file with the following parameters:
    *
@@ -217,29 +145,133 @@ PROCEDURE CustomDump:
   DEFINE OUTPUT PARAMETER plDefaultDump AS LOGICAL   NO-UNDO INITIAL TRUE.
   DEFINE OUTPUT PARAMETER plContinue    AS LOGICAL   NO-UNDO INITIAL TRUE.
 
-  /* Example code: ask if user is really sure to delete */
-  /*   IF pcAction = 'Delete' THEN                                                              */
-  /*   DO:                                                                                      */
-  /*     MESSAGE 'Are you really really really sure you want to delete these precious records?' */
-  /*       VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE plContinue.                      */
-  /*   END.                                                                                     */
-  /*                                                                                            */
-  /*   ELSE                                                                                     */
-  /*   DO:                                                                                      */
-  /*     /* This will export your data just like DataDigger does */                             */
-  /*     phData:WRITE-XML                                                                       */
-  /*       ( 'file'        /* TargetType     */                                                 */
-  /*       , pcFileName    /* File           */                                                 */
-  /*       , YES           /* Formatted      */                                                 */
-  /*       , ?             /* Encoding       */                                                 */
-  /*       , ?             /* SchemaLocation */                                                 */
-  /*       , NO            /* WriteSchema    */                                                 */
-  /*       , NO            /* MinSchema      */                                                 */
-  /*       ).                                                                                   */
-  /*     ASSIGN plContinue = TRUE.                                                              */
-  /*   END.                                                                                     */
+  /*
+  /* Ask if user is really sure to delete */
+  IF pcAction = 'Delete' THEN                                                              
+  DO:                                                                                      
+    MESSAGE 'Are you really really really sure you want to delete these precious records?' 
+      VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO UPDATE plContinue.                      
+  END.                                                                                     
+                                                                                           
+  ELSE                                                                                     
+  DO:                                                                                      
+    /* This will export your data just like DataDigger does */                             
+    phData:WRITE-XML                                                                       
+      ( 'file'        /* TargetType     */                                                 
+      , pcFileName    /* File           */                                                 
+      , YES           /* Formatted      */                                                 
+      , ?             /* Encoding       */                                                 
+      , ?             /* SchemaLocation */                                                 
+      , NO            /* WriteSchema    */                                                 
+      , NO            /* MinSchema      */                                                 
+      ).                                                                                   
+    ASSIGN plContinue = TRUE.                                                              
+  END.                                                                                     
+  */
+  
+END PROCEDURE. /* customDump */
+*/
 
-END PROCEDURE. /* CustomDump */
+
+/*
+PROCEDURE customFrameColor:
+  /*
+   * Name: customFrameColor
+   * Desc: Change the background color of the main window
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-FrameColor
+   *
+   * This is handy if you want to make it clear that you have a certain
+   * database connected, eg production or test. This routine is called on startup
+   * and every time you connect or disconnect a database.
+   */
+  DEFINE OUTPUT PARAMETER pcFrameColor AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabases AS CHARACTER NO-UNDO.
+
+  /* Set frame to green for SPORTS or yellow for production db 
+  */
+  cDatabases = getDatabaseList().
+
+  IF cDatabases MATCHES '*prod*' THEN 
+    pcFrameColor = '14'. /* Progress color nr for yellow  */
+  ELSE 
+  IF cDatabases MATCHES '*sports*' THEN 
+    pcFrameColor = '200,255,200'. /* RGB for light green */
+  ELSE 
+    pcFrameColor = ?. /* sets to default color */
+
+END PROCEDURE. /* customFrameColor */
+*/
+
+
+/*
+PROCEDURE customFormat:
+  /*
+   * Name: customFormat
+   * Desc: Change the format for a field
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomFormat
+   *
+   * Depending on the input parameters you are able to adjust the format of 
+   * a field. This routine is called after the custom format is fetched 
+   * from the user settings.
+   *
+   * This is handy if - for example - all userid fields in your
+   * database have the wrong format. Or if you want to show
+   * all decimal fields with 4 decimals instead of 3.
+   */
+  DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT  PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE INPUT  PARAMETER pcField    AS CHARACTER NO-UNDO.
+  DEFINE INPUT  PARAMETER pcDatatype AS CHARACTER NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER pcFormat AS CHARACTER NO-UNDO.
+
+  /*
+  /* Example 1: Set minus sign at the front of an decimal field */
+  IF pcDataType = "DECIMAL" 
+    AND NOT pcFormat BEGINS "-" THEN pcFormat = "-" + pcFormat.
+
+  /* Example 2: Use at least 3 decimals for price field */
+  IF pcDataType = 'DECIMAL'
+    AND pcField = 'Price'
+    AND pcFormat MATCHES '*~~.99' THEN pcFormat = pcFormat + '9'.
+  */
+
+END PROCEDURE. /* customFormat */
+*/
+
+
+/*
+PROCEDURE customShowField:
+  /*
+   * Name: customShowField
+   * Desc: Change the visibility for a field
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomShowField
+   *
+   * This hook enables you to change the default visibility of a field.
+   *
+   * This is handy if you have some fields in your database that
+   * you never want to select, for example fields that have been added by
+   * your framework to all tables but which do not hold value for you.
+   *
+   * Note that this is just the default visibility. During run-time you
+   * can always change the visibility.
+   */
+  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcField    AS CHARACTER NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER plShow AS LOGICAL NO-UNDO.
+
+  /*
+  /* Example 1: hide the cust-num field except on the customer table */
+  IF pcField = 'cust-num' AND pcTable <> 'customer' THEN plShow = FALSE.
+
+  /* Example 2: hide the default RECID and ROWID field */
+  IF pcField = 'RECID' OR pcField = 'ROWID' THEN plShow = FALSE.
+
+  /* Example 3: By default, do not show extra #QAD fields */
+  IF pcField MATCHES '*__*' THEN plShow = FALSE. 
+  */
+
+END PROCEDURE. /* customShowField */
 */
 
 
@@ -248,6 +280,7 @@ PROCEDURE customQuery:
   /*
    * Name: customQuery.p
    * Desc: Adjust query string
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomQuery
    *
    * This routine is called when DataDigger places a query in the WHERE-editor
    * and when you select a table. In that case the query is empty. In all
@@ -263,37 +296,13 @@ PROCEDURE customQuery:
   DEFINE INPUT  PARAMETER pcTable       AS CHARACTER NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
 
-  /* Example code: get the most recently used query from query history */
-  /* IF pcQuery = "" THEN                                              */
-  /*  pcQuery = DYNAMIC-FUNCTION("getQuery", pcDatabase, pcTable, 1).  */
+  /*          
+  /* Example: get the most recently used query from query history */
+  IF pcQuery = "" THEN
+    pcQuery = getQuery(pcDatabase, pcTable, 1).
+  */
 
 END PROCEDURE. /* customQuery */
-*/
-
-
-/*
-PROCEDURE DataDigger:
-  /*
-   * Name: DataDigger
-   * Desc: Called on open and close of a DataDigger window.
-   * 
-   * When DD is started and closed, this event is published 
-   * with piNumber = 1 for opening and -1 for closing. 
-   */
-  DEFINE INPUT PARAMETER piNumber AS INTEGER.
-
-  /* Example code: quit DD when a certain .txt file is found
-   *
-     
-  /* Check if we are allowed to start */
-  IF piNumber = 1 
-    AND SEARCH('db-maintenance.txt') <> ? THEN 
-  DO:
-    MESSAGE 'Sorry, db is in maintenance, please try again later' VIEW-AS ALERT-BOX.
-    QUIT.
-  END.  
-  */
-END PROCEDURE. /* DataDigger */
 */
 
 
@@ -301,9 +310,11 @@ END PROCEDURE. /* DataDigger */
 PROCEDURE customGetFilterValue:
   /*
    * Name: customGetFilterValue
-   * Desc: After the data browse is created, the filter fields
-   *       are created one by one. You can use this routine to
-   *       give them a default value.
+   * Desc: Set a default value for field filters
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-FilterValue
+   * 
+   * After the data browse is created, the filter fields are created 
+   * one by one. You can use this routine to give them a default value.
    */
   DEFINE INPUT  PARAMETER pcDatabase AS CHARACTER NO-UNDO.
   DEFINE INPUT  PARAMETER pcTable    AS CHARACTER NO-UNDO.
@@ -316,12 +327,12 @@ PROCEDURE customGetFilterValue:
 END PROCEDURE. /* customGetFilterValue */
 */
 
-
 /*
 PROCEDURE customSaveFilterValue:
   /*
    * Name: customSaveFilterValue
    * Desc: Perform actions based on the value of a filter
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-FilterValue
    *
    */
   DEFINE INPUT PARAMETER pcDatabase    AS CHARACTER NO-UNDO.
@@ -330,8 +341,7 @@ PROCEDURE customSaveFilterValue:
   DEFINE INPUT PARAMETER pcFilterValue AS CHARACTER NO-UNDO.
 
   /* Example code: save value of a particular field 
-   * #QAD users could use this to catch filtering on global_domain
-   *       and then later adding it to the query.
+   * For #QAD, catch filter on global_domain. Add back to query later.
    */
   /* IF pcField MATCHES "*_domain" THEN global_domain = pcFilterValue. */
 
@@ -339,35 +349,69 @@ END PROCEDURE. /* customSaveFilterValue */
 */
 
 
+
 /*
 PROCEDURE queryOpen:
   /* 
    * Name: queryOpen
    * Desc: Receive the full query that is executed
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-QueryOpen
    */
   DEFINE INPUT PARAMETER pcQuery AS CHARACTER NO-UNDO. 
   
-  /* DEFINE VARIABLE iWord  AS INTEGER   NO-UNDO.                     */
-  /* DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.                     */
-  /*                                                                  */
-  /* /* Remove double spaces */                                       */
-  /* DO WHILE REPLACE(pcQuery,'  ', ' ') <> pcQuery:                  */
-  /*   pcQuery = REPLACE(pcQuery,'  ', ' ').                          */
-  /* END.                                                             */
-  /*                                                                  */
-  /* /* Parse the query word by word and look for the domain field    */
-  /*  * If the domain field is used in an equality match, filter out  */
-  /*  * the value and save that as the new global_domain              */
-  /*  */                                                              */
-  /* DO iWord = 1 TO NUM-ENTRIES(pcQuery,' ') - 2:                    */
-  /*   IF ENTRY(iWord,pcQuery,' ') MATCHES '*_domain'                 */
-  /*     AND ENTRY(iWord + 1,pcQuery,' ') = '=' THEN                  */
-  /*   DO:                                                            */
-  /*     cValue = ENTRY(iWord + 2,pcQuery,' ').                       */
-  /*     cValue = TRIM(cValue,'()"~'').                               */
-  /*     IF cValue > '' THEN global_domain = cValue.                  */
-  /*   END.                                                           */
-  /* END.                                                             */
+  /*
+  DEFINE VARIABLE iWord  AS INTEGER   NO-UNDO.                     
+  DEFINE VARIABLE cValue AS CHARACTER NO-UNDO.                     
+                                                                   
+  /* Remove double spaces */                                       
+  DO WHILE REPLACE(pcQuery,'  ', ' ') <> pcQuery:                  
+    pcQuery = REPLACE(pcQuery,'  ', ' ').                          
+  END.                                                             
+                                                                   
+  /* Parse the query word by word and look for the domain field.
+   * If the #QAD domain field is used in an equality match, filter 
+   * out the value and save that as the new global_domain
+   */
+  DO iWord = 1 TO NUM-ENTRIES(pcQuery,' ') - 2:
+    IF ENTRY(iWord,pcQuery,' ') MATCHES '*_domain'
+      AND ENTRY(iWord + 1,pcQuery,' ') = '=' THEN
+    DO:
+      cValue = ENTRY(iWord + 2,pcQuery,' ').
+      cValue = TRIM(cValue,'()"~'').
+      IF cValue > '' THEN global_domain = cValue.
+    END.
+  END.
+  */
   
 END PROCEDURE. /* queryOpen */
 */
+
+
+/*
+PROCEDURE setWindowTitle:
+  /*
+   * Name: setWindowTitle
+   * Desc: Change the title of the main window
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-SetWindowTitle
+   *
+   * This hook enables you to change the title of the DataDigger window.
+   *
+   * This is handy if you want to have other information in the title bar
+   * that is not provided by DataDigger (for example user name)
+   *
+   */
+  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER pcTitle AS CHARACTER NO-UNDO.
+
+  /* Example 1: add user name to title bar
+  IF NUM-DBS > 0 THEN pcTitle = pcTitle + ' ' + USERID(LDBNAME(1)).
+  */
+  
+  /* Example 2: replace title with simple version of db + table name
+  pcTitle = SUBSTITUTE('&1.&2', pcDatabase, pcTable).
+  */
+
+END PROCEDURE. /* setWindowTitle */
+*/
+

@@ -28,8 +28,8 @@ DEFINE {&invar} picTableName      AS CHARACTER  NO-UNDO.
   DEFINE {&invar} TABLE FOR ttColumn.
 &ENDIF
 
-DEFINE {&outvar} polSuccess        AS LOGICAL   NO-UNDO INITIAL ?.
-DEFINE {&outvar} porRepositionId   AS ROWID     NO-UNDO.
+DEFINE {&outvar} polSuccess       AS LOGICAL   NO-UNDO INITIAL ?.
+DEFINE {&outvar} porRepositionId  AS ROWID     NO-UNDO.
 
 /* Local Variable Definitions ---                                       */
 DEFINE VARIABLE gcUniqueFields    AS CHARACTER NO-UNDO.
@@ -977,7 +977,6 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lCommit         AS LOGICAL NO-UNDO.
-  DEFINE VARIABLE iFormatLength   AS INTEGER NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bField  FOR ttField.
@@ -1514,6 +1513,7 @@ PROCEDURE initializeObject :
         DO:
           ttData.cValue = SUBSTRING(ttData.cValue, 1, {&field-maxLength}).
           bColumn.cNewValue = ttData.cValue.
+          bColumn.lShow     = FALSE.
         END.
       END.
     END.

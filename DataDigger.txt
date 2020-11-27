@@ -40,8 +40,8 @@ DataDigger version 25
 - Solved: Filters of field browse were not aligned after double-click (Dirk Vreken)
 - Solved: Warnings when exporting to Excel (Dirk Vreken)
 - Solved: ADM errors when running DD during session
-- Solved: DICTDB alias not set while running DD #51 (Dubravko Laba�)
-- Solved: Codepage errors on exporting to Excel #52 (Dubravko Laba�)
+- Solved: DICTDB alias not set while running DD #51 (Dubravko Labas)
+- Solved: Codepage errors on exporting to Excel #52 (Dubravko Labas)
 - Solved: Error when changing field format when query was not yet opened (Didier Dujardin)
 - Solved: List of tables is refreshed after change in dictionary
 - Solved: Drawing error in easter egg
@@ -51,6 +51,7 @@ DataDigger version 25
 - Solved: Deprecated option RCODE-INFORMATION on TT definitions removed #53 (Movedoa)
 - Solved: Conversion procedure not found
 - Solved: Pingback restriction not always respected
+- Solved: Connections not synchronized among multiple windows in one session
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
@@ -60,6 +61,7 @@ DataDigger version 25
 - Change: Minimum window size much smaller now
 - Change: Favourites are now stored db-independent
 - Change: No hardcoded limit for maximum window width #55 (Tipe)
+- Change: When editing, fields with long data are now not selected for saving
 
 - New   : Option to change window title via myDataDigger.p (Johan Geerts)
 - New   : Generate dump/load: toggle for selected fields only (Dirk Vreken)
@@ -68,6 +70,8 @@ DataDigger version 25
 - New   : Extra levels for the easter egg
 - New   : Option to generate bulk delete routine
 - New   : Logical fields can be filtered on non-standard format values (Hans Kaman)
+- New   : More help options
+- New   : Option to set frame color via customization
 
 =====================================================================================
 

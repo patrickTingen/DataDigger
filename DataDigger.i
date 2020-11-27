@@ -34,8 +34,9 @@
  * changed from https://goo.gl/24deK3 to is.gd because google has ended the service
  * get analytics for the is.gd link by adding a - (minus) to it
 */
-&GLOBAL-DEFINE PINGBACKURL   https://is.gd/DataDigger25
-&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger25
+&GLOBAL-DEFINE PINGBACKURL   https://is.gd/DataDigger
+&GLOBAL-DEFINE PINGBACKSTATS https://is.gd/stats.php?url=DataDigger
+&GLOBAL-DEFINE LATESTVERSION https://is.gd/DataDigger25
 &GLOBAL-DEFINE EASTEREGG     https://is.gd/EasterEgg
 &GLOBAL-DEFINE FEELINGLUCKY  https://is.gd/FeelingLucky
 

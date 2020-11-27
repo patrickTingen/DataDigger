@@ -193,7 +193,7 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit fiTableFilter ~
 cbDatabaseFilter btnFavourite tgSelAll fiIndexNameFilter fiFlagsFilter ~
 fiFieldsFilter btnClearIndexFilter brTables brFields brIndexes tgDebugMode ~
-fiTableDesc cbFavouriteGroup btnClearTableFilter ficWhere btnTableFilter ~
+fiTableDesc cbFavouriteGroup ficWhere btnClearTableFilter btnTableFilter ~
 btnAddFavGroup btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
@@ -392,6 +392,17 @@ FUNCTION trimList RETURNS CHARACTER
 DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
+DEFINE MENU POPUP-MENU-btnHelp 
+       MENU-ITEM m_Introduction_DataDigger LABEL "&Introduction to DataDigger"
+       MENU-ITEM m_New_in_this_version LABEL "&New in this version"
+       RULE
+       MENU-ITEM m_DataDigger_blog LABEL "&Blog on wordpress.com"
+       MENU-ITEM m_DataDigger_on_GitHub LABEL "&Source code on GitHub"
+       MENU-ITEM m_DataDigger_Wiki LABEL "&Wiki with How-To and docu"
+       RULE
+       MENU-ITEM m_Create_an_issue_on_GitHub LABEL "Create an &issue on GitHub"
+       MENU-ITEM m_questions_and_feedback LABEL "&Questions and feedback".
+
 DEFINE MENU POPUP-MENU-btnView 
        MENU-ITEM m_View_as_text LABEL "View as TEXT"  
        MENU-ITEM m_View_as_HTML LABEL "View as HTML"  
@@ -723,7 +734,7 @@ DEFINE BUTTON btnExpand-txt  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnHelp 
      LABEL "Help" 
-     SIZE-PIXELS 30 BY 30 TOOLTIP "show quick intro #(CTRL-SHIFT-W)".
+     SIZE-PIXELS 30 BY 30 TOOLTIP "help on DataDigger".
 
 DEFINE BUTTON btnHelp-txt  NO-FOCUS FLAT-BUTTON
      LABEL "&Welcome" 
@@ -991,9 +1002,9 @@ DEFINE FRAME frMain
      tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      ficWhere AT Y 266 X 80 NO-LABEL
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
+     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
      btnTableFilter AT Y 3 X 257 WIDGET-ID 38
      btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
      btnWhere AT Y 265 X 683 WIDGET-ID 236
@@ -1033,17 +1044,46 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
+     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
+     btnSettings AT Y 70 X 1 WIDGET-ID 210
+     btnDict AT Y 105 X 1 WIDGET-ID 224
+     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
+     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
+     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
+     btnConnections AT Y 245 X 1 WIDGET-ID 212
+     btnEditor AT Y 280 X 1 WIDGET-ID 228
+     btnHelp AT Y 315 X 1 WIDGET-ID 260
+     btnAbout AT Y 350 X 1 WIDGET-ID 196
+     btnExpand AT Y 485 X 1 WIDGET-ID 306
+     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
+     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
+     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
+     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
+     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
+     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
+     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
+     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
+     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
+     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
+     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
+     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15  WIDGET-ID 500.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
+     btGotIt AT Y 110 X 104 WIDGET-ID 4
+     imgArrow AT Y 0 X 0 WIDGET-ID 10
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14  WIDGET-ID 600.
 
 DEFINE FRAME frWhere
      btnBegins AT Y 123 X 17 WIDGET-ID 74
@@ -1081,46 +1121,17 @@ DEFINE FRAME frWhere
          TITLE "Query Editor"
          DEFAULT-BUTTON btnOK WIDGET-ID 400.
 
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 110 X 104 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14  WIDGET-ID 600.
-
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
+     btnDataSort AT Y 4 X 5 WIDGET-ID 300
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
+     rctData AT Y 0 X 0 WIDGET-ID 272
+     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24 WIDGET-ID 700.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1300,6 +1311,9 @@ ASSIGN
    NOT-VISIBLE                                                          */
 ASSIGN 
        FRAME frSettings:HIDDEN           = TRUE.
+
+ASSIGN 
+       btnHelp:POPUP-MENU IN FRAME frSettings       = MENU POPUP-MENU-btnHelp:HANDLE.
 
 /* SETTINGS FOR FRAME frWhere
                                                                         */
@@ -1743,7 +1757,7 @@ ANYWHERE DO:
   END.
 
   setWindowFreeze(YES).
-  RUN initializeObjects.
+  RUN initObjects.
   setWindowFreeze(NO).
   
   &ENDIF
@@ -3023,13 +3037,16 @@ END.
 &Scoped-define SELF-NAME btnHelp
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
 ON CHOOSE OF btnHelp IN FRAME frSettings /* Help */
-OR "CHOOSE" OF btnHelp-txt
-OR "HELP" OF c-win
 DO:
+  DEFINE VARIABLE iReturn AS INTEGER NO-UNDO.
 
-  glShowTour = TRUE.
-  RUN btnHelpChoose.
-  glShowTour = FALSE.
+  /* Force right mouse click on help button */
+  &GLOBAL-DEFINE WM_RBUTTONDOWN 516
+  &GLOBAL-DEFINE MK_RBUTTON 2
+  &GLOBAL-DEFINE WM_RBUTTONUP 517
+  
+  RUN SendMessageA (INPUT SELF:HWND, INPUT {&WM_RBUTTONDOWN}, INPUT {&MK_RBUTTON}, INPUT 0, OUTPUT iReturn).
+  RUN SendMessageA (INPUT SELF:HWND, INPUT {&WM_RBUTTONUP}  , INPUT 0            , INPUT 0, OUTPUT iReturn).
 
 END.
 
@@ -3037,15 +3054,11 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
-ON MOUSE-MENU-CLICK OF btnHelp IN FRAME frSettings /* Help */
-, btnHelp-txt
+&Scoped-define SELF-NAME btnHelp-txt
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp-txt C-Win
+ON CHOOSE OF btnHelp-txt IN FRAME frSettings /* Welcome */
 DO:
-
-  glShowTour = TRUE.
-  RUN showNewFeatures.
-  glShowTour = FALSE.
-
+  APPLY 'choose' TO btnHelp.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4061,6 +4074,92 @@ END.
 &ANALYZE-RESUME
 
 
+&Scoped-define SELF-NAME m_Create_an_issue_on_GitHub
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Create_an_issue_on_GitHub C-Win
+ON CHOOSE OF MENU-ITEM m_Create_an_issue_on_GitHub /* Create an issue on GitHub */
+DO:
+  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/issues/new'). 
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_DataDigger_blog
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_blog C-Win
+ON CHOOSE OF MENU-ITEM m_DataDigger_blog /* Blog on wordpress.com */
+DO:
+  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com').
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_DataDigger_on_GitHub
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_on_GitHub C-Win
+ON CHOOSE OF MENU-ITEM m_DataDigger_on_GitHub /* Source code on GitHub */
+DO:
+  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger').
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_DataDigger_Wiki
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_Wiki C-Win
+ON CHOOSE OF MENU-ITEM m_DataDigger_Wiki /* Wiki with How-To and docu */
+DO:
+  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/wiki'). 
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_Introduction_DataDigger
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Introduction_DataDigger C-Win
+ON CHOOSE OF MENU-ITEM m_Introduction_DataDigger /* Introduction to DataDigger */
+OR "HELP" OF c-win
+DO:
+
+  glShowTour = TRUE.
+  RUN btnHelpChoose.
+  glShowTour = FALSE.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_New_in_this_version
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_New_in_this_version C-Win
+ON CHOOSE OF MENU-ITEM m_New_in_this_version /* New in this version */
+DO:
+  
+  glShowTour = TRUE.
+  RUN showNewFeatures.
+  glShowTour = FALSE.
+
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&Scoped-define SELF-NAME m_questions_and_feedback
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_questions_and_feedback C-Win
+ON CHOOSE OF MENU-ITEM m_questions_and_feedback /* Questions and feedback */
+DO:
+  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/contact').
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
 &Scoped-define SELF-NAME m_View_as_Excel
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_Excel C-Win
 ON CHOOSE OF MENU-ITEM m_View_as_Excel /* View as Excel */
@@ -4136,16 +4235,19 @@ RUN startDiggerLib.
  * startup procedure can demand that all windows are
  * closed. For example, when an update is done
  */
-SUBSCRIBE TO 'DataDiggerClose' ANYWHERE.
+SUBSCRIBE TO "DataDiggerClose" ANYWHERE.
 
 /* If we started the DataDigger from within DWP and we stop
  * DWP, then exit the DataDigger as well.
  * Requested by Jeroen Stam from NetSetup 30-3-2012
  */
-SUBSCRIBE TO "dwp_stop" ANYWHERE RUN-PROCEDURE 'DataDiggerClose'.
+SUBSCRIBE TO "dwp_stop" ANYWHERE RUN-PROCEDURE "DataDiggerClose".
 
 /* Save queries in a temp-table for the query tester */
 SUBSCRIBE TO "query" ANYWHERE RUN-PROCEDURE "processQuery".
+
+/* Refresh connections when a db is (dis)connected in another window */
+SUBSCRIBE TO "refreshConnections" ANYWHERE.
 
 /* Avoid drawing */
 {&WINDOW-NAME}:VISIBLE           = YES. /* otherwise lockwindow complains */
@@ -4321,8 +4423,8 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   /* Notify launcher that the window started */
   PUBLISH 'DataDigger'(+1).
 
-  RUN initializeUi.
-  RUN initializeObjects.
+  RUN initUI.
+  RUN initObjects.
 
   /* Clear wait-message */
   DELETE WIDGET winWait.
@@ -4589,30 +4691,14 @@ PROCEDURE btnConnectionsChoose :
   {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cDummy        AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
 
   cProgDir   = getProgramDir().
-  cDatabasesOld = getDatabaseList().
 
   {&_proparse_ prolint-nowarn(varusage)}
   RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'UI', INPUT '', OUTPUT cDummy).
 
-  /* Rebuild context menu for table browse */
-  RUN createMenuTableBrowse.
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-
-  /* If needed, repopulate db combo */
-  IF cDatabases <> cDatabasesOld THEN
-  DO:
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
-
-    RUN filterTables.
-  END.
+  /* Refresh connections in all windows */
+  PUBLISH "refreshConnections".
 
 END PROCEDURE. /* btnConnectionsChoose */
 
@@ -4968,7 +5054,7 @@ PROCEDURE btnQueriesChoose :
 
   hEditor = getActiveQueryEditor().
 
-  RUN value(getProgramDir() + 'dQueries.w')
+  RUN VALUE(getProgramDir() + 'dQueries.w')
     ( INPUT gcCurrentDatabase
     , INPUT gcCurrentTable
     , INPUT hEditor:SCREEN-VALUE
@@ -5033,7 +5119,7 @@ PROCEDURE btnSettingsChoose :
     RUN clearRegistryCache.
     RUN clearColorCache.
     RUN clearFontCache.
-    RUN initializeObjects.
+    RUN initObjects.
 
     gcCurrentTable = ?.
     APPLY "value-changed" TO brTables IN FRAME frMain.
@@ -5416,15 +5502,10 @@ PROCEDURE cloneDatabase :
 /* Clone the structure + definitions of the current
  * database into a new, empty one.
 */
-  DEFINE VARIABLE cNewDatabaseList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cOldDatabaseList AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cLogicalName     AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME frMain:
     CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
-
-    /* Get list of connected databases */
-    cOldDatabaseList = getDatabaseList().
 
     RUN VALUE(getProgramDir() + 'dCloneDatabase.w')
      ( INPUT-OUTPUT gcCurrentDatabase
@@ -5432,15 +5513,11 @@ PROCEDURE cloneDatabase :
      , OUTPUT cLogicalName
      ).
 
-    /* Get all connected databases */
-    cNewDatabaseList = getDatabaseList().
+    /* Refresh connections in all windows */
+    PUBLISH "refreshConnections".
 
-    IF cNewDatabaseList <> cOldDatabaseList THEN
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cNewDatabaseList.
-
-    IF LOOKUP(cLogicalName,cNewDatabaseList) > 0 THEN
+    /* Select newly created db */
+    IF LOOKUP(cLogicalName, cbDatabaseFilter:LIST-ITEMS) > 0 THEN
     DO:
       cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
       APPLY 'value-changed' TO cbDatabaseFilter.
@@ -5579,40 +5656,22 @@ PROCEDURE connectDatabase :
  */
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE cError        AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cProgDir      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cError   AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cProgDir AS CHARACTER NO-UNDO.
 
   DO WITH FRAME {&frame-name}:
     cProgDir   = getProgramDir().
 
-    cDatabasesOld = getDatabaseList().
     RUN VALUE(cProgDir + 'wConnections.w') (INPUT 'CONNECT', INPUT pcDatabase, OUTPUT cError).
     IF cError <> '' THEN
       MESSAGE cError VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
 
-    /* Get all connected databases */
-    cDatabases = getDatabaseList().
-
-    /* If needed, repopulate db combo */
-    IF cDatabases <> cDatabasesOld THEN
-    DO:
-      ASSIGN
-        cbDatabaseFilter:list-items   = ',' + cDatabases
-        cbDatabaseFilter:SCREEN-VALUE = gcCurrentDatabase
-        .
-
-      /* Rebuild context menu for table browse */
-      RUN createMenuTableBrowse.
-
-      /* Get list of all tables of all databases */
-      RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    END.
+    /* Refresh connections in all windows */
+    PUBLISH "refreshConnections".
 
     /* If the chosen DB is connected, switch to that one */
-    IF LOOKUP(pcDatabase, cDatabases) > 0 THEN
-      cbDatabaseFilter:screen-value = pcDatabase.
+    IF LOOKUP(pcDatabase, cbDatabaseFilter:LIST-ITEMS) > 0 THEN
+      cbDatabaseFilter:SCREEN-VALUE = pcDatabase.
 
     APPLY 'value-changed' TO cbDatabaseFilter.
   END.
@@ -5628,9 +5687,8 @@ PROCEDURE connectDroppedDatabase :
  */
   DEFINE INPUT PARAMETER pcDatabase AS CHARACTER   NO-UNDO.
 
-  DEFINE VARIABLE cDatabaseList AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE iDatabase     AS INTEGER     NO-UNDO INITIAL 1.
-  DEFINE VARIABLE cLdbName      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE iDatabase AS INTEGER   NO-UNDO INITIAL 1.
+  DEFINE VARIABLE cLdbName  AS CHARACTER NO-UNDO.
 
   /* Accept one database at a time */
   pcDatabase = ENTRY(1,pcDatabase,'~n').
@@ -5659,21 +5717,11 @@ PROCEDURE connectDroppedDatabase :
     RETURN.
   END.
 
-  /* Get all connected databases */
-  DO WITH FRAME frMain:
-    cDatabaseList = getDatabaseList().
-    ASSIGN
-      cbDatabaseFilter:LIST-ITEMS   = ',' + cDatabaseList
-      cbDatabaseFilter:SCREEN-VALUE = LDBNAME(NUM-DBS).
-
-    /* Get list of all tables of all databases */
-    SESSION:SET-WAIT-STATE('general').
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    SESSION:SET-WAIT-STATE('').
-  END.
+  /* Refresh connections in all windows */
+  PUBLISH "refreshConnections".
 
   /* If the chosen DB is connected, switch to that one */
-  IF LOOKUP(pcDatabase, cDatabaseList) > 0 THEN
+  IF LOOKUP(pcDatabase, cbDatabaseFilter:LIST-ITEMS IN FRAME frMain) > 0 THEN
     cbDatabaseFilter:SCREEN-VALUE = LDBNAME(NUM-DBS).
 
   APPLY 'value-changed' TO cbDatabaseFilter.
@@ -5706,20 +5754,10 @@ PROCEDURE connectParamFile :
 
   CONNECT -pf VALUE(pcParamFile).
 
-  /* Get all connected databases */
-  DO WITH FRAME frMain:
-    cDatabaseList = getDatabaseList().
-    ASSIGN
-      cbDatabaseFilter:LIST-ITEMS   = ',' + cDatabaseList
-      cbDatabaseFilter:SCREEN-VALUE = ''.
+  /* Refresh connections in all windows */
+  PUBLISH "refreshConnections".
 
-    /* Get list of all tables of all databases */
-    SESSION:SET-WAIT-STATE('general').
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    SESSION:SET-WAIT-STATE('').
-  END.
-
-  APPLY 'value-changed' TO cbDatabaseFilter.
+  APPLY 'value-changed' TO cbDatabaseFilter IN FRAME {&FRAME-NAME}.
 
 END PROCEDURE. /* connectParamFile */
 
@@ -6516,16 +6554,6 @@ PROCEDURE disconnectDatabase :
     gcCurrentDatabase = ""
     gcCurrentTable    = "".
 
-  /* Rebuild context menu for table browse */
-  RUN createMenuTableBrowse.
-
-  /* Get list of all tables of all databases */
-  RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-  cbDatabaseFilter:LIST-ITEMS = "," + cDatabases.
-
   /* If we have no db connected, kill the fields tt */
   IF NUM-DBS = 0 THEN
   DO:
@@ -6544,9 +6572,8 @@ PROCEDURE disconnectDatabase :
     setUpdatePanel(?). /* Refresh sensitivity of buttons if needed */
   END.
 
-  RUN reopenTableBrowse(?).
-  APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
-  RUN filterTables.
+  /* Refresh connections in all windows */
+  PUBLISH "refreshConnections".
 
 END PROCEDURE.
 
@@ -6731,7 +6758,7 @@ PROCEDURE enable_UI :
   ENABLE rctQuery rctEdit fiTableFilter cbDatabaseFilter btnFavourite tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
          brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         btnClearTableFilter ficWhere btnTableFilter btnAddFavGroup btnWhere 
+         ficWhere btnClearTableFilter btnTableFilter btnAddFavGroup btnWhere 
          btnQueries btnView btnTools btnTabTables btnClear btnClearFieldFilter 
          btnClipboard btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
          btnTabFavourites btnTabFields btnTabIndexes btnNextQuery btnPrevQuery 
@@ -7843,57 +7870,8 @@ END PROCEDURE. /* incQueriesServed */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeBGColor C-Win 
-PROCEDURE initializeBGColor :
-/* Set background color for main window, based on startup param
-*/
-  DEFINE VARIABLE iColor AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cColor AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iRed   AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iGreen AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iBlue  AS INTEGER   NO-UNDO.
-
-  DO WITH FRAME frMain:
-
-    DO i = 1 TO NUM-ENTRIES(SESSION:PARAMETER,' '):
-      IF ENTRY(i,SESSION:PARAMETER,' ') BEGINS 'color=' THEN 
-      DO:
-        cColor = ENTRY(2,ENTRY(i,SESSION:PARAMETER,' '),'=').
-        IF NUM-ENTRIES(cColor) = 3 THEN 
-        DO:
-          iRed   = INTEGER(ENTRY(1,cColor)) NO-ERROR.
-          iGreen = INTEGER(ENTRY(2,cColor)) NO-ERROR.
-          iBlue  = INTEGER(ENTRY(3,cColor)) NO-ERROR.
-          iColor = getColorByRGB(iRed, iGreen, iBlue).
-        END.
-        ELSE 
-          iColor = INTEGER(cColor) NO-ERROR.
-
-        IF NOT ERROR-STATUS:ERROR AND iColor <> ? THEN 
-        DO:
-          FRAME frMain:BGCOLOR = iColor.
-
-          /* Set key elements to white for readability */
-          BROWSE brTables:BGCOLOR  = 15.
-          BROWSE brFields:BGCOLOR  = 15.
-          BROWSE brIndexes:BGCOLOR = 15.
-          ficWhere:BGCOLOR         = 15.
-          fiTableFilter:BGCOLOR    = 15.
-          fiTableDesc:BGCOLOR      = 15.
-        END. /* not error */
-      END. /* if entry... */
-    END. /* do i */
-
-  END. /* do with frame */
-
-END PROCEDURE. /* initializeBGColor */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeColors C-Win 
-PROCEDURE initializeColors :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initColors C-Win 
+PROCEDURE initColors :
 /* Set color nrs in vars so we don"t have to call the function
    * inside the ROW-DISPLAY trigger
   */
@@ -7918,13 +7896,13 @@ PROCEDURE initializeColors :
   giColorIndexInactiveBG = getColor("IndexInactive:bg").
 
 
-END PROCEDURE. /* initializeColors */
+END PROCEDURE. /* initColors */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeFilters C-Win 
-PROCEDURE initializeFilters :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFilters C-Win 
+PROCEDURE initFilters :
 /* Create filter widgets
  */
   DEFINE INPUT PARAMETER phParentBrowse AS HANDLE NO-UNDO.
@@ -8006,13 +7984,46 @@ PROCEDURE initializeFilters :
     hColumn:VISIBLE = lVisible.
   END.
 
-END PROCEDURE. /* initializeFilters */
+END PROCEDURE. /* initFilters */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObjects C-Win 
-PROCEDURE initializeObjects :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFrameColor C-Win 
+PROCEDURE initFrameColor :
+/* Set background color for main window. First use 
+ * customized color, if none defined check startup param
+*/
+  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cParam AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cColor AS CHARACTER NO-UNDO.
+
+  /* Customization */
+  PUBLISH 'customFrameColor' (OUTPUT cColor).
+
+  /* From startup parameter */
+  IF cColor = '' THEN 
+  DO:
+    #ParamLoop:
+    DO i = 1 TO NUM-ENTRIES(SESSION:PARAMETER,' '):
+      cParam = ENTRY(i,SESSION:PARAMETER,' ').
+      IF cParam BEGINS 'color=' THEN 
+      DO:
+        cColor = ENTRY(2,cParam,'=').
+        LEAVE #ParamLoop.
+      END.
+    END. /* do i */
+  END.
+
+  RUN setFrameColor(cColor).
+
+END PROCEDURE. /* initFrameColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initObjects C-Win 
+PROCEDURE initObjects :
 /* General setup of the window
  */
   DEFINE VARIABLE cLastFav   AS CHARACTER NO-UNDO.
@@ -8028,13 +8039,13 @@ PROCEDURE initializeObjects :
   {&timerStart}
 
   /* Open the settings file */
-  RUN initializeSettingsFile.
+  RUN initSettingsFile.
 
   IF LOGICAL(getRegistry('DataDigger','StartDebugger')) = TRUE THEN
     RUN VALUE(getProgramDir() + "wDebugger.w") PERSISTENT.
 
   /* Set fonts and load Images */
-  RUN initializeVisuals.
+  RUN initVisuals.
 
   /* Table filter */
   RUN initTableFilter(INPUT-OUTPUT TABLE ttTableFilter).
@@ -8056,7 +8067,7 @@ PROCEDURE initializeObjects :
   IF giMaxFilterHistory = ? THEN giMaxFilterHistory = 10.
 
   /* Set color nrs in vars */
-  RUN initializeColors.
+  RUN initColors.
 
   /* If the stack space is 128 or less, limit nr of columns
    * to prevent the session from crashing. As a rough guide
@@ -8081,7 +8092,7 @@ PROCEDURE initializeObjects :
     IF getRegistry("DataDigger:Colors","DataRow:UseSystem") = "YES" THEN
       ASSIGN
         giDataOddRowColor[1]  = 1
-        giDataOddRowColor[2]  = COLOR-TABLE:NUM-ENTRIES - 1 /* ButtonFace, often defined as off-white */
+        giDataOddRowColor[2]  = getColorByRGB(240,240,240) /* ButtonFace, often defined as off-white */
         giDataEvenRowColor[1] = 1
         giDataEvenRowColor[2] = 15 /* white */
         .
@@ -8235,7 +8246,7 @@ PROCEDURE initializeObjects :
     IF cSetting <> ? THEN RUN setViewType(cSetting).
 
     /* Create filter fill-ins for the fields browse */
-    RUN initializeFilters
+    RUN initFilters
       ( INPUT brFields:HANDLE
       , INPUT btnClearFieldFilter:HANDLE
       ).
@@ -8347,13 +8358,13 @@ PROCEDURE initializeObjects :
   APPLY "value-changed" TO brTables.
 
   {&timerStop}
-END PROCEDURE. /* initializeObjects */
+END PROCEDURE. /* initObjects */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeSettingsFile C-Win 
-PROCEDURE initializeSettingsFile :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initSettingsFile C-Win 
+PROCEDURE initSettingsFile :
 /* Initialize the settings file
  */
   {&timerStart}
@@ -8558,13 +8569,13 @@ PROCEDURE initializeSettingsFile :
   END.
 
   {&timerStop}
-END PROCEDURE. /* initializeSettingsFile */
+END PROCEDURE. /* initSettingsFile */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeUi C-Win 
-PROCEDURE initializeUi :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initUI C-Win 
+PROCEDURE initUI :
 /* Enable the user interface
    */
   DEFINE VARIABLE lLoaded AS LOGICAL    NO-UNDO.
@@ -8650,13 +8661,13 @@ PROCEDURE initializeUi :
 
   RUN createMenuTableBrowse.
 
-END PROCEDURE. /* initializeUi */
+END PROCEDURE. /* initUI */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeVisuals C-Win 
-PROCEDURE initializeVisuals :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initVisuals C-Win 
+PROCEDURE initVisuals :
 /* Initialize all kind of visual things
  */
   {&timerStart}
@@ -8732,7 +8743,7 @@ PROCEDURE initializeVisuals :
     FRAME frData:FONT = giDefaultFont.
 
     /* BGColor */
-    RUN initializeBGColor.
+    RUN initFrameColor.
 
     /* Fonts */
     c-win:FONT = giDefaultFont.
@@ -8852,7 +8863,7 @@ PROCEDURE initializeVisuals :
   END. /* DO WITH FRAME */
 
   {&timerStop}
-END PROCEDURE. /* initializeVisuals */
+END PROCEDURE. /* initVisuals */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -9254,33 +9265,56 @@ PROCEDURE quickConnect :
   DEFINE VARIABLE cPhysicalName AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cLogicalName  AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cTypes        AS CHARACTER   NO-UNDO INITIAL 'PROGRESS'.
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE iNumDbs       AS INTEGER     NO-UNDO.
 
   DO WITH FRAME frMain:
+
     iNumDbs = NUM-DBS.
-
-    RUN adecomm\_dbconn.p ( INPUT-OUTPUT cPhysicalName
-                          , INPUT-OUTPUT cLogicalName
-                          , INPUT-OUTPUT cTypes
-                          ).
-
+    RUN adecomm\_dbconn.p(INPUT-OUTPUT cPhysicalName, INPUT-OUTPUT cLogicalName, INPUT-OUTPUT cTypes).
     IF NUM-DBS = iNumDbs THEN RETURN. /* nothing connected */
 
-    /* Rebuild context menu for table browse */
-    RUN createMenuTableBrowse.
-
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-
-    /* Get all connected databases */
-    cDatabases = getDatabaseList().
-    cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
-    cbDatabaseFilter:SCREEN-VALUE = cLogicalName.
-    APPLY 'value-changed' TO cbDatabaseFilter.
+    /* Refresh connections in all windows */
+    PUBLISH "refreshConnections".
+    
   END.
 
 END PROCEDURE. /* QuickConnect */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE refreshConnections C-Win 
+PROCEDURE refreshConnections :
+/* If you have multiple windows open in the same 
+ * session and connect or disconnect a db, we want 
+ * to see that in all other windows as well
+ */
+  DEFINE VARIABLE cDatabases AS CHARACTER   NO-UNDO.
+
+  DO WITH FRAME frMain:
+
+    /* Rebuild context menu for table browse */
+    RUN createMenuTableBrowse.
+  
+    /* Get all connected databases */
+    cDatabases = getDatabaseList().
+  
+    /* If needed, repopulate db combo */
+    IF cDatabases <> cbDatabaseFilter:LIST-ITEMS THEN
+    DO:
+      /* Get list of all tables of all connected databases */
+      RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
+      cbDatabaseFilter:LIST-ITEMS = ',' + cDatabases.
+  
+      RUN filterTables.
+      RUN reopenTableBrowse(?).
+      RUN initFrameColor. /* set bg color */
+
+      APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
+    END.
+  END.
+
+END PROCEDURE. /* refreshConnections */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -10822,6 +10856,55 @@ END PROCEDURE. /* setFilterFieldTabOrder */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFrameColor C-Win 
+PROCEDURE setFrameColor :
+/* Set the main frame bg color 
+*/
+  DEFINE INPUT PARAMETER pcColor AS CHARACTER NO-UNDO.
+
+  DEFINE VARIABLE iColor AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iRed   AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iGreen AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iBlue  AS INTEGER   NO-UNDO.
+
+  IF pcColor = "" THEN RETURN. 
+
+  IF NUM-ENTRIES(pcColor) = 3 THEN 
+  DO:
+    ASSIGN 
+      iRed   = INTEGER(ENTRY(1,pcColor)) 
+      iGreen = INTEGER(ENTRY(2,pcColor)) 
+      iBlue  = INTEGER(ENTRY(3,pcColor)) NO-ERROR.
+
+    IF NOT ERROR-STATUS:ERROR THEN 
+      iColor = getColorByRGB(iRed, iGreen, iBlue).
+    ELSE 
+      iColor = ?.
+  END.
+  ELSE 
+  DO:
+    iColor = INTEGER(pcColor) NO-ERROR.
+    IF ERROR-STATUS:ERROR THEN iColor = ?.
+  END.
+
+  DO WITH FRAME frMain:
+    FRAME frMain:BGCOLOR = iColor.
+
+    /* Set key elements to white for readability */
+    BROWSE brTables:BGCOLOR  = 15.
+    BROWSE brFields:BGCOLOR  = 15.
+    BROWSE brIndexes:BGCOLOR = 15.
+    ficWhere:BGCOLOR         = 15.
+    fiTableFilter:BGCOLOR    = 15.
+    fiTableDesc:BGCOLOR      = 15.
+  END.
+
+END PROCEDURE. /* setFrameColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win 
 PROCEDURE setPage :
 /* Set active page: Tables/Pinned/Fields/Indexes
@@ -10957,6 +11040,36 @@ DEFINE INPUT  PARAMETER pcFailedQuery AS CHARACTER  NO-UNDO.
     APPLY "entry" TO ficWhere.
   END.
 END PROCEDURE.  /* setQueryWhereAlert */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRandomColor C-Win 
+PROCEDURE setRandomColor :
+/* Set a random bg color for the main frame
+** (for the new-features wizard)
+*/
+  RUN setFrameColor(RANDOM(1,15)).
+  PROCESS EVENTS.
+
+END PROCEDURE. /* setRandomColor */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRandomTitle C-Win 
+PROCEDURE setRandomTitle :
+/* Do a small animation for the window title
+** (for the new-features wizard)
+*/
+  CASE c-win:TITLE:
+    WHEN 'Hello world' THEN c-win:TITLE = 'H e l l o   w o r l d'.
+    OTHERWISE c-win:TITLE = 'Hello world'.
+  END CASE.
+
+  PROCESS EVENTS. 
+
+END PROCEDURE. /* setRandomTitle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -11911,6 +12024,8 @@ END PROCEDURE. /* showHint */
 PROCEDURE showNewFeatures :
 /* Highlight some new features
    */
+  DEFINE VARIABLE cOldTitle AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE i         AS INTEGER   NO-UNDO.
 
   demoLoop:
   DO WITH FRAME frMain:
@@ -11918,47 +12033,58 @@ PROCEDURE showNewFeatures :
     /* This will be checked within showHint */
     glHintCancelled = FALSE.
 
-    /* New in 24
-
-    - New : Option to use multiple favourites groups
-    - New : Option to generate an include file with tt definitions
-    - New : Toolbar now docked
-
-    &GLOBAL-DEFINE ARROW-NONE       0
-    &GLOBAL-DEFINE ARROW-LEFT-UP    1
-    &GLOBAL-DEFINE ARROW-RIGHT-UP   2
-    &GLOBAL-DEFINE ARROW-RIGHT-DOWN 3
-    &GLOBAL-DEFINE ARROW-LEFT-DOWN  4
-    */
-
     /* Wait until databrowse is ready (due to timer) */
     DO WHILE NOT VALID-HANDLE(ghDataBrowse): 
       PROCESS EVENTS. 
     END.
 
-    /* Toolbar */
-    RUN showHint(FRAME frSettings:HANDLE, {&ARROW-LEFT-DOWN}, "1/5~n~nThe toolbar is docked, but can be hidden or collapsed").
+    /* Bug fixes */
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n1/7~n~nWelcome to the new DataDigger~nWith 50+ bug fixes and changes").
+
+    /* Title */
+    tgDebugMode:X = 130.
+    tgDebugMode:Y = -5 NO-ERROR.
+    tgDebugMode:HIDDEN = YES.
+    cOldTitle = c-win:TITLE.
+    c-win:TITLE = 'Hello world'.
+    RUN setTimer("SetRandomTitle", 400).
+    RUN showHint(tgDebugMode:HANDLE, {&ARROW-LEFT-UP}, "2/7~n~nOption to set your own custom title for the window~n~nSee the wiki on how to do this").
+    RUN setTimer("SetRandomTitle", 0).
+    c-win:TITLE = cOldTitle.
+    IF glHintCancelled THEN LEAVE demoLoop.
+    tgDebugMode:X = 38. 
+    tgDebugMode:Y = 29.
+
+    /* BG Color */
+    RUN setTimer("SetRandomColor", 400).
+    RUN showHint(c-win:HANDLE, {&ARROW-NONE}, "3/7~n~nOr set your own background color to indicate that you are in a production db~n~nAgain: check the wiki").
+    RUN setTimer("SetRandomColor",0).
+    RUN setFrameColor('?').
     IF glHintCancelled THEN LEAVE demoLoop.
 
-    /* Sort button */
-    RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "2/5~n~nGenerate different types of code straight from the context menu ~n(and add your own)").
-    IF glHintCancelled THEN LEAVE demoLoop.
+    /* Help options */
+    RUN showToolbar(YES).
+    DO WITH FRAME frSettings:
+      RUN showHint(btnHelp:HANDLE, {&ARROW-LEFT-DOWN}, "4/7~n~nWiki and other help options can be found here").
+      IF glHintCancelled THEN LEAVE demoLoop.
+    END.
 
-    /* Right-click on data browse now shows total, min, max, avg of selected rows */
+    /* Favourites */
     RUN setPage({&PAGE-FAVOURITES}).
-    RUN showHint(btnAddFavGroup:HANDLE, {&ARROW-LEFT-DOWN}, "3/5~n~nYou can now have multiple groups with favourites").
+    RUN showHint(cbFavouriteGroup:HANDLE, {&ARROW-LEFT-DOWN}, "5/7~n~nFavourites are now no longer per-database but act globally").
     RUN setPage({&PAGE-TABLES}).
     IF glHintCancelled THEN LEAVE demoLoop.
 
-    RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "4/5~n~nAnd in the tables view, they show up with a different color").
+    /* Bulk delete */
+    RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "6/7~n~nCheck the new bulk delete routine that can be generated via right-click").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* feedback */
-    RUN showHint(fiFeedback:HANDLE, 3, "5/5~n~nGot some questions or feedback? ~nClick here to mail me").
+    RUN showHint(fiFeedback:HANDLE, 3, "7/7~n~nGot some questions or feedback? ~nClick here to mail me").
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* Done! */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~n~nHappy Digging!").
   END.
 
   /* back to normal */
@@ -12051,8 +12177,14 @@ PROCEDURE showToolbar :
 */
   DEFINE INPUT PARAMETER plShow AS LOGICAL NO-UNDO.
 
+  setWindowFreeze(YES).
   FRAME frSettings:VISIBLE = plShow.
   setRegistry('DataDigger','Toolbar:visible', STRING(plShow)).
+
+  DO WITH FRAME frMain:
+    btnTools:WIDTH-PIXELS = (IF plShow THEN 30 ELSE 22).
+  END.
+  setWindowFreeze(NO).
 
 END PROCEDURE. /* showToolbar */
 
@@ -12285,6 +12417,7 @@ PROCEDURE startDiggerLib :
     SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
     SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
     SUBSCRIBE PROCEDURE hDiggerLib TO "setWindowTitle" ANYWHERE.
+    SUBSCRIBE PROCEDURE hDiggerLib TO "customFrameColor" ANYWHERE.
 
   END.
 END PROCEDURE. /* startDiggerLib */
@@ -12363,7 +12496,7 @@ PROCEDURE startSession :
     SESSION:SET-WAIT-STATE("").
 
     RUN clearDiskCache.
-    RUN initializeObjects.
+    RUN initObjects.
   END.
 
   /* Check on the use of -rereadnolock */
@@ -12394,8 +12527,12 @@ PROCEDURE startSession :
   IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE
     AND getRegistry('DataDigger:Update','LastPingBack') <> ISO-DATE(TODAY) THEN
   DO:
+    /* Pingback for total statistics across all versions */
     RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0, OUTPUT iResult).
     setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)).
+    
+    /* Pingback for just the latest version */
+    RUN urlDownloadToFileA (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
   END.
 
   /* Check for new version only once a day */
@@ -12434,24 +12571,15 @@ END PROCEDURE. /* startSession */
 PROCEDURE startTool :
 /* Start Dictionary or Data Adminstration
  */
-  DEFINE INPUT PARAMETER pcTool AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER pcTool AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE cDatabases    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cDatabasesOld AS CHARACTER   NO-UNDO.
-
-  /* Return if no db connected */
   IF NUM-DBS = 0 THEN RETURN.
-
-  /* Don't allow in read only mode */
   IF glReadOnlyDigger THEN RETURN.
-
-  CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
 
   /* Turn off KeepAlive timer to avoid "DB has changed warnings" */
   RUN setTimer("KeepAlive", 0).
 
-  /* Remember all connected db's */
-  cDatabasesOld = getDatabaseList().
+  CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
 
   CASE pcTool:
     WHEN "Dict" THEN RUN DICT.p.
@@ -12462,19 +12590,8 @@ PROCEDURE startTool :
   IF LOGICAL(getRegistry("DataDigger", "KeepAlive")) THEN
     RUN setTimer("KeepAlive", 60000). /* every 60 seconds */
 
-  /* Get all connected databases */
-  cDatabases = getDatabaseList().
-
-  /* If needed, repopulate db combo */
-  IF cDatabases <> cDatabasesOld THEN
-  DO:
-    /* Get list of all tables of all databases */
-    RUN getTables(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
-    ASSIGN cbDatabaseFilter:LIST-ITEMS IN FRAME frMain = ',' + cDatabases.
-    RUN filterTables.
-  END.
-  ELSE
-    CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
+  /* Refresh connections in all windows */
+  PUBLISH "refreshConnections".
 
 END PROCEDURE.
 
