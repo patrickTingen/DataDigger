@@ -71,7 +71,8 @@ DataDigger version 25
 - New   : Option to generate bulk delete routine
 - New   : Logical fields can be filtered on non-standard format values (Hans Kaman)
 - New   : More help options
-- New   : Option to set frame color via customization
+- New   : Option to set frame color via myDataDigger.p
+- New   : Option to turn off filter-as-you-type on tables and fields (Jay Farr)
 
 =====================================================================================
 
