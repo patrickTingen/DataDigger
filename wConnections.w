@@ -755,6 +755,7 @@ PROCEDURE btnDeleteChoose :
       setRegistry('Connections', SUBSTITUTE('&1-description', STRING(iConn,'999')), ? ).
       setRegistry('Connections', SUBSTITUTE('&1-pdbname'    , STRING(iConn,'999')), ? ).
       setRegistry('Connections', SUBSTITUTE('&1-parameters' , STRING(iConn,'999')), ? ).
+      setRegistry('Connections', SUBSTITUTE('&1-section'    , STRING(iConn,'999')), ? ).
 
       /* Remember record to delete */
       rDelete = brConnections:query:get-buffer-handle(1):rowid.
@@ -1220,6 +1221,8 @@ PROCEDURE saveConnection :
 
   DEFINE VARIABLE iConn AS INTEGER NO-UNDO.
 
+  IF ttConnection.cLogicalName = '' THEN RETURN. 
+
   iConn = ttConnection.iConnectionNr.
 
   setRegistry('Connections', SUBSTITUTE('&1-ldbname'    , STRING(iConn,'999')), ttConnection.cLogicalName  ).
@@ -1314,3 +1317,4 @@ END FUNCTION. /* getNewConnectionNr */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
