@@ -52,6 +52,7 @@ DataDigger version 25
 - Solved: Conversion procedure not found
 - Solved: Pingback restriction not always respected
 - Solved: Connections not synchronized among multiple windows in one session
+- Solved: Cache not invalidated when removing connections
 
 - Change: File description now shows both label and description (Johan Geerts)
 - Change: File label shown in title and description as tooltip on file browse (Dirk Vreken)
