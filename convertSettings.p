@@ -363,9 +363,13 @@ PROCEDURE convertFrom-24 :
     setRegistry('DataDigger:Favourites', btFavGroup.cGroup, btFavGroup.cTables).
   END.
 
+  /* Obsolete files */
+  OS-DELETE VALUE(SEARCH("dEditGroup.wrx")).
+
 END PROCEDURE. /* 24 */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 &ENDIF
+
