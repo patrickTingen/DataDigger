@@ -4295,7 +4295,7 @@ DO:
   DEFINE VARIABLE cSetting AS CHARACTER NO-UNDO.
 
   /* If we click this in the middle of the tour, ignore it */
-  IF FRAME frHint:visible THEN RETURN NO-APPLY.
+  IF FRAME frHint:VISIBLE THEN RETURN NO-APPLY.
 
   /* Cancel all running timer events */
   IF glUseTimer THEN chCtrlFrame:pstimer:ENABLED = FALSE.
@@ -12055,7 +12055,7 @@ PROCEDURE showNewFeatures :
     END.
 
     /* Bug fixes */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n1/7~n~nWelcome to the new DataDigger~nWith 50+ bug fixes and changes").
+    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n1/7~n~nWelcome to the new DataDigger~nWith >50 bug fixes and changes").
 
     /* Title */
     tgDebugMode:X = 130.
