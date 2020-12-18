@@ -11882,6 +11882,9 @@ PROCEDURE showHint :
   DEFINE VARIABLE iTargetY  AS INTEGER NO-UNDO.
   DEFINE VARIABLE hMyWidget AS HANDLE  NO-UNDO.
 
+  /* If we are in the start phase of DD, ignore hints */
+  IF VALID-HANDLE(winWait) THEN RETURN.
+  
   /* If user opted to NEVER see hints, just exit, except
    * when she pressed the 'help' button */
   IF NOT glShowTour
