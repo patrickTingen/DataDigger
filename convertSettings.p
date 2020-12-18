@@ -61,7 +61,7 @@ DEFINE INPUT PARAMETER piOldVersion AS INTEGER NO-UNDO.
 
 SESSION:SET-WAIT-STATE("general").
 
-RUN VALUE(SUBSTITUTE('ConvertFrom-&1', piOldVersion)).
+RUN VALUE(SUBSTITUTE('ConvertFrom-&1', piOldVersion)) NO-ERROR.
 RUN flushRegistry.
 
 SESSION:SET-WAIT-STATE("").

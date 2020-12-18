@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------*/
 
 &GLOBAL-DEFINE version {version.i}
-&GLOBAL-DEFINE edition Pure Gold
+&GLOBAL-DEFINE edition Rudolf
 &GLOBAL-DEFINE build {build.i}
 
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
