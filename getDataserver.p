@@ -29,6 +29,8 @@ DEFINE VARIABLE cDontShow             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE lDontShowSchemaHr     AS LOGICAL    NO-UNDO.
 DEFINE VARIABLE iStartTime            AS INTEGER    NO-UNDO.
 DEFINE VARIABLE hWindow               AS HANDLE     NO-UNDO.
+DEFINE VARIABLE iItem                 AS INTEGER    NO-UNDO.
+DEFINE VARIABLE cConnectedDatabases   AS CHARACTER  NO-UNDO.
 
 DEFINE BUFFER bDb FOR dictdb._db.
 
@@ -158,7 +160,13 @@ FOR EACH ttDataserver BY ttDataserver.iServerNr:
 
     CONNECT VALUE(ttDataserver.cConnectString) NO-ERROR.
 
-    IF ERROR-STATUS:GET-MESSAGE(1) <> ? AND ERROR-STATUS:GET-MESSAGE(1) <> "" THEN
+    IF   ERROR-STATUS:GET-MESSAGE(1) <> ?
+     AND ERROR-STATUS:GET-MESSAGE(1) <> ""
+     AND (IF ERROR-STATUS:GET-NUMBER(1) = 43 AND program-name(3) BEGINS "btnDisconnectChoose " THEN
+            NO
+          ELSE
+            YES)
+    THEN  
     DO:
       MESSAGE
         SUBSTITUTE( TRIM(
@@ -185,6 +193,20 @@ FOR EACH ttDataserver BY ttDataserver.iServerNr:
   ttDataserver.lConnected = CONNECTED(ttDataserver.cLDbNameDataserver).
 END. /* FOR EACH */
 
+if program-name(3) begins "btnDisconnectChoose " then
+do:
+  do iItem = 1 to num-dbs:
+    cConnectedDatabases = trim(cConnectedDatabases + "," + ldbname(iItem), ",").
+  end.
+  
+  for each ttDataserver by ttDataserver.iServerNr:
+    if not can-do(cConnectedDatabases, ttDataserver.cLDbNameSchema) then
+    do:
+      piDataserverNr = piDataserverNr - 1.
+      delete ttDataserver.
+    end.
+  end.
+end.
 
 PROCEDURE removeParameter:
   DEFINE INPUT        PARAMETER pcParam       AS CHARACTER  NO-UNDO.
