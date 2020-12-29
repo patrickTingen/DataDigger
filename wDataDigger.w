@@ -8333,6 +8333,7 @@ PROCEDURE initObjects :
 
     /* Set Table or Favourites view */
     cSetting = getRegistry("DataDigger","TableView").
+    IF cSetting = ? THEN cSetting = 'T'.
     glShowFavourites = (cSetting BEGINS "F").
     IF glShowFavourites THEN RUN setPage({&PAGE-FAVOURITES}).
     RUN setTableView(glShowFavourites,YES).
@@ -8433,6 +8434,9 @@ PROCEDURE initSettingsFile :
   /* Position of resize bar */
   IF getRegistry("DataDigger", "ResizeBar:Y" ) = ? THEN setRegistry("DataDigger", "ResizeBar:Y", "260" ).
 
+  /* Initial tab to show (tables) */
+  IF getRegistry("DataDigger","TableView") = ? THEN setRegistry("DataDigger","TableView","T").
+    
   /* Add column for recid / rowid */
   IF getRegistry("DataDigger","AddDataColumnForRecid") = ? THEN setRegistry("DataDigger","AddDataColumnForRecid","yes").
   IF getRegistry("DataDigger","AddDataColumnForRowid") = ? THEN setRegistry("DataDigger","AddDataColumnForRowid","no").
