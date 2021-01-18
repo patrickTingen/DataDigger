@@ -6,6 +6,12 @@
 
 =====================================================================================
 
+DataDigger version 26
+
+- New   : Option for abbreviated keywords in generate temp-table include (Baltazar Oliveira)
+
+=====================================================================================
+
 DataDigger version 25
 
 - Solved: Error when deleting record while in edit mode (Johan Geerts)
