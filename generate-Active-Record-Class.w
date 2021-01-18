@@ -46,9 +46,10 @@ CREATE WIDGET-POOL.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-4 RECT-5 edDefinition tgSelectedOnly ~
-tgLowerCase cbIndent rsPrefix fiPrefix rsDashes fiReplace btnSave 
+tgLowerCase tgShortTypes cbIndent rsPrefix fiPrefix rsDashes fiReplace ~
+btnSave 
 &Scoped-Define DISPLAYED-OBJECTS edDefinition tgSelectedOnly tgLowerCase ~
-cbIndent rsPrefix fiPrefix rsDashes fiReplace 
+tgShortTypes cbIndent rsPrefix fiPrefix rsDashes fiReplace 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -163,6 +164,11 @@ DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 160 BY 17 TOOLTIP "export only the fields that are selected in the main window" NO-UNDO.
 
+DEFINE VARIABLE tgShortTypes AS LOGICAL INITIAL no 
+     LABEL "&Short datatypes" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 130 BY 17 TOOLTIP "use abbreviated datatypes (e.g. INT instead of INTEGER)" NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
@@ -170,20 +176,21 @@ DEFINE FRAME frMain
      edDefinition AT Y 5 X 185 NO-LABEL WIDGET-ID 2
      tgSelectedOnly AT Y 10 X 15 WIDGET-ID 8
      tgLowerCase AT Y 30 X 15 WIDGET-ID 22
-     cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     rsPrefix AT Y 120 X 30 NO-LABEL WIDGET-ID 28
-     fiPrefix AT Y 180 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 34
-     rsDashes AT Y 240 X 30 NO-LABEL WIDGET-ID 62
-     fiReplace AT Y 276 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
-     btnSave AT Y 330 X 15 WIDGET-ID 36
+     tgShortTypes AT Y 50 X 15 WIDGET-ID 72
+     cbIndent AT Y 73 X 50 COLON-ALIGNED NO-LABEL WIDGET-ID 50
+     rsPrefix AT Y 130 X 30 NO-LABEL WIDGET-ID 28
+     fiPrefix AT Y 190 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 34
+     rsDashes AT Y 250 X 30 NO-LABEL WIDGET-ID 62
+     fiReplace AT Y 286 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
+     btnSave AT Y 340 X 15 WIDGET-ID 36
      "Dashes" VIEW-AS TEXT
-          SIZE-PIXELS 65 BY 13 AT Y 220 X 25 WIDGET-ID 70
-     "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
+          SIZE-PIXELS 65 BY 13 AT Y 230 X 25 WIDGET-ID 70
      "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 100 X 25 WIDGET-ID 48
-     RECT-4 AT Y 105 X 15 WIDGET-ID 46
-     RECT-5 AT Y 227 X 15 WIDGET-ID 58
+          SIZE-PIXELS 75 BY 13 AT Y 110 X 25 WIDGET-ID 48
+     "Indent:" VIEW-AS TEXT
+          SIZE-PIXELS 40 BY 20 AT Y 74 X 15 WIDGET-ID 68
+     RECT-4 AT Y 115 X 15 WIDGET-ID 46
+     RECT-5 AT Y 237 X 15 WIDGET-ID 58
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
@@ -353,7 +360,7 @@ END.
 &Scoped-define SELF-NAME tgSelectedOnly
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelectedOnly C-Win
 ON VALUE-CHANGED OF tgSelectedOnly IN FRAME frMain /* Selected fields only */
-, tgLowerCase, cbIndent, fiPrefix, fiReplace
+, tgLowerCase, cbIndent, fiPrefix, fiReplace, tgShortTypes
 DO:
   RUN generateClass.
 END.
@@ -430,11 +437,11 @@ PROCEDURE enable_UI :
                These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY edDefinition tgSelectedOnly tgLowerCase cbIndent rsPrefix fiPrefix 
-          rsDashes fiReplace 
+  DISPLAY edDefinition tgSelectedOnly tgLowerCase tgShortTypes cbIndent rsPrefix 
+          fiPrefix rsDashes fiReplace 
       WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE RECT-4 RECT-5 edDefinition tgSelectedOnly tgLowerCase cbIndent 
-         rsPrefix fiPrefix rsDashes fiReplace btnSave 
+  ENABLE RECT-4 RECT-5 edDefinition tgSelectedOnly tgLowerCase tgShortTypes 
+         cbIndent rsPrefix fiPrefix rsDashes fiReplace btnSave 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -456,7 +463,7 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
   
   DO WITH FRAME frMain:
     
-    ASSIGN rsPrefix cbIndent.
+    ASSIGN rsPrefix cbIndent tgShortTypes.
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -496,7 +503,7 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
         
       iMaxName   = MAXIMUM(iMaxName  , LENGTH(bField.cFieldName)).
-      iMaxType   = MAXIMUM(iMaxType  , LENGTH(TRIM(getTypeString(bField.cDataType, bField.iExtent, 100)) )).
+      iMaxType   = MAXIMUM(iMaxType  , LENGTH(TRIM(getTypeString(bField.cDataType, bField.iExtent, 0)) )).
     END. 
     
     /* Inc name lenth when using prefix */
@@ -563,6 +570,7 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateActiveRecord', 'FixedPrefix')   = ? THEN setRegistry('DataDigger:GenerateActiveRecord', 'FixedPrefix','').
     IF getRegistry('DataDigger:GenerateActiveRecord', 'Dashes')        = ? THEN setRegistry('DataDigger:GenerateActiveRecord', 'Dashes','0').
     IF getRegistry('DataDigger:GenerateActiveRecord', 'DashReplace')   = ? THEN setRegistry('DataDigger:GenerateActiveRecord', 'DashReplace','').
+    IF getRegistry('DataDigger:GenerateActiveRecord', 'ShortTypes')    = ? THEN setRegistry('DataDigger:GenerateActiveRecord', 'ShortTypes','no').
 
     /* Get user settings */
     tgSelectedOnly:CHECKED = LOGICAL(getRegistry('DataDigger:GenerateActiveRecord', 'SelectedOnly')).
@@ -572,6 +580,7 @@ PROCEDURE initObject :
     fiPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'FixedPrefix').
     rsDashes:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'Dashes').
     fiReplace:SCREEN-VALUE = getRegistry('DataDigger:GenerateActiveRecord', 'DashReplace').
+    tgShortTypes:CHECKED   = LOGICAL(getRegistry('DataDigger:GenerateActiveRecord', 'ShortTypes')).
     APPLY 'VALUE-CHANGED' TO rsPrefix.
     APPLY 'VALUE-CHANGED' TO rsDashes.
     
@@ -596,6 +605,7 @@ PROCEDURE saveSettings :
 /* Save settings */
     
   DO WITH FRAME {&FRAME-NAME}:
+
     /* Window size (don't save x,y pos because you might place it on a second monitor and 
      * later try to restore it when your second monitor is gone) 
      */
@@ -609,17 +619,7 @@ PROCEDURE saveSettings :
     setRegistry('DataDigger:GenerateActiveRecord', 'SerialReplace', fiReplace:SCREEN-VALUE         ). 
     setRegistry('DataDigger:GenerateActiveRecord', 'AddPrefix'    , rsPrefix:SCREEN-VALUE          ).
     setRegistry('DataDigger:GenerateActiveRecord', 'FixedPrefix'  , fiPrefix:SCREEN-VALUE          ).
-    
-    
-    /* Get user settings */
-    tgSelectedOnly:CHECKED = LOGICAL(getRegistry('DataDigger:GenerateActiveRecord', 'SelectedOnly')).
-    tgLowerCase:CHECKED    = LOGICAL(getRegistry('DataDigger:GenerateActiveRecord', 'UseLowerCase')).
-    cbIndent:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'Indent').    
-    rsPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'AddPrefix').
-    fiPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'FixedPrefix').
-    rsDashes:SCREEN-VALUE  = getRegistry('DataDigger:GenerateActiveRecord', 'Dashes').
-    fiReplace:SCREEN-VALUE = getRegistry('DataDigger:GenerateActiveRecord', 'DashReplace').
-    
+    setRegistry('DataDigger:GenerateActiveRecord', 'ShortTypes'   , STRING(tgShortTypes:CHECKED  ) ).
     
   END.
 
@@ -770,14 +770,25 @@ FUNCTION getTypeString RETURNS CHARACTER
 
   DO WITH FRAME {&FRAME-NAME}:
 
+    IF tgShortTypes THEN 
+    DO:
+      CASE pcDataType:
+        WHEN 'INTEGER'   THEN pcDataType = 'int'.
+        WHEN 'CHARACTER' THEN pcDataType = 'char'.
+        WHEN 'DECIMAL'   THEN pcDataType = 'dec'.
+        WHEN 'LOGICAL'   THEN pcDataType = 'log'.
+      END CASE.
+    END.
+
     IF piExtent = 0 THEN
       cReturnValue = pcDataType.
     ELSE 
       cReturnValue = SUBSTITUTE('&1 extent &2', pcDataType, piExtent).
 
     cReturnValue = (IF tgLowerCase:CHECKED THEN LC(cReturnValue) ELSE CAPS(cReturnValue)).
+
     cMask = SUBSTITUTE('X(&1)', piLength).
-    cReturnValue = STRING(cReturnValue, cMask).
+    cReturnValue = (IF piLength > 0 THEN STRING(cReturnValue, cMask) ELSE cReturnValue).
 
   END.
 
@@ -787,3 +798,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
