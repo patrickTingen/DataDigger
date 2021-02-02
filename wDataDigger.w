@@ -4308,7 +4308,7 @@ DO:
   setRegistry("DataDigger", "Database", cSetting ).
 
   /* Make sure all settings are saved */
-  RUN flushRegistry.
+  RUN saveConfigFileSorted.
 
   /* Notify launcher that the window closes */
   PUBLISH 'DataDigger'(-1).

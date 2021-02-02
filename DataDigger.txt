@@ -10,6 +10,7 @@ DataDigger version 26
 
 - New   : Option for abbreviated datatypes in generate temp-table include (Baltazar Oliveira)
 - New   : Option for abbreviated datatypes in generate active record class
+- Solved: Window position not saved on exit (Johan Geerts)
 
 =====================================================================================
 
