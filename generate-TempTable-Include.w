@@ -252,12 +252,12 @@ DEFINE FRAME frMain
      btnSave AT Y 486 X 15 WIDGET-ID 36
      "Indent:" VIEW-AS TEXT
           SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
-     "Field Options" VIEW-AS TEXT
-          SIZE-PIXELS 90 BY 13 AT Y 178 X 25 WIDGET-ID 26
+     "Field Prefix" VIEW-AS TEXT
+          SIZE-PIXELS 75 BY 13 AT Y 270 X 25 WIDGET-ID 48
      "Indexes" VIEW-AS TEXT
           SIZE-PIXELS 50 BY 13 AT Y 395 X 25 WIDGET-ID 40
-     "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 272 X 25 WIDGET-ID 48
+     "Field Options" VIEW-AS TEXT
+          SIZE-PIXELS 90 BY 13 AT Y 178 X 25 WIDGET-ID 26
      RECT-2 AT Y 185 X 15 WIDGET-ID 24
      RECT-3 AT Y 401 X 15 WIDGET-ID 38
      RECT-4 AT Y 275 X 15 WIDGET-ID 46
@@ -564,7 +564,7 @@ PROCEDURE generateCode :
       rsPrefix fiPrefix 
       rsIndex  .
 
-    cTable = TRIM(STRING('tt' + LC(pcTable), 'xx!x(20)')).
+    cTable = TRIM(STRING('tt' + LC(pcTable), 'xx!x(30)')).
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -602,7 +602,6 @@ PROCEDURE generateCode :
       iMaxName   = MAXIMUM(iMaxName  , LENGTH(bField.cFieldName)).
       iMaxType   = MAXIMUM(iMaxType  , LENGTH(getTypeString(bField.cDataType, bField.iExtent, 0) )).
       iMaxFormat = MAXIMUM(iMaxFormat, LENGTH(bField.cFormat)).
-      IF bField.cLabel <> ? THEN iMaxLabel  = MAXIMUM(iMaxLabel , LENGTH(bField.cLabel)).
       IF bField.cLabel <> ? THEN iMaxLabel = MAXIMUM(iMaxLabel, LENGTH(bField.cLabel)).
     END.
 
