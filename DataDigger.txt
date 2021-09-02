@@ -11,6 +11,9 @@ DataDigger version 26
 - New   : Option for abbreviated datatypes in generate temp-table include (Baltazar Oliveira)
 - New   : Option for abbreviated datatypes in generate active record class
 - Solved: Window position not saved on exit (Johan Geerts)
+- Solved: Generate include fails when all labels are undefined #77 (Dirk Vreken)
+- Solved: Generate include file abbreviates table name when longer than 20 chars #78 (Dirk Vreken)
+- Solved: CTRL-A or CTRL-D on empty browse gives error #76
 
 =====================================================================================
 

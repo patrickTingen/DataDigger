@@ -6418,7 +6418,7 @@ PROCEDURE dataSelectAll :
   DO:
     setWindowFreeze(YES).
     SESSION:SET-WAIT-STATE('general').
-    phBrowse:SELECT-ALL().
+    phBrowse:SELECT-ALL() NO-ERROR.
     RUN showNumSelected.
     setUpdatePanel('display'). /* Activate buttons */
     setWindowFreeze(NO).
@@ -6439,7 +6439,7 @@ PROCEDURE dataSelectNone :
   {&timerStart}
 
   setWindowFreeze(YES).
-  phBrowse:DESELECT-ROWS().
+  phBrowse:DESELECT-ROWS() NO-ERROR.
   RUN showNumSelected.
   setUpdatePanel('display'). /* Activate buttons */
   setWindowFreeze(NO).
