@@ -603,6 +603,7 @@ PROCEDURE generateCode :
       iMaxType   = MAXIMUM(iMaxType  , LENGTH(getTypeString(bField.cDataType, bField.iExtent, 0) )).
       iMaxFormat = MAXIMUM(iMaxFormat, LENGTH(bField.cFormat)).
       IF bField.cLabel <> ? THEN iMaxLabel  = MAXIMUM(iMaxLabel , LENGTH(bField.cLabel)).
+      IF bField.cLabel <> ? THEN iMaxLabel = MAXIMUM(iMaxLabel, LENGTH(bField.cLabel)).
     END.
 
     /* Inc name lenth when using prefix */
@@ -905,6 +906,7 @@ FUNCTION getLabelString RETURNS CHARACTER
   DO WITH FRAME {&FRAME-NAME}:
 
     IF NOT tgLabel:CHECKED THEN RETURN ''.
+    IF pcLabel = ? THEN pcLabel = ''.
 
     cReturnValue = SUBSTITUTE('&1 "&2"'
                              , (IF tgLowerCase:CHECKED THEN 'label' ELSE 'LABEL')
