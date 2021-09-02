@@ -10,7 +10,7 @@ pipeline {
       steps {
         checkout([ $class: 'GitSCM', branches: scm.branches, extensions: scm.extensions + [[$class: 'CleanCheckout']], userRemoteConfigs: scm.userRemoteConfigs ])
         withEnv(["DLC=${tool name: 'OpenEdge-12.2', type: 'openedge'}"]) {
-          bat "%DLC%\\ant\\bin\\ant -DDLC=%DLC% -lib %DLC%\\pct\\pct.jar -lib Z:\\Tools\\xmltask.jar init build test dist"
+          bat "%DLC%\\ant\\bin\\ant -DDLC=%DLC% -lib %DLC%\\pct\\pct.jar -lib C:\\Tools\\xmltask.jar init build test dist"
         }
         junit 'results.xml'
         archiveArtifacts artifacts: 'target/DataDigger.zip'
