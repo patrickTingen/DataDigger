@@ -8,7 +8,7 @@
 
 DEFINE INPUT PARAMETER piOldVersion AS INTEGER NO-UNDO.
 
-{datadigger.i}
+{DataDigger.i}
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

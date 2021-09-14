@@ -3258,7 +3258,7 @@ DO:
   cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini', getWorkfolder(), getUserName()).
 
   /* Start default editor for ini file */
-  OS-COMMAND NO-WAIT START VALUE( cEnvironment ).
+  OS-COMMAND NO-WAIT START VALUE(cEnvironment).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4094,7 +4094,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Create_an_issue_on_GitHub C-Win
 ON CHOOSE OF MENU-ITEM m_Create_an_issue_on_GitHub /* Create an issue on GitHub */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/issues/new'). 
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger/issues/new'). 
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4105,7 +4105,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_blog C-Win
 ON CHOOSE OF MENU-ITEM m_DataDigger_blog /* Blog on wordpress.com */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com').
+  OS-COMMAND NO-WAIT VALUE('START https://datadigger.wordpress.com').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4116,7 +4116,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_on_GitHub C-Win
 ON CHOOSE OF MENU-ITEM m_DataDigger_on_GitHub /* Source code on GitHub */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger').
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4127,7 +4127,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_Wiki C-Win
 ON CHOOSE OF MENU-ITEM m_DataDigger_Wiki /* Wiki with How-To and docu */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/wiki'). 
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger/wiki'). 
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4169,7 +4169,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_questions_and_feedback C-Win
 ON CHOOSE OF MENU-ITEM m_questions_and_feedback /* Questions and feedback */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/contact').
+  OS-COMMAND NO-WAIT VALUE('START https://datadigger.wordpress.com/contact').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -7146,7 +7146,7 @@ PROCEDURE feelingLucky :
  * Start link https://is.gd/FeelingLucky
  */
   setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
-  OS-COMMAND NO-WAIT START VALUE("{&FEELINGLUCKY}").
+  OS-COMMAND NO-WAIT VALUE("START {&FEELINGLUCKY}").
   RUN createMenuTableBrowse.
 
 END PROCEDURE. /* feelingLucky */
