@@ -16,6 +16,8 @@ DataDigger version 26
 - Solved: CTRL-A or CTRL-D on empty browse gives error #76
 - Solved: Export to 4GL does not escape curly braces #80 (Rob Willoughby)
 
+- Changed: Starting the libraries is simplified, contact me when you have errors
+
 =====================================================================================
 
 DataDigger version 25

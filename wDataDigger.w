@@ -4245,7 +4245,7 @@ SESSION:DEBUG-ALERT = YES.
 
 /* ***************************  Main Block  *************************** */
 glReadOnlyDigger = plReadOnlyDigger.
-RUN startDiggerLib.
+RUN startDiggerLib.p.
 
 /* More than one DataDigger window can be open. The
  * startup procedure can demand that all windows are
@@ -12395,55 +12395,6 @@ PROCEDURE sortComboBox :
 
   phCombo:LIST-ITEMS = SUBSTRING(cList,2).
 END PROCEDURE. /* sortComboBox */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib C-Win 
-PROCEDURE startDiggerLib :
-/* Start DiggerLib if it has not already been started
- */
-  DEFINE VARIABLE cProgDir   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hDiggerLib AS HANDLE      NO-UNDO.
-
-  FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"wdatadigger.w","wdatadigger.r").
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
-    FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"wdatadigger.r","wdatadigger.w").
-
-  cProgDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
-
-  /* If we run in the UIB we know where we are running from */
-  IF "{&UIB_is_Running}" <> "" THEN cProgDir = '.\'.
-
-  /* Call out to see if the lib has been started for this build nr */
-  PUBLISH 'DataDiggerLib' (OUTPUT hDiggerLib).
-
-  /* If it is not, then start it */
-  IF NOT VALID-HANDLE(hDiggerLib) THEN
-  DO:
-    RUN VALUE(cProgDir + 'DataDiggerLib.p') PERSISTENT SET hDiggerLib.
-    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
-  END.
-
-  /* Start customizations in myDataDigger.p */
-  IF SEARCH(cProgDir + 'myDataDigger.p') <> ? THEN
-  DO:
-    RUN VALUE(cProgDir + 'myDataDigger.p') PERSISTENT SET hDiggerLib.
-    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib, SEARCH-TARGET).
-
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customDump"   ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customFormat" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customGetFilterValue" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
-    SUBSCRIBE PROCEDURE hDiggerLib TO "setWindowTitle" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customFrameColor" ANYWHERE.
-
-  END.
-END PROCEDURE. /* startDiggerLib */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
