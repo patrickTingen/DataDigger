@@ -877,8 +877,11 @@ DO:
     brRecord:TOOLTIP = "use CTRL-PGUP / CTRL-PGDN to~nbrowse through existing values".
 
     /* Make sure we are looking at the right field. It might have changed due to a sort */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     IF ttField.cDataType = "character" THEN
     DO:
@@ -905,8 +908,11 @@ ON "SHIFT-DEL" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
   DO WITH FRAME {&FRAME-NAME}:
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+      
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     CASE ttField.cDataType:
       WHEN "date"      THEN SELF:SCREEN-VALUE = ?.
@@ -927,8 +933,11 @@ DO:
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     /* If it is a date or looks like a date, treat it like a date */
     dValue = DATE(SELF:SCREEN-VALUE) NO-ERROR.
@@ -1785,3 +1794,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
