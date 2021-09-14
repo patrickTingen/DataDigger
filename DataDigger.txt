@@ -14,6 +14,7 @@ DataDigger version 26
 - Solved: Generate include fails when all labels are undefined #77 (Dirk Vreken)
 - Solved: Generate include file abbreviates table name when longer than 20 chars #78 (Dirk Vreken)
 - Solved: CTRL-A or CTRL-D on empty browse gives error #76
+- Solved: Export to 4GL does not escape curly braces #80 (Rob Willoughby)
 
 =====================================================================================
 

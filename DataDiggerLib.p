@@ -3970,6 +3970,12 @@ FUNCTION getEscapedData RETURNS CHARACTER
       /* Replace single quotes because we are using them for 4GL separating too */
       cOutput = REPLACE(cOutput, "'", "~~'").
 
+      /* Opening curly brace */
+      cOutput = replace(cOutput, chr(123), "' + chr(123) + '").
+
+      /* Tilde */
+      cOutput = replace(cOutput, chr(126), "' + chr(126) + '").
+      
       /* Replace CHR's 1 till 13  */
       DO iTmp = 1 TO 13:
         cOutput = REPLACE(cOutput, CHR(iTmp), "' + chr(" + string(iTmp) + ") + '").
