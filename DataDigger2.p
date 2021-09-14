@@ -406,7 +406,7 @@ PROCEDURE initializeObject :
       SKIP "Please download and reinstall DataDigger again" 
       SKIP(1) "The program will now quit"
            VIEW-AS ALERT-BOX INFORMATION.
-    OS-COMMAND NO-WAIT START VALUE("https://datadigger.wordpress.com/download/").
+    OS-COMMAND NO-WAIT VALUE("START https://datadigger.wordpress.com/download/").
     QUIT.
   END.
 
@@ -475,7 +475,7 @@ PROCEDURE recompileDataDigger :
       DO:
         MESSAGE "Cannot create dummy database in folder" cDummyDb SKIP 
                 "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-        OS-COMMAND NO-WAIT START 'https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
+        OS-COMMAND NO-WAIT 'START https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
         STOP.
       END.
     END.
@@ -721,7 +721,7 @@ PROCEDURE recompileSelf :
   DO:
     MESSAGE "An error occurred while recompiling. ~n~nPlease check 'DataDigger.log' in the DataDigger directory."
       VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-    OS-COMMAND NO-WAIT START VALUE(cLogFile).
+    OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cLogFile)).
   END.
 
   /* Clean up */
@@ -1010,3 +1010,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

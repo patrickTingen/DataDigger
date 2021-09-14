@@ -2636,7 +2636,7 @@ END.
 ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Info */
 , btnAbout-txt
 DO:
-  OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", getProgramDir() + '\DataDigger.txt')).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3006,16 +3006,6 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
-ON MOUSE-MENU-CLICK OF btnExpand IN FRAME frSettings /* < > */
-DO:
-  OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnFavourite
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavourite C-Win
@@ -3258,7 +3248,8 @@ DO:
   cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini', getWorkfolder(), getUserName()).
 
   /* Start default editor for ini file */
-  OS-COMMAND NO-WAIT START VALUE(cEnvironment).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cEnvironment)).
+   
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3830,7 +3821,7 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFeedback C-Win
 ON MOUSE-SELECT-CLICK OF fiFeedback IN FRAME frMain
 DO:
-  OS-COMMAND NO-WAIT START VALUE(SELF:PRIVATE-DATA).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", SELF:PRIVATE-DATA)).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -5321,7 +5312,7 @@ PROCEDURE btnViewChoose :
   OUTPUT CLOSE.
 
   /* Start associated program for the txt file */
-  OS-COMMAND NO-WAIT START VALUE(cFilename).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cFilename)).
 
   /* Cleanup */
   EMPTY TEMP-TABLE bView.

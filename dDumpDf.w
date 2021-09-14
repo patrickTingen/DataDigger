@@ -193,7 +193,7 @@ DO:
   
   IF tgOpenFile:CHECKED THEN
   DO i = 1 TO NUM-ENTRIES(cList):
-    OS-COMMAND NO-WAIT START VALUE(ENTRY(i,cList)).
+    OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", ENTRY(i,cList))).
   END.
 
   /* Save settings */
@@ -339,3 +339,4 @@ END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

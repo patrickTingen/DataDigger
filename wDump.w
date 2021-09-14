@@ -797,7 +797,7 @@ PROCEDURE btnOpenLastDumpDirChoose :
     FILE-INFO:FILE-NAME = cDumpDir.
 
     IF FILE-INFO:FULL-PATHNAME <> ? THEN
-      OS-COMMAND NO-WAIT explorer /n, /e, VALUE(FILE-INFO:FULL-PATHNAME).
+      OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("explorer /n, /e, &1", FILE-INFO:FULL-PATHNAME)).
     ELSE
       MESSAGE SUBSTITUTE("Last used dir '&1' not found.", cDumpDir)
         VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE "Invalid Dir" .
@@ -2707,3 +2707,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

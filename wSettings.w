@@ -313,8 +313,7 @@ END.
 ON CHOOSE OF btnRawEdit IN FRAME DEFAULT-FRAME /* Raw Edit */
 DO:
   /* Start default editor for ini file */
-  OS-COMMAND NO-WAIT START VALUE( pcSettingsFile ).
-
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", pcSettingsFile)).
 END.
 
 /* _UIB-CODE-BLOCK-END */

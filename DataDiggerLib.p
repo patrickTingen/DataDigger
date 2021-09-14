@@ -3380,7 +3380,7 @@ PROCEDURE showHelp :
   /* Start external things if needed */
   IF iButtonPressed = 1 THEN
   DO:
-    IF cUrl <> ? THEN OS-COMMAND NO-WAIT START (cUrl).
+    IF cUrl <> ? THEN OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cUrl)).
     IF cPrg <> ? THEN RUN VALUE(cPrg) NO-ERROR.
   END.
 
@@ -3971,10 +3971,10 @@ FUNCTION getEscapedData RETURNS CHARACTER
       cOutput = REPLACE(cOutput, "'", "~~'").
 
       /* Opening curly brace */
-      cOutput = replace(cOutput, chr(123), "' + chr(123) + '").
+      cOutput = REPLACE(cOutput, CHR(123), "' + chr(123) + '").
 
       /* Tilde */
-      cOutput = replace(cOutput, chr(126), "' + chr(126) + '").
+      cOutput = REPLACE(cOutput, CHR(126), "' + chr(126) + '").
       
       /* Replace CHR's 1 till 13  */
       DO iTmp = 1 TO 13:
@@ -4425,10 +4425,6 @@ FUNCTION getRegistry RETURNS CHARACTER
     FIND bDatabase WHERE bDatabase.cLogicalName = ENTRY(2,pcSection,":") NO-ERROR.
     IF AVAILABLE bDatabase THEN pcSection = "DB:" + bDatabase.cSection.
   END.
-
-  /* Load settings if there is nothing in the config table */
-  IF NOT TEMP-TABLE ttConfig:HAS-RECORDS THEN
-    RUN loadSettings.
 
   /* Search in settings tt */
   FIND bConfig WHERE bConfig.cSection = pcSection AND bConfig.cSetting = pcKey NO-ERROR.
