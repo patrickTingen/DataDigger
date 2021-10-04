@@ -17,7 +17,7 @@
 &GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
 
 /* Maximum field length for editing char fields */
-&GLOBAL-DEFINE field-maxLength 200
+&GLOBAL-DEFINE field-maxLength 2000
 
 /* FINALLY statement was introduced in 10.1C */
 &IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN

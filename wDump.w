@@ -730,9 +730,15 @@ PROCEDURE btnDumpChoose :
     /* For Excel, we need a 12-something codepage */
     IF cbDumpType:SCREEN-VALUE = "XLSX" THEN 
     DO:
+      /* Use 12* codepage for Excel */
       IF cbCodePage:SCREEN-VALUE = ? AND SESSION:CPSTREAM BEGINS '12' THEN 
         cbCodePage:SCREEN-VALUE = SESSION:CPSTREAM.
 
+      /* ISO88591 can almost always be mapped to 1252 */
+      IF SESSION:CPSTREAM BEGINS 'ISO8859' THEN
+        cbCodePage:SCREEN-VALUE = '1252'.
+
+      /* Otherwise nag about it */
       IF NOT cbCodePage:SCREEN-VALUE BEGINS '12' THEN 
       DO:
         MESSAGE 'For Excel, use a Windows codepage like 1250,1251,1252 etc' SKIP
