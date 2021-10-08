@@ -12546,7 +12546,13 @@ PROCEDURE startTool :
   CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
 
   CASE pcTool:
-    WHEN "Dict" THEN RUN DICT.p.
+    WHEN "Dict" THEN 
+    DO: 
+      RUN setTimer("resizeDictWindow", 500).
+      RUN dict.p.
+      RUN setTimer("resizeDictWindow", 0).
+    END.
+
     WHEN "Admin" THEN RUN _admin.p.
   END CASE.
 
