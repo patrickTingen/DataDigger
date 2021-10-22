@@ -118,31 +118,31 @@ DEFINE RECTANGLE rcSettings
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnSettings AT Y 10 X 20 WIDGET-ID 24
-     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED WIDGET-ID 54 NO-TAB-STOP 
-     btnRawEdit AT Y 15 X 690 WIDGET-ID 90
-     fiSearch AT Y 64 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 16
-     btPage1 AT Y 104 X 20 WIDGET-ID 8
-     btPage2 AT Y 139 X 20 WIDGET-ID 14
-     btPage3 AT Y 174 X 20 WIDGET-ID 10
-     BtnCancel-2 AT Y 470 X 575 WIDGET-ID 98
-     BtnOK AT Y 470 X 660 WIDGET-ID 94
+     btnSettings AT Y 10 X 20   
+     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED    NO-TAB-STOP 
+     btnRawEdit AT Y 15 X 690   
+     fiSearch AT Y 64 X 10 COLON-ALIGNED NO-LABEL   
+     btPage1 AT Y 104 X 20  
+     btPage2 AT Y 139 X 20   
+     btPage3 AT Y 174 X 20   
+     BtnCancel-2 AT Y 470 X 575   
+     BtnOK AT Y 470 X 660   
      "CTRL-SHIFT-S also opens this window" VIEW-AS TEXT
-          SIZE-PIXELS 240 BY 20 AT Y 475 X 15 WIDGET-ID 100
+          SIZE-PIXELS 240 BY 20 AT Y 475 X 15    
           FGCOLOR 7 
-     rcSettings AT Y 60 X 150 WIDGET-ID 92
+     rcSettings AT Y 60 X 150   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 761 BY 508
-         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel-2 WIDGET-ID 100.
+         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel-2    .
 
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 155 Y 65
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
-         TITLE "" WIDGET-ID 200.
+         TITLE ""    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -971,3 +971,4 @@ END PROCEDURE. /* showFrames */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

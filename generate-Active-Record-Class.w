@@ -173,28 +173,28 @@ DEFINE VARIABLE tgShortTypes AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 185 NO-LABEL WIDGET-ID 2
-     tgSelectedOnly AT Y 10 X 15 WIDGET-ID 8
-     tgLowerCase AT Y 30 X 15 WIDGET-ID 22
-     tgShortTypes AT Y 50 X 15 WIDGET-ID 72
-     cbIndent AT Y 73 X 50 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     rsPrefix AT Y 130 X 30 NO-LABEL WIDGET-ID 28
-     fiPrefix AT Y 190 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 34
-     rsDashes AT Y 250 X 30 NO-LABEL WIDGET-ID 62
-     fiReplace AT Y 286 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
-     btnSave AT Y 340 X 15 WIDGET-ID 36
+     edDefinition AT Y 5 X 185 NO-LABEL  
+     tgSelectedOnly AT Y 10 X 15  
+     tgLowerCase AT Y 30 X 15   
+     tgShortTypes AT Y 50 X 15   
+     cbIndent AT Y 73 X 50 COLON-ALIGNED NO-LABEL   
+     rsPrefix AT Y 130 X 30 NO-LABEL   
+     fiPrefix AT Y 190 X 125 COLON-ALIGNED NO-LABEL   
+     rsDashes AT Y 250 X 30 NO-LABEL   
+     fiReplace AT Y 286 X 125 COLON-ALIGNED NO-LABEL   
+     btnSave AT Y 340 X 15   
      "Dashes" VIEW-AS TEXT
-          SIZE-PIXELS 65 BY 13 AT Y 230 X 25 WIDGET-ID 70
+          SIZE-PIXELS 65 BY 13 AT Y 230 X 25   
      "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 110 X 25 WIDGET-ID 48
+          SIZE-PIXELS 75 BY 13 AT Y 110 X 25   
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 74 X 15 WIDGET-ID 68
-     RECT-4 AT Y 115 X 15 WIDGET-ID 46
-     RECT-5 AT Y 237 X 15 WIDGET-ID 58
+          SIZE-PIXELS 40 BY 20 AT Y 74 X 15   
+     RECT-4 AT Y 115 X 15   
+     RECT-5 AT Y 237 X 15   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 180 BY 24.67 WIDGET-ID 100.
+         SIZE 180 BY 24.67    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -798,4 +798,5 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

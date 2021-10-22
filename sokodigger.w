@@ -142,11 +142,11 @@ DEFINE VARIABLE fiFocus AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL WIDGET-ID 4
+     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL  
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 160 BY 28.57 WIDGET-ID 100.
+         SIZE 160 BY 28.57    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1357,4 +1357,5 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

@@ -142,29 +142,29 @@ DEFINE VARIABLE sList AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnShow AT Y 268 X 340 WIDGET-ID 34
-     fiNumItems AT Y 380 X 165 COLON-ALIGNED WIDGET-ID 38
-     sList AT Y 5 X 5 NO-LABEL WIDGET-ID 2
-     fiNewItem AT Y 357 X 5 NO-LABEL WIDGET-ID 4
-     btnAdd AT Y 355 X 250 WIDGET-ID 6
-     btnUp AT Y 85 X 250 WIDGET-ID 8
-     btnDelete AT Y 110 X 250 WIDGET-ID 10
-     btnDown AT Y 135 X 250 WIDGET-ID 12
-     btnSort AT Y 185 X 250 WIDGET-ID 32
-     rsDelimiter AT Y 25 X 295 NO-LABEL WIDGET-ID 14
-     fcDelimiter AT Y 220 X 355 COLON-ALIGNED WIDGET-ID 30
-     fiDelimiter AT Y 243 X 355 COLON-ALIGNED WIDGET-ID 22
+     btnShow AT Y 268 X 340   
+     fiNumItems AT Y 380 X 165 COLON-ALIGNED   
+     sList AT Y 5 X 5 NO-LABEL  
+     fiNewItem AT Y 357 X 5 NO-LABEL  
+     btnAdd AT Y 355 X 250  
+     btnUp AT Y 85 X 250  
+     btnDelete AT Y 110 X 250   
+     btnDown AT Y 135 X 250   
+     btnSort AT Y 185 X 250   
+     rsDelimiter AT Y 25 X 295 NO-LABEL   
+     fcDelimiter AT Y 220 X 355 COLON-ALIGNED   
+     fiDelimiter AT Y 243 X 355 COLON-ALIGNED   
      Btn_OK AT Y 350 X 315
      Btn_Cancel AT Y 378 X 315
      "Delimiter:" VIEW-AS TEXT
-          SIZE-PIXELS 60 BY 13 AT Y 5 X 315 WIDGET-ID 26
-     RECT-1 AT Y 11 X 290 WIDGET-ID 28
-     rcDelimiter AT Y 210 X 290 WIDGET-ID 36
+          SIZE-PIXELS 60 BY 13 AT Y 5 X 315   
+     RECT-1 AT Y 11 X 290   
+     rcDelimiter AT Y 210 X 290   
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 429 BY 440
          TITLE "List Editor"
-         DEFAULT-BUTTON Btn_OK WIDGET-ID 100.
+         DEFAULT-BUTTON Btn_OK    .
 
 
 /* *********************** Procedure Settings ************************ */

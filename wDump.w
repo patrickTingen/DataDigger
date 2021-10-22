@@ -271,50 +271,50 @@ DEFINE RECTANGLE rcBorder
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     ficFileName AT Y 15 X 97 COLON-ALIGNED WIDGET-ID 2
-     btnChooseDumpFile AT Y 15 X 682 WIDGET-ID 4
-     cbDumpType AT Y 45 X 97 COLON-ALIGNED WIDGET-ID 6
-     cbCodePage AT Y 45 X 384 COLON-ALIGNED WIDGET-ID 54
-     tbUseCustomizedFormats AT Y 66 X 576 WIDGET-ID 52
-     cbSeparator AT Y 70 X 97 COLON-ALIGNED WIDGET-ID 64
-     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED WIDGET-ID 48
-     tbExportSchema AT Y 85 X 576 WIDGET-ID 20
-     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED WIDGET-ID 8
-     cbDateFormat AT Y 95 X 384 COLON-ALIGNED WIDGET-ID 50
-     tbMinimalSchema AT Y 104 X 576 WIDGET-ID 22
-     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED WIDGET-ID 30
-     btnViewLastDump AT Y 200 X 750 WIDGET-ID 28
-     btnOpenLastDumpDir AT Y 200 X 773 WIDGET-ID 32
-     btnDump AT Y 265 X 649 WIDGET-ID 62
-     btnClose AT Y 265 X 729 WIDGET-ID 60
-     tbDumpReadyClose AT Y 270 X 15 WIDGET-ID 36
-     tbDumpReadyExplore AT Y 270 X 145 WIDGET-ID 38
-     tbDumpReadyView AT Y 270 X 282 WIDGET-ID 40
-     tbDumpReadyClipboard AT Y 270 X 406 WIDGET-ID 56
-     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
-     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
+     ficFileName AT Y 15 X 97 COLON-ALIGNED  
+     btnChooseDumpFile AT Y 15 X 682  
+     cbDumpType AT Y 45 X 97 COLON-ALIGNED  
+     cbCodePage AT Y 45 X 384 COLON-ALIGNED   
+     tbUseCustomizedFormats AT Y 66 X 576   
+     cbSeparator AT Y 70 X 97 COLON-ALIGNED   
+     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED   
+     tbExportSchema AT Y 85 X 576   
+     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED  
+     cbDateFormat AT Y 95 X 384 COLON-ALIGNED   
+     tbMinimalSchema AT Y 104 X 576   
+     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED   
+     btnViewLastDump AT Y 200 X 750   
+     btnOpenLastDumpDir AT Y 200 X 773   
+     btnDump AT Y 265 X 649   
+     btnClose AT Y 265 X 729   
+     tbDumpReadyClose AT Y 270 X 15   
+     tbDumpReadyExplore AT Y 270 X 145   
+     tbDumpReadyView AT Y 270 X 282   
+     tbDumpReadyClipboard AT Y 270 X 406   
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL   
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL   
      "Last dump" VIEW-AS TEXT
-          SIZE-PIXELS 87 BY 13 AT Y 163 X 13 WIDGET-ID 26
+          SIZE-PIXELS 87 BY 13 AT Y 163 X 13   
      "After the dump ..." VIEW-AS TEXT
-          SIZE-PIXELS 103 BY 13 AT Y 248 X 12 WIDGET-ID 44
-     RECT-2 AT Y 5 X 10 WIDGET-ID 14
-     RECT-3 AT Y 169 X 5 WIDGET-ID 24
-     RECT-4 AT Y 254 X 5 WIDGET-ID 34
+          SIZE-PIXELS 103 BY 13 AT Y 248 X 12   
+     RECT-2 AT Y 5 X 10   
+     RECT-3 AT Y 169 X 5   
+     RECT-4 AT Y 254 X 5   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 810 BY 301
-         DEFAULT-BUTTON btnDump WIDGET-ID 100.
+         DEFAULT-BUTTON btnDump    .
 
 DEFINE FRAME infoFrame
-     btAbort AT Y 58 X 60 WIDGET-ID 54
-     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 46
-     rcBorder AT Y 30 X 10 WIDGET-ID 2
-     rcBody AT Y 29 X 10 WIDGET-ID 6
+     btAbort AT Y 58 X 60   
+     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL   
+     rcBorder AT Y 30 X 10  
+     rcBody AT Y 29 X 10  
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 280 Y 84
-         SIZE-PIXELS 188 BY 103 WIDGET-ID 200.
+         SIZE-PIXELS 188 BY 103    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -2713,4 +2713,5 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

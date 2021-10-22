@@ -88,14 +88,14 @@ DEFINE VARIABLE tgWriteTrigger AS LOGICAL INITIAL yes
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnBack AT Y 460 X 535 WIDGET-ID 6
-     btnFinish AT Y 460 X 615 WIDGET-ID 4
-     tgWriteTrigger AT Y 463 X 15 WIDGET-ID 16
-     rctData AT Y 0 X 1 WIDGET-ID 52
+     btnBack AT Y 460 X 535  
+     btnFinish AT Y 460 X 615  
+     tgWriteTrigger AT Y 463 X 15   
+     rctData AT Y 0 X 1   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnBack WIDGET-ID 100.
+         CANCEL-BUTTON btnBack    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -810,4 +810,5 @@ END PROCEDURE. /* loadData */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

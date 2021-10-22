@@ -73,11 +73,11 @@ DEFINE VARIABLE edDefinition AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 5 NO-LABEL WIDGET-ID 2
+     edDefinition AT Y 5 X 5 NO-LABEL  
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 127 BY 16.67 WIDGET-ID 100.
+         SIZE 127 BY 16.67    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -290,4 +290,5 @@ END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

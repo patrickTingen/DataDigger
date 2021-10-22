@@ -373,3 +373,34 @@ END PROCEDURE. /* 24 */
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-convertFrom-25) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE convertFrom-25 Procedure 
+PROCEDURE convertFrom-25 :
+/* v25 -> 26
+*/
+  DEFINE BUFFER bfConfig FOR ttConfig.
+
+  /* Query editor is now default not expanded on startup */
+  setRegistry("DataDigger", "QueryEditorState", ?).
+
+  /* Change of query separator */
+  RUN getRegistryTable(OUTPUT TABLE bfConfig).
+
+  FOR EACH bfConfig 
+    WHERE bfConfig.cSection BEGINS  "DB:" 
+      AND bfConfig.cSetting MATCHES "*:query:*":
+
+    setRegistry( bfConfig.cSection
+               , bfConfig.cSetting
+               , REPLACE( bfConfig.cValue, CHR(1, SESSION:CPINTERNAL, "UTF-8")
+                                         , CHR(2, SESSION:CPINTERNAL, "UTF-8") )  ).
+  END.
+
+END PROCEDURE. /* 25 */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+

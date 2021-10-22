@@ -10,7 +10,12 @@ DataDigger version 26
 
 - New   : Option for abbreviated datatypes in generate temp-table include (Baltazar Oliveira)
 - New   : Option for abbreviated datatypes in generate active record class
+- New   : Option to set border color via myDataDigger.p (Johan Geerts)
+- New   : Automagically complete query with missing quotes #74 (Johan Geerts)
+
+- Solved: Call-stack error on getCursorPos (Jay Farr)
 - Solved: Window position not saved on exit (Johan Geerts)
+- Solved: Shift-del does not work in query editor
 - Solved: Generate include fails when all labels are undefined #77 (Dirk Vreken)
 - Solved: Generate include file abbreviates table name when longer than 20 chars #78 (Dirk Vreken)
 - Solved: CTRL-A or CTRL-D on empty browse gives error #76
@@ -19,6 +24,7 @@ DataDigger version 26
 
 - Changed: Starting the libraries is simplified, contact me when you have errors
 - Changed: When dumping to Excel, assume codepage 1252 when current is ISO8859
+- Changed: All widget-id attributes removed from UI elements #82 (Simi Slegian)
 
 =====================================================================================
 

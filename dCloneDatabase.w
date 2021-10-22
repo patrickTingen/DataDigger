@@ -87,18 +87,18 @@ DEFINE VARIABLE tgConnect AS LOGICAL INITIAL YES
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiDir AT Y 28 X 2 COLON-ALIGNED NO-LABEL WIDGET-ID 2
+     fiDir AT Y 28 X 2 COLON-ALIGNED NO-LABEL  
      Btn_OK AT Y 77 X 245
      Btn_Cancel AT Y 77 X 325
-     tgConnect AT Y 52 X 12 WIDGET-ID 10
-     btnChooseDumpFile AT Y 28 X 380 WIDGET-ID 8
-     fiLabel AT Y 9 X 2 COLON-ALIGNED NO-LABEL WIDGET-ID 12
-     RECT-1 AT Y 0 X 0 WIDGET-ID 4
+     tgConnect AT Y 52 X 12   
+     btnChooseDumpFile AT Y 28 X 380  
+     fiLabel AT Y 9 X 2 COLON-ALIGNED NO-LABEL   
+     RECT-1 AT Y 0 X 0  
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
          SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 423 BY 146
          TITLE "Create an empty Clone Database"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel    .
 
 
 /* *********************** Procedure Settings ************************ */

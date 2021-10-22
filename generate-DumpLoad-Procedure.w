@@ -147,32 +147,32 @@ DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 205 NO-LABEL WIDGET-ID 2
-     rsDumpLoad AT Y 13 X 30 NO-LABEL WIDGET-ID 78
-     cbIndent AT Y 44 X 70 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     cbDelimiter AT Y 70 X 70 COLON-ALIGNED NO-LABEL WIDGET-ID 88
-     tgLowerCase AT Y 100 X 25 WIDGET-ID 84
-     tgIncludeDb AT Y 125 X 25 WIDGET-ID 86
-     tgSelectedOnly AT Y 150 X 25 WIDGET-ID 8
-     tgDelete AT Y 205 X 30 WIDGET-ID 10
-     tgLoadInChunks AT Y 258 X 30 WIDGET-ID 12
-     tgDisableTriggers AT Y 278 X 30 WIDGET-ID 76
-     btnSave AT Y 317 X 15 WIDGET-ID 36
+     edDefinition AT Y 5 X 205 NO-LABEL  
+     rsDumpLoad AT Y 13 X 30 NO-LABEL   
+     cbIndent AT Y 44 X 70 COLON-ALIGNED NO-LABEL   
+     cbDelimiter AT Y 70 X 70 COLON-ALIGNED NO-LABEL   
+     tgLowerCase AT Y 100 X 25   
+     tgIncludeDb AT Y 125 X 25   
+     tgSelectedOnly AT Y 150 X 25  
+     tgDelete AT Y 205 X 30   
+     tgLoadInChunks AT Y 258 X 30   
+     tgDisableTriggers AT Y 278 X 30   
+     btnSave AT Y 317 X 15   
      "Delimiter:" VIEW-AS TEXT
-          SIZE-PIXELS 55 BY 20 AT Y 71 X 25 WIDGET-ID 90
+          SIZE-PIXELS 55 BY 20 AT Y 71 X 25   
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 45 X 25 WIDGET-ID 68
+          SIZE-PIXELS 40 BY 20 AT Y 45 X 25   
      "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 185 X 25 WIDGET-ID 48
+          SIZE-PIXELS 50 BY 13 AT Y 185 X 25   
      "Load" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 238 X 25 WIDGET-ID 74
-     RECT-2 AT Y 245 X 15 WIDGET-ID 24
-     RECT-5 AT Y 192 X 15 WIDGET-ID 58
-     RECT-6 AT Y 5 X 15 WIDGET-ID 82
+          SIZE-PIXELS 50 BY 13 AT Y 238 X 25   
+     RECT-2 AT Y 245 X 15   
+     RECT-5 AT Y 192 X 15   
+     RECT-6 AT Y 5 X 15   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 182 BY 16.52 WIDGET-ID 100.
+         SIZE 182 BY 16.52    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -658,3 +658,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -90,20 +90,20 @@ DEFINE VARIABLE tgOpenFile AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiDir AT Y 95 X 50 COLON-ALIGNED WIDGET-ID 2
+     fiDir AT Y 95 X 50 COLON-ALIGNED  
      Btn_OK AT Y 166 X 245
      Btn_Cancel AT Y 166 X 325
-     tgOpenFile AT Y 121 X 60 WIDGET-ID 10
-     btnChooseDumpFile AT Y 95 X 380 WIDGET-ID 8
-     rsDump AT Y 10 X 60 NO-LABEL WIDGET-ID 12
+     tgOpenFile AT Y 121 X 60   
+     btnChooseDumpFile AT Y 95 X 380  
+     rsDump AT Y 10 X 60 NO-LABEL   
      "Dump:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 13 AT Y 15 X 13 WIDGET-ID 16
-     RECT-1 AT Y 0 X 0 WIDGET-ID 4
+          SIZE-PIXELS 40 BY 13 AT Y 15 X 13   
+     RECT-1 AT Y 0 X 0  
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 425 BY 243
          TITLE "Dump Definitions"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -339,4 +339,5 @@ END PROCEDURE. /* initObject */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

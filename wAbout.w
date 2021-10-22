@@ -106,19 +106,19 @@ DEFINE RECTANGLE rcCord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnDataDigger AT ROW 1.71 COL 3 WIDGET-ID 324
-     BtnOK AT Y 10 X 540 WIDGET-ID 48
-     edChangelog AT Y 60 X 5 NO-LABEL WIDGET-ID 72
-     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 74
-     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-     fiWebsite AT Y 425 X 227 NO-LABEL WIDGET-ID 298
-     imgPlayer AT ROW 2.43 COL 61.2 WIDGET-ID 328
-     imgBall AT ROW 5.43 COL 59.8 WIDGET-ID 330
-     rcCord AT ROW 4.05 COL 60.6 WIDGET-ID 332
+     btnDataDigger AT ROW 1.71 COL 3    
+     BtnOK AT Y 10 X 540   
+     edChangelog AT Y 60 X 5 NO-LABEL   
+     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL   
+     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL   
+     fiWebsite AT Y 425 X 227 NO-LABEL    
+     imgPlayer AT ROW 2.43 COL 61.2    
+     imgBall AT ROW 5.43 COL 59.8    
+     rcCord AT ROW 4.05 COL 60.6    
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 126.4 BY 21.71 WIDGET-ID 100.
+         SIZE 126.4 BY 21.71    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -201,7 +201,6 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        COLUMN          = 85
        HEIGHT          = 1.67
        WIDTH           = 7
-       WIDGET-ID       = 336
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
@@ -598,4 +597,5 @@ END PROCEDURE. /* justWait */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

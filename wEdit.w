@@ -202,25 +202,25 @@ DEFINE BROWSE brRecord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     brRecord AT Y 25 X 0 WIDGET-ID 200
-     tgSelAll AT Y 27 X 5 WIDGET-ID 38
-     fiNumRecords AT Y 425 X 78 COLON-ALIGNED WIDGET-ID 10
-     btnDecrease AT Y 0 X 210 WIDGET-ID 26
-     btnOk AT Y 425 X 505 WIDGET-ID 6
-     btnClose AT Y 425 X 585 WIDGET-ID 4
-     tgWriteTrigger AT Y 427 X 145 WIDGET-ID 16
-     btnIncrease AT Y 0 X 180 WIDGET-ID 24
-     btnDatePicker AT Y 0 X 240 WIDGET-ID 34
-     btnEditor AT Y 0 X 0 WIDGET-ID 36
-     btnEncode AT Y 0 X 60 WIDGET-ID 12
-     btnListEdit AT Y 0 X 30 WIDGET-ID 14
-     btnLowerCase AT Y 0 X 120 WIDGET-ID 20
-     btnUpperCase AT Y 0 X 90 WIDGET-ID 18
-     btnWordCase AT Y 0 X 150 WIDGET-ID 22
+     brRecord AT Y 25 X 0    
+     tgSelAll AT Y 27 X 5   
+     fiNumRecords AT Y 425 X 78 COLON-ALIGNED   
+     btnDecrease AT Y 0 X 210   
+     btnOk AT Y 425 X 505  
+     btnClose AT Y 425 X 585  
+     tgWriteTrigger AT Y 427 X 145   
+     btnIncrease AT Y 0 X 180   
+     btnDatePicker AT Y 0 X 240   
+     btnEditor AT Y 0 X 0   
+     btnEncode AT Y 0 X 60   
+     btnListEdit AT Y 0 X 30   
+     btnLowerCase AT Y 0 X 120   
+     btnUpperCase AT Y 0 X 90   
+     btnWordCase AT Y 0 X 150   
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnClose WIDGET-ID 100.
+         CANCEL-BUTTON btnClose    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1794,4 +1794,5 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

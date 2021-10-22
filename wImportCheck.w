@@ -144,13 +144,13 @@ DEFINE VARIABLE edSummary AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edSummary AT Y 0 X 0 NO-LABEL WIDGET-ID 22
-     btnBack AT Y 370 X 340 WIDGET-ID 6
-     btnNext AT Y 370 X 420 WIDGET-ID 4
+     edSummary AT Y 0 X 0 NO-LABEL   
+     btnBack AT Y 370 X 340  
+     btnNext AT Y 370 X 420  
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnBack WIDGET-ID 100.
+         CANCEL-BUTTON btnBack    .
 
 
 /* *********************** Procedure Settings ************************ */

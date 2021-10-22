@@ -14,7 +14,7 @@
 &GLOBAL-DEFINE edition Rudolf
 &GLOBAL-DEFINE build {build.i}
 
-&GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
+&GLOBAL-DEFINE QUERYSEP CHR(2, SESSION:CPINTERNAL, "UTF-8")
 
 /* Maximum field length for editing char fields */
 &GLOBAL-DEFINE field-maxLength 2000
@@ -529,3 +529,4 @@ END PROCEDURE. /* getProcHandle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

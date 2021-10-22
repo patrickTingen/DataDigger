@@ -251,96 +251,96 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 184 BY 31.38 WIDGET-ID 100.
+         SIZE 184 BY 31.38    .
 
 DEFINE FRAME FRAME-Z
-     rsColumnLabelTemplate AT Y 30 X 85 NO-LABEL WIDGET-ID 186
-     fiExample AT Y 111 X 75 COLON-ALIGNED WIDGET-ID 192
+     rsColumnLabelTemplate AT Y 30 X 85 NO-LABEL    
+     fiExample AT Y 111 X 75 COLON-ALIGNED    
      "Data Browse Column Label Template" VIEW-AS TEXT
-          SIZE-PIXELS 240 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-19 AT Y 11 X 5 WIDGET-ID 176
+          SIZE-PIXELS 240 BY 17 AT Y 2 X 15    
+     RECT-19 AT Y 11 X 5    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 155
          SIZE-PIXELS 415 BY 170
-         TITLE "2" WIDGET-ID 2900.
+         TITLE "2"     .
 
 DEFINE FRAME FRAME-V
-     tgUseSystemColors AT Y 25 X 170 WIDGET-ID 122
-     fiOddRow AT Y 45 X 160 COLON-ALIGNED WIDGET-ID 110 NO-TAB-STOP 
-     btnOdd AT Y 45 X 344 WIDGET-ID 196
-     fiEvenRow AT Y 68 X 160 COLON-ALIGNED WIDGET-ID 112 NO-TAB-STOP 
-     btnEven AT Y 68 X 344 WIDGET-ID 194
-     fiFilterBox AT Y 102 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnFilterBox AT Y 102 X 344 WIDGET-ID 116
-     fiQueryError AT Y 127 X 160 COLON-ALIGNED WIDGET-ID 174 NO-TAB-STOP 
-     btnQueryError AT Y 127 X 344 WIDGET-ID 192
-     fiRecordCountComplete AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 204 NO-TAB-STOP 
-     btnRecordCountComplete AT Y 152 X 344 WIDGET-ID 198
-     fiRecordCountIncomplete AT Y 178 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnRecordCountIncomplete AT Y 178 X 344 WIDGET-ID 200
-     fiRecordCountSelected AT Y 204 X 160 COLON-ALIGNED WIDGET-ID 206 NO-TAB-STOP 
-     btnRecordCountSelected AT Y 204 X 344 WIDGET-ID 202
+     tgUseSystemColors AT Y 25 X 170    
+     fiOddRow AT Y 45 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnOdd AT Y 45 X 344    
+     fiEvenRow AT Y 68 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnEven AT Y 68 X 344    
+     fiFilterBox AT Y 102 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnFilterBox AT Y 102 X 344    
+     fiQueryError AT Y 127 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnQueryError AT Y 127 X 344    
+     fiRecordCountComplete AT Y 152 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnRecordCountComplete AT Y 152 X 344    
+     fiRecordCountIncomplete AT Y 178 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnRecordCountIncomplete AT Y 178 X 344    
+     fiRecordCountSelected AT Y 204 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnRecordCountSelected AT Y 204 X 344    
      "Data / query highlighting colors" VIEW-AS TEXT
-          SIZE-PIXELS 225 BY 17 AT Y 2 X 15 WIDGET-ID 178
-     RECT-17 AT Y 11 X 5 WIDGET-ID 176
+          SIZE-PIXELS 225 BY 17 AT Y 2 X 15    
+     RECT-17 AT Y 11 X 5    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 340
          SIZE-PIXELS 415 BY 265
-         TITLE "2" WIDGET-ID 2100.
+         TITLE "2"     .
 
 DEFINE FRAME FRAME-T
-     tgHighlightFavouriteTables AT Y 20 X 170 WIDGET-ID 192
-     fiFavouriteTable AT Y 39 X 160 COLON-ALIGNED WIDGET-ID 190 NO-TAB-STOP 
-     btnFavouriteTable AT Y 39 X 344 WIDGET-ID 188
-     fiFieldFilter AT Y 74 X 160 COLON-ALIGNED WIDGET-ID 186 NO-TAB-STOP 
-     btnFieldFilter AT Y 74 X 344 WIDGET-ID 184
-     fiCustomOrder AT Y 100 X 160 COLON-ALIGNED WIDGET-ID 200 NO-TAB-STOP 
-     btnfiCustomOrder AT Y 100 X 344 WIDGET-ID 194
-     fiCustomFormat AT Y 126 X 160 COLON-ALIGNED WIDGET-ID 198 NO-TAB-STOP 
-     btnfiCustomFormat AT Y 126 X 344 WIDGET-ID 182
-     fiWarningBox AT Y 152 X 160 COLON-ALIGNED WIDGET-ID 202 NO-TAB-STOP 
-     btnWarningBox AT Y 152 X 344 WIDGET-ID 196
-     fiIndexInactive AT Y 179 X 160 COLON-ALIGNED WIDGET-ID 168 NO-TAB-STOP 
-     btnIndexInactive AT Y 179 X 344 WIDGET-ID 116
-     fiPrimIndex AT Y 205 X 160 COLON-ALIGNED WIDGET-ID 172 NO-TAB-STOP 
-     btnPrimIndex AT Y 205 X 344 WIDGET-ID 204
+     tgHighlightFavouriteTables AT Y 20 X 170    
+     fiFavouriteTable AT Y 39 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnFavouriteTable AT Y 39 X 344    
+     fiFieldFilter AT Y 74 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnFieldFilter AT Y 74 X 344    
+     fiCustomOrder AT Y 100 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnfiCustomOrder AT Y 100 X 344    
+     fiCustomFormat AT Y 126 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnfiCustomFormat AT Y 126 X 344    
+     fiWarningBox AT Y 152 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnWarningBox AT Y 152 X 344    
+     fiIndexInactive AT Y 179 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnIndexInactive AT Y 179 X 344    
+     fiPrimIndex AT Y 205 X 160 COLON-ALIGNED     NO-TAB-STOP 
+     btnPrimIndex AT Y 205 X 344    
      "Schema highlighting colors" VIEW-AS TEXT
-          SIZE-PIXELS 175 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-14 AT Y 11 X 5 WIDGET-ID 176
+          SIZE-PIXELS 175 BY 17 AT Y 2 X 15    
+     RECT-14 AT Y 11 X 5    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 465 Y 205
          SIZE-PIXELS 415 BY 275
-         TITLE "2" WIDGET-ID 2000.
+         TITLE "2"     .
 
 DEFINE FRAME FRAME-J
-     tgAutoFont AT Y 25 X 88 WIDGET-ID 122
-     btnDefaultFont AT Y 46 X 88 WIDGET-ID 98
-     btnFixedFont AT Y 46 X 245 WIDGET-ID 100
+     tgAutoFont AT Y 25 X 88    
+     btnDefaultFont AT Y 46 X 88   
+     btnFixedFont AT Y 46 X 245    
      "Fonts" VIEW-AS TEXT
-          SIZE-PIXELS 55 BY 17 AT Y 2 X 15 WIDGET-ID 180
+          SIZE-PIXELS 55 BY 17 AT Y 2 X 15    
      "Set fonts:" VIEW-AS TEXT
-          SIZE-PIXELS 73 BY 13 AT Y 51 X 10 WIDGET-ID 102
-     RECT-20 AT Y 11 X 5 WIDGET-ID 124
+          SIZE-PIXELS 73 BY 13 AT Y 51 X 10    
+     RECT-20 AT Y 11 X 5    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 10 Y 15
          SIZE-PIXELS 415 BY 115
-         TITLE "2" WIDGET-ID 1200.
+         TITLE "2"     .
 
 DEFINE FRAME FRAME-AB
-     rsTitleBarDbName AT Y 28 X 85 NO-LABEL WIDGET-ID 186
-     tgTitleStartsWithTableName AT Y 95 X 85 WIDGET-ID 190
+     rsTitleBarDbName AT Y 28 X 85 NO-LABEL    
+     tgTitleStartsWithTableName AT Y 95 X 85    
      "Database Name in Title Bar" VIEW-AS TEXT
-          SIZE-PIXELS 180 BY 17 AT Y 2 X 15 WIDGET-ID 180
-     RECT-22 AT Y 11 X 5 WIDGET-ID 176
+          SIZE-PIXELS 180 BY 17 AT Y 2 X 15    
+     RECT-22 AT Y 11 X 5    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 465 Y 40
          SIZE-PIXELS 415 BY 150
-         TITLE "2" WIDGET-ID 3000.
+         TITLE "2"     .
 
 
 /* *********************** Procedure Settings ************************ */

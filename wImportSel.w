@@ -99,18 +99,18 @@ DEFINE VARIABLE fiText AS CHARACTER FORMAT "X(256)":U INITIAL "Select the files 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fcFilename AT Y 30 X 25 COLON-ALIGNED WIDGET-ID 12
-     btnGetFile AT Y 30 X 450 WIDGET-ID 10
-     btnAddFile AT Y 30 X 475 WIDGET-ID 14
-     edFileList AT ROW 3.62 COL 1 NO-LABEL WIDGET-ID 2
-     btnBack AT Y 213 X 340 WIDGET-ID 8
-     BtnNext AT Y 213 X 423 WIDGET-ID 6
-     fiText AT Y 6 X 9 NO-LABEL WIDGET-ID 4
+     fcFilename AT Y 30 X 25 COLON-ALIGNED   
+     btnGetFile AT Y 30 X 450   
+     btnAddFile AT Y 30 X 475   
+     edFileList AT ROW 3.62 COL 1 NO-LABEL  
+     btnBack AT Y 213 X 340  
+     BtnNext AT Y 213 X 423  
+     fiText AT Y 6 X 9 NO-LABEL  
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 500 BY 239
-         CANCEL-BUTTON btnBack DROP-TARGET WIDGET-ID 100.
+         CANCEL-BUTTON btnBack DROP-TARGET    .
 
 
 /* *********************** Procedure Settings ************************ */

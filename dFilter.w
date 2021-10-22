@@ -137,51 +137,51 @@ DEFINE VARIABLE tgShowVst AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     cbTableFieldShow AT Y 68 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 8
-     cbTableFieldHide AT Y 113 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 10
-     cbTableNameShow AT Y 218 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     cbTableNameHide AT Y 263 X 10 COLON-ALIGNED NO-LABEL WIDGET-ID 18
-     tgShowNormalTables AT Y 335 X 20 WIDGET-ID 50
-     tgShowSchema AT Y 358 X 20 WIDGET-ID 24
-     tgShowVst AT Y 381 X 20 WIDGET-ID 28
-     tgShowSql AT Y 406 X 20 WIDGET-ID 40
-     tgShowOther AT Y 358 X 243 WIDGET-ID 44
-     tgShowHidden AT Y 381 X 243 WIDGET-ID 30
-     tgShowFrozen AT Y 406 X 243 WIDGET-ID 42
-     btnReset AT Y 450 X 10 WIDGET-ID 46
+     cbTableFieldShow AT Y 68 X 10 COLON-ALIGNED NO-LABEL  
+     cbTableFieldHide AT Y 113 X 10 COLON-ALIGNED NO-LABEL   
+     cbTableNameShow AT Y 218 X 10 COLON-ALIGNED NO-LABEL   
+     cbTableNameHide AT Y 263 X 10 COLON-ALIGNED NO-LABEL   
+     tgShowNormalTables AT Y 335 X 20   
+     tgShowSchema AT Y 358 X 20   
+     tgShowVst AT Y 381 X 20   
+     tgShowSql AT Y 406 X 20   
+     tgShowOther AT Y 358 X 243   
+     tgShowHidden AT Y 381 X 243   
+     tgShowFrozen AT Y 406 X 243   
+     btnReset AT Y 450 X 10   
      Btn_OK AT Y 450 X 345
      Btn_Cancel AT Y 450 X 425
      "But hide these" VIEW-AS TEXT
-          SIZE-PIXELS 138 BY 18 AT Y 245 X 23 WIDGET-ID 20
+          SIZE-PIXELS 138 BY 18 AT Y 245 X 23   
      "Comma sep list, wildcards allowed" VIEW-AS TEXT
-          SIZE-PIXELS 215 BY 18 AT Y 171 X 285 WIDGET-ID 54
+          SIZE-PIXELS 215 BY 18 AT Y 171 X 285   
           FGCOLOR 7 
      "Use ALT-DOWN to open this window" VIEW-AS TEXT
-          SIZE-PIXELS 250 BY 18 AT Y 453 X 90 WIDGET-ID 56
+          SIZE-PIXELS 250 BY 18 AT Y 453 X 90   
           FGCOLOR 7 
      "But hide tables that contain any of these" VIEW-AS TEXT
-          SIZE-PIXELS 350 BY 18 AT Y 95 X 23 WIDGET-ID 12
+          SIZE-PIXELS 350 BY 18 AT Y 95 X 23   
      "Show only tables that contain all of these fields" VIEW-AS TEXT
-          SIZE-PIXELS 350 BY 18 AT Y 50 X 23 WIDGET-ID 6
+          SIZE-PIXELS 350 BY 18 AT Y 50 X 23  
      "Show these tables" VIEW-AS TEXT
-          SIZE-PIXELS 163 BY 18 AT Y 200 X 23 WIDGET-ID 16
+          SIZE-PIXELS 163 BY 18 AT Y 200 X 23   
      "Filter by name" VIEW-AS TEXT
-          SIZE-PIXELS 99 BY 18 AT Y 163 X 23 WIDGET-ID 36
+          SIZE-PIXELS 99 BY 18 AT Y 163 X 23   
      "Filter by fields in table" VIEW-AS TEXT
-          SIZE-PIXELS 142 BY 18 AT Y 10 X 23 WIDGET-ID 38
+          SIZE-PIXELS 142 BY 18 AT Y 10 X 23   
      "Filter by Type" VIEW-AS TEXT
-          SIZE-PIXELS 99 BY 18 AT Y 310 X 23 WIDGET-ID 48
+          SIZE-PIXELS 99 BY 18 AT Y 310 X 23   
      "Comma sep list, wildcards allowed" VIEW-AS TEXT
-          SIZE-PIXELS 215 BY 18 AT Y 21 X 285 WIDGET-ID 52
+          SIZE-PIXELS 215 BY 18 AT Y 21 X 285   
           FGCOLOR 7 
-     RECT-1 AT Y 170 X 10 WIDGET-ID 4
-     RECT-2 AT Y 19 X 10 WIDGET-ID 22
-     RECT-3 AT Y 320 X 10 WIDGET-ID 32
+     RECT-1 AT Y 170 X 10  
+     RECT-2 AT Y 19 X 10   
+     RECT-3 AT Y 320 X 10   
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 521 BY 514
          TITLE "Edit table filter"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel    .
 
 
 /* *********************** Procedure Settings ************************ */
