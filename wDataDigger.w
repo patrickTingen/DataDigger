@@ -988,150 +988,150 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     btnFavourite AT Y 236 X 269 
      fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
-     tgSelAll AT Y 5 X 345 WIDGET-ID 6
-     fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
-     fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL WIDGET-ID 164
-     fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL WIDGET-ID 166
-     btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
-     brTables AT Y 27 X 56 WIDGET-ID 300
-     brFields AT Y 27 X 325 WIDGET-ID 100
-     brIndexes AT Y 28 X 829 WIDGET-ID 200
-     tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
-     fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
-     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     tgSelAll AT Y 5 X 345 
+     fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL 
+     fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL 
+     fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL 
+     btnClearIndexFilter AT Y 5 X 1095 
+     btnClearTableFilter AT Y 3 X 237 
+     brTables AT Y 27 X 56 
+     brFields AT Y 27 X 325 
+     brIndexes AT Y 28 X 829 
+     tgDebugMode AT Y 29 X 38  NO-TAB-STOP 
+     btnTableFilter AT Y 3 X 257 
+     fiTableDesc AT Y 236 X 57 NO-LABEL 
+     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL 
+     btnAddFavGroup AT Y 236 X 248 
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
-     btnView AT Y 520 X 200 WIDGET-ID 4
-     btnTools AT Y 0 X 1 WIDGET-ID 264
-     btnTabTables AT Y 45 X 34 WIDGET-ID 300
-     btnClear AT Y 265 X 725 WIDGET-ID 30
-     btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
-     btnClipboard AT Y 265 X 765 WIDGET-ID 178
-     btnMoveBottom AT Y 143 X 790 WIDGET-ID 200
-     btnMoveDown AT Y 121 X 790 WIDGET-ID 194
-     btnMoveTop AT Y 55 X 790 WIDGET-ID 198
-     btnMoveUp AT Y 77 X 790 WIDGET-ID 192
-     btnReset AT Y 99 X 790 WIDGET-ID 196
+     btnWhere AT Y 265 X 683 
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL 
+     btnQueries AT Y 265 X 745 
+     btnView AT Y 520 X 200 
+     btnTools AT Y 0 X 1 
+     btnTabTables AT Y 45 X 34 
+     btnClear AT Y 265 X 725 
+     btnClearFieldFilter AT Y 5 X 765 
+     btnClipboard AT Y 265 X 765 
+     btnMoveBottom AT Y 143 X 790 
+     btnMoveDown AT Y 121 X 790 
+     btnMoveTop AT Y 55 X 790 
+     btnMoveUp AT Y 77 X 790 
+     btnReset AT Y 99 X 790 
      btnViewData AT Y 265 X 705
-     btnTabFavourites AT Y 122 X 33 WIDGET-ID 302
-     btnTabFields AT Y 45 X 303 WIDGET-ID 156
-     btnTabIndexes AT Y 122 X 303 WIDGET-ID 158
-     btnNextQuery AT Y 265 X 57 WIDGET-ID 314
-     btnPrevQuery AT Y 265 X 36 WIDGET-ID 312
+     btnTabFavourites AT Y 122 X 33 
+     btnTabFields AT Y 45 X 303 
+     btnTabIndexes AT Y 122 X 303 
+     btnNextQuery AT Y 265 X 57 
+     btnPrevQuery AT Y 265 X 36 
      btnDump AT Y 520 X 175
-     btnLoad AT Y 520 X 225 WIDGET-ID 224
+     btnLoad AT Y 520 X 225 
      btnDelete AT Y 520 X 280
-     btnResizeVer AT ROW 13.38 COL 7.6 WIDGET-ID 274
-     btnClone AT Y 520 X 80 WIDGET-ID 276
+     btnResizeVer AT ROW 13.38 COL 7.6 
+     btnClone AT Y 520 X 80 
      btnAdd AT Y 520 X 55
      btnEdit AT Y 520 X 105
-     fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL WIDGET-ID 308
+     fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL 
      rctQuery AT Y 0 X 30
      rctEdit AT Y 515 X 50
-     rcTableFilter AT Y 24 X 53 WIDGET-ID 254
-     rcFieldFilter AT Y 24 X 322 WIDGET-ID 256
-     rcIndexFilter AT Y 24 X 825 WIDGET-ID 258
+     rcTableFilter AT Y 24 X 53 
+     rcFieldFilter AT Y 24 X 322 
+     rcIndexFilter AT Y 24 X 825 
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
 DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+     btnQueries-txt AT Y 175 X 37 
+     btnDataDigger AT Y 35 X 1 
+     btnSettings AT Y 70 X 1 
+     btnDict AT Y 105 X 1 
+     btnDataAdmin AT Y 140 X 1 
+     btnQueries-3 AT Y 175 X 1 
+     btnQueryTester AT Y 210 X 1 
+     btnConnections AT Y 245 X 1 
+     btnEditor AT Y 280 X 1 
+     btnHelp AT Y 315 X 1 
+     btnAbout AT Y 350 X 1 
+     btnExpand AT Y 485 X 1 
+     btnExpand-txt AT Y 485 X 35 
+     btnEditor-txt AT Y 280 X 37 
+     btnQueryTester-txt AT Y 210 X 37 
+     btnAbout-txt AT Y 350 X 37 
+     btnConnections-txt AT Y 245 X 37 
+     btnDataAdmin-txt AT Y 140 X 37 
+     btnDataDigger-txt AT Y 35 X 37 
+     btnHelp-txt AT Y 315 X 37 
+     btnSettings-txt AT Y 70 X 37 
+     btnTools-2 AT Y 0 X 1 
+     btnDict-txt AT Y 105 X 37 
+     btnTools-txt AT Y 0 X 35 
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE 
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+         BGCOLOR 15  .
 
 DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 110 X 104 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
+     edHint AT Y 4 X 35 NO-LABEL 
+     btGotIt AT Y 110 X 104 
+     imgArrow AT Y 0 X 0 
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
          AT X 1150 Y 15
          SIZE-PIXELS 285 BY 140
-         BGCOLOR 14  WIDGET-ID 600.
+         BGCOLOR 14  .
 
 DEFINE FRAME frWhere
-     btnBegins AT Y 123 X 17 WIDGET-ID 74
-     cbAndOr AT Y 5 X 46 COLON-ALIGNED WIDGET-ID 10
-     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
-     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
-     btnInsert AT Y 5 X 595 WIDGET-ID 18
-     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
-     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
-     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
-     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
-     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
-     btnOK AT Y 230 X 460 WIDGET-ID 132
-     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
-     btnOr AT Y 101 X 57 WIDGET-ID 24
-     btnAnd AT Y 101 X 17 WIDGET-ID 22
-     btnBracket AT Y 79 X 17 WIDGET-ID 28
-     btnContains AT Y 145 X 17 WIDGET-ID 116
-     btnEq AT Y 35 X 17 WIDGET-ID 62
-     btnGT AT Y 57 X 57 WIDGET-ID 66
-     btnLT AT Y 57 X 17 WIDGET-ID 64
-     btnMatches AT Y 167 X 17 WIDGET-ID 114
-     btnNE AT Y 35 X 57 WIDGET-ID 68
-     btnQt AT Y 79 X 57 WIDGET-ID 72
-     btnToday AT Y 189 X 17 WIDGET-ID 122
+     btnBegins AT Y 123 X 17 
+     cbAndOr AT Y 5 X 46 COLON-ALIGNED 
+     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL 
+     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL 
+     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL 
+     btnInsert AT Y 5 X 595 
+     ficWhere2 AT Y 35 X 110 NO-LABEL 
+     btnViewData-2 AT Y 70 X 623 
+     btnClear-2 AT Y 95 X 623 
+     btnQueries-2 AT Y 120 X 623 
+     btnClipboard-2 AT Y 145 X 623 
+     btnOK AT Y 230 X 460 
+     btnCancel-2 AT Y 230 X 540 
+     btnOr AT Y 101 X 57 
+     btnAnd AT Y 101 X 17 
+     btnBracket AT Y 79 X 17 
+     btnContains AT Y 145 X 17 
+     btnEq AT Y 35 X 17 
+     btnGT AT Y 57 X 57 
+     btnLT AT Y 57 X 17 
+     btnMatches AT Y 167 X 17 
+     btnNE AT Y 35 X 57 
+     btnQt AT Y 79 X 57 
+     btnToday AT Y 189 X 17 
      "Use CTRL-DOWN / UP to open or close this window" VIEW-AS TEXT
-          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 WIDGET-ID 218
+          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 
           FGCOLOR 7 
-     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
+     rctQueryButtons AT Y 30 X 5 
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
          AT X 830 Y 175
          SIZE-PIXELS 656 BY 285
          TITLE "Query Editor"
-         DEFAULT-BUTTON btnOK WIDGET-ID 400.
+         DEFAULT-BUTTON btnOK .
 
 DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+     btnClearDataFilter AT Y 5 X 761 
+     btnDataSort AT Y 4 X 5 
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL 
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL 
+     rctData AT Y 0 X 0 
+     rctDataFilter AT Y 1 X 0 
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIZE 158 BY 10.24 .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1413,7 +1413,6 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        COLUMN          = 43
        HEIGHT          = .81
        WIDTH           = 4
-       WIDGET-ID       = 292
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
