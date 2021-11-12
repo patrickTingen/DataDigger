@@ -235,37 +235,37 @@ DEFINE VARIABLE tgShortTypes AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 4 X 185 NO-LABEL  
-     tgSelectedOnly AT Y 10 X 15  
-     tgLowerCase AT Y 30 X 15   
-     cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL   
-     tgSerial AT Y 86 X 25   
-     rsSerial AT Y 106 X 30 NO-LABEL   
-     fiReplace AT Y 142 X 125 COLON-ALIGNED NO-LABEL   
-     tgFormat AT Y 197 X 30   
-     tgLabel AT Y 217 X 30   
-     tgShortTypes AT Y 237 X 30   
-     rsPrefix AT Y 287 X 30 NO-LABEL   
-     fiPrefix AT Y 338 X 75 COLON-ALIGNED NO-LABEL   
-     tgCamelCasing AT Y 367 X 30   
-     rsIndex AT Y 414 X 30 NO-LABEL   
-     btnSave AT Y 486 X 15   
+     edDefinition AT Y 4 X 185 NO-LABEL
+     tgSelectedOnly AT Y 10 X 15
+     tgLowerCase AT Y 30 X 15
+     cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL
+     tgSerial AT Y 86 X 25
+     rsSerial AT Y 106 X 30 NO-LABEL
+     fiReplace AT Y 142 X 125 COLON-ALIGNED NO-LABEL
+     tgFormat AT Y 197 X 30
+     tgLabel AT Y 217 X 30
+     tgShortTypes AT Y 237 X 30
+     rsPrefix AT Y 287 X 30 NO-LABEL
+     fiPrefix AT Y 338 X 75 COLON-ALIGNED NO-LABEL
+     tgCamelCasing AT Y 367 X 30
+     rsIndex AT Y 414 X 30 NO-LABEL
+     btnSave AT Y 486 X 15
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 56 X 25   
-     "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 270 X 25   
-     "Indexes" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 395 X 25   
+          SIZE-PIXELS 40 BY 20 AT Y 56 X 25
      "Field Options" VIEW-AS TEXT
-          SIZE-PIXELS 90 BY 13 AT Y 178 X 25   
-     RECT-2 AT Y 185 X 15   
-     RECT-3 AT Y 401 X 15   
-     RECT-4 AT Y 275 X 15   
-     RECT-5 AT Y 93 X 15   
+          SIZE-PIXELS 90 BY 13 AT Y 178 X 25
+     "Indexes" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 395 X 25
+     "Field Prefix" VIEW-AS TEXT
+          SIZE-PIXELS 75 BY 13 AT Y 270 X 25
+     RECT-2 AT Y 185 X 15
+     RECT-3 AT Y 401 X 15
+     RECT-4 AT Y 275 X 15
+     RECT-5 AT Y 93 X 15
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 180 BY 24.67    .
+         SIZE 180 BY 24.67.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -573,16 +573,16 @@ PROCEDURE generateCode :
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*---------------------------------------------------------------------- ~n' )
+    cHeader =            '/*---------------------------------------------------------------------- ~n' 
             + SUBSTITUTE('    File        : &1.i ~n', cTable )
             + SUBSTITUTE('    Description : TT definition for &1.&2 ~n', pcDatabase, pcTable )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('    History: ~n' )
+            +            ' ~n' 
+            +            '    History: ~n' 
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('  ---------------------------------------------------------------------- ~n' )
-            + SUBSTITUTE('            This file was generated with the DataDigger                  ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
+            +            ' ~n' 
+            +            '  ---------------------------------------------------------------------- ~n' 
+            +            '            This file was generated with the DataDigger                  ~n' 
+            +            '  ----------------------------------------------------------------------*/ ~n' 
             .
             
     cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO&3&4'.
@@ -1037,5 +1037,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

@@ -428,7 +428,7 @@ PROCEDURE populateCombo :
 
   /* Add old entries to the list */
   #AddEntry:
-  DO iPos = 1 TO NUM-ENTRIES(cFilterList,CHR(1)).
+  DO iPos = 1 TO NUM-ENTRIES(cFilterList,CHR(1)):
     cThisValue = ENTRY(iPos,cFilterList,CHR(1)).
     IF cThisValue = '' THEN NEXT #AddEntry.
 

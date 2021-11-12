@@ -16,12 +16,6 @@ DEFINE VARIABLE glDirtyCache        AS LOGICAL    NO-UNDO.
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
 
-PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
-  DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
-  DEFINE INPUT-OUTPUT PARAMETER intBufferSize AS LONG NO-UNDO.
-  DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
-END PROCEDURE. 
-
 /* Detect bitness of running Progress version
  * See for more info:
  * https://knowledgebase.progress.com/articles/Article/Windows-API-call-fails-with-error-13712-in-11-7-64-bit
@@ -43,6 +37,12 @@ END PROCEDURE.
   &GLOBAL-DEFINE POINTERTYPE LONG
   &GLOBAL-DEFINE POINTERBYTES 4
 &ENDIF  /* PROVERSION < 8 */
+
+PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
+  DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER intBufferSize AS LONG NO-UNDO.
+  DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
+END PROCEDURE. 
 
 PROCEDURE GetKeyboardState EXTERNAL "user32.dll":
   DEFINE INPUT  PARAMETER KBState AS {&POINTERTYPE}. /* memptr */
@@ -734,7 +734,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 41
+         HEIGHT             = 55.76
          WIDTH              = 57.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -939,7 +939,7 @@ PROCEDURE checkDir :
 
   /* Try to create path + file. Progress will not raise an error if it already exists */
   cDirToCreate = ENTRY(1,cDumpDir,'\').
-  DO iDir = 2 TO NUM-ENTRIES(cDumpDir,'\').
+  DO iDir = 2 TO NUM-ENTRIES(cDumpDir,'\'):
 
     /* In which dir do we want to create a subdir? */
     IF iDir = 2 THEN
@@ -1001,7 +1001,7 @@ END PROCEDURE. /* checkDir */
 PROCEDURE clearColorCache :
 /* Clear the registry cache
   */
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing color cache")).
+  PUBLISH "debugInfo" (3, "Clearing color cache").
   EMPTY TEMP-TABLE ttColor.
 
 END PROCEDURE. /* clearColorCache */
@@ -1019,7 +1019,7 @@ PROCEDURE clearDiskCache :
   */
   DEFINE VARIABLE cFile AS CHARACTER NO-UNDO EXTENT 3.
 
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing disk cache")).
+  PUBLISH "debugInfo" (3, "Clearing disk cache").
 
   FILE-INFORMATION:FILE-NAME = getWorkFolder() + "cache".
   IF FILE-INFORMATION:FULL-PATHNAME = ? THEN RETURN.
@@ -1044,7 +1044,7 @@ END PROCEDURE. /* clearDiskCache */
 PROCEDURE clearFontCache :
 /* Clear the font cache
   */
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing font cache")).
+  PUBLISH "debugInfo" (3, "Clearing font cache").
   EMPTY TEMP-TABLE ttFont.
 
 END PROCEDURE. /* clearFontCache */
@@ -1060,7 +1060,7 @@ END PROCEDURE. /* clearFontCache */
 PROCEDURE clearMemoryCache :
 /* Clear the memory cache
   */
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing memory cache")).
+  PUBLISH "debugInfo" (3, "Clearing memory cache").
   EMPTY TEMP-TABLE ttFieldCache.
 
 END PROCEDURE. /* clearMemoryCache */
@@ -1076,7 +1076,7 @@ END PROCEDURE. /* clearMemoryCache */
 PROCEDURE clearRegistryCache :
 /* Clear the registry cache
   */
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing registry cache")).
+  PUBLISH "debugInfo" (3, "Clearing registry cache").
   EMPTY TEMP-TABLE ttConfig.
 
 END PROCEDURE. /* clearRegistryCache */
@@ -1364,12 +1364,12 @@ PROCEDURE dynamicDump :
   DEFINE VARIABLE hColumn    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hField     AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hQuery     AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iBack      AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBack      AS INT64       NO-UNDO.
+  DEFINE VARIABLE iTrailer   AS INT64       NO-UNDO.
   DEFINE VARIABLE iBuffer    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iColumn    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent    AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iRecords   AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTrailer   AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lFirst     AS LOGICAL     NO-UNDO.
 
   hQuery = pihBrowse:QUERY.
@@ -1772,7 +1772,7 @@ PROCEDURE getFields :
       /* It seems that it is not possible to refresh the schema cache of the running
        * session. You just have to restart your session.
        */
-      PUBLISH "debugInfo" (1, SUBSTITUTE("File CRC changed, kill cache and build new")).
+      PUBLISH "debugInfo" (1, "File CRC changed, kill cache and build new").
       FOR EACH bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId:
         DELETE bFieldCache.
       END.
@@ -1793,7 +1793,7 @@ PROCEDURE getFields :
     IF CAN-FIND(FIRST bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId) THEN
     DO:
       PUBLISH "DD:Timer" ("start", 'getFields - step 2: check memory cache').
-      PUBLISH "debugInfo" (3, SUBSTITUTE("Get from memory-cache")).
+      PUBLISH "debugInfo" (3, "Get from memory-cache").
 
       FOR EACH bFieldCache WHERE bFieldCache.cTableCacheId = bTable.cCacheId:
         CREATE bField.
@@ -1819,13 +1819,13 @@ PROCEDURE getFields :
     IF SEARCH(cCacheFile) <> ? THEN
     DO:
       PUBLISH "DD:Timer" ("start", 'getFields - step 3: get from disk cache').
-      PUBLISH "debugInfo" (3, SUBSTITUTE("Get from disk cache")).
+      PUBLISH "debugInfo" (3, "Get from disk cache").
       DATASET dsFields:READ-XML("file", cCacheFile, "empty", ?, ?, ?, ?).
 
       /* Add to memory cache, so the next time it's even faster */
       IF TEMP-TABLE bField:HAS-RECORDS THEN
       DO:
-        PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache")).
+        PUBLISH "debugInfo" (3, "Add to first-level cache").
         FOR EACH bField {&TABLE-SCAN}:
           CREATE bFieldCache.
           BUFFER-COPY bField TO bFieldCache.
@@ -1844,7 +1844,7 @@ PROCEDURE getFields :
       RETURN.
     END.
 
-    PUBLISH "debugInfo" (3, SUBSTITUTE("Not found in any cache, build tables...")).
+    PUBLISH "debugInfo" (3, "Not found in any cache, build tables...").
   END.
 
   /*
@@ -2006,11 +2006,11 @@ PROCEDURE getFields :
   DO:
     /* Add to disk cache */
     PUBLISH "DD:Timer" ("start", 'getFields - step 5: save to disk').
-    PUBLISH "debugInfo" (3, SUBSTITUTE("Add to second-level cache.")).
+    PUBLISH "debugInfo" (3, "Add to second-level cache.").
     DATASET dsFields:WRITE-XML( "file", cCacheFile, YES, ?, ?, NO, NO).
 
     /* Add to memory cache */
-    PUBLISH "debugInfo" (3, SUBSTITUTE("Add to first-level cache.")).
+    PUBLISH "debugInfo" (3, "Add to first-level cache.").
     FOR EACH bField {&TABLE-SCAN}:
       CREATE bFieldCache.
       BUFFER-COPY bField TO bFieldCache.
@@ -2555,7 +2555,7 @@ PROCEDURE lockWindow :
 
   {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iRet AS INTEGER NO-UNDO.
-  DEFINE BUFFER ttWindowLock FOR ttWindowLock.
+  DEFINE BUFFER btWindowLock FOR ttWindowLock.
 
   {&timerStart}
   PUBLISH "debugInfo" (3, SUBSTITUTE("Window &1, lock: &2", phWindow:TITLE, STRING(plLock,"ON/OFF"))).
@@ -2563,15 +2563,15 @@ PROCEDURE lockWindow :
   IF NOT VALID-HANDLE(phWindow) THEN RETURN.
 
   /* Find window in our tt of locked windows */
-  FIND ttWindowLock WHERE ttWindowLock.hWindow = phWindow NO-ERROR.
-  IF NOT AVAILABLE ttWindowLock THEN
+  FIND btWindowLock WHERE btWindowLock.hWindow = phWindow NO-ERROR.
+  IF NOT AVAILABLE btWindowLock THEN
   DO:
     /* If we try to unlock a window thats not in the tt, just go back */
     IF NOT plLock THEN RETURN.
 
     /* Otherwise create a tt record for it */
-    CREATE ttWindowLock.
-    ttWindowLock.hWindow = phWindow.
+    CREATE btWindowLock.
+    btWindowLock.hWindow = phWindow.
   END.
 
   /* Because commands to lock or unlock may be nested, keep track
@@ -2588,14 +2588,14 @@ PROCEDURE lockWindow :
    * lockWindow(no).  -> actually unlock the window
    */
   IF plLock THEN
-    ttWindowLock.iLockCounter = ttWindowLock.iLockCounter + 1.
+    btWindowLock.iLockCounter = btWindowLock.iLockCounter + 1.
   ELSE
-    ttWindowLock.iLockCounter = ttWindowLock.iLockCounter - 1.
+    btWindowLock.iLockCounter = btWindowLock.iLockCounter - 1.
 
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Lock counter: &1", ttWindowLock.iLockCounter)).
+  PUBLISH "debugInfo" (3, SUBSTITUTE("Lock counter: &1", btWindowLock.iLockCounter)).
 
   /* Now, only lock when the semaphore is increased to 1 */
-  IF plLock AND ttWindowLock.iLockCounter = 1 THEN
+  IF plLock AND btWindowLock.iLockCounter = 1 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
     RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
@@ -2607,7 +2607,7 @@ PROCEDURE lockWindow :
   END.
 
   /* And only unlock after the last unlock command */
-  ELSE IF ttWindowLock.iLockCounter <= 0 THEN
+  ELSE IF btWindowLock.iLockCounter <= 0 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
     RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
@@ -2626,7 +2626,7 @@ PROCEDURE lockWindow :
                     ).
 
     /* Don't delete, creating records is more expensive than re-use, so just reset */
-    ttWindowLock.iLockCounter = 0.
+    btWindowLock.iLockCounter = 0.
   END.
 
   {&timerStop}
@@ -3081,13 +3081,16 @@ END PROCEDURE. /* saveQueryTable */
 PROCEDURE saveWindowPos :
 /* Save position / size of a window
   */
-  DEFINE INPUT PARAMETER phWindow     AS HANDLE      NO-UNDO.
-  DEFINE INPUT PARAMETER pcWindowName AS CHARACTER   NO-UNDO.
+  DEFINE INPUT PARAMETER phWindow     AS HANDLE    NO-UNDO.
+  DEFINE INPUT PARAMETER pcWindowName AS CHARACTER NO-UNDO.
 
-  setRegistry(pcWindowName, "Window:x"     , STRING(phWindow:X) ).
-  setRegistry(pcWindowName, "Window:y"     , STRING(phWindow:Y) ).
-  setRegistry(pcWindowName, "Window:height", STRING(phWindow:HEIGHT-PIXELS) ).
-  setRegistry(pcWindowName, "Window:width" , STRING(phWindow:WIDTH-PIXELS) ).
+  IF phWindow:WINDOW-STATE = 3 THEN /* normal state */
+  DO:
+    setRegistry(pcWindowName, "Window:x"     , STRING(phWindow:X) ).
+    setRegistry(pcWindowName, "Window:y"     , STRING(phWindow:Y) ).
+    setRegistry(pcWindowName, "Window:height", STRING(phWindow:HEIGHT-PIXELS) ).
+    setRegistry(pcWindowName, "Window:width" , STRING(phWindow:WIDTH-PIXELS) ).
+  END.
 
 END PROCEDURE. /* saveWindowPos */
 
@@ -3452,15 +3455,15 @@ PROCEDURE unlockWindow :
 
   {&_proparse_prolint-nowarn(varusage)}
   DEFINE VARIABLE iRet AS INTEGER NO-UNDO.
-  DEFINE BUFFER ttWindowLock FOR ttWindowLock.
+  DEFINE BUFFER btWindowLock FOR ttWindowLock.
 
   PUBLISH "debugInfo" (3, SUBSTITUTE("Window &1, force to unlock", phWindow:TITLE)).
 
   /* Find window in our tt of locked windows */
-  FIND ttWindowLock WHERE ttWindowLock.hWindow = phWindow NO-ERROR.
-  IF NOT AVAILABLE ttWindowLock THEN RETURN.
+  FIND btWindowLock WHERE btWindowLock.hWindow = phWindow NO-ERROR.
+  IF NOT AVAILABLE btWindowLock THEN RETURN.
 
-  IF ttWindowLock.iLockCounter > 0 THEN
+  IF btWindowLock.iLockCounter > 0 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
     RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
@@ -3468,7 +3471,7 @@ PROCEDURE unlockWindow :
     {&_proparse_prolint-nowarn(varusage)}
     RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
 
-    DELETE ttWindowLock.
+    DELETE btWindowLock.
   END.
 
 END PROCEDURE. /* unlockWindow */
@@ -4601,6 +4604,7 @@ FUNCTION getUserName RETURNS CHARACTER
   ELSE
     cUserName = REPLACE(cUserName,".","").
 
+  {&_proparse_ prolint-nowarn(overflow)}
   RETURN STRING(cUserName). /* Function return value. */
 
   {&stopTimer}
@@ -5135,11 +5139,11 @@ FUNCTION setRegistry RETURNS CHARACTER
   END.
   ELSE
   DO:
+    IF bfConfig.cValue <> pcValue THEN glDirtyCache = TRUE.
+
     ASSIGN
       bfConfig.lUser  = TRUE
       bfConfig.cValue = pcValue.
-
-    IF bfConfig.cValue <> pcValue THEN glDirtyCache = TRUE.
   END.
 
   RETURN "". /* Function return value. */

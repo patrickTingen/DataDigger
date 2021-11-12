@@ -15,7 +15,6 @@ DEFINE INPUT-OUTPUT PARAMETER piDataserverNr  AS INTEGER    NO-UNDO.
 DEFINE INPUT-OUTPUT PARAMETER TABLE FOR ttDataserver.
 
 DEFINE VARIABLE cDbComm               AS CHARACTER  NO-UNDO.
-DEFINE VARIABLE iDataserverCount      AS INTEGER    NO-UNDO.
 DEFINE VARIABLE cUserName             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cPassword             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cForceUserName        AS CHARACTER  NO-UNDO.
@@ -25,12 +24,13 @@ DEFINE VARIABLE cPhysNameDS           AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cDatabaseType         AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cStatus               AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cAddParams            AS CHARACTER  NO-UNDO.
+DEFINE VARIABLE cConnectedDatabases   AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE cDontShow             AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE lDontShowSchemaHr     AS LOGICAL    NO-UNDO.
-DEFINE VARIABLE iStartTime            AS INTEGER    NO-UNDO.
 DEFINE VARIABLE hWindow               AS HANDLE     NO-UNDO.
+DEFINE VARIABLE iStartTime            AS INT64      NO-UNDO.
+DEFINE VARIABLE iDataserverCount      AS INTEGER    NO-UNDO.
 DEFINE VARIABLE iItem                 AS INTEGER    NO-UNDO.
-DEFINE VARIABLE cConnectedDatabases   AS CHARACTER  NO-UNDO.
 
 DEFINE BUFFER bDb FOR dictdb._db.
 
@@ -156,7 +156,7 @@ FOR EACH ttDataserver BY ttDataserver.iServerNr:
     
     /* Enforce small delay */
     iStartTime = ETIME.
-    REPEAT WHILE ETIME < iStartTime + 1000. /* small delay */ END.
+    REPEAT WHILE ETIME < iStartTime + 1000: /* small delay */ END.
 
     CONNECT VALUE(ttDataserver.cConnectString) NO-ERROR.
 

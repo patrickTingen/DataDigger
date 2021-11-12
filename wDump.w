@@ -271,50 +271,50 @@ DEFINE RECTANGLE rcBorder
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     ficFileName AT Y 15 X 97 COLON-ALIGNED  
-     btnChooseDumpFile AT Y 15 X 682  
-     cbDumpType AT Y 45 X 97 COLON-ALIGNED  
-     cbCodePage AT Y 45 X 384 COLON-ALIGNED   
-     tbUseCustomizedFormats AT Y 66 X 576   
-     cbSeparator AT Y 70 X 97 COLON-ALIGNED   
-     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED   
-     tbExportSchema AT Y 85 X 576   
-     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED  
-     cbDateFormat AT Y 95 X 384 COLON-ALIGNED   
-     tbMinimalSchema AT Y 104 X 576   
-     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED   
-     btnViewLastDump AT Y 200 X 750   
-     btnOpenLastDumpDir AT Y 200 X 773   
-     btnDump AT Y 265 X 649   
-     btnClose AT Y 265 X 729   
-     tbDumpReadyClose AT Y 270 X 15   
-     tbDumpReadyExplore AT Y 270 X 145   
-     tbDumpReadyView AT Y 270 X 282   
-     tbDumpReadyClipboard AT Y 270 X 406   
-     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL   
-     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL   
+     ficFileName AT Y 15 X 97 COLON-ALIGNED
+     btnChooseDumpFile AT Y 15 X 682
+     cbDumpType AT Y 45 X 97 COLON-ALIGNED
+     cbCodePage AT Y 45 X 384 COLON-ALIGNED
+     tbUseCustomizedFormats AT Y 66 X 576
+     cbSeparator AT Y 70 X 97 COLON-ALIGNED
+     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED
+     tbExportSchema AT Y 85 X 576
+     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED
+     cbDateFormat AT Y 95 X 384 COLON-ALIGNED
+     tbMinimalSchema AT Y 104 X 576
+     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED
+     btnViewLastDump AT Y 200 X 750
+     btnOpenLastDumpDir AT Y 200 X 773
+     btnDump AT Y 265 X 649
+     btnClose AT Y 265 X 729
+     tbDumpReadyClose AT Y 270 X 15
+     tbDumpReadyExplore AT Y 270 X 145
+     tbDumpReadyView AT Y 270 X 282
+     tbDumpReadyClipboard AT Y 270 X 406
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL
      "Last dump" VIEW-AS TEXT
-          SIZE-PIXELS 87 BY 13 AT Y 163 X 13   
+          SIZE-PIXELS 87 BY 13 AT Y 163 X 13
      "After the dump ..." VIEW-AS TEXT
-          SIZE-PIXELS 103 BY 13 AT Y 248 X 12   
-     RECT-2 AT Y 5 X 10   
-     RECT-3 AT Y 169 X 5   
-     RECT-4 AT Y 254 X 5   
+          SIZE-PIXELS 103 BY 13 AT Y 248 X 12
+     RECT-2 AT Y 5 X 10
+     RECT-3 AT Y 169 X 5
+     RECT-4 AT Y 254 X 5
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 810 BY 301
-         DEFAULT-BUTTON btnDump    .
+         DEFAULT-BUTTON btnDump.
 
 DEFINE FRAME infoFrame
-     btAbort AT Y 58 X 60   
-     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL   
-     rcBorder AT Y 30 X 10  
-     rcBody AT Y 29 X 10  
+     btAbort AT Y 58 X 60
+     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL
+     rcBorder AT Y 30 X 10
+     rcBody AT Y 29 X 10
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 280 Y 84
-         SIZE-PIXELS 188 BY 103    .
+         SIZE-PIXELS 188 BY 103.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1113,7 +1113,7 @@ PROCEDURE dumpData :
 
   DEFINE VARIABLE iCurSelectedRow AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iCurIndex       AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted    AS INT64       NO-UNDO.
   DEFINE VARIABLE cStatus         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cIndexInfo      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cIndexName      AS CHARACTER   NO-UNDO.
@@ -1322,7 +1322,7 @@ PROCEDURE dumpData4GL :
   DEFINE VARIABLE iNumRecords         AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxLength          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumFields          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBufName            AS CHARACTER   NO-UNDO.
@@ -1483,7 +1483,7 @@ PROCEDURE dumpDataCSV :
   DEFINE VARIABLE iField              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSeparator          AS CHARACTER   NO-UNDO.
 
@@ -1792,7 +1792,7 @@ PROCEDURE dumpDataHtml :
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cData               AS CHARACTER   NO-UNDO.
 
@@ -1905,12 +1905,12 @@ PROCEDURE dumpDataProgressD :
   DEFINE VARIABLE cTimeStamp          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iBack               AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBack               AS INT64       NO-UNDO.
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTrailer            AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
+  DEFINE VARIABLE iTrailer            AS INT64       NO-UNDO.
   DEFINE VARIABLE lFirstFieldOfRecord AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
 
@@ -2039,7 +2039,7 @@ PROCEDURE dumpDataTxt :
   DEFINE VARIABLE iField              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE iLength             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cDumpFormatList     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldFormatList    AS CHARACTER   NO-UNDO.
@@ -2713,5 +2713,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

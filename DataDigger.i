@@ -495,13 +495,13 @@ FUNCTION setLinkInfo RETURNS LOGICAL
   ) IN SUPER.
 
 FUNCTION setRegistry RETURNS CHARACTER
-    ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER
-    , pcValue   AS CHARACTER
-    ) IN SUPER.
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) IN SUPER.
 
 FUNCTION isValidCodePage RETURNS LOGICAL
-  (pcCodepage AS CHARACTER) IN SUPER.
+  ( pcCodepage AS CHARACTER ) IN SUPER.
 
 /* Initialize */
 gcThisProcedure = THIS-PROCEDURE:FILE-NAME.

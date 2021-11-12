@@ -106,19 +106,19 @@ DEFINE RECTANGLE rcCord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnDataDigger AT ROW 1.71 COL 3    
-     BtnOK AT Y 10 X 540   
-     edChangelog AT Y 60 X 5 NO-LABEL   
-     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL   
-     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL   
-     fiWebsite AT Y 425 X 227 NO-LABEL    
-     imgPlayer AT ROW 2.43 COL 61.2    
-     imgBall AT ROW 5.43 COL 59.8    
-     rcCord AT ROW 4.05 COL 60.6    
+     btnDataDigger AT ROW 1.71 COL 3
+     BtnOK AT Y 10 X 540
+     edChangelog AT Y 60 X 5 NO-LABEL
+     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL
+     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL
+     fiWebsite AT Y 425 X 227 NO-LABEL
+     imgPlayer AT ROW 2.43 COL 61.2
+     imgBall AT ROW 5.43 COL 59.8
+     rcCord AT ROW 4.05 COL 60.6
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 126.4 BY 21.71    .
+         SIZE 126.4 BY 21.71.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -286,7 +286,7 @@ END.
 
 &Scoped-define SELF-NAME CtrlFrame
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame wAbout OCX.Tick
-PROCEDURE CtrlFrame.PSTimer.Tick .
+PROCEDURE CtrlFrame.PSTimer.Tick :
 /* Blink the logo every now and then
 */
   DO WITH FRAME {&FRAME-NAME}:
@@ -585,7 +585,7 @@ PROCEDURE justWait :
 /* Wait a few miliseconds
  */
   DEFINE INPUT PARAMETER piWait AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStart AS INT64 NO-UNDO.
 
   iStart = ETIME.
 
@@ -597,5 +597,3 @@ END PROCEDURE. /* justWait */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
-

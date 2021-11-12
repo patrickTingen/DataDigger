@@ -28,7 +28,6 @@ DEFINE VARIABLE ghWeekNum       AS HANDLE EXTENT 6  NO-UNDO.
 DEFINE VARIABLE gcMonthNames    AS CHARACTER        NO-UNDO.
 DEFINE VARIABLE ghPrevDay       AS HANDLE           NO-UNDO.
 
-
 PROCEDURE LockWindowUpdate EXTERNAL "user32.dll" :
   /* Temporarily disables window painting.
   */
@@ -51,7 +50,7 @@ END PROCEDURE. /* LockWindowUpdate */
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnNextMonth reBorderIn reBorderOut ~
-reSelectedDay btnNextYear btnHome btnPrevMonth btnPrevYear 
+btnNextYear reSelectedDay btnHome btnPrevMonth btnPrevYear 
 &Scoped-Define DISPLAYED-OBJECTS fiMonth fiDayName-1 fiDayName-2 ~
 fiDayName-3 fiDayName-4 fiDayName-5 fiDayName-6 fiDayName-7 
 
@@ -201,26 +200,26 @@ DEFINE RECTANGLE reSelectedDay
 DEFINE FRAME frCalendarDays
      btnNextMonth AT Y 1 X 139
      btnNextYear AT Y 1 X 152
-     fiMonth AT Y 0 X 35 COLON-ALIGNED NO-LABEL  
      btnHome AT Y 178 X 30
+     fiMonth AT Y 0 X 35 COLON-ALIGNED NO-LABEL
      btnPrevMonth AT Y 1 X 20
      btnPrevYear AT Y 1 X 0
-     fiDayName-1 AT Y 29 X 13 COLON-ALIGNED NO-LABEL   
-     fiDayName-2 AT Y 29 X 35 COLON-ALIGNED NO-LABEL  
-     fiDayName-3 AT Y 29 X 57 COLON-ALIGNED NO-LABEL  
-     fiDayName-4 AT Y 29 X 79 COLON-ALIGNED NO-LABEL  
-     fiDayName-5 AT Y 29 X 101 COLON-ALIGNED NO-LABEL   
-     fiDayName-6 AT Y 29 X 125 COLON-ALIGNED NO-LABEL   
-     fiDayName-7 AT Y 29 X 147 COLON-ALIGNED NO-LABEL   
-     fiWeek-1 AT Y 49 X 2 NO-LABEL   
-     fiWeek-2 AT Y 69 X 2 NO-LABEL   
-     fiWeek-3 AT Y 89 X 2 NO-LABEL   
-     fiWeek-4 AT Y 110 X 2 NO-LABEL   
-     fiWeek-5 AT Y 130 X 2 NO-LABEL   
-     fiWeek-6 AT Y 150 X 3 NO-LABEL   
-     reBorderIn AT Y 45 X 18   
-     reBorderOut AT Y 25 X 0   
-     reSelectedDay AT Y 100 X 105   
+     fiDayName-1 AT Y 29 X 13 COLON-ALIGNED NO-LABEL
+     fiDayName-2 AT Y 29 X 35 COLON-ALIGNED NO-LABEL
+     fiDayName-3 AT Y 29 X 57 COLON-ALIGNED NO-LABEL
+     fiDayName-4 AT Y 29 X 79 COLON-ALIGNED NO-LABEL
+     fiDayName-5 AT Y 29 X 101 COLON-ALIGNED NO-LABEL
+     fiDayName-6 AT Y 29 X 125 COLON-ALIGNED NO-LABEL
+     fiDayName-7 AT Y 29 X 147 COLON-ALIGNED NO-LABEL
+     fiWeek-1 AT Y 49 X 2 NO-LABEL
+     fiWeek-2 AT Y 69 X 2 NO-LABEL
+     fiWeek-3 AT Y 89 X 2 NO-LABEL
+     fiWeek-4 AT Y 110 X 2 NO-LABEL
+     fiWeek-5 AT Y 130 X 2 NO-LABEL
+     fiWeek-6 AT Y 150 X 3 NO-LABEL
+     reBorderIn AT Y 45 X 18
+     reBorderOut AT Y 25 X 0
+     reSelectedDay AT Y 100 X 105
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 186 BY 233
@@ -735,7 +734,7 @@ PROCEDURE enable_UI :
   DISPLAY fiMonth fiDayName-1 fiDayName-2 fiDayName-3 fiDayName-4 fiDayName-5 
           fiDayName-6 fiDayName-7 
       WITH FRAME frCalendarDays.
-  ENABLE btnNextMonth reBorderIn reBorderOut reSelectedDay btnNextYear btnHome 
+  ENABLE btnNextMonth reBorderIn reBorderOut btnNextYear reSelectedDay btnHome 
          btnPrevMonth btnPrevYear 
       WITH FRAME frCalendarDays.
   VIEW FRAME frCalendarDays.
@@ -973,5 +972,4 @@ END FUNCTION. /* getWeekNum */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

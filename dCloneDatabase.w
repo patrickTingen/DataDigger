@@ -2,7 +2,7 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
   Name: dCloneDatabase.w
@@ -24,7 +24,7 @@ DEFINE OUTPUT PARAMETER pcNewDatabase AS CHARACTER   NO-UNDO.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -36,8 +36,8 @@ DEFINE OUTPUT PARAMETER pcNewDatabase AS CHARACTER   NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-1 fiDir Btn_OK Btn_Cancel tgConnect ~
-btnChooseDumpFile fiLabel
-&Scoped-Define DISPLAYED-OBJECTS fiDir tgConnect fiLabel
+btnChooseDumpFile fiLabel 
+&Scoped-Define DISPLAYED-OBJECTS fiDir tgConnect fiLabel 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -52,34 +52,34 @@ btnChooseDumpFile fiLabel
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON btnChooseDumpFile
-     LABEL "..."
+DEFINE BUTTON btnChooseDumpFile 
+     LABEL "..." 
      SIZE-PIXELS 20 BY 21.
 
-DEFINE BUTTON Btn_Cancel AUTO-END-KEY
-     LABEL "Cancel"
+DEFINE BUTTON Btn_Cancel AUTO-END-KEY 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON Btn_OK AUTO-GO
-     LABEL "OK"
+DEFINE BUTTON Btn_OK AUTO-GO 
+     LABEL "OK" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U
-     VIEW-AS FILL-IN
+DEFINE VARIABLE fiDir AS CHARACTER FORMAT "X(256)":U 
+     VIEW-AS FILL-IN 
      SIZE-PIXELS 362 BY 21 TOOLTIP "the dir where you want to create the clone database" NO-UNDO.
 
-DEFINE VARIABLE fiLabel AS CHARACTER FORMAT "X(256)":U
-      VIEW-AS TEXT
+DEFINE VARIABLE fiLabel AS CHARACTER FORMAT "X(256)":U 
+      VIEW-AS TEXT 
      SIZE-PIXELS 358 BY 19 NO-UNDO.
 
 DEFINE RECTANGLE RECT-1
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL  GROUP-BOX  
      SIZE-PIXELS 410 BY 110.
 
-DEFINE VARIABLE tgConnect AS LOGICAL INITIAL YES
-     LABEL "&Connect after cloning"
+DEFINE VARIABLE tgConnect AS LOGICAL INITIAL yes 
+     LABEL "&Connect after cloning" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 213 BY 17 TOOLTIP "connect the database after cloning" NO-UNDO.
 
@@ -87,18 +87,18 @@ DEFINE VARIABLE tgConnect AS LOGICAL INITIAL YES
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiDir AT Y 28 X 2 COLON-ALIGNED NO-LABEL  
+     fiDir AT Y 28 X 2 COLON-ALIGNED NO-LABEL
      Btn_OK AT Y 77 X 245
      Btn_Cancel AT Y 77 X 325
-     tgConnect AT Y 52 X 12   
-     btnChooseDumpFile AT Y 28 X 380  
-     fiLabel AT Y 9 X 2 COLON-ALIGNED NO-LABEL   
-     RECT-1 AT Y 0 X 0  
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
+     tgConnect AT Y 52 X 12
+     btnChooseDumpFile AT Y 28 X 380
+     fiLabel AT Y 9 X 2 COLON-ALIGNED NO-LABEL
+     RECT-1 AT Y 0 X 0
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 423 BY 146
          TITLE "Create an empty Clone Database"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel    .
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -118,14 +118,14 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN
+ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -196,7 +196,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
 
 
 /* ***************************  Main Block  *************************** */
@@ -224,9 +224,9 @@ RUN disable_UI.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearCache Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearCache Dialog-Frame 
 PROCEDURE clearCache :
-  /* Delete old cache files of the newly created database.
+/* Delete old cache files of the newly created database.
   *
   * Note: If you create a local db with a name that has been used before, DD
   *       will see a difference in the schema. To avoid this, remove old cache
@@ -235,7 +235,7 @@ PROCEDURE clearCache :
 
   DEFINE VARIABLE cFile AS CHARACTER NO-UNDO EXTENT 3.
 
-  PUBLISH "debugInfo" (3, SUBSTITUTE("Clearing disk cache")).
+  PUBLISH "debugInfo" (3, "Clearing disk cache").
 
   INPUT FROM OS-DIR(getProgramdir() + "cache").
   REPEAT:
@@ -249,9 +249,9 @@ END PROCEDURE. /* clearCache */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cloneDatabase Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cloneDatabase Dialog-Frame 
 PROCEDURE cloneDatabase :
-  /* Clone the current database
+/* Clone the current database
   */
   DEFINE INPUT PARAMETER pcDbName        AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcFolder        AS CHARACTER   NO-UNDO.
@@ -335,9 +335,9 @@ END PROCEDURE. /* cloneDatabase */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createStructureFile Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createStructureFile Dialog-Frame 
 PROCEDURE createStructureFile :
-  /* Create a .st file for the currently connected database
+/* Create a .st file for the currently connected database
   */
   DEFINE INPUT PARAMETER pcDbName AS CHARACTER   NO-UNDO.
   DEFINE INPUT PARAMETER pcFolder   AS CHARACTER   NO-UNDO.
@@ -390,7 +390,7 @@ PROCEDURE disable_UI :
   Purpose:     DISABLE the User Interface
   Parameters:  <none>
   Notes:       Here we clean-up the user-interface by deleting
-               dynamic widgets we have created and/or hide
+               dynamic widgets we have created and/or hide 
                frames.  This procedure is usually called when
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
@@ -409,12 +409,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY fiDir tgConnect fiLabel
+  DISPLAY fiDir tgConnect fiLabel 
       WITH FRAME Dialog-Frame.
-  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgConnect btnChooseDumpFile fiLabel
+  ENABLE RECT-1 fiDir Btn_OK Btn_Cancel tgConnect btnChooseDumpFile fiLabel 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -423,9 +423,9 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
-  /* Initialize global vars
+/* Initialize global vars
   */
   DEFINE VARIABLE iOption  AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cOption  AS CHARACTER NO-UNDO.
@@ -465,3 +465,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -88,14 +88,14 @@ DEFINE VARIABLE tgWriteTrigger AS LOGICAL INITIAL yes
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnBack AT Y 460 X 535  
-     btnFinish AT Y 460 X 615  
-     tgWriteTrigger AT Y 463 X 15   
-     rctData AT Y 0 X 1   
+     btnBack AT Y 460 X 535
+     btnFinish AT Y 460 X 615
+     tgWriteTrigger AT Y 463 X 15
+     rctData AT Y 0 X 1
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnBack    .
+         CANCEL-BUTTON btnBack.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -792,7 +792,7 @@ PROCEDURE loadData :
       IF porRepositionId = ? THEN porRepositionId = hDbBuffer:ROWID.
 
       /* Let it go ... */
-      hXmlBuffer:BUFFER-RELEASE.
+      hXmlBuffer:BUFFER-RELEASE().
     END. /* XmlLoop */
 
     hXmlQuery:QUERY-CLOSE.
@@ -810,5 +810,4 @@ END PROCEDURE. /* loadData */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

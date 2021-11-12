@@ -147,32 +147,32 @@ DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 205 NO-LABEL  
-     rsDumpLoad AT Y 13 X 30 NO-LABEL   
-     cbIndent AT Y 44 X 70 COLON-ALIGNED NO-LABEL   
-     cbDelimiter AT Y 70 X 70 COLON-ALIGNED NO-LABEL   
-     tgLowerCase AT Y 100 X 25   
-     tgIncludeDb AT Y 125 X 25   
-     tgSelectedOnly AT Y 150 X 25  
-     tgDelete AT Y 205 X 30   
-     tgLoadInChunks AT Y 258 X 30   
-     tgDisableTriggers AT Y 278 X 30   
-     btnSave AT Y 317 X 15   
+     edDefinition AT Y 5 X 205 NO-LABEL
+     rsDumpLoad AT Y 13 X 30 NO-LABEL
+     cbIndent AT Y 44 X 70 COLON-ALIGNED NO-LABEL
+     cbDelimiter AT Y 70 X 70 COLON-ALIGNED NO-LABEL
+     tgLowerCase AT Y 100 X 25
+     tgIncludeDb AT Y 125 X 25
+     tgSelectedOnly AT Y 150 X 25
+     tgDelete AT Y 205 X 30
+     tgLoadInChunks AT Y 258 X 30
+     tgDisableTriggers AT Y 278 X 30
+     btnSave AT Y 317 X 15
      "Delimiter:" VIEW-AS TEXT
-          SIZE-PIXELS 55 BY 20 AT Y 71 X 25   
-     "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 45 X 25   
-     "Dump" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 185 X 25   
+          SIZE-PIXELS 55 BY 20 AT Y 71 X 25
      "Load" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 238 X 25   
-     RECT-2 AT Y 245 X 15   
-     RECT-5 AT Y 192 X 15   
-     RECT-6 AT Y 5 X 15   
+          SIZE-PIXELS 50 BY 13 AT Y 238 X 25
+     "Dump" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 185 X 25
+     "Indent:" VIEW-AS TEXT
+          SIZE-PIXELS 40 BY 20 AT Y 45 X 25
+     RECT-2 AT Y 245 X 15
+     RECT-5 AT Y 192 X 15
+     RECT-6 AT Y 5 X 15
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 182 BY 16.52    .
+         SIZE 182 BY 16.52.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -443,16 +443,16 @@ DEFINE VARIABLE cText   AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------   ~n' )
+    cHeader =            '/*----------------------------------------------------------------------   ~n' 
             + SUBSTITUTE('    File        : &1-&2.p ~n', rsDumpLoad, pcTable )
             + SUBSTITUTE('    Description : &1 program for &2.&3 ~n', rsDumpLoad, pcDatabase, pcTable )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('    History: ~n' )
+            +            ' ~n' 
+            +            '    History: ~n' 
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------   ~n' )
-            + SUBSTITUTE('            This file was generated with the DataDigger                    ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
+            +            ' ~n' 
+            +            '  ----------------------------------------------------------------------   ~n' 
+            +            '            This file was generated with the DataDigger                    ~n' 
+            +            '  ----------------------------------------------------------------------*/ ~n' 
             .
             
     

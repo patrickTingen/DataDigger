@@ -178,7 +178,7 @@ PROCEDURE customFrameColor:
   /*
    * Name: customFrameColor
    * Desc: Change the background color of the main window
-   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-FrameColor
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomFrameColor
    *
    * This is handy if you want to make it clear that you have a certain
    * database connected, eg production or test. This routine is called on startup
@@ -195,7 +195,7 @@ PROCEDURE customFrameColor:
     pcFrameColor = '14'. /* Progress color nr for yellow  */
   ELSE 
   IF cDatabases MATCHES '*sports*' THEN 
-    pcFrameColor = '200,255,200'. /* RGB for light green */
+    pcFrameColor = '150,250,250'. /* RGB for light blue */
   ELSE 
     pcFrameColor = ?. /* sets to default color */
 

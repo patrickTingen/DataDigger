@@ -202,25 +202,25 @@ DEFINE BROWSE brRecord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     brRecord AT Y 25 X 0    
-     tgSelAll AT Y 27 X 5   
-     fiNumRecords AT Y 425 X 78 COLON-ALIGNED   
-     btnDecrease AT Y 0 X 210   
-     btnOk AT Y 425 X 505  
-     btnClose AT Y 425 X 585  
-     tgWriteTrigger AT Y 427 X 145   
-     btnIncrease AT Y 0 X 180   
-     btnDatePicker AT Y 0 X 240   
-     btnEditor AT Y 0 X 0   
-     btnEncode AT Y 0 X 60   
-     btnListEdit AT Y 0 X 30   
-     btnLowerCase AT Y 0 X 120   
-     btnUpperCase AT Y 0 X 90   
-     btnWordCase AT Y 0 X 150   
+     brRecord AT Y 25 X 0
+     tgSelAll AT Y 27 X 5
+     fiNumRecords AT Y 425 X 78 COLON-ALIGNED
+     btnDecrease AT Y 0 X 210
+     btnOk AT Y 425 X 505
+     btnClose AT Y 425 X 585
+     tgWriteTrigger AT Y 427 X 145
+     btnIncrease AT Y 0 X 180
+     btnDatePicker AT Y 0 X 240
+     btnEditor AT Y 0 X 0
+     btnEncode AT Y 0 X 60
+     btnListEdit AT Y 0 X 30
+     btnLowerCase AT Y 0 X 120
+     btnUpperCase AT Y 0 X 90
+     btnWordCase AT Y 0 X 150
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnClose    .
+         CANCEL-BUTTON btnClose.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -578,7 +578,7 @@ DO:
 
     RUN VALUE(getProgramDir() + 'wViewAsEditor.w')(INPUT-OUTPUT cValue).
 
-    ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord = STRING(cValue).
+    ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord = SUBSTRING(cValue,1,20000).
     APPLY 'value-changed' TO ttColumn.cNewValue IN BROWSE brRecord.
   END.
 END.
@@ -983,7 +983,7 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE hSourceBuffer   AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iNumRecs        AS INTEGER NO-UNDO.
   DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStartTime      AS INT64   NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lCommit         AS LOGICAL NO-UNDO.
 
@@ -1163,7 +1163,7 @@ PROCEDURE btnGoChoose :
         IF NOT plSuccess THEN UNDO #CommitLoop, LEAVE #CommitLoop.
       END.
       ELSE
-        hBuffer:BUFFER-RELEASE.
+        hBuffer:BUFFER-RELEASE().
 
       /* Set nr of processed records in field "Num records" */
       IF ETIME - iStartTime > 500 THEN
@@ -1794,5 +1794,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

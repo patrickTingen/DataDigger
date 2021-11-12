@@ -173,28 +173,28 @@ DEFINE VARIABLE tgShortTypes AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 185 NO-LABEL  
-     tgSelectedOnly AT Y 10 X 15  
-     tgLowerCase AT Y 30 X 15   
-     tgShortTypes AT Y 50 X 15   
-     cbIndent AT Y 73 X 50 COLON-ALIGNED NO-LABEL   
-     rsPrefix AT Y 130 X 30 NO-LABEL   
-     fiPrefix AT Y 190 X 125 COLON-ALIGNED NO-LABEL   
-     rsDashes AT Y 250 X 30 NO-LABEL   
-     fiReplace AT Y 286 X 125 COLON-ALIGNED NO-LABEL   
-     btnSave AT Y 340 X 15   
+     edDefinition AT Y 5 X 185 NO-LABEL
+     tgSelectedOnly AT Y 10 X 15
+     tgLowerCase AT Y 30 X 15
+     tgShortTypes AT Y 50 X 15
+     cbIndent AT Y 73 X 50 COLON-ALIGNED NO-LABEL
+     rsPrefix AT Y 130 X 30 NO-LABEL
+     fiPrefix AT Y 190 X 125 COLON-ALIGNED NO-LABEL
+     rsDashes AT Y 250 X 30 NO-LABEL
+     fiReplace AT Y 286 X 125 COLON-ALIGNED NO-LABEL
+     btnSave AT Y 340 X 15
      "Dashes" VIEW-AS TEXT
-          SIZE-PIXELS 65 BY 13 AT Y 230 X 25   
-     "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 110 X 25   
+          SIZE-PIXELS 65 BY 13 AT Y 230 X 25
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 74 X 15   
-     RECT-4 AT Y 115 X 15   
-     RECT-5 AT Y 237 X 15   
+          SIZE-PIXELS 40 BY 20 AT Y 74 X 15
+     "Field Prefix" VIEW-AS TEXT
+          SIZE-PIXELS 75 BY 13 AT Y 110 X 25
+     RECT-4 AT Y 115 X 15
+     RECT-5 AT Y 237 X 15
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 180 BY 24.67    .
+         SIZE 180 BY 24.67.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -472,16 +472,16 @@ DEFINE VARIABLE cText         AS LONGCHAR  NO-UNDO.
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*----------------------------------------------------------------------   ~n' )
+    cHeader =            '/*----------------------------------------------------------------------   ~n'
             + SUBSTITUTE('    File        : &1 ~n', getClassName(pcTable) )
             + SUBSTITUTE('    Description : Active Record Class definition for &1.&2 ~n', pcDatabase, pcTable )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('    History: ~n' )
+            +            ' ~n'
+            +            '    History: ~n' 
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------   ~n' )
-            + SUBSTITUTE('            This file was generated with the DataDigger                    ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
+            +            ' ~n'
+            +            '  ----------------------------------------------------------------------   ~n'
+            +            '            This file was generated with the DataDigger                    ~n'
+            +            '  ----------------------------------------------------------------------*/ ~n'
             .
             
     cMask = '&1~nBLOCK-LEVEL ON ERROR UNDO, THROW.~n'.
@@ -798,5 +798,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

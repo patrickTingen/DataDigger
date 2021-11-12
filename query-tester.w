@@ -141,9 +141,9 @@ DEFINE FRAME DEFAULT-FRAME
      btnTestQuery AT Y 134 X 640
      edQuery AT Y 135 X 5 NO-LABEL
      btnRunQuery AT Y 165 X 640
-     btnPopOut AT Y 289 X 640  
+     btnPopOut AT Y 289 X 640
      edResult AT Y 290 X 5 NO-LABEL
-     RECT-1 AT Y 6 X 5  
+     RECT-1 AT Y 6 X 5
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -815,20 +815,20 @@ PROCEDURE test-query PRIVATE :
   DEFINE BUFFER bf-ttVstIndexInfo FOR ttVstIndexInfo.
   DEFINE BUFFER bf-ttBuffer       FOR ttBuffer.
 
-  DEFINE VARIABLE hQry         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cString      AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cBufferName  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cCurrentName AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cPrevName    AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBuffer      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iNumWords    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iSeconds     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iWord        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lOk          AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE iNumResults  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lStop        AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE iDelayStart  AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iDelayTime   AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE hQry         AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cString      AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cBufferName  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cCurrentName AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cPrevName    AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hBuffer      AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE iNumWords    AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iWord        AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lOk          AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE iNumResults  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE lStop        AS LOGICAL   NO-UNDO.
+  DEFINE VARIABLE iDelayStart  AS INT64     NO-UNDO.
+  DEFINE VARIABLE iDelayTime   AS INT64     NO-UNDO.
+  DEFINE VARIABLE iSeconds     AS INT64     NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -917,7 +917,7 @@ PROCEDURE test-query PRIVATE :
     IF NOT lOk OR ERROR-STATUS:ERROR THEN
     DO:
       SESSION:SET-WAIT-STATE("").
-      edResult:SCREEN-VALUE = SUBSTITUTE("Unable to prepare the query ~n")
+      edResult:SCREEN-VALUE =  "Unable to prepare the query ~n"
                              + SUBSTITUTE("Query string : &1 ~n", edQuery )
                              + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                              + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
@@ -941,7 +941,7 @@ PROCEDURE test-query PRIVATE :
       IF NOT lOk OR ERROR-STATUS:ERROR THEN
       DO:
         SESSION:SET-WAIT-STATE("").
-        edResult:SCREEN-VALUE = SUBSTITUTE("Unable to open the query ~n")
+        edResult:SCREEN-VALUE = "Unable to open the query ~n"
                                + SUBSTITUTE("Query string : &1 ~n", edQuery )
                                + SUBSTITUTE("Error status : &1 ~n", ERROR-STATUS:ERROR )
                                + SUBSTITUTE("Error message: &1 ~n", ERROR-STATUS:GET-MESSAGE(1) )
@@ -1039,5 +1039,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
-

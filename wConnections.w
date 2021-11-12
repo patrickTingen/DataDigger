@@ -210,28 +210,28 @@ ttConnection.lConnected
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnBrowse AT Y 90 X 825   
-     btnDelete AT Y 5 X 560   
-     btnTest AT Y 325 X 790   
-     btnConnect AT Y 5 X 310   
-     fiLogicalName AT Y 40 X 390 COLON-ALIGNED  
-     btnDisconnect AT Y 5 X 335   
-     cbSection AT Y 40 X 655 COLON-ALIGNED   
-     btnAdd AT Y 5 X 385  
-     fiDescription AT Y 65 X 390 COLON-ALIGNED   
-     fiDatabaseName AT Y 92 X 390 COLON-ALIGNED  
-     brConnections AT Y 1 X 1    
-     btnClone AT Y 5 X 410   
-     edParameters AT Y 145 X 310 NO-LABEL   
-     btnEdit AT Y 5 X 435   
-     btnSave AT Y 5 X 485   
-     btnUndo AT Y 5 X 510   
+     btnBrowse AT Y 90 X 825
+     btnDelete AT Y 5 X 560
+     btnTest AT Y 325 X 790
+     btnConnect AT Y 5 X 310
+     fiLogicalName AT Y 40 X 390 COLON-ALIGNED
+     btnDisconnect AT Y 5 X 335
+     cbSection AT Y 40 X 655 COLON-ALIGNED
+     btnAdd AT Y 5 X 385
+     fiDescription AT Y 65 X 390 COLON-ALIGNED
+     fiDatabaseName AT Y 92 X 390 COLON-ALIGNED
+     brConnections AT Y 1 X 1
+     btnClone AT Y 5 X 410
+     edParameters AT Y 145 X 310 NO-LABEL
+     btnEdit AT Y 5 X 435
+     btnSave AT Y 5 X 485
+     btnUndo AT Y 5 X 510
      "Parameters:" VIEW-AS TEXT
-          SIZE-PIXELS 120 BY 13 AT Y 130 X 310   
+          SIZE-PIXELS 120 BY 13 AT Y 130 X 310
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 873 BY 382
-         TITLE "Database Connections" DROP-TARGET    .
+         TITLE "Database Connections" DROP-TARGET.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -614,7 +614,7 @@ PROCEDURE addConnections :
         ELSE
         DO:
           COPY-LOB FROM FILE cFile TO cContents NO-CONVERT.
-          ttConnection.cParameters = STRING(cContents).
+          ttConnection.cParameters = SUBSTRING(cContents,1,20000).
         END.
 
         /* Save to registry */
@@ -1317,5 +1317,4 @@ END FUNCTION. /* getNewConnectionNr */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

@@ -108,16 +108,15 @@ DEFINE VARIABLE giFixedFont                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxColumns               AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxExtent                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxFilterHistory         AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO INITIAL NO.
+DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO.
 DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
+DEFINE VARIABLE glInitializing             AS LOGICAL     NO-UNDO. /* to indicate init is running */
 DEFINE VARIABLE gcFavouriteTables          AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to override 'ShowHints=no' setting */
 DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
 DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
-DEFINE VARIABLE giLastEventMouseX          AS INTEGER     NO-UNDO.
-DEFINE VARIABLE giLastEventMouseY          AS INTEGER     NO-UNDO.
 
 /* Vars to keep the values for the colors */
 DEFINE VARIABLE giColorFieldFilterFG    AS INTEGER NO-UNDO.
@@ -192,13 +191,13 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields tgDebugMode fiTableDesc ~
-cbFavouriteGroup brIndexes ficWhere btnFavourite btnClearTableFilter ~
-btnTableFilter btnAddFavGroup btnQueries btnView btnTools btnTabTables ~
-btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown ~
-btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes ~
-btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone ~
-btnAdd btnEdit fiFeedback 
+btnClearIndexFilter brTables brFields tgDebugMode btnFavourite fiTableDesc ~
+btnClearTableFilter btnTableFilter cbFavouriteGroup btnAddFavGroup ~
+brIndexes btnQueries ficWhere btnView btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -843,17 +842,17 @@ DEFINE FRAME frMain
      brTables AT Y 27 X 56
      brFields AT Y 27 X 325
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
-     fiTableDesc AT Y 236 X 57 NO-LABEL
-     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
-     brIndexes AT Y 260 X 830
-     ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnFavourite AT Y 236 X 269
+     fiTableDesc AT Y 236 X 57 NO-LABEL
      btnClearTableFilter AT Y 3 X 237
      btnTableFilter AT Y 3 X 257
+     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      btnAddFavGroup AT Y 236 X 248
+     brIndexes AT Y 260 X 830
      btnQueries AT Y 265 X 745
+     ficWhere AT Y 266 X 80 NO-LABEL
      btnView AT Y 520 X 200
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnTools AT Y 0 X 1
      btnTabTables AT Y 45 X 34
      btnClear AT Y 265 X 725
@@ -888,6 +887,28 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14 .
+
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37
      btnDataDigger AT Y 35 X 1
@@ -918,28 +939,6 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15 .
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL
-     btGotIt AT Y 110 X 104
-     imgArrow AT Y 0 X 0
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14 .
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761
-     btnDataSort AT Y 4 X 5
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
-     rctData AT Y 0 X 0
-     rctDataFilter AT Y 1 X 0
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1014,7 +1013,7 @@ ASSIGN
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
 /* BROWSE-TAB brFields brTables frMain */
-/* BROWSE-TAB brIndexes cbFavouriteGroup frMain */
+/* BROWSE-TAB brIndexes btnAddFavGroup frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -1173,14 +1172,14 @@ OPEN QUERY {&SELF-NAME} FOR EACH ttTable.
 
 CREATE CONTROL-FRAME CtrlFrame ASSIGN
        FRAME           = FRAME frMain:HANDLE
-       ROW             = 1.29
+       ROW             = 1.19
        COLUMN          = 43
        HEIGHT          = .81
        WIDTH           = 4
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
-      CtrlFrame:MOVE-AFTER(btnClearIndexFilter:HANDLE IN FRAME frMain).
+      CtrlFrame:MOVE-AFTER(cbDatabaseFilter:HANDLE IN FRAME frMain).
 
 &ENDIF
 
@@ -2852,6 +2851,16 @@ DO:
   RUN setPage({&PAGE-FAVOURITES}).
   RUN setTableView(YES,NO).
   APPLY 'value-changed' TO fiTableFilter.
+
+  /* Show additional info on first use of favourites tab */
+  IF getRegistry("DataDigger:Hints", "setPage-{&PAGE-FAVOURITES}") = ? THEN
+  DO:
+    setRegistry("DataDigger:Hints", "setPage-{&PAGE-FAVOURITES}", "yes").
+    RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"(1/3)~n~nI created a default group for your favourites").
+    RUN showHint(btnAddFavGroup:HANDLE  ,{&ARROW-LEFT-DOWN},"(2/3)~n~nIf you like, you can create additional groups").
+    RUN showHint(brTables:HANDLE        ,{&ARROW-LEFT-UP}  ,"(3/3)~n~nBy removing all tables from a group, the group will be automatically deleted when you close DataDigger").
+  END.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3922,8 +3931,10 @@ DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
   /* Notify launcher that the window started */
   PUBLISH 'DataDigger'(+1).
 
+  glInitializing = TRUE.
   RUN initUI.
   RUN initObjects.
+  glInitializing = FALSE.
 
   /* Clear wait-message */
   DELETE WIDGET winWait.
@@ -4610,16 +4621,21 @@ PROCEDURE btnSettingsChoose :
 
   IF lOkClicked THEN
   DO:
+    glInitializing = TRUE.
     setWindowFreeze(YES).
 
     RUN clearRegistryCache.
     RUN clearColorCache.
     RUN clearFontCache.
+    RUN loadSettings.
+
     RUN initObjects.
 
     gcTable = ?.
     APPLY "value-changed" TO brTables IN FRAME frMain.
+
     setWindowFreeze(NO).
+    glInitializing = FALSE.
   END.
 
 END PROCEDURE. /* btnSettingsChoose */
@@ -5991,23 +6007,23 @@ PROCEDURE deleteRecord :
 
   OUTPUT to value(cTempFile).
   PUT UNFORMATTED
-         SUBSTITUTE('/* ' )
-    SKIP SUBSTITUTE(' * Name: delrecord.p ')
+                    '/* '
+    SKIP            ' * Name: delrecord.p '
     SKIP SUBSTITUTE(' * Desc: generated by DataDigger to delete &1.&2 ', pcDataBase, pcTable)
     SKIP SUBSTITUTE(' * Date: &1 ', NOW )
-    SKIP SUBSTITUTE(' */  ' )
-    SKIP SUBSTITUTE('     ' )
-    SKIP SUBSTITUTE('DEFINE INPUT  PARAMETER prRowid   AS ROWID   NO-UNDO. ' )
-    SKIP SUBSTITUTE('DEFINE OUTPUT PARAMETER plDeleted AS LOGICAL NO-UNDO. ' )
-    SKIP SUBSTITUTE('  ' ).
+    SKIP            ' */  '
+    SKIP            '     '
+    SKIP            'DEFINE INPUT  PARAMETER prRowid   AS ROWID   NO-UNDO. '
+    SKIP            'DEFINE OUTPUT PARAMETER plDeleted AS LOGICAL NO-UNDO. '
+    SKIP            '  ' .
 
   IF NOT plEnableTrigger THEN
     PUT UNFORMATTED
     SKIP SUBSTITUTE('DISABLE TRIGGERS FOR DUMP OF &1.&2.', pcDataBase, pcTable).
 
   PUT UNFORMATTED
-    SKIP SUBSTITUTE('  ' )
-    SKIP SUBSTITUTE('/* Find the record to delete */' )
+    SKIP            '  '
+    SKIP            '/* Find the record to delete */'
     SKIP SUBSTITUTE('FIND &1.&2 WHERE ROWID(&1.&2) = prRowid EXCLUSIVE-LOCK NO-ERROR NO-WAIT.', pcDataBase, pcTable)
     SKIP SUBSTITUTE('IF NOT AVAILABLE &1.&2 THEN RETURN.                                     ', pcDataBase, pcTable).
 
@@ -6021,14 +6037,14 @@ PROCEDURE deleteRecord :
     SKIP SUBSTITUTE('DELETE &1.&2 NO-ERROR. ', pcDataBase, pcTable).
 
   PUT UNFORMATTED
-    SKIP SUBSTITUTE('  ' )
-    SKIP SUBSTITUTE('/* See if its really gone */' )
+    SKIP            '  '
+    SKIP            '/* See if its really gone */'
     SKIP SUBSTITUTE('plDeleted = NOT CAN-FIND(&1.&2 WHERE ROWID(&1.&2) = prRowid).           ', pcDataBase, pcTable)
     SKIP .
-  OUTPUT close.
+  OUTPUT CLOSE.
 
   RUN VALUE(cTempFile) (INPUT prRowid, OUTPUT plDeleted).
-  OS-DELETE value(cTempFile).
+  OS-DELETE VALUE(cTempFile).
 
 END PROCEDURE. /* deleteRecord */
 
@@ -6102,8 +6118,8 @@ END PROCEDURE.
 PROCEDURE doNothing :
 /* Wait for an amount of msec
  */
-  DEFINE INPUT  PARAMETER piMilliSeconds AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStartTime AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER piMilliSeconds AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartTime AS INT64 NO-UNDO.
 
   iStartTime = ETIME.
   DO WHILE ETIME < iStartTime + piMilliSeconds:
@@ -6272,9 +6288,9 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields tgDebugMode fiTableDesc cbFavouriteGroup brIndexes 
-         ficWhere btnFavourite btnClearTableFilter btnTableFilter 
-         btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
+         brTables brFields tgDebugMode btnFavourite fiTableDesc 
+         btnClearTableFilter btnTableFilter cbFavouriteGroup btnAddFavGroup 
+         brIndexes btnQueries ficWhere btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
@@ -6591,7 +6607,6 @@ PROCEDURE endResize :
 
   /* Hide rectangles */
   rctEdit:VISIBLE  = FALSE.
-  .rctQuery:VISIBLE = FALSE.
   rctData:VISIBLE  = FALSE.
 
   /* Restore suppress-warnings setting */
@@ -8690,7 +8705,7 @@ PROCEDURE preCache :
     bTable.lCached = TRUE.
 
     /* Thanks, but not needed anymore */
-    DATASET dsFieldCache:EMPTY-DATASET.
+    DATASET dsFieldCache:EMPTY-DATASET().
 
     /* One table at a time */
     LEAVE #TableCache.
@@ -8702,7 +8717,7 @@ PROCEDURE preCache :
   IF NOT lDoneSomething THEN
   DO:
     RUN setTimer("PreCache",0).
-    PUBLISH "debugInfo" (1, SUBSTITUTE("Pre-Caching complete")).
+    PUBLISH "debugInfo" (1, "Pre-Caching complete").
   END.
 
   {&timerStop}
@@ -8887,14 +8902,14 @@ PROCEDURE reopenDataBrowse :
   DEFINE VARIABLE hBufferDB       AS HANDLE     NO-UNDO.
   DEFINE VARIABLE hQuery          AS HANDLE     NO-UNDO.
   DEFINE VARIABLE iNumRecords     AS INTEGER    NO-UNDO.
-  DEFINE VARIABLE iStartTime      AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE iStartTime      AS INT64      NO-UNDO.
   DEFINE VARIABLE lPrepare        AS LOGICAL    NO-UNDO.
   DEFINE VARIABLE rCurrentRecord  AS ROWID      NO-UNDO.
   DEFINE VARIABLE lQueryComplete  AS LOGICAL    NO-UNDO.
   DEFINE VARIABLE cOldWhere       AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cTestQuery      AS CHARACTER  NO-UNDO.  
   DEFINE VARIABLE cFileCompCheck  AS CHARACTER  NO-UNDO.  
-  DEFINE VARIABLE iPrepareAttempt AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iPrepareAttempt AS INTEGER    NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bOldFilter FOR ttOldFilter.
@@ -8980,6 +8995,7 @@ PROCEDURE reopenDataBrowse :
   cUserQuery = ficWhere:SCREEN-VALUE IN FRAME {&FRAME-NAME}. /* this one will be saved if it has no errors */
   cBaseQuery = cUserQuery. /* this one might get auto-fixed */
 
+  #PrepareAttempt:
   DO iPrepareAttempt = 1 TO 2:
   
     RUN getDataQuery(cBaseQuery, OUTPUT cQuery).
@@ -9008,7 +9024,7 @@ PROCEDURE reopenDataBrowse :
     IF NOT lPrepare AND iPrepareAttempt = 1 THEN 
       RUN fixMissingQuotes(INPUT-OUTPUT cBaseQuery).
     ELSE 
-      LEAVE.
+      LEAVE #PrepareAttempt.
   END. /* do iPrepareAttempt */
 
   /* Missing quotes might have been fixed. Show this to the user. 
@@ -9553,7 +9569,6 @@ PROCEDURE reopenFieldBrowse :
   DEFINE VARIABLE hQuery           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE lAscending       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lFieldsFound     AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lAllVisible      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord   AS ROWID       NO-UNDO.
   DEFINE VARIABLE iCurrentRow      AS INTEGER     NO-UNDO.
 
@@ -9657,22 +9672,9 @@ PROCEDURE reopenFieldBrowse :
     hQuery:QUERY-PREPARE(cQuery).
     hQuery:QUERY-OPEN().
 
-    /* Find out if all visible fields have the same 'visibility flags'. If they are all
-     * the same, set the "toggle all" toggle-box to this same value.
-     */
-    lAllVisible = TRUE.
-
-    hQuery:GET-FIRST.
-    REPEAT WHILE NOT hQuery:QUERY-OFF-END:
-      lFieldsFound = TRUE.
-      IF NOT hBuffer::lShow THEN lAllVisible = FALSE.
-      hQuery:GET-NEXT.
-    END.
-
-    .tgSelAll:CHECKED = lAllVisible.
-
     /* Attach query to the browse */
     hQuery:GET-FIRST.
+    lFieldsFound = NOT hQuery:QUERY-OFF-END.
     brFields:QUERY = hQuery.
 
     /* Jump back to selected row */
@@ -10102,7 +10104,7 @@ PROCEDURE saveFilterValue :
 
   /* Add old entries to the list */
   #AddEntry:
-  DO iPos = 1 TO NUM-ENTRIES(cOldList,CHR(1)).
+  DO iPos = 1 TO NUM-ENTRIES(cOldList,CHR(1)):
     cThisValue = ENTRY(iPos,cOldList,CHR(1)).
 
     /* Skip empty */
@@ -10132,20 +10134,11 @@ END PROCEDURE. /* saveFilterValue */
 PROCEDURE saveWindow :
 /* Save size and position of the window.
  */
-
-  IF wDataDigger:WINDOW-STATE = 3 THEN /* normal state */
-  DO:
-    /* Upper left corner of window */
-    setRegistry("DataDigger", "Window:x", STRING(wDataDigger:X) ).
-    setRegistry("DataDigger", "Window:y", STRING(wDataDigger:Y) ).
-  END.
-
-  /* Width and height */
-  setRegistry("DataDigger", "Window:height", STRING(wDataDigger:HEIGHT-PIXELS) ).
-  setRegistry("DataDigger", "Window:width", STRING(wDataDigger:WIDTH-PIXELS) ).
-
-  /* Position of the resize bar */
   DO WITH FRAME frMain:
+
+    RUN saveWindowPos(wDataDigger:HANDLE, "DataDigger").
+
+    /* Position of the resize bar */
     setRegistry("DataDigger", "ResizeBar:Y", STRING(btnResizeVer:Y) ).
   END.
 
@@ -10170,7 +10163,7 @@ PROCEDURE selectClickedRow :
   DEFINE VARIABLE hBuffer          AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hBrowseColumn    AS HANDLE    NO-UNDO.
 
-  PUBLISH "debugInfo" (1, SUBSTITUTE("Select Clicked Row.")).
+  PUBLISH "debugInfo" (1, "Select Clicked Row.").
 
   /* Get mouse position (but not if we used SHIFT-F10 for the context menu */
   IF LAST-EVENT:LABEL = 'SHIFT-F10' THEN
@@ -10413,9 +10406,11 @@ PROCEDURE setFrameColor :
     iBorderColor = INTEGER(pcBorderColor) NO-ERROR.
   IF ERROR-STATUS:ERROR THEN iBorderColor = ?.
 
-
   DO WITH FRAME frMain:
+  
+    rctQuery:HIDDEN = (iBorderColor = ?).
     rctQuery:FGCOLOR = iBorderColor.
+      
     FRAME frMain:BGCOLOR = iFrameColor.
 
     /* Set key elements to white for readability */
@@ -10516,16 +10511,6 @@ PROCEDURE setPage :
 
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   setWindowFreeze(NO).
-
-  /* Show additional info on first use of favourites tab */
-  IF piPage = {&PAGE-FAVOURITES} 
-    AND getRegistry("DataDigger:Hints", SUBSTITUTE("setPage-&1",piPage)) = ? THEN
-  DO:
-    setRegistry("DataDigger:Hints", SUBSTITUTE("setPage-&1",piPage), "yes").
-    RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"(1/3)~n~nI created a default group for your favourites").
-    RUN showHint(btnAddFavGroup:HANDLE  ,{&ARROW-LEFT-DOWN},"(2/3)~n~nIf you like, you can create additional groups").
-    RUN showHint(brTables:HANDLE        ,{&ARROW-LEFT-UP}  ,"(3/3)~n~nBy removing all tables from a group, the group will be automatically deleted when you close DataDigger").
-  END.
 
   {&timerStop}
 
@@ -11367,7 +11352,7 @@ PROCEDURE showHint :
   DEFINE VARIABLE hMyWidget AS HANDLE  NO-UNDO.
 
   /* If we are in the start phase of DD, ignore hints */
-  IF VALID-HANDLE(winWait) THEN RETURN.
+  IF glInitializing THEN RETURN.
   
   /* If user opted to NEVER see hints, just exit, except
    * when she pressed the 'help' button */
@@ -11822,7 +11807,7 @@ END PROCEDURE. /* showValue */
 PROCEDURE sortComboBox :
 /* Sort the entries of a ComboBox
  */
-  DEFINE INPUT  PARAMETER phCombo AS HANDLE NO-UNDO.
+  DEFINE INPUT PARAMETER phCombo AS HANDLE NO-UNDO.
 
   DEFINE VARIABLE iItem  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cList  AS CHARACTER   NO-UNDO.
@@ -11832,7 +11817,7 @@ PROCEDURE sortComboBox :
   cList = phCombo:LIST-ITEMS.
   cDelim = phCombo:DELIMITER.
 
-  DO iItem = 1 TO NUM-ENTRIES(cList,cDelim).
+  DO iItem = 1 TO NUM-ENTRIES(cList,cDelim):
     CREATE ttItem.
     ASSIGN ttItem.cItem = ENTRY(iItem,cList,cDelim).
   END.
@@ -11844,6 +11829,7 @@ PROCEDURE sortComboBox :
   EMPTY TEMP-TABLE ttItem.
 
   phCombo:LIST-ITEMS = SUBSTRING(cList,2).
+
 END PROCEDURE. /* sortComboBox */
 
 /* _UIB-CODE-BLOCK-END */
@@ -11880,7 +11866,7 @@ PROCEDURE startSession :
   DEFINE VARIABLE lNewVersion    AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lUpgraded      AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE iChannel       AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iResult        AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iResult        AS INT64     NO-UNDO.
   DEFINE VARIABLE cRemoteBuildNr AS CHARACTER NO-UNDO.
 
   /* Set debug flag */
@@ -12015,8 +12001,8 @@ PROCEDURE startTool :
     WHEN "Admin" THEN RUN _admin.p.
   END CASE.
 
-  RUN resizeDictWindow. 
-
+  RUN KeepAlive. /* to track db changes */
+  
   /* re-enable KeepAlive timer */
   IF LOGICAL(getRegistry("DataDigger", "KeepAlive")) THEN
     RUN setTimer("KeepAlive", 60000). /* every 60 seconds */
@@ -12039,7 +12025,7 @@ PROCEDURE tgSelAllChoose :
   DEFINE VARIABLE hQuery     AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hBuffer    AS HANDLE    NO-UNDO.
   DEFINE BUFFER bColumn FOR ttColumn.
-  {&TimerStart}
+  {&timerStart}
 
   SESSION:SET-WAIT-STATE('general').
   setWindowFreeze(YES).
@@ -12804,4 +12790,3 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

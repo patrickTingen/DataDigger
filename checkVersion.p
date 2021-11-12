@@ -69,7 +69,7 @@ DO:
   IF plManualCheck THEN
   DO:
     MESSAGE 'A new version is available on the DataDigger website~n~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
-    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE(cNewVersionUrl).
+    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT "START" VALUE(cNewVersionUrl).
   END.
   ELSE 
     setRegistry('DataDigger:Update', 'NewVersionURL', cNewVersionUrl).

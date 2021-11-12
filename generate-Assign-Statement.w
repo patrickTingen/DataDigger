@@ -124,24 +124,24 @@ DEFINE VARIABLE tgSelectedOnly AS LOGICAL INITIAL no
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 5 X 205 NO-LABEL  
-     cbIndent AT Y 17 X 60 COLON-ALIGNED NO-LABEL   
-     tgSelectedOnly AT Y 49 X 25  
-     tgLowerCase AT Y 69 X 25   
-     tgIncludeDb AT Y 89 X 25   
-     rsBufferName AT Y 145 X 24 NO-LABEL   
-     fiBuffer AT Y 260 X 30 COLON-ALIGNED NO-LABEL   
-     btnCopy AT Y 320 X 15   
+     edDefinition AT Y 5 X 205 NO-LABEL
+     cbIndent AT Y 17 X 60 COLON-ALIGNED NO-LABEL
+     tgSelectedOnly AT Y 49 X 25
+     tgLowerCase AT Y 69 X 25
+     tgIncludeDb AT Y 89 X 25
+     rsBufferName AT Y 145 X 24 NO-LABEL
+     fiBuffer AT Y 260 X 30 COLON-ALIGNED NO-LABEL
+     btnCopy AT Y 320 X 15
      "Buffer name" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 123 X 25   
+          SIZE-PIXELS 75 BY 13 AT Y 123 X 25
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 18 X 25   
-     RECT-6 AT Y 5 X 15   
-     RECT-5 AT Y 130 X 15   
+          SIZE-PIXELS 40 BY 20 AT Y 18 X 25
+     RECT-6 AT Y 5 X 15
+     RECT-5 AT Y 130 X 15
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 183.4 BY 16.81    .
+         SIZE 183.4 BY 16.81.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -403,7 +403,7 @@ PROCEDURE generateCode :
       WHEN  2 THEN cTable = SUBSTITUTE('b&1&2'  , CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
       WHEN  3 THEN cTable = SUBSTITUTE('bf&1&2' , CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
       WHEN  4 THEN cTable = SUBSTITUTE('buf&1&2', CAPS(SUBSTRING(pcTable,1,1)), LOWER(SUBSTRING(pcTable,2))).
-      WHEN  5 THEN cTable = SUBSTITUTE('b-&1&2' , LOWER(pcTable)).
+      WHEN  5 THEN cTable = SUBSTITUTE('b-&1'   , LOWER(pcTable)).
       WHEN 99 THEN cTable = (IF fiBuffer <> '' THEN fiBuffer ELSE pcTable).
     END CASE.
 
@@ -564,5 +564,4 @@ END PROCEDURE. /* windowResized */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 
