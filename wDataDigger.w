@@ -77,46 +77,46 @@ DEFINE TEMP-TABLE ttColumnHandle NO-UNDO
   .
 
 /* Local Variable Definitions --- */
-DEFINE VARIABLE glReadOnlyDigger           AS LOGICAL     NO-UNDO. /* org value of plReadOnlyDigger */
-DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
-DEFINE VARIABLE gcTable                    AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcDatabase                 AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcFieldFilterHandles       AS CHARACTER   NO-UNDO. /* To save Handles to the filter widgets */
-DEFINE VARIABLE gcFieldFilterList          AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumnNames    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumns        AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcDatabase                 AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcFavouriteTables          AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcFieldFilterHandles       AS CHARACTER   NO-UNDO. /* To save Handles to the filter widgets */
+DEFINE VARIABLE gcFieldFilterList          AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
+DEFINE VARIABLE gcRecordMode               AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcTable                    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE ghDataBrowse               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghDataBuffer               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghDataQuery                AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghTableQuery               AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghTableBuffer              AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghLockTable                AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldBrowse              AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
 DEFINE VARIABLE ghLastFilterField          AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghLastIndexFilter          AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghLockTable                AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghTableBuffer              AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghTableQuery               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE giCurrentPage              AS INTEGER     NO-UNDO. /* 1=fields 2=indexes */
-DEFINE VARIABLE giQueryPointer             AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glRowEditActive            AS LOGICAL     NO-UNDO.
-DEFINE VARIABLE glFormatChanged            AS LOGICAL     NO-UNDO. /* When user changes a format */
-DEFINE VARIABLE glHintCancelled            AS LOGICAL     NO-UNDO. /* When user presses ESC during hint */
-DEFINE VARIABLE giMaxQueryTime             AS INTEGER     NO-UNDO.
-DEFINE VARIABLE gcRecordMode               AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE giDataOddRowColor          AS INTEGER     NO-UNDO EXTENT 2.
 DEFINE VARIABLE giDataEvenRowColor         AS INTEGER     NO-UNDO EXTENT 2.
+DEFINE VARIABLE giDataOddRowColor          AS INTEGER     NO-UNDO EXTENT 2.
 DEFINE VARIABLE giDefaultFont              AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giFixedFont                AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxColumns               AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxExtent                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxFilterHistory         AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giMaxQueryTime             AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giQueryPointer             AS INTEGER     NO-UNDO.
 DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO.
-DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
+DEFINE VARIABLE glFormatChanged            AS LOGICAL     NO-UNDO. /* When user changes a format */
+DEFINE VARIABLE glHintCancelled            AS LOGICAL     NO-UNDO. /* When user presses ESC during hint */
 DEFINE VARIABLE glInitializing             AS LOGICAL     NO-UNDO. /* to indicate init is running */
-DEFINE VARIABLE gcFavouriteTables          AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
+DEFINE VARIABLE glReadOnlyDigger           AS LOGICAL     NO-UNDO. /* org value of plReadOnlyDigger */
+DEFINE VARIABLE glRowEditActive            AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
 DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to override 'ShowHints=no' setting */
-DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
 DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
+DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 
 /* Vars to keep the values for the colors */
 DEFINE VARIABLE giColorFieldFilterFG    AS INTEGER NO-UNDO.
@@ -191,13 +191,13 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields tgDebugMode btnFavourite fiTableDesc ~
-btnClearTableFilter btnTableFilter cbFavouriteGroup btnAddFavGroup ~
-brIndexes btnQueries ficWhere btnView btnTools btnTabTables btnClear ~
-btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
-btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
-btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
-fiFeedback 
+btnClearIndexFilter brTables brFields tgDebugMode fiTableDesc ~
+cbFavouriteGroup brIndexes ficWhere btnFavourite btnClearTableFilter ~
+btnTableFilter btnAddFavGroup btnQueries btnView btnTools btnTabTables ~
+btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown ~
+btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes ~
+btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone ~
+btnAdd btnEdit fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -842,17 +842,17 @@ DEFINE FRAME frMain
      brTables AT Y 27 X 56
      brFields AT Y 27 X 325
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
-     btnFavourite AT Y 236 X 269
      fiTableDesc AT Y 236 X 57 NO-LABEL
+     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
+     brIndexes AT Y 260 X 830
+     ficWhere AT Y 266 X 80 NO-LABEL
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
+     btnFavourite AT Y 236 X 269
      btnClearTableFilter AT Y 3 X 237
      btnTableFilter AT Y 3 X 257
-     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      btnAddFavGroup AT Y 236 X 248
-     brIndexes AT Y 260 X 830
      btnQueries AT Y 265 X 745
-     ficWhere AT Y 266 X 80 NO-LABEL
      btnView AT Y 520 X 200
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnTools AT Y 0 X 1
      btnTabTables AT Y 45 X 34
      btnClear AT Y 265 X 725
@@ -887,28 +887,6 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761
-     btnDataSort AT Y 4 X 5
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
-     rctData AT Y 0 X 0
-     rctDataFilter AT Y 1 X 0
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL
-     btGotIt AT Y 110 X 104
-     imgArrow AT Y 0 X 0
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14 .
-
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37
      btnDataDigger AT Y 35 X 1
@@ -939,6 +917,28 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15 .
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14 .
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1013,7 +1013,7 @@ ASSIGN
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
 /* BROWSE-TAB brFields brTables frMain */
-/* BROWSE-TAB brIndexes btnAddFavGroup frMain */
+/* BROWSE-TAB brIndexes cbFavouriteGroup frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -2359,7 +2359,7 @@ END.
 ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Info */
 , btnAbout-txt
 DO:
-  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", getProgramDir() + '\DataDigger.txt')).
+  OS-COMMAND NO-WAIT "START" VALUE(SEARCH('DataDigger.txt')).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -6288,9 +6288,9 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields tgDebugMode btnFavourite fiTableDesc 
-         btnClearTableFilter btnTableFilter cbFavouriteGroup btnAddFavGroup 
-         brIndexes btnQueries ficWhere btnView btnTools btnTabTables btnClear 
+         brTables brFields tgDebugMode fiTableDesc cbFavouriteGroup brIndexes 
+         ficWhere btnFavourite btnClearTableFilter btnTableFilter 
+         btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
@@ -12790,3 +12790,4 @@ END FUNCTION. /* trimList */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -20,19 +20,13 @@
   DEFINE VARIABLE pdCalendarDate AS DATE NO-UNDO.
 &ENDIF
 
-/* Local Variable Definitions ---                                       */
+/* Local Variable Definitions --- */
 DEFINE VARIABLE gtCalendarDate  AS DATE             NO-UNDO .
 DEFINE VARIABLE ghDayField      AS HANDLE EXTENT 42 NO-UNDO.
 DEFINE VARIABLE ghDayName       AS HANDLE EXTENT 7  NO-UNDO.
 DEFINE VARIABLE ghWeekNum       AS HANDLE EXTENT 6  NO-UNDO.
 DEFINE VARIABLE gcMonthNames    AS CHARACTER        NO-UNDO.
 DEFINE VARIABLE ghPrevDay       AS HANDLE           NO-UNDO.
-
-PROCEDURE LockWindowUpdate EXTERNAL "user32.dll" :
-  /* Temporarily disables window painting.
-  */
-  DEFINE INPUT PARAMETER hWndLock AS LONG NO-UNDO.
-END PROCEDURE. /* LockWindowUpdate */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -50,7 +44,7 @@ END PROCEDURE. /* LockWindowUpdate */
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnNextMonth reBorderIn reBorderOut ~
-btnNextYear reSelectedDay btnHome btnPrevMonth btnPrevYear 
+reSelectedDay btnHome btnNextYear btnPrevMonth btnPrevYear 
 &Scoped-Define DISPLAYED-OBJECTS fiMonth fiDayName-1 fiDayName-2 ~
 fiDayName-3 fiDayName-4 fiDayName-5 fiDayName-6 fiDayName-7 
 
@@ -92,7 +86,7 @@ FUNCTION getWeekNum RETURNS INTEGER
 /* Definitions of the field level widgets                               */
 DEFINE BUTTON btnHome 
      LABEL "Today" 
-     SIZE-PIXELS 125 BY 21.
+     SIZE-PIXELS 125 BY 24.
 
 DEFINE BUTTON btnNextMonth  NO-FOCUS FLAT-BUTTON
      LABEL ">" 
@@ -199,9 +193,9 @@ DEFINE RECTANGLE reSelectedDay
 
 DEFINE FRAME frCalendarDays
      btnNextMonth AT Y 1 X 139
-     btnNextYear AT Y 1 X 152
-     btnHome AT Y 178 X 30
      fiMonth AT Y 0 X 35 COLON-ALIGNED NO-LABEL
+     btnHome AT Y 178 X 30
+     btnNextYear AT Y 1 X 152
      btnPrevMonth AT Y 1 X 20
      btnPrevYear AT Y 1 X 0
      fiDayName-1 AT Y 29 X 13 COLON-ALIGNED NO-LABEL
@@ -222,7 +216,7 @@ DEFINE FRAME frCalendarDays
      reSelectedDay AT Y 100 X 105
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
-         SIZE-PIXELS 186 BY 233
+         SIZE-PIXELS 186 BY 240
          TITLE "Calendar".
 
 
@@ -476,14 +470,12 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  /* Freeze window */
-  RUN LockWindowUpdate IN THIS-PROCEDURE (INPUT {&WINDOW-NAME}:HWND).
+  RUN startDiggerLib.p.
 
+  RUN lockWindow({&WINDOW-NAME}:HANDLE, YES).
   RUN enable_UI.
   RUN initializeObject.
-
-  /* Unfreeze window */
-  RUN LockWindowUpdate IN THIS-PROCEDURE (INPUT 0).
+  RUN lockWindow({&WINDOW-NAME}:HANDLE, NO).
 
   WAIT-FOR GO OF FRAME {&FRAME-NAME} OR RETURN OF FRAME {&FRAME-NAME}.
   IF KEYFUNCTION(LASTKEY) = "RETURN" THEN RUN btnOkChoose.
@@ -650,6 +642,8 @@ PROCEDURE drawCalendar :
     hDayField       = ?
     .
 
+  RUN lockWindow({&WINDOW-NAME}:HANDLE, YES).
+
   /* Hide fields before the first of month */
   DO iDayNr = 1 TO iWeekDay - 1:
     ASSIGN ghDayField[iDayNr]:VISIBLE = FALSE.
@@ -715,6 +709,8 @@ PROCEDURE drawCalendar :
 
   END.
 
+  RUN lockWindow({&WINDOW-NAME}:HANDLE, NO).
+
 END PROCEDURE. /* drawCalendar */
 
 /* _UIB-CODE-BLOCK-END */
@@ -734,7 +730,7 @@ PROCEDURE enable_UI :
   DISPLAY fiMonth fiDayName-1 fiDayName-2 fiDayName-3 fiDayName-4 fiDayName-5 
           fiDayName-6 fiDayName-7 
       WITH FRAME frCalendarDays.
-  ENABLE btnNextMonth reBorderIn reBorderOut btnNextYear reSelectedDay btnHome 
+  ENABLE btnNextMonth reBorderIn reBorderOut reSelectedDay btnHome btnNextYear 
          btnPrevMonth btnPrevYear 
       WITH FRAME frCalendarDays.
   VIEW FRAME frCalendarDays.
@@ -755,8 +751,7 @@ PROCEDURE initializeObject :
   DEFINE VARIABLE tTempDate AS DATE    NO-UNDO.
 
   ASSIGN
-    gcMonthNames = 'January,February,March,April,May,June,July,August,September,October,November,December'
-    .
+    gcMonthNames = 'January,February,March,April,May,June,July,August,September,October,November,December'.
 
   DO WITH FRAME {&FRAME-NAME}:
 
@@ -784,12 +779,15 @@ PROCEDURE initializeObject :
     ASSIGN iButtonNr = 0.
 
     /* Yeah, this is what we call semi-dynamic :) */
-    &GLOBAL-DEFINE BUTTON-WIDTH       18
-    &GLOBAL-DEFINE BUTTON-HEIGHT      18
-    &GLOBAL-DEFINE BUTTON-HOR-SPACE    4
-    &GLOBAL-DEFINE BUTTON-VER-SPACE    3
-    &GLOBAL-DEFINE BUTTON-HOR-OFFSET  20
-    &GLOBAL-DEFINE BUTTON-VER-OFFSET  45
+    &GLOBAL-DEFINE BUTTON-WIDTH       22
+    &GLOBAL-DEFINE BUTTON-HEIGHT      22
+    &GLOBAL-DEFINE BUTTON-HOR-SPACE    2
+    &GLOBAL-DEFINE BUTTON-VER-SPACE    2
+    &GLOBAL-DEFINE BUTTON-HOR-OFFSET  24
+    &GLOBAL-DEFINE BUTTON-VER-OFFSET  50
+
+    reSelectedDay:WIDTH-PIXELS = {&BUTTON-WIDTH} + 2.
+    reSelectedDay:HEIGHT-PIXELS = {&BUTTON-HEIGHT} + 2.
 
     /* Set canvas size */
     FRAME frCalendarDays:WIDTH-PIXELS  = {&BUTTON-HOR-OFFSET} + 7 * ({&BUTTON-WIDTH}  + {&BUTTON-HOR-SPACE} ) + 10.
@@ -800,7 +798,7 @@ PROCEDURE initializeObject :
 
     /* Correct position of the day name */
     DO iColNr = 0 TO 6:
-      ghDayName[iColNr + 1]:X = {&BUTTON-HOR-OFFSET} + 5 + iColNr * ({&BUTTON-WIDTH} + {&BUTTON-HOR-SPACE} ).
+      ghDayName[iColNr + 1]:X = {&BUTTON-HOR-OFFSET} + 6 + iColNr * ({&BUTTON-WIDTH} + {&BUTTON-HOR-SPACE} ).
     END.
 
     /* Correct position of the week nr */
@@ -810,7 +808,7 @@ PROCEDURE initializeObject :
 
     /* Center home button */
     btnHome:X = (FRAME frCalendarDays:WIDTH-PIXELS - btnHome:WIDTH-PIXELS) / 2.
-    btnHome:Y = reBorderOut:Y + reBorderOut:HEIGHT-PIXELS + ({&BUTTON-VER-SPACE} * 2).
+    btnHome:Y = reBorderOut:Y + reBorderOut:HEIGHT-PIXELS + (2 * {&BUTTON-VER-SPACE}).
 
     /* Center top row */
     btnNextYear:X  = (reBorderOut:X + reBorderOut:WIDTH-PIXELS) - btnNextYear:WIDTH-PIXELS.

@@ -503,30 +503,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 FUNCTION isValidCodePage RETURNS LOGICAL
   ( pcCodepage AS CHARACTER ) IN SUPER.
 
-/* Initialize */
-gcThisProcedure = THIS-PROCEDURE:FILE-NAME.
-gcThisProcedure = ENTRY(NUM-ENTRIES(gcThisProcedure,"\"),gcThisProcedure,"\").
-gcThisProcedure = ENTRY(1,gcThisProcedure,".").
-
-SUBSCRIBE TO gcThisProcedure ANYWHERE RUN-PROCEDURE "getProcHandle".
-
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-
-/* **********************  Internal Procedures  *********************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getProcHandle Include 
-PROCEDURE getProcHandle :
-/*
- * Name : getProcHandle
- * Desc : Return the handle of the procedure this include is in
- */
-DEFINE OUTPUT PARAMETER phHandle AS HANDLE NO-UNDO.
-phHandle = THIS-PROCEDURE:HANDLE.
-
-END PROCEDURE. /* getProcHandle */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
 

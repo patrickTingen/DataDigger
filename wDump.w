@@ -1348,9 +1348,9 @@ PROCEDURE dumpData4GL :
   PUT STREAM strDump UNFORMATTED
          SUBSTITUTE("/* Data-create procedure for &1.&2 ", gcDB, gcTable)
     SKIP SUBSTITUTE(" * Generated &1 by &2", STRING(NOW,"99-99-9999 HH:MM"), getUsername() )
-    SKIP SUBSTITUTE(" */" )
+    SKIP            " */"
     SKIP SUBSTITUTE("DEFINE BUFFER &1 FOR &2.&3.", cBufName, gcDB, gcTable)
-    SKIP SUBSTITUTE(" ")
+    SKIP            " "
     .
 
   /* Build query */
@@ -1437,9 +1437,9 @@ PROCEDURE dumpData4GL :
         IF iNumFields MODULO 100 = 0 THEN
         DO:
           /* Closing dot for previouse assign */
-          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("  .").
+          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP "  .".
           /* New assign */
-          PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("ASSIGN").
+          PUT STREAM strDump UNFORMATTED SKIP "ASSIGN".
         END.
 
         cFieldName = SUBSTITUTE("&1&2",hField:NAME, IF iExtent > 0 THEN SUBSTITUTE("[&1]",iExtent) ELSE "").
@@ -2713,4 +2713,3 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

@@ -13,6 +13,38 @@ DEFINE VARIABLE gcSaveDatabaseList  AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE giDataserverNr      AS INTEGER    NO-UNDO.  /* [JAG 01-11-2019] */
 DEFINE VARIABLE glDirtyCache        AS LOGICAL    NO-UNDO.
 
+/* Vars for caching dirnames */
+DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
+DEFINE VARIABLE gcWorkFolder AS CHARACTER NO-UNDO.
+
+/* If you have trouble with the cache, disable it in the settings screen */
+DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
+DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
+
+/* Locking / unlocking windows */
+&GLOBAL-DEFINE WM_SETREDRAW     11
+&GLOBAL-DEFINE RDW_ALLCHILDREN 128
+&GLOBAL-DEFINE RDW_ERASE         4
+&GLOBAL-DEFINE RDW_INVALIDATE    1
+
+/* Find out if a file is locked */
+&GLOBAL-DEFINE GENERIC_WRITE         1073741824 /* &H40000000 */
+&GLOBAL-DEFINE OPEN_EXISTING         3
+&GLOBAL-DEFINE FILE_SHARE_READ       1          /* = &H1 */
+&GLOBAL-DEFINE FILE_ATTRIBUTE_NORMAL 128        /* = &H80 */
+
+/* TT to map color numbers to names */
+DEFINE TEMP-TABLE ttColor NO-UNDO
+  FIELD cName  AS CHARACTER
+  FIELD iColor AS INTEGER
+  INDEX iPrim AS PRIMARY cName.
+
+/* TT to map font numbers to names */
+DEFINE TEMP-TABLE ttFont NO-UNDO
+  FIELD cName  AS CHARACTER
+  FIELD iFont  AS INTEGER
+  INDEX iPrim AS PRIMARY cName.
+
 /* Buildnr, temp-tables and forward defs */
 { DataDigger.i }
 
@@ -37,6 +69,24 @@ DEFINE VARIABLE glDirtyCache        AS LOGICAL    NO-UNDO.
   &GLOBAL-DEFINE POINTERTYPE LONG
   &GLOBAL-DEFINE POINTERBYTES 4
 &ENDIF  /* PROVERSION < 8 */
+
+/* Clean up on closing */
+ON CLOSE OF THIS-PROCEDURE
+DO:
+  DEFINE VARIABLE cEnvironment AS CHARACTER NO-UNDO.
+  cEnvironment = SUBSTITUTE('DataDigger-&1', getUserName() ).
+
+  UNLOAD 'DataDiggerHelp' NO-ERROR.
+  UNLOAD 'DataDigger'     NO-ERROR.
+  UNLOAD cEnvironment     NO-ERROR.
+END. /* CLOSE OF THIS-PROCEDURE  */
+
+/* Caching settings must be set from within UI.
+ * Since the library might be started from DataDigger.p
+ * we cannot rely on the registry being loaded yet
+ */
+glCacheTableDefs = TRUE.
+glCacheFieldDefs = TRUE.
 
 PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
   DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
@@ -120,13 +170,6 @@ PROCEDURE SetLayeredWindowAttributes EXTERNAL "user32.dll":
   DEFINE RETURN PARAMETER stat     AS SHORT.
 END PROCEDURE.
 
-
-/* Find out if a file is locked */
-&GLOBAL-DEFINE GENERIC_WRITE         1073741824 /* &H40000000 */
-&GLOBAL-DEFINE OPEN_EXISTING         3
-&GLOBAL-DEFINE FILE_SHARE_READ       1          /* = &H1 */
-&GLOBAL-DEFINE FILE_ATTRIBUTE_NORMAL 128        /* = &H80 */
-
 PROCEDURE CreateFileA EXTERNAL "kernel32":
   DEFINE INPUT PARAMETER lpFileName            AS CHARACTER.
   DEFINE INPUT PARAMETER dwDesiredAccess       AS {&POINTERTYPE}.
@@ -156,30 +199,6 @@ END PROCEDURE. /* URLDownloadToFileA */
 PROCEDURE DeleteUrlCacheEntry EXTERNAL "WININET.DLL" :
   DEFINE INPUT PARAMETER lbszUrlName AS CHARACTER.
 END PROCEDURE. /* DeleteUrlCacheEntry */
-
-DEFINE TEMP-TABLE ttColor NO-UNDO
-  FIELD cName  AS CHARACTER
-  FIELD iColor AS INTEGER
-  INDEX iPrim AS PRIMARY cName.
-
-DEFINE TEMP-TABLE ttFont NO-UNDO
-  FIELD cName  AS CHARACTER
-  FIELD iFont  AS INTEGER
-  INDEX iPrim AS PRIMARY cName.
-
-/* If you have trouble with the cache, disable it in the settings screen */
-DEFINE VARIABLE glCacheTableDefs AS LOGICAL NO-UNDO.
-DEFINE VARIABLE glCacheFieldDefs AS LOGICAL NO-UNDO.
-
-/* Vars for caching dirnames */
-DEFINE VARIABLE gcProgramDir AS CHARACTER NO-UNDO.
-DEFINE VARIABLE gcWorkFolder AS CHARACTER NO-UNDO.
-
-/* Locking / unlocking windows */
-&GLOBAL-DEFINE WM_SETREDRAW     11
-&GLOBAL-DEFINE RDW_ALLCHILDREN 128
-&GLOBAL-DEFINE RDW_ERASE         4
-&GLOBAL-DEFINE RDW_INVALIDATE    1
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -734,7 +753,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 55.76
+         HEIGHT             = 46.19
          WIDTH              = 57.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -747,24 +766,6 @@ FUNCTION setRegistry RETURNS CHARACTER
 
 
 /* ***************************  Main Block  *************************** */
-
-/* terminate it.                                                        */
-ON CLOSE OF THIS-PROCEDURE
-DO:
-  DEFINE VARIABLE cEnvironment AS CHARACTER NO-UNDO.
-  cEnvironment = SUBSTITUTE('DataDigger-&1', getUserName() ).
-
-  UNLOAD 'DataDiggerHelp' NO-ERROR.
-  UNLOAD 'DataDigger'     NO-ERROR.
-  UNLOAD cEnvironment     NO-ERROR.
-END. /* CLOSE OF THIS-PROCEDURE  */
-
-/* Caching settings must be set from within UI.
- * Since the library might be started from DataDigger.p
- * we cannot rely on the registry being loaded yet
- */
-glCacheTableDefs = TRUE.
-glCacheFieldDefs = TRUE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
