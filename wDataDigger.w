@@ -191,13 +191,13 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields tgDebugMode fiTableDesc ~
-cbFavouriteGroup brIndexes ficWhere btnFavourite btnClearTableFilter ~
-btnTableFilter btnAddFavGroup btnQueries btnView btnTools btnTabTables ~
-btnClear btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown ~
-btnMoveTop btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes ~
-btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone ~
-btnAdd btnEdit fiFeedback 
+btnClearIndexFilter brTables btnFavourite brFields tgDebugMode fiTableDesc ~
+cbFavouriteGroup brIndexes btnClearTableFilter ficWhere btnTableFilter ~
+btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
+btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
+btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
+btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
+fiFeedback 
 &Scoped-Define DISPLAYED-OBJECTS fiTableFilter cbDatabaseFilter tgSelAll ~
 fiIndexNameFilter fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ~
 ficWhere fiFeedback 
@@ -840,16 +840,16 @@ DEFINE FRAME frMain
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL
      btnClearIndexFilter AT Y 5 X 1095
      brTables AT Y 27 X 56
+     btnFavourite AT Y 236 X 269
      brFields AT Y 27 X 325
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
      fiTableDesc AT Y 236 X 57 NO-LABEL
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      brIndexes AT Y 260 X 830
-     ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
-     btnFavourite AT Y 236 X 269
      btnClearTableFilter AT Y 3 X 237
+     ficWhere AT Y 266 X 80 NO-LABEL
      btnTableFilter AT Y 3 X 257
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnAddFavGroup AT Y 236 X 248
      btnQueries AT Y 265 X 745
      btnView AT Y 520 X 200
@@ -1012,7 +1012,7 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
-/* BROWSE-TAB brFields brTables frMain */
+/* BROWSE-TAB brFields btnFavourite frMain */
 /* BROWSE-TAB brIndexes cbFavouriteGroup frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
@@ -2359,7 +2359,7 @@ END.
 ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Info */
 , btnAbout-txt
 DO:
-  OS-COMMAND NO-WAIT "START" VALUE(SEARCH('DataDigger.txt')).
+  OS-COMMAND NO-WAIT "START DataDigger.txt".
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -6288,8 +6288,8 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields tgDebugMode fiTableDesc cbFavouriteGroup brIndexes 
-         ficWhere btnFavourite btnClearTableFilter btnTableFilter 
+         brTables btnFavourite brFields tgDebugMode fiTableDesc 
+         cbFavouriteGroup brIndexes btnClearTableFilter ficWhere btnTableFilter 
          btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
