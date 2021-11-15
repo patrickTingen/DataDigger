@@ -15,7 +15,7 @@
 /*----------------------------------------------------------------------*/
 
 CREATE WIDGET-POOL.
-{ DataDigger.i }
+{DataDigger.i}
 
 /* Local Variable Definitions */
 DEFINE VARIABLE giPrevTime AS INTEGER     NO-UNDO. /* remember last TIME */
@@ -35,11 +35,6 @@ DEFINE TEMP-TABLE ttTimer NO-UNDO
   FIELD iNumStarts AS INTEGER
   FIELD tTotalTime AS INTEGER
   INDEX ttTimerPrim IS PRIMARY UNIQUE cTimerId.
-
-PROCEDURE LockWindowUpdate EXTERNAL "user32.dll":
-   DEFINE INPUT  PARAMETER piWindowHwnd AS LONG NO-UNDO.
-   DEFINE RETURN PARAMETER piResult     AS LONG NO-UNDO.
-END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

@@ -68,22 +68,6 @@ DEFINE VARIABLE giCurrentLevel   AS INTEGER   NO-UNDO INITIAL 1.
 DEFINE VARIABLE glLevelComplete  AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE giLockCounter    AS INTEGER   NO-UNDO.
 
-PROCEDURE SendMessageA EXTERNAL "user32.dll":
-  DEFINE INPUT  PARAMETER hwnd   AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER wmsg   AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER wparam AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER lparam AS long NO-UNDO.
-  DEFINE RETURN PARAMETER rc     AS long NO-UNDO.
-END PROCEDURE.
-
-PROCEDURE RedrawWindow EXTERNAL "user32.dll":
-  DEFINE INPUT PARAMETER v-hwnd  AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-rect  AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-rgn   AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-flags AS LONG NO-UNDO.
-  DEFINE RETURN PARAMETER v-ret  AS LONG NO-UNDO.
-END PROCEDURE.
-
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -751,19 +735,9 @@ PROCEDURE lockWindow :
   IF phWindow:HWND <> ? THEN 
   DO:
     IF giLockCounter > 0 THEN
-    DO:
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
-    END.
-    
+      RUN lockWindowUpdate (INPUT phWindow:HWND, OUTPUT iRet).
     ELSE
-    DO:
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
-      
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
-    END.
+      RUN lockWindowUpdate (INPUT 0, OUTPUT iRet).
   END.
 END PROCEDURE. /* lockWindow */
 
@@ -1357,5 +1331,3 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
-

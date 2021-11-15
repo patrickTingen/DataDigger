@@ -45,8 +45,8 @@ DEFINE INPUT PARAMETER piOldVersion AS INTEGER NO-UNDO.
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 15
-         WIDTH              = 60.
+         HEIGHT             = 10.48
+         WIDTH              = 41.6.
 /* END WINDOW DEFINITION */
                                                                         */
 &ANALYZE-RESUME

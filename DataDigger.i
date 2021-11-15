@@ -49,8 +49,6 @@
   &GLOBAL-DEFINE TABLE-SCAN TABLE-SCAN
 &ENDIF
 
-DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
-
 /* TT for field data to link DataDiggers to each other */
 DEFINE TEMP-TABLE ttLinkInfo NO-UNDO
   FIELD cField AS CHARACTER
@@ -505,5 +503,4 @@ FUNCTION isValidCodePage RETURNS LOGICAL
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 
