@@ -9,8 +9,8 @@ DEFINE INPUT  PARAMETER pcRemoteFile AS CHARACTER NO-UNDO.
 DEFINE OUTPUT PARAMETER pcContents   AS LONGCHAR  NO-UNDO.
 
 {&_proparse_prolint-nowarn(varusage)}
-DEFINE VARIABLE iResult   AS INTEGER   NO-UNDO.
-DEFINE VARIABLE cTempFile AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE iResult   AS INT64     NO-UNDO.
+DEFINE VARIABLE cTempFile AS CHARACTER NO-UNDO.
 
 /* Figure out a temp name */
 #GetName:
