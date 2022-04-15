@@ -191,9 +191,9 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnFavourite btnClearIndexFilter brTables btnClearTableFilter brFields ~
-brIndexes btnTableFilter tgDebugMode btnAddFavGroup fiTableDesc ~
-cbFavouriteGroup btnQueries ficWhere btnView btnTools btnTabTables btnClear ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
+cbFavouriteGroup ficWhere btnFavourite btnClearTableFilter btnTableFilter ~
+btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
 btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
@@ -838,21 +838,21 @@ DEFINE FRAME frMain
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL
      fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL
-     btnFavourite AT Y 236 X 269
      btnClearIndexFilter AT Y 5 X 1095
      brTables AT Y 27 X 56
-     btnClearTableFilter AT Y 3 X 237
      brFields AT Y 27 X 325
      brIndexes AT Y 28 X 829
-     btnTableFilter AT Y 3 X 257
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
-     btnAddFavGroup AT Y 236 X 248
      fiTableDesc AT Y 236 X 57 NO-LABEL
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
-     btnQueries AT Y 265 X 745
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnView AT Y 520 X 200
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
+     btnFavourite AT Y 236 X 269
+     btnClearTableFilter AT Y 3 X 237
+     btnTableFilter AT Y 3 X 257
+     btnAddFavGroup AT Y 236 X 248
+     btnQueries AT Y 265 X 745
+     btnView AT Y 520 X 200
      btnTools AT Y 0 X 1
      btnTabTables AT Y 45 X 34
      btnClear AT Y 265 X 725
@@ -887,6 +887,28 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14 .
+
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37
      btnDataDigger AT Y 35 X 1
@@ -917,28 +939,6 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15 .
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL
-     btGotIt AT Y 110 X 104
-     imgArrow AT Y 0 X 0
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14 .
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761
-     btnDataSort AT Y 4 X 5
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
-     rctData AT Y 0 X 0
-     rctDataFilter AT Y 1 X 0
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1012,7 +1012,7 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
-/* BROWSE-TAB brFields btnClearTableFilter frMain */
+/* BROWSE-TAB brFields brTables frMain */
 /* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
@@ -6287,10 +6287,10 @@ PROCEDURE enable_UI :
           fiFeedback 
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnFavourite 
-         btnClearIndexFilter brTables btnClearTableFilter brFields brIndexes 
-         btnTableFilter tgDebugMode btnAddFavGroup fiTableDesc cbFavouriteGroup 
-         btnQueries ficWhere btnView btnTools btnTabTables btnClear 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
+         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
+         ficWhere btnFavourite btnClearTableFilter btnTableFilter 
+         btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
@@ -9449,13 +9449,16 @@ PROCEDURE reopenDataBrowse-create :
       ON "CTRL-D"           OF hFilterField PERSISTENT RUN dataSelectNone          IN THIS-PROCEDURE (ghDataBrowse).
       ON "ENTRY"            OF hFilterField PERSISTENT RUN filterFieldEntry        IN THIS-PROCEDURE (hFilterField, YES).
       ON "LEAVE"            OF hFilterField PERSISTENT RUN filterFieldLeave        IN THIS-PROCEDURE (hFilterField, YES).
-      ON "ANY-PRINTABLE"    OF hFilterField PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField).
       ON "VALUE-CHANGED"    OF hFilterField PERSISTENT RUN filterFieldValueChanged IN THIS-PROCEDURE (hFilterField,NO).
       ON "SHIFT-DEL"        OF hFilterField PERSISTENT RUN filterFieldClearAll     IN THIS-PROCEDURE (hFilterField, btnClearDataFilter:HANDLE).
       ON "RETURN"           OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F2"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F5"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "CTRL-CURSOR-DOWN" OF hFilterField PERSISTENT RUN filterFieldCursorDown   IN THIS-PROCEDURE (hFilterField, bColumn.hColumn).
+
+      /* This one does not play nice with UTF-8 session */
+      IF SESSION:CPINTERNAL <> "UTF-8" THEN
+        ON "ANY-PRINTABLE" OF hFilterField PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField). 
 
       /* Keep track of filters */
       CREATE bFilter.
