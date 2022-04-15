@@ -275,7 +275,7 @@ PROCEDURE cloneDatabase :
     RETURN.
   END.
 
-  cDlc = OS-GETENV('DLC':U).
+  cDlc = System.Environment:GetEnvironmentVariable('DLC':U).
   IF cDlc = ? THEN
     ASSIGN cDlc = SEARCH('empty.db':U)
            cDlc = SUBSTRING(cDlc,1,LENGTH(cDlc,'CHARACTER':U) - 9,'CHARACTER':U).
@@ -465,4 +465,3 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

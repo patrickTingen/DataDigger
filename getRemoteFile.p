@@ -23,7 +23,9 @@ END.
 RUN DeleteURLCacheEntry (INPUT pcRemoteFile).
 
 {&_proparse_prolint-nowarn(varusage)}
-RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
+IF SESSION:CPINTERNAL = 'UTF8' 
+  THEN RUN urlDownloadToFileW (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
+  ELSE RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
 
 /* Read */
 IF SEARCH(cTempFile) <> ? THEN COPY-LOB FILE cTempFile TO pcContents.

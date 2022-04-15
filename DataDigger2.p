@@ -591,7 +591,7 @@ PROCEDURE recompileSelf :
   PUT UNFORMATTED SKIP(0) "  Windows version    : " SESSION:WINDOW-SYSTEM " " cSystem + ", " getProcessorArchitecture() "bit".
   PUT UNFORMATTED SKIP(0) "  System memory      : " cMemory.
   PUT UNFORMATTED SKIP(0) "  Display size       : " SESSION:WORK-AREA-WIDTH-PIXELS " x " SESSION:WORK-AREA-HEIGHT-PIXELS.
-  PUT UNFORMATTED SKIP(0) "  Logged in as       : " OS-GETENV("username").
+  PUT UNFORMATTED SKIP(0) "  Logged in as       : " System.Environment:GetEnvironmentVariable("username").
 
   PUT UNFORMATTED SKIP(1) "SESSION INFO".
   PUT UNFORMATTED SKIP(0) "  Program dir        : " gcProgramDir.
@@ -1010,4 +1010,3 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
-

@@ -263,7 +263,11 @@ DO:
   chCtrlFrame:PSTimer:ENABLED = FALSE.
 
   IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE THEN 
-    RUN urlDownloadToFileA (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+  DO:
+    IF SESSION:CPINTERNAL = 'UTF8' 
+      THEN RUN urlDownloadToFileW (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+      ELSE RUN urlDownloadToFileA (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+  END.
 
   RUN SokoDigger.w.
   {&WINDOW-NAME}:SENSITIVE = TRUE.
@@ -286,7 +290,7 @@ END.
 
 &Scoped-define SELF-NAME CtrlFrame
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame wAbout OCX.Tick
-PROCEDURE CtrlFrame.PSTimer.Tick :
+PROCEDURE CtrlFrame.PSTimer.Tick .
 /* Blink the logo every now and then
 */
   DO WITH FRAME {&FRAME-NAME}:
@@ -541,8 +545,6 @@ PROCEDURE initializeObject :
     edChangeLog:INSERT-FILE(getProgramDir() + 'DataDigger.txt').
     edChangeLog:CURSOR-OFFSET = 1.
 
-    RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
-
     /* For some reasons, these #*$&# scrollbars keep coming back */
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
 
@@ -597,3 +599,4 @@ END PROCEDURE. /* justWait */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

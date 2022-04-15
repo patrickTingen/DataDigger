@@ -191,9 +191,9 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables btnFavourite brFields tgDebugMode fiTableDesc ~
-cbFavouriteGroup brIndexes btnClearTableFilter ficWhere btnTableFilter ~
-btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
+btnFavourite btnClearIndexFilter brTables btnClearTableFilter brFields ~
+brIndexes btnTableFilter tgDebugMode btnAddFavGroup fiTableDesc ~
+cbFavouriteGroup btnQueries ficWhere btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
 btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
@@ -838,21 +838,21 @@ DEFINE FRAME frMain
      fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL
      fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL
+     btnFavourite AT Y 236 X 269
      btnClearIndexFilter AT Y 5 X 1095
      brTables AT Y 27 X 56
-     btnFavourite AT Y 236 X 269
+     btnClearTableFilter AT Y 3 X 237
      brFields AT Y 27 X 325
+     brIndexes AT Y 28 X 829
+     btnTableFilter AT Y 3 X 257
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
+     btnAddFavGroup AT Y 236 X 248
      fiTableDesc AT Y 236 X 57 NO-LABEL
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
-     brIndexes AT Y 260 X 830
-     btnClearTableFilter AT Y 3 X 237
-     ficWhere AT Y 266 X 80 NO-LABEL
-     btnTableFilter AT Y 3 X 257
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
-     btnAddFavGroup AT Y 236 X 248
      btnQueries AT Y 265 X 745
+     ficWhere AT Y 266 X 80 NO-LABEL
      btnView AT Y 520 X 200
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnTools AT Y 0 X 1
      btnTabTables AT Y 45 X 34
      btnClear AT Y 265 X 725
@@ -1012,8 +1012,8 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
-/* BROWSE-TAB brFields btnFavourite frMain */
-/* BROWSE-TAB brIndexes cbFavouriteGroup frMain */
+/* BROWSE-TAB brFields btnClearTableFilter frMain */
+/* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
 ASSIGN 
@@ -6287,10 +6287,10 @@ PROCEDURE enable_UI :
           fiFeedback 
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
-         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables btnFavourite brFields tgDebugMode fiTableDesc 
-         cbFavouriteGroup brIndexes btnClearTableFilter ficWhere btnTableFilter 
-         btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
+         fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnFavourite 
+         btnClearIndexFilter brTables btnClearTableFilter brFields brIndexes 
+         btnTableFilter tgDebugMode btnAddFavGroup fiTableDesc cbFavouriteGroup 
+         btnQueries ficWhere btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
@@ -11227,7 +11227,9 @@ PROCEDURE setWindowTitle :
 
   RUN GetParent (wDataDigger:HWND, OUTPUT hParent).
   RUN GetWindow (hParent, 4, OUTPUT hOwner).
-  RUN SetWindowTextA ( hOwner, cTitle ).
+  IF SESSION:CPINTERNAL = 'UTF8' 
+    THEN RUN SetWindowTextW(hOwner, cTitle).
+    ELSE RUN SetWindowTextA(hOwner, cTitle).
 
 END PROCEDURE. /* setWindowTitle */
 
@@ -11937,11 +11939,18 @@ PROCEDURE startSession :
     AND getRegistry('DataDigger:Update','LastPingBack') <> ISO-DATE(TODAY) THEN
   DO:
     /* Pingback for total statistics across all versions */
-    RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0, OUTPUT iResult).
-    setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)).
-    
-    /* Pingback for just the latest version */
-    RUN urlDownloadToFileA (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    IF SESSION:CPINTERNAL = 'UTF8' THEN 
+    DO:
+      RUN urlDownloadToFileW (0, '{&PINGBACKURL}'  , '', 0, 0, OUTPUT iResult).
+      RUN urlDownloadToFileW (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    END.
+    ELSE
+    DO:
+      RUN urlDownloadToFileA (0, '{&PINGBACKURL}'  , '', 0, 0, OUTPUT iResult).
+      RUN urlDownloadToFileA (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    END.
+
+    setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)). 
   END.
 
   /* Check for new version only once a day */

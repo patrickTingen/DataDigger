@@ -7,9 +7,8 @@
   Desc: Library for DataDigger functions
 
 ------------------------------------------------------------------------*/
-/*          This .W file was created with the Progress AppBuilder.       */
-/*----------------------------------------------------------------------*/
-DEFINE VARIABLE gcSaveDatabaseList  AS CHARACTER  NO-UNDO.  
+
+DEFINE VARIABLE gcSaveDatabaseList  AS CHARACTER  NO-UNDO.
 DEFINE VARIABLE giDataserverNr      AS INTEGER    NO-UNDO.  /* [JAG 01-11-2019] */
 DEFINE VARIABLE glDirtyCache        AS LOGICAL    NO-UNDO.
 
@@ -52,23 +51,18 @@ DEFINE TEMP-TABLE ttFont NO-UNDO
  * See for more info:
  * https://knowledgebase.progress.com/articles/Article/Windows-API-call-fails-with-error-13712-in-11-7-64-bit
  */
-&IF PROVERSION <= '8' &THEN  /* OE 10+ */
-  &IF PROVERSION >= '11.3' &THEN   /* PROCESS-ARCHITECTURE function is available */
-    &IF PROCESS-ARCHITECTURE = 32 &THEN /* 32-bit pointers */
-      &GLOBAL-DEFINE POINTERTYPE LONG
-      &GLOBAL-DEFINE POINTERBYTES 4
-    &ELSEIF PROCESS-ARCHITECTURE = 64 &THEN /* 64-bit pointers */
-      &GLOBAL-DEFINE POINTERTYPE INT64
-      &GLOBAL-DEFINE POINTERBYTES 8
-    &ENDIF  /* PROCESS-ARCHITECTURE */
-  &ELSE   /* Can't check architecture pre-11.3 so default to 32-bit */
+&IF PROVERSION >= '11.3' &THEN   /* PROCESS-ARCHITECTURE function is available */
+  &IF PROCESS-ARCHITECTURE = 32 &THEN /* 32-bit pointers */
     &GLOBAL-DEFINE POINTERTYPE LONG
     &GLOBAL-DEFINE POINTERBYTES 4
-  &ENDIF  /* PROVERSION > 11.3 */
-&ELSE   /* pre-OE10 always 32-bit on Windows */
+  &ELSEIF PROCESS-ARCHITECTURE = 64 &THEN /* 64-bit pointers */
+    &GLOBAL-DEFINE POINTERTYPE INT64
+    &GLOBAL-DEFINE POINTERBYTES 8
+  &ENDIF  /* PROCESS-ARCHITECTURE */
+&ELSE   /* Can't check architecture pre-11.3 so default to 32-bit */
   &GLOBAL-DEFINE POINTERTYPE LONG
   &GLOBAL-DEFINE POINTERBYTES 4
-&ENDIF  /* PROVERSION < 8 */
+&ENDIF  /* PROVERSION > 11.3 */
 
 /* Clean up on closing */
 ON CLOSE OF THIS-PROCEDURE
@@ -92,7 +86,13 @@ PROCEDURE GetUserNameA EXTERNAL "ADVAPI32.DLL":
   DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
   DEFINE INPUT-OUTPUT PARAMETER intBufferSize AS LONG NO-UNDO.
   DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
-END PROCEDURE. 
+END PROCEDURE.
+
+PROCEDURE GetUserNameW EXTERNAL "ADVAPI32.DLL":
+  DEFINE INPUT        PARAMETER mUserId       AS MEMPTR NO-UNDO.
+  DEFINE INPUT-OUTPUT PARAMETER intBufferSize AS LONG NO-UNDO.
+  DEFINE RETURN       PARAMETER intResult     AS SHORT NO-UNDO.
+END PROCEDURE.
 
 PROCEDURE GetKeyboardState EXTERNAL "user32.dll":
   DEFINE INPUT  PARAMETER KBState AS {&POINTERTYPE}. /* memptr */
@@ -115,17 +115,20 @@ PROCEDURE SendMessageA EXTERNAL "user32.dll":
   DEFINE RETURN PARAMETER rc     AS {&POINTERTYPE} NO-UNDO.
 END PROCEDURE.
 
+PROCEDURE SendMessageW EXTERNAL "user32.dll":
+  DEFINE INPUT  PARAMETER hwnd   AS {&POINTERTYPE} NO-UNDO.
+  DEFINE INPUT  PARAMETER wmsg   AS {&POINTERTYPE} NO-UNDO.
+  DEFINE INPUT  PARAMETER wparam AS {&POINTERTYPE} NO-UNDO.
+  DEFINE INPUT  PARAMETER lparam AS {&POINTERTYPE} NO-UNDO.
+  DEFINE RETURN PARAMETER rc     AS {&POINTERTYPE} NO-UNDO.
+END PROCEDURE.
+
 PROCEDURE RedrawWindow EXTERNAL "user32.dll":
   DEFINE INPUT PARAMETER v-hwnd  AS {&POINTERTYPE} NO-UNDO.
   DEFINE INPUT PARAMETER v-rect  AS {&POINTERTYPE} NO-UNDO.
   DEFINE INPUT PARAMETER v-rgn   AS {&POINTERTYPE} NO-UNDO.
   DEFINE INPUT PARAMETER v-flags AS {&POINTERTYPE} NO-UNDO.
   DEFINE RETURN PARAMETER v-ret  AS {&POINTERTYPE} NO-UNDO.
-END PROCEDURE.
-
-PROCEDURE SetWindowTextA EXTERNAL "user32.dll":
-  DEFINE INPUT PARAMETER hwnd AS {&POINTERTYPE}.
-  DEFINE INPUT PARAMETER txt  AS CHARACTER.
 END PROCEDURE.
 
 PROCEDURE GetWindow EXTERNAL "user32.dll" :
@@ -154,23 +157,19 @@ PROCEDURE ScreenToClient EXTERNAL "user32.dll" :
   DEFINE INPUT  PARAMETER lpPoint  AS MEMPTR.
 END PROCEDURE.
 
-/* Transparency */
-PROCEDURE SetWindowLongA EXTERNAL "user32.dll":
-  DEFINE INPUT PARAMETER HWND      AS {&POINTERTYPE}.
-  DEFINE INPUT PARAMETER nIndex    AS {&POINTERTYPE}.
-  DEFINE INPUT PARAMETER dwNewLong AS {&POINTERTYPE}.
-  DEFINE RETURN PARAMETER stat     AS {&POINTERTYPE}.
-END PROCEDURE.
-
-PROCEDURE SetLayeredWindowAttributes EXTERNAL "user32.dll":
-  DEFINE INPUT PARAMETER HWND      AS {&POINTERTYPE}.
-  DEFINE INPUT PARAMETER crKey     AS {&POINTERTYPE}.
-  DEFINE INPUT PARAMETER bAlpha    AS SHORT.
-  DEFINE INPUT PARAMETER dwFlagsas AS {&POINTERTYPE}.
-  DEFINE RETURN PARAMETER stat     AS SHORT.
-END PROCEDURE.
-
+/* Procs for function isFileLocked */
 PROCEDURE CreateFileA EXTERNAL "kernel32":
+  DEFINE INPUT PARAMETER lpFileName            AS CHARACTER.
+  DEFINE INPUT PARAMETER dwDesiredAccess       AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER dwShareMode           AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER lpSecurityAttributes  AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER dwCreationDisposition AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER dwFlagsAndAttributes  AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER hTemplateFile         AS {&POINTERTYPE}.
+  DEFINE RETURN PARAMETER ReturnValue          AS {&POINTERTYPE}.
+END PROCEDURE.
+
+PROCEDURE CreateFileW EXTERNAL "kernel32":
   DEFINE INPUT PARAMETER lpFileName            AS CHARACTER.
   DEFINE INPUT PARAMETER dwDesiredAccess       AS {&POINTERTYPE}.
   DEFINE INPUT PARAMETER dwShareMode           AS {&POINTERTYPE}.
@@ -196,6 +195,15 @@ PROCEDURE URLDownloadToFileA EXTERNAL "URLMON.DLL" :
   DEFINE RETURN PARAMETER ReturnValue AS {&POINTERTYPE}.
 END PROCEDURE. /* URLDownloadToFileA */
 
+PROCEDURE URLDownloadToFileW EXTERNAL "URLMON.DLL" :
+  DEFINE INPUT PARAMETER pCaller      AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER szURL        AS CHARACTER.
+  DEFINE INPUT PARAMETER szFilename   AS CHARACTER.
+  DEFINE INPUT PARAMETER dwReserved   AS {&POINTERTYPE}.
+  DEFINE INPUT PARAMETER lpfnCB       AS {&POINTERTYPE}.
+  DEFINE RETURN PARAMETER ReturnValue AS {&POINTERTYPE}.
+END PROCEDURE. /* URLDownloadToFileA */
+
 PROCEDURE DeleteUrlCacheEntry EXTERNAL "WININET.DLL" :
   DEFINE INPUT PARAMETER lbszUrlName AS CHARACTER.
 END PROCEDURE. /* DeleteUrlCacheEntry */
@@ -203,6 +211,16 @@ END PROCEDURE. /* DeleteUrlCacheEntry */
 PROCEDURE LockWindowUpdate EXTERNAL "user32.dll":
   DEFINE INPUT  PARAMETER piWindowHwnd AS LONG NO-UNDO.
   DEFINE RETURN PARAMETER piResult     AS LONG NO-UNDO.
+END PROCEDURE.
+
+PROCEDURE SetWindowTextA EXTERNAL "user32.dll":
+  DEFINE INPUT PARAMETER hwnd AS long.
+  DEFINE INPUT PARAMETER txt AS CHARACTER.
+END PROCEDURE.
+
+PROCEDURE SetWindowTextW EXTERNAL "user32.dll":
+  DEFINE INPUT PARAMETER hwnd AS long.
+  DEFINE INPUT PARAMETER txt AS CHARACTER.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
@@ -758,7 +776,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 46.19
+         HEIGHT             = 28.48
          WIDTH              = 57.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -2604,24 +2622,18 @@ PROCEDURE lockWindow :
   IF plLock AND btWindowLock.iLockCounter = 1 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
-    RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
-                    , {&WM_SETREDRAW}
-                    , 0
-                    , 0
-                    , OUTPUT iRet
-                    ).
+    IF SESSION:CPINTERNAL = 'UTF8' 
+      THEN RUN SendMessageW(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
+      ELSE RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
   END.
 
   /* And only unlock after the last unlock command */
   ELSE IF btWindowLock.iLockCounter <= 0 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
-    RUN SendMessageA( phWindow:HWND /* {&window-name}:hwnd */
-                    , {&WM_SETREDRAW}
-                    , 1
-                    , 0
-                    , OUTPUT iRet
-                    ).
+    IF SESSION:CPINTERNAL = 'UTF8' 
+      THEN RUN SendMessageW(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
+      ELSE RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
 
     {&_proparse_prolint-nowarn(varusage)}
     RUN RedrawWindow( phWindow:HWND /* {&window-name}:hwnd */
@@ -3233,38 +3245,6 @@ END PROCEDURE. /* setSortArrow */
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-setTransparency) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTransparency Procedure 
-PROCEDURE setTransparency :
-/* Set transparency level for a frame, using Windows api
-  */
-  DEFINE INPUT  PARAMETER phFrame AS HANDLE     NO-UNDO.
-  DEFINE INPUT  PARAMETER piLevel AS INTEGER    NO-UNDO.
-
-  &SCOPED-DEFINE GWL_EXSTYLE         -20
-  &SCOPED-DEFINE WS_EX_LAYERED       524288
-  &SCOPED-DEFINE LWA_ALPHA           2
-  &SCOPED-DEFINE WS_EX_TRANSPARENT   32
-
-  {&_proparse_prolint-nowarn(varusage)}
-  DEFINE VARIABLE stat AS INTEGER    NO-UNDO.
-
-  /* Set WS_EX_LAYERED on this window  */
-  {&_proparse_prolint-nowarn(varusage)}
-  RUN SetWindowLongA(phFrame:HWND, {&GWL_EXSTYLE}, {&WS_EX_LAYERED}, OUTPUT stat).
-
-  /* Make this window transparent (0 - 255) */
-  {&_proparse_prolint-nowarn(varusage)}
-  RUN SetLayeredWindowAttributes(phFrame:HWND, 0, piLevel, {&LWA_ALPHA}, OUTPUT stat).
-
-END PROCEDURE. /* setTransparency */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-setXmlNodeNames) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setXmlNodeNames Procedure 
@@ -3472,7 +3452,9 @@ PROCEDURE unlockWindow :
   IF btWindowLock.iLockCounter > 0 THEN
   DO:
     {&_proparse_prolint-nowarn(varusage)}
-    RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
+    IF SESSION:CPINTERNAL = 'UTF8' 
+      THEN RUN SendMessageW(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
+      ELSE RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
 
     {&_proparse_prolint-nowarn(varusage)}
     RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
@@ -4602,8 +4584,19 @@ FUNCTION getUserName RETURNS CHARACTER
   SET-SIZE(mUserId) = 256.
   intSize = 255.
 
-  RUN GetUserNameA(INPUT mUserId, INPUT-OUTPUT intSize, OUTPUT intResult).
-  COPY-LOB mUserId FOR (intSize - 1) TO cUserName NO-CONVERT.
+  /* Ansi / UTF */
+  IF SESSION:CPINTERNAL = "UTF-8" THEN
+  DO:  
+    RUN GetUserNameW(INPUT mUserId, INPUT-OUTPUT intSize, OUTPUT intResult).
+    FIX-CODEPAGE(cUserName) = "UTF-8".
+    COPY-LOB mUserId FOR (intSize - 1) TO cUserName CONVERT SOURCE CODEPAGE "UTF-16LE".  
+    SET-SIZE(mUserId) = 0.
+  END. 
+  ELSE 
+  DO:
+    RUN GetUserNameA(INPUT mUserId, INPUT-OUTPUT intSize, OUTPUT intResult).
+    COPY-LOB mUserId FOR (intSize - 1) TO cUserName NO-CONVERT.
+  END.
 
   IF intResult <> 1 OR cUserName = "" OR cUserName = ? THEN
     cUserName = "default".
@@ -4770,22 +4763,16 @@ FUNCTION isFileLocked RETURNS LOGICAL
   */
   DEFINE VARIABLE iFileHandle   AS INTEGER NO-UNDO.
   {&_proparse_prolint-nowarn(varusage)}
-  DEFINE VARIABLE nReturn       AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iReturn       AS INTEGER NO-UNDO.
 
   /* Try to lock the file agains writing */
-  RUN CreateFileA ( INPUT pcFileName
-                  , INPUT {&GENERIC_WRITE}
-                  , {&FILE_SHARE_READ}
-                  , 0
-                  , {&OPEN_EXISTING}
-                  , {&FILE_ATTRIBUTE_NORMAL}
-                  , 0
-                  , OUTPUT iFileHandle
-                  ).
+  IF SESSION:CPINTERNAL = 'UTF8' 
+    THEN RUN CreateFileW(pcFileName, {&GENERIC_WRITE}, {&FILE_SHARE_READ}, 0, {&OPEN_EXISTING}, {&FILE_ATTRIBUTE_NORMAL}, 0, OUTPUT iFileHandle).
+    ELSE RUN CreateFileA(pcFileName, {&GENERIC_WRITE}, {&FILE_SHARE_READ}, 0, {&OPEN_EXISTING}, {&FILE_ATTRIBUTE_NORMAL}, 0, OUTPUT iFileHandle).
 
   /* Release file handle */
   {&_proparse_prolint-nowarn(varusage)}
-  RUN CloseHandle (INPUT iFileHandle, OUTPUT nReturn).
+  RUN CloseHandle (INPUT iFileHandle, OUTPUT iReturn).
 
   RETURN (iFileHandle = -1).
 
@@ -4949,8 +4936,8 @@ FUNCTION resolveOsVars RETURNS CHARACTER
 
   DO i = 1 TO NUM-ENTRIES(pcString,'%'):
     IF i MODULO 2 = 0
-      AND OS-GETENV(ENTRY(i,pcString,'%')) <> ? THEN
-      ENTRY(i,pcString,'%') = OS-GETENV(ENTRY(i,pcString,'%')).
+      AND System.Environment:GetEnvironmentVariable(ENTRY(i,pcString,'%')) <> ? THEN
+      ENTRY(i,pcString,'%') = System.Environment:GetEnvironmentVariable(ENTRY(i,pcString,'%')).
   END.
   
   pcString = REPLACE(pcString,'%','').
