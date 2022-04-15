@@ -887,28 +887,6 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761
-     btnDataSort AT Y 4 X 5
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
-     rctData AT Y 0 X 0
-     rctDataFilter AT Y 1 X 0
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24.
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL
-     btGotIt AT Y 110 X 104
-     imgArrow AT Y 0 X 0
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14 .
-
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37
      btnDataDigger AT Y 35 X 1
@@ -939,6 +917,28 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15 .
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14 .
+
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -5065,12 +5065,11 @@ END PROCEDURE. /* cloneDatabase */
 &ANALYZE-RESUME
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo wDataDigger 
-PROCEDURE collectFieldInfo PRIVATE :
+PROCEDURE collectFieldInfo :
 /* Fill the fields temp-table
  */
   DEFINE INPUT PARAMETER pcTableName AS CHARACTER NO-UNDO.
   DEFINE BUFFER bTable FOR ttTable.
-  {&timerStart}
 
   /* Collect fields from target table */
   RUN getFields( INPUT gcDatabase
@@ -5083,104 +5082,7 @@ PROCEDURE collectFieldInfo PRIVATE :
       AND bTable.cTableName = pcTableName  NO-ERROR.
   IF AVAILABLE bTable THEN ASSIGN bTable.lCached = TRUE.
 
-  {&timerStop}
-
 END PROCEDURE. /* collectFieldInfo */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectIndexInfo wDataDigger 
-PROCEDURE collectIndexInfo :
-/* Fill the index temp-table
- */
-  {&timerStart}
-  DEFINE INPUT PARAMETER pcTableName   AS CHARACTER   NO-UNDO.
-
-  DEFINE VARIABLE hBufferFile       AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferIndex      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferIndexField AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferField      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cQuery            AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hQuery            AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cCurrentDatabase  AS CHARACTER   NO-UNDO. /* NelsonAlcala */
-
-  DEFINE BUFFER bIndex FOR ttIndex.
-
-  /* Return if no db connected */
-  IF NUM-DBS = 0 THEN RETURN.
-
-  /* NelsonAlcala */
-  cCurrentDatabase = SDBNAME(gcDatabase).  /*use DB schemaholder name*/
-  /* Fill the tt with _Fields */
-                                           /* NelsonAlcala */
-  CREATE BUFFER hBufferFile       FOR TABLE /*g*/ cCurrentDatabase + "._File".
-  CREATE BUFFER hBufferIndex      FOR TABLE /*g*/ cCurrentDatabase + "._Index".
-  CREATE BUFFER hBufferIndexField FOR TABLE /*g*/ cCurrentDatabase + "._Index-Field".
-  CREATE BUFFER hBufferField      FOR TABLE /*g*/ cCurrentDatabase + "._Field".
-
-  CREATE QUERY hQuery.
-  hQuery:SET-BUFFERS(hBufferFile,hBufferIndex,hBufferIndexField,hBufferField).
-
-  cQuery = SUBSTITUTE("for each &1._File  where &1._file._file-name = '&2' no-lock " +
-                      "  , each &1._Index       of &1._File        no-lock " +
-                      "  , each &1._Index-field of &1._Index       no-lock " +
-                      "  , each &1._Field       of &1._Index-field no-lock where true "
-                     , cCurrentDatabase /* NelsonAlcala */
-                     , pcTableName
-                     ).
-
-  hQuery:QUERY-PREPARE(cQuery).
-  EMPTY TEMP-TABLE bIndex.
-  hQuery:QUERY-OPEN().
-  hQuery:GET-FIRST().
-
-  REPEAT WHILE NOT hQuery:QUERY-OFF-END:
-
-    FIND bIndex WHERE bIndex.cIndexName = hBufferIndex:BUFFER-FIELD('_index-name'):BUFFER-VALUE NO-ERROR.
-    IF NOT AVAILABLE bIndex THEN
-    DO:
-      CREATE bIndex.
-
-      bIndex.cIndexName  = hBufferIndex:BUFFER-FIELD('_index-name'):BUFFER-VALUE.
-
-      {&_proparse_ prolint-nowarn(recidkeyword)}
-      bIndex.cIndexFlags = STRING( hBufferFile:BUFFER-FIELD('_prime-index'):BUFFER-VALUE = hBufferIndex:RECID, 'P/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_unique'):BUFFER-VALUE, ' U/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_WordIdx'):BUFFER-VALUE <> ?, ' W/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_Active'):BUFFER-VALUE , ' /INACTIVE')
-                          .
-      bIndex.cIndexFlags  = TRIM(bIndex.cIndexFlags).
-      bIndex.lIndexActive = hBufferIndex:BUFFER-FIELD('_Active'):BUFFER-VALUE.
-    END.
-
-    /* Add field */
-    bIndex.cIndexFields = SUBSTITUTE('&1  &2&3'
-                                     , bIndex.cIndexFields
-                                     , hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE
-                                     , STRING( hBufferIndexField:BUFFER-FIELD('_Ascending'):BUFFER-VALUE, '+/-')
-                                     ).
-    bIndex.cIndexFields = TRIM(bIndex.cIndexFields,' ').
-
-    /* Naked list of just fieldnames */
-    bIndex.cFieldList   = SUBSTITUTE('&1,&2'
-                                     , bIndex.cFieldList
-                                     , hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE
-                                     ).
-    bIndex.cFieldList   = TRIM(bIndex.cFieldList,', ').
-
-    hQuery:GET-NEXT().
-  END.
-  hQuery:QUERY-CLOSE().
-
-  DELETE OBJECT hQuery.
-  DELETE OBJECT hBufferFile.
-  DELETE OBJECT hBufferIndex.
-  DELETE OBJECT hBufferIndexField.
-  DELETE OBJECT hBufferField.
-
-  {&timerStop}
-END PROCEDURE. /* collectIndexInfo */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -10823,10 +10725,10 @@ PROCEDURE setTableContext :
     setUpdatePanel('no-record').
 
     /* Refill the tt with fields of this table */
-    RUN collectFieldInfo(INPUT pcTable).
+    RUN collectFieldInfo(pcTable).
 
     /* Refill the index tt */
-    RUN collectIndexInfo(INPUT pcTable).
+    RUN collectIndexInfo(gcDatabase, pcTable, OUTPUT TABLE ttIndex).
 
     /* Get all saved queries of this table */
     RUN collectQueryInfo( INPUT gcDatabase, INPUT pcTable ).

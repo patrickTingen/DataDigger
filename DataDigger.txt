@@ -25,6 +25,7 @@ DataDigger version 26
 - Solved: Error when starting datadigger with UTF-8 and windows username with special characters #84 (movedoa)
 - Solved: Function resolveOsVars is returning invalid values with cpinternal UTF-8 #85 (movedoa)
 - Solved: Cannot type umlaut in filter row #83 (movedoa)
+- Solved: Inactivated index shows as active #75
 
 - Changed: Starting the libraries is simplified, contact me when you have errors
 - Changed: When dumping to Excel, assume codepage 1252 when current is ISO8859

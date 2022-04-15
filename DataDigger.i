@@ -174,7 +174,7 @@ DEFINE TEMP-TABLE ttColumnCache NO-UNDO LIKE ttColumn
 DEFINE DATASET dsFields FOR ttField, ttColumn.
 DEFINE DATASET dsFieldCache FOR ttFieldCache, ttColumnCache.
 
-/* TT for the indexfields of a table */
+/* TT for the index fields of a table */
 DEFINE TEMP-TABLE ttIndex NO-UNDO
   FIELD cIndexName   AS CHARACTER          LABEL "Name"        FORMAT "x(20)"
   FIELD cIndexFlags  AS CHARACTER          LABEL "Flags"       FORMAT "x(14)"
@@ -468,6 +468,9 @@ FUNCTION isDefaultFontsChanged RETURNS LOGICAL IN SUPER.
 FUNCTION isFileLocked RETURNS LOGICAL
   ( pcFileName AS CHARACTER ) IN SUPER.
 
+FUNCTION isIndexActive RETURNS LOGICAL
+  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ) IN SUPER.
+
 FUNCTION isMouseOver RETURNS LOGICAL
   ( INPUT phWidget AS HANDLE ) IN SUPER.
 
@@ -503,4 +506,3 @@ FUNCTION isValidCodePage RETURNS LOGICAL
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-

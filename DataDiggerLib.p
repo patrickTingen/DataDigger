@@ -630,6 +630,17 @@ FUNCTION isFileLocked RETURNS LOGICAL
 
 &ENDIF
 
+&IF DEFINED(EXCLUDE-isIndexActive) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isIndexActive Procedure 
+FUNCTION isIndexActive RETURNS LOGICAL
+  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ) FORWARD.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
 &IF DEFINED(EXCLUDE-isMouseOver) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isMouseOver Procedure 
@@ -1104,6 +1115,105 @@ PROCEDURE clearRegistryCache :
   EMPTY TEMP-TABLE ttConfig.
 
 END PROCEDURE. /* clearRegistryCache */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-collectIndexInfo) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectIndexInfo Procedure 
+PROCEDURE collectIndexInfo :
+/* Fill the index temp-table
+ */
+  DEFINE INPUT PARAMETER pcDatabase AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcTable    AS CHARACTER NO-UNDO.
+  DEFINE OUTPUT PARAMETER TABLE FOR ttIndex. 
+
+  DEFINE VARIABLE hFile       AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hIndex      AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hIndexField AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE hField      AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cQuery      AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE hQuery      AS HANDLE    NO-UNDO.
+  DEFINE VARIABLE cDatabase   AS CHARACTER NO-UNDO.
+
+  DEFINE BUFFER bIndex FOR ttIndex.
+
+  /* Return if no db connected */
+  IF NUM-DBS = 0 THEN RETURN.
+
+  EMPTY TEMP-TABLE ttIndex.
+  cDatabase = SDBNAME(pcDatabase). /* use DB schemaholder name */
+  
+  CREATE BUFFER hFile       FOR TABLE cDatabase + "._File".
+  CREATE BUFFER hIndex      FOR TABLE cDatabase + "._Index".
+  CREATE BUFFER hIndexField FOR TABLE cDatabase + "._Index-Field".
+  CREATE BUFFER hField      FOR TABLE cDatabase + "._Field".
+
+  CREATE QUERY hQuery.
+  hQuery:SET-BUFFERS(hFile, hIndex, hIndexField, hField).
+
+  cQuery = SUBSTITUTE("FOR EACH &1._File  WHERE &1._file._file-name = '&2' NO-LOCK " +
+                      "  , EACH &1._Index       OF &1._File        NO-LOCK " +
+                      "  , EACH &1._Index-field OF &1._Index       NO-LOCK " +
+                      "  , EACH &1._Field       OF &1._Index-field NO-LOCK WHERE TRUE "
+                     , cDatabase
+                     , pcTable
+                     ).
+
+  hQuery:QUERY-PREPARE(cQuery).
+  EMPTY TEMP-TABLE bIndex.
+  hQuery:QUERY-OPEN().
+  hQuery:GET-FIRST().
+
+  REPEAT WHILE NOT hQuery:QUERY-OFF-END:
+
+    FIND bIndex WHERE bIndex.cIndexName = hIndex::_index-name NO-ERROR.
+    IF NOT AVAILABLE bIndex THEN
+    DO:
+      CREATE bIndex.
+
+      bIndex.cIndexName   = hIndex::_index-name.
+      bIndex.lIndexActive = isIndexActive(hFile::_file-name, hIndex::_index-name).
+
+      {&_proparse_ prolint-nowarn(recidkeyword)}
+      bIndex.cIndexFlags = SUBSTITUTE("&1 &2 &3 &4"
+                                     , STRING(hFile::_prime-index = hIndex:RECID, 'P/')
+                                     , STRING(hIndex::_unique, 'U/')
+                                     , STRING(hIndex::_WordIdx <> ?, 'W/')
+                                     , STRING(bIndex.lIndexActive, ' /INACTIVE')
+                                     ).
+      bIndex.cIndexFlags  = TRIM(bIndex.cIndexFlags).
+    END.
+
+    /* Add field */
+    bIndex.cIndexFields = SUBSTITUTE('&1  &2&3'
+                                     , bIndex.cIndexFields
+                                     , hField::_field-name
+                                     , STRING(hIndexField::_Ascending, '+/-')
+                                     ).
+    bIndex.cIndexFields = TRIM(bIndex.cIndexFields,' ').
+
+    /* Naked list of just fieldnames */
+    bIndex.cFieldList   = SUBSTITUTE('&1,&2'
+                                     , bIndex.cFieldList
+                                     , hField::_field-name
+                                     ).
+    bIndex.cFieldList   = TRIM(bIndex.cFieldList,', ').
+
+    hQuery:GET-NEXT().
+  END.
+  hQuery:QUERY-CLOSE().
+
+  DELETE OBJECT hQuery.
+  DELETE OBJECT hFile.
+  DELETE OBJECT hIndex.
+  DELETE OBJECT hIndexField.
+  DELETE OBJECT hField.
+
+END PROCEDURE. /* collectIndexInfo */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
@@ -1790,7 +1900,7 @@ PROCEDURE getFields :
     PUBLISH "DD:Timer" ("start", 'getFields - step 1: verify CRC').
     CREATE BUFFER hBufferFile FOR TABLE cSDBName + "._File".
 
-    hBufferFile:FIND-UNIQUE(SUBSTITUTE('where _file-name = &1 and _File._File-Number < 32768', QUOTER(pcTableName)),NO-LOCK).
+    hBufferFile:FIND-UNIQUE(SUBSTITUTE('WHERE _file-name = &1 AND _File._File-Number < 32768', QUOTER(pcTableName)),NO-LOCK).
     IF hBufferFile::_crc <> bTable.cCrc THEN
     DO:
       /* It seems that it is not possible to refresh the schema cache of the running
@@ -4777,6 +4887,40 @@ FUNCTION isFileLocked RETURNS LOGICAL
   RETURN (iFileHandle = -1).
 
 END FUNCTION. /* isFileLocked */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ENDIF
+
+&IF DEFINED(EXCLUDE-isIndexActive) = 0 &THEN
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isIndexActive Procedure 
+FUNCTION isIndexActive RETURNS LOGICAL
+  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ):
+
+  /* See also
+   * https://knowledgebase.progress.com/articles/Knowledge/abl-procedure-fails-to-find-inactive-index
+   */
+  FIND _file WHERE _file._file-name = pcFile NO-ERROR.
+  FIND _index WHERE _index._file-recid = RECID(_file) AND _index._index-name = pcIndex NO-ERROR.
+  IF NOT AVAILABLE _index THEN RETURN NO.
+
+  IF NOT _index._active THEN RETURN NO.
+
+  &IF PROVERSION >= "11" &THEN
+  FIND _StorageObject 
+    WHERE _StorageObject._db-recid      = _file._db-recid
+      AND _StorageObject._object-type   = 2 /* index */
+      AND _StorageObject._object-number = _index._idx-num NO-ERROR.
+
+  IF NOT AVAILABLE _StorageObject THEN RETURN NO.
+  IF _StorageObject._Object-state = 1 THEN RETURN NO. /* 0 = activated, 1 = not */
+  &ENDIF
+  
+  RETURN YES.
+
+END FUNCTION. /* isIndexActive */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
