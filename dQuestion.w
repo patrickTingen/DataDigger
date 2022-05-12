@@ -2,7 +2,7 @@
 &ANALYZE-RESUME
 &Scoped-define WINDOW-NAME CURRENT-WINDOW
 &Scoped-define FRAME-NAME Dialog-Frame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS Dialog-Frame 
 /*------------------------------------------------------------------------
 
   Name: dQuestion.w
@@ -57,7 +57,7 @@
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK
+&ANALYZE-SUSPEND _UIB-PREPROCESSOR-BLOCK 
 
 /* ********************  Preprocessor Definitions  ******************** */
 
@@ -68,8 +68,8 @@
 &Scoped-define FRAME-NAME Dialog-Frame
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS EdMessage BtnYes
-&Scoped-Define DISPLAYED-OBJECTS tgDontShowAgain
+&Scoped-Define ENABLED-OBJECTS EdMessage BtnYes 
+&Scoped-Define DISPLAYED-OBJECTS tgDontShowAgain 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -84,22 +84,22 @@
 /* Define a dialog box                                                  */
 
 /* Definitions of the field level widgets                               */
-DEFINE BUTTON BtnCancel AUTO-END-KEY
-     LABEL "Cancel"
+DEFINE BUTTON BtnCancel AUTO-END-KEY 
+     LABEL "Cancel" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnNo AUTO-GO
-     LABEL "&No"
+DEFINE BUTTON BtnNo AUTO-GO 
+     LABEL "&No" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE BUTTON BtnYes AUTO-GO
-     LABEL "&Yes"
+DEFINE BUTTON BtnYes AUTO-GO 
+     LABEL "&Yes" 
      SIZE-PIXELS 75 BY 24
      BGCOLOR 8 .
 
-DEFINE VARIABLE EdMessage AS CHARACTER
+DEFINE VARIABLE EdMessage AS CHARACTER 
      CONTEXT-HELP-ID 0
      VIEW-AS EDITOR NO-BOX
      SIZE-PIXELS 325 BY 74 NO-UNDO.
@@ -107,8 +107,8 @@ DEFINE VARIABLE EdMessage AS CHARACTER
 DEFINE IMAGE imgQuestion TRANSPARENT
      SIZE-PIXELS 32 BY 36.
 
-DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL NO
-     LABEL "&Don't show this message again"
+DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL no 
+     LABEL "&Don't show this message again" 
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 215 BY 17 NO-UNDO.
 
@@ -116,14 +116,14 @@ DEFINE VARIABLE tgDontShowAgain AS LOGICAL INITIAL NO
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     EdMessage AT Y 11 X 65 NO-LABEL NO-TAB-STOP
+     EdMessage AT Y 11 X 65 NO-LABEL NO-TAB-STOP 
      BtnYes AT Y 115 X 145
      BtnNo AT Y 115 X 227
      BtnCancel AT Y 115 X 309
      tgDontShowAgain AT Y 145 X 5
      imgQuestion AT Y 11 X 10
-    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
-         SIDE-LABELS NO-UNDERLINE THREE-D
+    WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 402 BY 204
          TITLE "Question"
          DEFAULT-BUTTON BtnYes CANCEL-BUTTON BtnCancel.
@@ -146,7 +146,7 @@ DEFINE FRAME Dialog-Frame
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
 /* SETTINGS FOR DIALOG-BOX Dialog-Frame
    FRAME-NAME                                                           */
-ASSIGN
+ASSIGN 
        FRAME Dialog-Frame:SCROLLABLE       = FALSE
        FRAME Dialog-Frame:HIDDEN           = TRUE.
 
@@ -156,7 +156,7 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR EDITOR EdMessage IN FRAME Dialog-Frame
    NO-DISPLAY                                                           */
-ASSIGN
+ASSIGN 
        EdMessage:AUTO-RESIZE IN FRAME Dialog-Frame      = TRUE
        EdMessage:READ-ONLY IN FRAME Dialog-Frame        = TRUE.
 
@@ -177,7 +177,7 @@ ASSIGN
 */  /* DIALOG-BOX Dialog-Frame */
 &ANALYZE-RESUME
 
-
+ 
 
 
 
@@ -272,7 +272,7 @@ END.
 
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK Dialog-Frame 
 
 
 /* ***************************  Main Block  *************************** */
@@ -309,12 +309,12 @@ PROCEDURE enable_UI :
   Notes:       Here we display/view/enable the widgets in the
                user-interface.  In addition, OPEN all queries
                associated with each FRAME and BROWSE.
-               These statements here are based on the "Other
+               These statements here are based on the "Other 
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
-  DISPLAY tgDontShowAgain
+  DISPLAY tgDontShowAgain 
       WITH FRAME Dialog-Frame.
-  ENABLE EdMessage BtnYes
+  ENABLE EdMessage BtnYes 
       WITH FRAME Dialog-Frame.
   VIEW FRAME Dialog-Frame.
   {&OPEN-BROWSERS-IN-QUERY-Dialog-Frame}
@@ -323,7 +323,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initializeObject Dialog-Frame 
 PROCEDURE initializeObject :
 /*
  * Init vars and frame
@@ -379,6 +379,7 @@ PROCEDURE initializeObject :
       tgDontShowAgain:y = btnYes:Y + btnYes:height-pixels + iVertMargin.
 
       /* Add border top and bottom to ensure min heigth  */
+      {&_proparse_ prolint-nowarn(overflow)}
       FRAME {&FRAME-NAME}:HEIGHT-PIXELS = tgDontShowAgain:Y + tgDontShowAgain:HEIGHT-PIXELS
                                         + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS
                                         + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
@@ -390,10 +391,11 @@ PROCEDURE initializeObject :
       tgDontShowAgain:sensitive = plCanHide.
       tgDontShowAgain:y = 1.
 
+      {&_proparse_ prolint-nowarn(overflow)}
       FRAME {&FRAME-NAME}:HEIGHT-PIXELS = btnYes:Y + btnYes:height-pixels
                                         + FRAME {&FRAME-NAME}:BORDER-TOP-PIXELS
                                         + FRAME {&FRAME-NAME}:BORDER-BOTTOM-PIXELS
-                                   + INTEGER(iVertMargin / 2) NO-ERROR.
+                                        + INTEGER(iVertMargin / 2) NO-ERROR.
 
     END.
 
@@ -430,3 +432,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

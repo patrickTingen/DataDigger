@@ -1217,7 +1217,7 @@ PROCEDURE dumpData :
           IF glAborted THEN LEAVE #CollectData.
         END.
 
-        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-CREATE().
         hBuffer:BUFFER-COPY(hQuery:GET-BUFFER-HANDLE(1)).
       END.
       hQuery:QUERY-CLOSE().
@@ -1231,7 +1231,7 @@ PROCEDURE dumpData :
       #DumpSelectedRow:
       DO iCurSelectedRow = 1 TO phDdBrowse:NUM-SELECTED-ROWS:
         phDdBrowse:FETCH-SELECTED-ROW(iCurSelectedRow).
-        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-CREATE().
         hBuffer:BUFFER-COPY(phDdBrowse:QUERY:get-buffer-handle()).
 
         ASSIGN iNumRecs = iNumRecs + 1.
@@ -2477,10 +2477,11 @@ PROCEDURE showProgressBar :
     ENABLE btAbort WITH FRAME infoFrame.
     fcInfoLine:SCREEN-VALUE = pcInfoText.
 
-    iNewWidth = (MINIMUM(100,piPrcDone) / 100) * rcBorder:width-pixels.
+    {&_proparse_ prolint-nowarn(overflow)}
+    iNewWidth = (MINIMUM(100,piPrcDone) / 100) * rcBorder:WIDTH-PIXELS.
+
     rcBody:VISIBLE = (iNewWidth > 0).
-    IF iNewWidth > 0 THEN
-      rcBody:WIDTH-PIXELS = iNewWidth.
+    IF iNewWidth > 0 THEN rcBody:WIDTH-PIXELS = iNewWidth.
 
     PROCESS EVENTS.
   END.
@@ -2619,11 +2620,13 @@ FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER ) :
   /* Transform a column nr to Excel Column name (27 -> AA)
   */
-  DEFINE VARIABLE ifirst  AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE isecond AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iFirst  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iSecond AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cCols   AS CHARACTER NO-UNDO.
 
+  {&_proparse_ prolint-nowarn(overflow)}
   iFirst  = INTEGER(TRUNCATE((iColumnNr - 1) / 26, 0)).
+
   iSecond = iColumnNr - (26 * iFirst).
   cCols   = CHR(64 + iSecond).
   IF iFirst > 0 THEN cCols = CHR(64 + iFirst) + cCols.
@@ -2713,3 +2716,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

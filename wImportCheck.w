@@ -144,13 +144,13 @@ DEFINE VARIABLE edSummary AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edSummary AT Y 0 X 0 NO-LABEL   
-     btnBack AT Y 370 X 340  
-     btnNext AT Y 370 X 420  
+     edSummary AT Y 0 X 0 NO-LABEL
+     btnBack AT Y 370 X 340
+     btnNext AT Y 370 X 420
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnBack    .
+         CANCEL-BUTTON btnBack.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -438,7 +438,7 @@ PROCEDURE addFile :
       bfXmlFile.cFields = TRIM(bfXmlFile.cFields + "," + hBuffer:BUFFER-FIELD(iField):NAME,",").
     END.
 
-    hQuery:QUERY-CLOSE.
+    hQuery:QUERY-CLOSE().
     DELETE OBJECT hQuery.
   END.
 
@@ -628,7 +628,7 @@ PROCEDURE checkFiles :
     IF hQuery:NUM-RESULTS <> iExpectedRecords THEN
       addWarning(0,SUBSTITUTE("Number of unique records : &1.",hQuery:NUM-RESULTS)).
 
-    hQuery:QUERY-CLOSE.
+    hQuery:QUERY-CLOSE().
     DELETE OBJECT hQuery.
   END.
   ELSE
@@ -844,3 +844,4 @@ END FUNCTION.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

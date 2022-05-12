@@ -69,8 +69,10 @@ cMessage:SCREEN-VALUE = cMessage.
 FRAME infoFrame:WIDTH-PIXELS = winMessage:WIDTH-PIXELS.
 
 /* Center the window */
-winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS - winMessage:WIDTH-PIXELS) / 2.
-winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
+{&_proparse_ prolint-nowarn(overflow)}
+ASSIGN 
+  winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS  - winMessage:WIDTH-PIXELS ) / 2
+  winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
 
 /* Showtime! */
 VIEW FRAME infoFrame IN WINDOW winMessage.

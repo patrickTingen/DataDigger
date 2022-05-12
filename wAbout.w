@@ -521,7 +521,10 @@ PROCEDURE initializeObject :
     yy = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
 
     /* Or centered on the screen */
+    {&_proparse_ prolint-nowarn(overflow)}
     IF xx = ? THEN xx = (SESSION:WIDTH-PIXELS - FRAME {&FRAME-NAME}:WIDTH-PIXELS) / 2.
+
+    {&_proparse_ prolint-nowarn(overflow)}
     IF yy = ? THEN yy = (SESSION:HEIGHT-PIXELS - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 2.
 
     wAbout:X = xx.

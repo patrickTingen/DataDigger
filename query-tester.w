@@ -655,6 +655,7 @@ PROCEDURE resizeFrame :
     IF LOOKUP(whand#:TYPE,"fill-in,text,literal,button") = 0 THEN
       ASSIGN temp-widget.hheig = temp-widget.hheig * afactvert#.
 
+    {&_proparse_ prolint-nowarn(overflow)}
     ASSIGN whand#:X = temp-widget.hx
            whand#:Y = temp-widget.hy
            whand#:WIDTH-PIXELS  = temp-widget.hwidt
@@ -954,14 +955,14 @@ PROCEDURE test-query PRIVATE :
         edResult:SCREEN-VALUE = "Performing Query".
 
       ETIME(TRUE).
-      hQry:GET-FIRST.
+      hQry:GET-FIRST().
       iNumResults = 0.
       lStop = ?.
 
       #QueryLoop:
       DO WHILE NOT hQry:QUERY-OFF-END:
         iNumResults = iNumResults + 1.
-        hQry:GET-NEXT.
+        hQry:GET-NEXT().
 
         IF ETIME > 5000 AND lStop = ? THEN
         DO:
@@ -1026,7 +1027,7 @@ PROCEDURE test-query PRIVATE :
         END.
       END.
 
-      hQry:QUERY-CLOSE.
+      hQry:QUERY-CLOSE().
     END.
 
     RUN cleanUp(hQry).
@@ -1039,3 +1040,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

@@ -29,7 +29,7 @@ DEFINE       OUTPUT PARAMETER plOk           AS LOGICAL   NO-UNDO.
 
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS btnBegins rctQueryButtons cbAndOr cbFields ~
-cbOperator ficValue btnInsert ficWhere btnOK btnCancel btnOr btnAnd ~
+cbOperator ficValue btnInsert ficWhere btnOr btnOK btnCancel btnAnd ~
 btnBracket btnContains btnEq btnGT btnLT btnMatches btnNE btnQt btnToday 
 &Scoped-Define DISPLAYED-OBJECTS cbAndOr cbFields cbOperator ficValue ~
 ficWhere 
@@ -173,38 +173,38 @@ DEFINE RECTANGLE rctQueryButtons
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frWhere
-     btnBegins AT Y 123 X 17   
-     cbAndOr AT Y 5 X 46 COLON-ALIGNED   
-     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL   
-     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL   
-     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL   
-     btnInsert AT Y 5 X 595   
-     ficWhere AT Y 35 X 110 NO-LABEL    
-     btnOK AT Y 231 X 460    
-     btnCancel AT Y 231 X 540    
-     btnOr AT Y 101 X 57   
-     btnAnd AT Y 101 X 17   
-     btnBracket AT Y 79 X 17   
-     btnContains AT Y 145 X 17    
-     btnEq AT Y 35 X 17   
-     btnGT AT Y 57 X 57   
-     btnLT AT Y 57 X 17   
-     btnMatches AT Y 167 X 17    
-     btnNE AT Y 35 X 57   
-     btnQt AT Y 79 X 57   
-     btnToday AT Y 189 X 17    
+     btnBegins AT Y 123 X 17
+     cbAndOr AT Y 5 X 46 COLON-ALIGNED
+     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL
+     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL
+     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL
+     btnInsert AT Y 5 X 595
+     ficWhere AT Y 35 X 110 NO-LABEL
+     btnOr AT Y 101 X 57
+     btnOK AT Y 231 X 460
+     btnCancel AT Y 231 X 540
+     btnAnd AT Y 101 X 17
+     btnBracket AT Y 79 X 17
+     btnContains AT Y 145 X 17
+     btnEq AT Y 35 X 17
+     btnGT AT Y 57 X 57
+     btnLT AT Y 57 X 17
+     btnMatches AT Y 167 X 17
+     btnNE AT Y 35 X 57
+     btnQt AT Y 79 X 57
+     btnToday AT Y 189 X 17
      "or ESC to undo your changes" VIEW-AS TEXT
-          SIZE-PIXELS 340 BY 15 AT Y 243 X 9    
+          SIZE-PIXELS 340 BY 15 AT Y 243 X 9
           FGCOLOR 7 
      "Use ALT-UP to take the query back to the main window" VIEW-AS TEXT
-          SIZE-PIXELS 340 BY 15 AT Y 227 X 10    
+          SIZE-PIXELS 340 BY 15 AT Y 227 X 10
           FGCOLOR 7 
-     rctQueryButtons AT Y 30 X 5    
+     rctQueryButtons AT Y 30 X 5
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
          SIZE 124.8 BY 13.71
-         TITLE "Query Editor"    .
+         TITLE "Query Editor".
 
 
 /* *********************** Procedure Settings ************************ */
@@ -596,7 +596,7 @@ PROCEDURE enable_UI :
   DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere 
       WITH FRAME frWhere.
   ENABLE btnBegins rctQueryButtons cbAndOr cbFields cbOperator ficValue 
-         btnInsert ficWhere btnOK btnCancel btnOr btnAnd btnBracket btnContains 
+         btnInsert ficWhere btnOr btnOK btnCancel btnAnd btnBracket btnContains 
          btnEq btnGT btnLT btnMatches btnNE btnQt btnToday 
       WITH FRAME frWhere.
   {&OPEN-BROWSERS-IN-QUERY-frWhere}
@@ -619,9 +619,11 @@ PROCEDURE initObject :
     iDefaultFont = getFont("Default").
     iFixedFont = getFont("Fixed").
     
-    FRAME frWhere:FONT = iDefaultFont.
-    FRAME frWhere:X    = (phParentWindow:WIDTH-PIXELS - FRAME frWhere:WIDTH-PIXELS) / 2.
-    FRAME frWhere:Y    = (phParentWindow:HEIGHT-PIXELS - FRAME frWhere:HEIGHT-PIXELS) / 2.
+    {&_proparse_ prolint-nowarn(overflow)}
+    ASSIGN 
+      FRAME frWhere:FONT = iDefaultFont
+      FRAME frWhere:X    = (phParentWindow:WIDTH-PIXELS - FRAME frWhere:WIDTH-PIXELS) / 2
+      FRAME frWhere:Y    = (phParentWindow:HEIGHT-PIXELS - FRAME frWhere:HEIGHT-PIXELS) / 2.
 
     cbAndOr:FONT     = iFixedFont.
     cbFields:FONT    = iFixedFont.
@@ -667,5 +669,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

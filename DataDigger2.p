@@ -877,12 +877,13 @@ FUNCTION getTimeStamp RETURNS CHARACTER
   ( INPUT pDateTime AS DATETIME ) :
   /* Return a timestamp in the form "YYYY-MM-DD HH:MM:SS"
   */
+  {&_proparse_ prolint-nowarn(overflow)}
   RETURN
     SUBSTITUTE('&1-&2-&3 &4'
               , STRING(YEAR(pDateTime),'9999')
               , STRING(MONTH(pDateTime),'99')
               , STRING(DAY(pDateTime),'99')
-              , STRING( INTEGER( TRUNCATE( MTIME( pDateTime ) / 1000, 0 ) ),'HH:MM:SS' )
+              , STRING(INTEGER( TRUNCATE( MTIME( pDateTime ) / 1000, 0 ) ),'HH:MM:SS' )
               ).
 
 END FUNCTION. /* getTimeStamp */
@@ -1010,3 +1011,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

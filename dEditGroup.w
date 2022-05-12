@@ -149,21 +149,21 @@ ttTable.cDatabase  COLUMN-LABEL "DB"
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     BtnCancel AT Y 270 X 330   
-     btnDelete AT Y 5 X 385   
-     btnEdit AT Y 5 X 295   
-     fiGroupname AT Y 5 X 5 NO-LABEL   
-     fiTableFilter AT Y 47 X 5 NO-LABEL  
-     cbDatabase AT Y 47 X 180 COLON-ALIGNED NO-LABEL   
-     brTables AT Y 70 X 5    
-     btnSelectAll AT Y 137 X 330  
-     btnDeselectAll AT Y 172 X 330  
+     BtnCancel AT Y 270 X 330
+     btnDelete AT Y 5 X 385
+     btnEdit AT Y 5 X 295
+     fiGroupname AT Y 5 X 5 NO-LABEL
+     fiTableFilter AT Y 47 X 5 NO-LABEL
+     cbDatabase AT Y 47 X 180 COLON-ALIGNED NO-LABEL
+     brTables AT Y 70 X 5
+     btnSelectAll AT Y 137 X 330
+     btnDeselectAll AT Y 172 X 330
      Btn_OK AT Y 300 X 330
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 424 BY 366
          TITLE "Edit favourites group"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON BtnCancel    .
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON BtnCancel.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -338,6 +338,7 @@ DO:
       AND iMouseX > hBrowse:X 
       AND iMouseX < (hBrowse:X + hBrowse:GET-BROWSE-COLUMN(2):X) THEN
     DO:
+      {&_proparse_ prolint-nowarn(overflow)}
       iRow = TRUNCATE((iMouseY - brTables:Y) / (hBrowse:ROW-HEIGHT-PIXELS + 4),0).
 
       IF hBrowse:NUM-ITERATIONS > 0 AND iRow > hBrowse:NUM-ITERATIONS THEN RETURN.
@@ -623,5 +624,4 @@ END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
-
 

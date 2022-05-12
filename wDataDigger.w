@@ -191,8 +191,8 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode fiTableDesc ~
-cbFavouriteGroup ficWhere btnFavourite btnClearTableFilter btnTableFilter ~
+btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnFavourite ~
+fiTableDesc cbFavouriteGroup ficWhere btnClearTableFilter btnTableFilter ~
 btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
@@ -843,12 +843,12 @@ DEFINE FRAME frMain
      brFields AT Y 27 X 325
      brIndexes AT Y 28 X 829
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
+     btnFavourite AT Y 236 X 269
      fiTableDesc AT Y 236 X 57 NO-LABEL
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      ficWhere AT Y 266 X 80 NO-LABEL
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
-     btnFavourite AT Y 236 X 269
      btnClearTableFilter AT Y 3 X 237
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnTableFilter AT Y 3 X 257
      btnAddFavGroup AT Y 236 X 248
      btnQueries AT Y 265 X 745
@@ -3403,10 +3403,6 @@ ON SHIFT-DEL OF fiIndexNameFilter IN FRAME frMain
 , fiFlagsFilter, fiFieldsFilter
 DO:
   RUN filterFieldClearAll(SELF,btnClearIndexFilter).
-/*   APPLY 'choose' TO btnClearIndexFilter. */
-/* /*   SELF:SCREEN-VALUE = ''. */          */
-/*   APPLY 'value-changed' TO SELF.         */
-/*   APPLY 'entry' TO SELF.                 */
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3446,7 +3442,7 @@ DO:
 
   hQuery:SET-BUFFERS(hBuffer).
   hQuery:QUERY-PREPARE(cQuery).
-  hQuery:QUERY-OPEN.
+  hQuery:QUERY-OPEN().
 
   SESSION:SET-WAIT-STATE('').
 
@@ -3454,7 +3450,7 @@ DO:
   RUN showNumRecords(hQuery:NUM-RESULTS, YES).
   RUN showNumSelected.
 
-  hQuery:QUERY-CLOSE.
+  hQuery:QUERY-CLOSE().
 
   DELETE OBJECT hQuery.
   DELETE OBJECT hBuffer.
@@ -3768,8 +3764,10 @@ SUBSCRIBE TO "refreshConnections" ANYWHERE.
 {&WINDOW-NAME}:HEIGHT-PIXELS = 100.
 
 /* For initializing, center the main window */
-{&WINDOW-NAME}:X = (SESSION:WORK-AREA-WIDTH-PIXELS - {&WINDOW-NAME}:WIDTH-PIXELS) / 2.
-{&WINDOW-NAME}:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - {&WINDOW-NAME}:HEIGHT-PIXELS) / 2.
+{&_proparse_ prolint-nowarn(overflow)}
+ASSIGN 
+  {&WINDOW-NAME}:X = (SESSION:WORK-AREA-WIDTH-PIXELS - {&WINDOW-NAME}:WIDTH-PIXELS) / 2
+  {&WINDOW-NAME}:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - {&WINDOW-NAME}:HEIGHT-PIXELS) / 2.
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
 ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
@@ -6190,8 +6188,8 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode fiTableDesc cbFavouriteGroup 
-         ficWhere btnFavourite btnClearTableFilter btnTableFilter 
+         brTables brFields brIndexes tgDebugMode btnFavourite fiTableDesc 
+         cbFavouriteGroup ficWhere btnClearTableFilter btnTableFilter 
          btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
@@ -6627,7 +6625,6 @@ PROCEDURE filterFieldClearAll :
   setWindowFreeze(YES).
 
   APPLY "choose"        TO phClearButton. /* clear them all */
-/*   APPLY "value-changed" TO phFilterField. /* force recolor of current filterfield */ */
   APPLY "entry"         TO phFilterField. /* set focus */
 
   setWindowFreeze(NO).
@@ -8474,6 +8471,8 @@ PROCEDURE moveField :
   FIND bField WHERE ROWID(bField) = rCurrentField NO-ERROR.
   IF NOT AVAILABLE bField THEN RETURN.
   FIND FIRST bColumnOrg WHERE bColumnOrg.cFieldName = bField.cFieldName NO-ERROR.
+
+  {&_proparse_ prolint-nowarn(overflow)}
   IF AVAILABLE bColumnOrg THEN iOldOrder = bField.iOrder.
 
   /* Change the order of the fields by 1.5
@@ -8958,7 +8957,7 @@ PROCEDURE reopenDataBrowse :
     ghDataQuery:QUERY-OPEN().
     iStartTime = ETIME.
     DO WHILE (ETIME - iStartTime) < giMaxQueryTime AND NOT ghDataQuery:QUERY-OFF-END:
-      ghDataQuery:GET-NEXT.
+      ghDataQuery:GET-NEXT().
       iNumRecords = iNumRecords + 1.
     END.
     lQueryComplete = ghDataQuery:QUERY-OFF-END.
@@ -9578,7 +9577,7 @@ PROCEDURE reopenFieldBrowse :
     hQuery:QUERY-OPEN().
 
     /* Attach query to the browse */
-    hQuery:GET-FIRST.
+    hQuery:GET-FIRST().
     lFieldsFound = NOT hQuery:QUERY-OFF-END.
     brFields:QUERY = hQuery.
 
@@ -10083,7 +10082,8 @@ PROCEDURE selectClickedRow :
     RUN getMouseXY(INPUT phBrowse, OUTPUT iMouseX, OUTPUT iMouseY).
     dRow = (iMouseY / (phBrowse:ROW-HEIGHT-PIXELS + 4)) - 1.
 
-    iRow = (IF dRow = integer(dRow) THEN INTEGER(dRow) ELSE TRUNCATE(dRow,0) + 1). /* ceiling of dRow */
+    {&_proparse_ prolint-nowarn(overflow)}
+    iRow = (IF dRow = INTEGER(dRow) THEN INTEGER(dRow) ELSE TRUNCATE(dRow,0) + 1). /* ceiling of dRow */
 
     /* Is it a valid row nr? (could be invalid if we clicked below last record) */
     PUBLISH "debugInfo" (2, SUBSTITUTE(" - Clicked row &1", iRow)).
@@ -11281,26 +11281,31 @@ PROCEDURE showHint :
 
     CASE piLayout:
       /* point nowhere */
+      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-NONE} THEN ASSIGN
                     iOffsetX = (phWidget:WIDTH-PIXELS - FRAME frHint:WIDTH-PIXELS) / 2
                     iOffsetY = (phWidget:HEIGHT-PIXELS - FRAME frHint:HEIGHT-PIXELS) / 2.
 
       /* point left up */
+      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-LEFT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right up */
+      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-RIGHT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right down */
+      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-RIGHT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.
 
       /* point left down */
+      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-LEFT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.
@@ -11399,8 +11404,11 @@ PROCEDURE showHint :
     /* Animation. Needless, but fun to program :) */
     DO iStep = 1 TO 25:
       RUN doNothing(10).
-      FRAME frHint:X = FRAME frHint:X + ((iTargetX - FRAME frHint:X) / 25 * iStep).
-      FRAME frHint:Y = FRAME frHint:Y + ((iTargetY - FRAME frHint:Y) / 25 * iStep).
+      
+      {&_proparse_ prolint-nowarn(overflow)}
+      ASSIGN 
+        FRAME frHint:X = FRAME frHint:X + ((iTargetX - FRAME frHint:X) / 25 * iStep)
+        FRAME frHint:Y = FRAME frHint:Y + ((iTargetY - FRAME frHint:Y) / 25 * iStep).
     END.
 
     WAIT-FOR "choose" OF btGotIt IN FRAME frHint
@@ -11950,7 +11958,7 @@ PROCEDURE tgSelAllChoose :
     CREATE BUFFER hBuffer FOR TABLE "ttField".
     hQuery:ADD-BUFFER(hBuffer).
     hQuery:QUERY-PREPARE(BROWSE brFields:QUERY:PREPARE-STRING).
-    hQuery:QUERY-OPEN.
+    hQuery:QUERY-OPEN().
 
     /* Walk thru all fields that are currently visible */
     #Field:
@@ -11968,7 +11976,7 @@ PROCEDURE tgSelAllChoose :
 
     RUN showField(INPUT cFieldList, INPUT plSelectAll).
 
-    hQuery:QUERY-CLOSE.
+    hQuery:QUERY-CLOSE().
     DELETE OBJECT hQuery.
     DELETE OBJECT hBuffer.
 
@@ -12256,18 +12264,18 @@ FUNCTION getFieldList RETURNS CHARACTER
   IF iMaxFields = ? THEN iMaxFields = 500.
 
   QUERY qField:QUERY-PREPARE(SUBSTITUTE('for each ttField by &1', pcSortBy)).
-  QUERY qField:QUERY-OPEN.
-  QUERY qField:GET-FIRST.
+  QUERY qField:QUERY-OPEN().
+  QUERY qField:GET-FIRST().
 
   /* All fields */
   #Field:
   REPEAT WHILE NOT QUERY qField:QUERY-OFF-END:
     cFieldList = cFieldList + ',' + ttField.cFieldName.
-    QUERY qField:GET-NEXT.
+    QUERY qField:GET-NEXT().
     iNumFields = iNumFields + 1.
     IF iNumFields > iMaxFields THEN LEAVE #Field.
   END.
-  QUERY qField:QUERY-CLOSE.
+  QUERY qField:QUERY-CLOSE().
 
   cFieldList = LEFT-TRIM(cFieldList, ",").
 

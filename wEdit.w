@@ -1692,7 +1692,7 @@ PROCEDURE reopenFieldBrowse :
 
   hQuery:QUERY-PREPARE(cQuery).
   hQuery:QUERY-OPEN().
-  hQuery:GET-FIRST.
+  hQuery:GET-FIRST().
 
   /* Attach query to the browse */
   brRecord:QUERY IN FRAME {&FRAME-NAME} = hQuery.

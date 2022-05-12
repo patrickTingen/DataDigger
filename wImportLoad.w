@@ -299,7 +299,7 @@ DO:
 
   IF VALID-HANDLE(ghXmlQuery) THEN
   DO:
-    ghXmlQuery:QUERY-CLOSE.
+    ghXmlQuery:QUERY-CLOSE().
     DELETE OBJECT ghXmlQuery.
   END.
 
@@ -762,7 +762,7 @@ PROCEDURE loadData :
       /* If nothing found, then the record from the tt is a new one */
       IF NOT hDbBuffer:AVAILABLE THEN
       DO:
-        hDbBuffer:BUFFER-CREATE NO-ERROR.
+        hDbBuffer:BUFFER-CREATE() NO-ERROR.
         IF ERROR-STATUS:ERROR THEN NEXT XmlLoop.
 
         /* Save backup file when not a testrun */
@@ -795,7 +795,7 @@ PROCEDURE loadData :
       hXmlBuffer:BUFFER-RELEASE().
     END. /* XmlLoop */
 
-    hXmlQuery:QUERY-CLOSE.
+    hXmlQuery:QUERY-CLOSE().
     DELETE OBJECT hXmlQuery.
     DELETE OBJECT hDbBuffer.
 

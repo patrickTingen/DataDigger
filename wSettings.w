@@ -37,6 +37,20 @@ DEFINE TEMP-TABLE ttFrame NO-UNDO
   FIELD cTags    AS CHARACTER
 .
 
+PROCEDURE SetScrollPos EXTERNAL "USER32.DLL":
+  DEFINE INPUT PARAMETER pHwnd   AS LONG  NO-UNDO.
+  DEFINE INPUT PARAMETER pNBar   AS SHORT NO-UNDO.
+  DEFINE INPUT PARAMETER pNPos   AS SHORT NO-UNDO.
+  DEFINE INPUT PARAMETER pRedraw AS SHORT NO-UNDO.
+END PROCEDURE.
+
+PROCEDURE PostMessageA EXTERNAL "USER32.DLL":
+  DEFINE INPUT  PARAMETER pHwnd    AS LONG NO-UNDO.
+  DEFINE INPUT  PARAMETER pMsg     AS LONG NO-UNDO.
+  DEFINE INPUT  PARAMETER pWparam  AS LONG NO-UNDO.
+  DEFINE INPUT  PARAMETER pLparam  AS LONG NO-UNDO.
+END PROCEDURE.
+
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -52,7 +66,7 @@ DEFINE TEMP-TABLE ttFrame NO-UNDO
 &Scoped-define FRAME-NAME DEFAULT-FRAME
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rcSettings btnSettings ficSettingsFile ~
+&Scoped-Define ENABLED-OBJECTS btnSettings rcSettings ficSettingsFile ~
 btnRawEdit fiSearch btPage1 btPage2 btPage3 BtnCancel-2 BtnOK 
 &Scoped-Define DISPLAYED-OBJECTS ficSettingsFile fiSearch 
 
@@ -118,31 +132,31 @@ DEFINE RECTANGLE rcSettings
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnSettings AT Y 10 X 20   
-     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED    NO-TAB-STOP 
-     btnRawEdit AT Y 15 X 690   
-     fiSearch AT Y 64 X 10 COLON-ALIGNED NO-LABEL   
-     btPage1 AT Y 104 X 20  
-     btPage2 AT Y 139 X 20   
-     btPage3 AT Y 174 X 20   
-     BtnCancel-2 AT Y 470 X 575   
-     BtnOK AT Y 470 X 660   
+     btnSettings AT Y 10 X 20
+     ficSettingsFile AT Y 15 X 215 COLON-ALIGNED NO-TAB-STOP 
+     btnRawEdit AT Y 15 X 690
+     fiSearch AT Y 64 X 10 COLON-ALIGNED NO-LABEL
+     btPage1 AT Y 104 X 20
+     btPage2 AT Y 139 X 20
+     btPage3 AT Y 174 X 20
+     BtnCancel-2 AT Y 470 X 575
+     BtnOK AT Y 470 X 660
      "CTRL-SHIFT-S also opens this window" VIEW-AS TEXT
-          SIZE-PIXELS 240 BY 20 AT Y 475 X 15    
+          SIZE-PIXELS 240 BY 20 AT Y 475 X 15
           FGCOLOR 7 
-     rcSettings AT Y 60 X 150   
+     rcSettings AT Y 60 X 150
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 761 BY 508
-         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel-2    .
+         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel-2.
 
 DEFINE FRAME frSettings
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 155 Y 65
          SCROLLABLE SIZE-PIXELS 1600 BY 3900
-         TITLE ""    .
+         TITLE "".
 
 
 /* *********************** Procedure Settings ************************ */
@@ -391,20 +405,6 @@ DO:
                   ).
 END.
 
-PROCEDURE SetScrollPos EXTERNAL "USER32.DLL":
-  DEFINE INPUT PARAMETER pHwnd   AS LONG  NO-UNDO.
-  DEFINE INPUT PARAMETER pNBar   AS SHORT NO-UNDO.
-  DEFINE INPUT PARAMETER pNPos   AS SHORT NO-UNDO.
-  DEFINE INPUT PARAMETER pRedraw AS SHORT NO-UNDO.
-END PROCEDURE.
-
-PROCEDURE PostMessageA EXTERNAL "USER32.DLL":
-  DEFINE INPUT  PARAMETER pHwnd    AS LONG NO-UNDO.
-  DEFINE INPUT  PARAMETER pMsg     AS LONG NO-UNDO.
-  DEFINE INPUT  PARAMETER pWparam  AS LONG NO-UNDO.
-  DEFINE INPUT  PARAMETER pLparam  AS LONG NO-UNDO.
-END PROCEDURE.
-
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -575,7 +575,7 @@ PROCEDURE enable_UI :
 ------------------------------------------------------------------------------*/
   DISPLAY ficSettingsFile fiSearch 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
-  ENABLE rcSettings btnSettings ficSettingsFile btnRawEdit fiSearch btPage1 
+  ENABLE btnSettings rcSettings ficSettingsFile btnRawEdit fiSearch btPage1 
          btPage2 btPage3 BtnCancel-2 BtnOK 
       WITH FRAME DEFAULT-FRAME IN WINDOW wSettings.
   {&OPEN-BROWSERS-IN-QUERY-DEFAULT-FRAME}

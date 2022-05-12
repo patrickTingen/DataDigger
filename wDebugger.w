@@ -139,15 +139,15 @@ DEFINE VARIABLE tgUpdate AS LOGICAL INITIAL yes
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     tgUpdate AT ROW 1.24 COL 28   
+     tgUpdate AT ROW 1.24 COL 28
      fiLevelFrom AT Y 2 X 26 COLON-ALIGNED
      fiLevelTo AT Y 2 X 78 COLON-ALIGNED
      fiFilterText AT Y 2 X 233 COLON-ALIGNED
      btnFilter AT Y 2 X 364
      btnClear AT Y 2 X 707
      edMessageBox AT Y 25 X 0 NO-LABEL
-     fiFindString AT Y 2 X 454 COLON-ALIGNED   
-     btnTimers AT Y 2 X 656   
+     fiFindString AT Y 2 X 454 COLON-ALIGNED
+     btnTimers AT Y 2 X 656
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
@@ -297,6 +297,8 @@ DO:
                                       )
                         ).
   FOR EACH bfTimer:
+
+    {&_proparse_ prolint-nowarn(overflow)}
     RUN debugInfo (1, SUBSTITUTE("&1 &2 &3 &4"
                                       , STRING(bfTimer.cTimerId,"x(40)")
                                       , STRING(bfTimer.iNumStarts,">>>>>>>9")
@@ -771,8 +773,9 @@ PROCEDURE showMessage :
   END.
 
   /* Use time representation in Seconds rather than milliseconds */
+  {&_proparse_ prolint-nowarn(overflow)}
   ASSIGN 
-    iTime = piTimeMsec / 1000 
+    iTime = piTimeMsec / 1000
     iMilliSec = piTimeMsec MOD 1000.
 
   /* Respect Capture level and text/program filter */
@@ -887,6 +890,7 @@ PROCEDURE TimerCommand :
         ttTimer.tTotalTime = ttTimer.tTotalTime + (dtNow - ttTimer.tStartTime)
         .
 
+      {&_proparse_ prolint-nowarn(overflow)}
       PUBLISH "debugInfo"(124, SUBSTITUTE("Timer [&1] stopped, time:&2 ms  num:&3  avg:&4 ms"
                                              , picTimerId
                                              , dtNow - ttTimer.tStartTime
@@ -943,3 +947,4 @@ END FUNCTION. /* setRegistry */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

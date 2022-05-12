@@ -126,11 +126,11 @@ DEFINE VARIABLE fiFocus AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL  
+     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 160 BY 28.57    .
+         SIZE 160 BY 28.57.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -480,6 +480,7 @@ PROCEDURE calcBlockSize :
   END.
 
   /* Calculate new size for buttons */
+  {&_proparse_ prolint-nowarn(overflow)}
   ASSIGN
     giMaxWidth    = (iMaxX - iMinX)
     giMaxHeight   = (iMaxY - iMinY)
@@ -1040,8 +1041,10 @@ PROCEDURE resizeWindow :
   hParent = {&WINDOW-NAME}:HANDLE.
 
   /* Adjust screen size to make blocks fit nicely */
-  hParent:WIDTH-PIXELS  = (INTEGER(hParent:WIDTH-PIXELS / 20) * 20).
-  hParent:HEIGHT-PIXELS = (INTEGER(hParent:HEIGHT-PIXELS / 20) * 20).
+  {&_proparse_ prolint-nowarn(overflow)}
+  ASSIGN
+    hParent:WIDTH-PIXELS  = (INTEGER(hParent:WIDTH-PIXELS / 20) * 20)
+    hParent:HEIGHT-PIXELS = (INTEGER(hParent:HEIGHT-PIXELS / 20) * 20).
 
   ASSIGN
     hFrame:SCROLLABLE            = TRUE
@@ -1331,3 +1334,4 @@ END FUNCTION. /* getSavedImage */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

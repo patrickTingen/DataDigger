@@ -1183,7 +1183,7 @@ PROCEDURE openConnectionQuery :
     cQuery = SUBSTITUTE("&1 by &2 &3", cQuery, cNewSort, STRING(lAscending,'/descending')).
     hQuery:QUERY-PREPARE(cQuery).
     hQuery:QUERY-OPEN().
-    hQuery:GET-FIRST.
+    hQuery:GET-FIRST().
 
     /* Attach query to the browse */
     brConnections:query IN FRAME {&frame-name} = hQuery.

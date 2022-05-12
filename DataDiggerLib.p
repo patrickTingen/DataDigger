@@ -1176,17 +1176,15 @@ PROCEDURE collectIndexInfo :
        */
       &IF PROVERSION >= "11" &THEN
       
-        hStorObject:FIND-FIRST(SUBSTITUTE("WHERE _StorageObject._db-recid = &1 AND _StorageObject._object-type = 2 AND _StorageObject._object-number = &2"
-                                         , hFile::_db-recid
-                                         , hIndex::_idx-num), NO-LOCK) NO-ERROR.
+      hStorObject:FIND-FIRST(SUBSTITUTE("WHERE _StorageObject._db-recid      = &1 ~
+                                           AND _StorageObject._object-type   = 2 ~
+                                           AND _StorageObject._object-number = &2" , hFile::_db-recid, hIndex::_idx-num), NO-LOCK) NO-ERROR.
     
-        IF NOT hStorObject:AVAILABLE THEN bIndex.lIndexActive = NO.
-        ELSE 
-        bIndex.lIndexActive = (hStorObject::_Object-state = 0). /* 0 = activated, 1 = not */
+      bIndex.lIndexActive = (hStorObject:AVAILABLE AND hStorObject::_Object-state = 0). /* 0 = activated, 1 = not */
     
       &ELSE
       
-        bIndex.lIndexActive = hIndex::_active.
+      bIndex.lIndexActive = hIndex::_active.
     
       &ENDIF
     
@@ -1532,7 +1530,7 @@ PROCEDURE dynamicDump :
               + string(DAY(  TODAY),"99":u  ) + "-":u
               + string(TIME,"HH:MM:SS":u).
 
-  hQuery:GET-FIRST.
+  hQuery:GET-FIRST().
 
   /* Open outputfile */
   OUTPUT to value(picFile) no-echo no-map.
@@ -3660,6 +3658,7 @@ PROCEDURE updateFields :
     IF bField.iOrder = ? THEN bField.iOrder = bField.iOrderOrg.
 
     /* Keep track of highest nr */
+    {&_proparse_ prolint-nowarn(overflow)}
     iFieldOrder = MAXIMUM(iFieldOrder,bField.iOrder).
 
   END. /* f/e bField */
@@ -4276,7 +4275,7 @@ FUNCTION getIndexFields RETURNS CHARACTER
 
   cFieldList = TRIM(cFieldList, ",").
 
-  hQuery:QUERY-CLOSE.
+  hQuery:QUERY-CLOSE().
 
   DELETE OBJECT hFileBuffer.
   DELETE OBJECT hIndexBuffer.
@@ -4667,15 +4666,15 @@ FUNCTION getTableList RETURNS CHARACTER
   cQuery = SUBSTITUTE("&1 and cTableName matches &2", cQuery, QUOTER(pcTableFilter )).
 
   QUERY qTable:QUERY-PREPARE( SUBSTITUTE('&1 by cTableName', cQuery)).
-  QUERY qTable:QUERY-OPEN.
-  QUERY qTable:GET-FIRST.
+  QUERY qTable:QUERY-OPEN().
+  QUERY qTable:GET-FIRST().
 
   /* All fields */
   REPEAT WHILE NOT QUERY qTable:QUERY-OFF-END:
     cTableList = cTableList + "," + bTable.cTableName.
-    QUERY qTable:GET-NEXT.
+    QUERY qTable:GET-NEXT().
   END.
-  QUERY qTable:QUERY-CLOSE.
+  QUERY qTable:QUERY-CLOSE().
 
   cTableList = LEFT-TRIM(cTableList, ",").
 
