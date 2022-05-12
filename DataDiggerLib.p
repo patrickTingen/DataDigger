@@ -630,17 +630,6 @@ FUNCTION isFileLocked RETURNS LOGICAL
 
 &ENDIF
 
-&IF DEFINED(EXCLUDE-isIndexActive) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isIndexActive Procedure 
-FUNCTION isIndexActive RETURNS LOGICAL
-  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ) FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
 &IF DEFINED(EXCLUDE-isMouseOver) = 0 &THEN
 
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD isMouseOver Procedure 
@@ -787,7 +776,7 @@ FUNCTION setRegistry RETURNS CHARACTER
 &ANALYZE-SUSPEND _CREATE-WINDOW
 /* DESIGN Window definition (used by the UIB) 
   CREATE WINDOW Procedure ASSIGN
-         HEIGHT             = 28.48
+         HEIGHT             = 39.43
          WIDTH              = 57.4.
 /* END WINDOW DEFINITION */
                                                                         */
@@ -1138,7 +1127,8 @@ PROCEDURE collectIndexInfo :
   DEFINE VARIABLE cQuery      AS CHARACTER NO-UNDO.
   DEFINE VARIABLE hQuery      AS HANDLE    NO-UNDO.
   DEFINE VARIABLE cDatabase   AS CHARACTER NO-UNDO.
-
+  DEFINE VARIABLE hStorObject AS HANDLE    NO-UNDO. /* only for v11+ */
+  
   DEFINE BUFFER bIndex FOR ttIndex.
 
   /* Return if no db connected */
@@ -1152,6 +1142,10 @@ PROCEDURE collectIndexInfo :
   CREATE BUFFER hIndexField FOR TABLE cDatabase + "._Index-Field".
   CREATE BUFFER hField      FOR TABLE cDatabase + "._Field".
 
+  &IF PROVERSION >= "11" &THEN
+    CREATE BUFFER hStorObject FOR TABLE cDatabase + "._StorageObject".
+  &ENDIF
+  
   CREATE QUERY hQuery.
   hQuery:SET-BUFFERS(hFile, hIndex, hIndexField, hField).
 
@@ -1176,8 +1170,26 @@ PROCEDURE collectIndexInfo :
       CREATE bIndex.
 
       bIndex.cIndexName   = hIndex::_index-name.
-      bIndex.lIndexActive = isIndexActive(hFile::_file-name, hIndex::_index-name).
 
+      /* Find out if index is active. Not as easy as you may think. 
+       * See also https://knowledgebase.progress.com/articles/Knowledge/abl-procedure-fails-to-find-inactive-index
+       */
+      &IF PROVERSION >= "11" &THEN
+      
+        hStorObject:FIND-FIRST(SUBSTITUTE("WHERE _StorageObject._db-recid = &1 AND _StorageObject._object-type = 2 AND _StorageObject._object-number = &2"
+                                         , hFile::_db-recid
+                                         , hIndex::_idx-num), NO-LOCK) NO-ERROR.
+    
+        IF NOT hStorObject:AVAILABLE THEN bIndex.lIndexActive = NO.
+        ELSE 
+        bIndex.lIndexActive = (hStorObject::_Object-state = 0). /* 0 = activated, 1 = not */
+    
+      &ELSE
+      
+        bIndex.lIndexActive = hIndex::_active.
+    
+      &ENDIF
+    
       {&_proparse_ prolint-nowarn(recidkeyword)}
       bIndex.cIndexFlags = SUBSTITUTE("&1 &2 &3 &4"
                                      , STRING(hFile::_prime-index = hIndex:RECID, 'P/')
@@ -4887,40 +4899,6 @@ FUNCTION isFileLocked RETURNS LOGICAL
   RETURN (iFileHandle = -1).
 
 END FUNCTION. /* isFileLocked */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ENDIF
-
-&IF DEFINED(EXCLUDE-isIndexActive) = 0 &THEN
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION isIndexActive Procedure 
-FUNCTION isIndexActive RETURNS LOGICAL
-  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ):
-
-  /* See also
-   * https://knowledgebase.progress.com/articles/Knowledge/abl-procedure-fails-to-find-inactive-index
-   */
-  FIND _file WHERE _file._file-name = pcFile NO-ERROR.
-  FIND _index WHERE _index._file-recid = RECID(_file) AND _index._index-name = pcIndex NO-ERROR.
-  IF NOT AVAILABLE _index THEN RETURN NO.
-
-  IF NOT _index._active THEN RETURN NO.
-
-  &IF PROVERSION >= "11" &THEN
-  FIND _StorageObject 
-    WHERE _StorageObject._db-recid      = _file._db-recid
-      AND _StorageObject._object-type   = 2 /* index */
-      AND _StorageObject._object-number = _index._idx-num NO-ERROR.
-
-  IF NOT AVAILABLE _StorageObject THEN RETURN NO.
-  IF _StorageObject._Object-state = 1 THEN RETURN NO. /* 0 = activated, 1 = not */
-  &ENDIF
-  
-  RETURN YES.
-
-END FUNCTION. /* isIndexActive */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
