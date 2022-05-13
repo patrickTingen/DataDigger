@@ -191,8 +191,8 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter brTables brFields brIndexes tgDebugMode btnFavourite ~
-fiTableDesc cbFavouriteGroup ficWhere btnClearTableFilter btnTableFilter ~
+btnClearIndexFilter brTables btnFavourite brFields brIndexes tgDebugMode ~
+fiTableDesc btnClearTableFilter cbFavouriteGroup ficWhere btnTableFilter ~
 btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
@@ -840,14 +840,14 @@ DEFINE FRAME frMain
      fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL
      btnClearIndexFilter AT Y 5 X 1095
      brTables AT Y 27 X 56
+     btnFavourite AT Y 236 X 269
      brFields AT Y 27 X 325
      brIndexes AT Y 28 X 829
      tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
-     btnFavourite AT Y 236 X 269
      fiTableDesc AT Y 236 X 57 NO-LABEL
+     btnClearTableFilter AT Y 3 X 237
      cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnClearTableFilter AT Y 3 X 237
      fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
      btnTableFilter AT Y 3 X 257
      btnAddFavGroup AT Y 236 X 248
@@ -887,6 +887,28 @@ DEFINE FRAME frMain
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
+    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
+
+DEFINE FRAME frHint
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
+    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
+         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
+         AT X 1150 Y 15
+         SIZE-PIXELS 285 BY 140
+         BGCOLOR 14 .
+
 DEFINE FRAME frSettings
      btnQueries-txt AT Y 175 X 37
      btnDataDigger AT Y 35 X 1
@@ -917,28 +939,6 @@ DEFINE FRAME frSettings
          AT COL 1 ROW 2.43
          SIZE 28 BY 24.76
          BGCOLOR 15 .
-
-DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL
-     btGotIt AT Y 110 X 104
-     imgArrow AT Y 0 X 0
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 1150 Y 15
-         SIZE-PIXELS 285 BY 140
-         BGCOLOR 14 .
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761
-     btnDataSort AT Y 4 X 5
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
-     rctData AT Y 0 X 0
-     rctDataFilter AT Y 1 X 0
-    WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1012,7 +1012,7 @@ ASSIGN
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
 /* BROWSE-TAB brTables frHint frMain */
-/* BROWSE-TAB brFields brTables frMain */
+/* BROWSE-TAB brFields btnFavourite frMain */
 /* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
@@ -6188,8 +6188,8 @@ PROCEDURE enable_UI :
       WITH FRAME frMain IN WINDOW wDataDigger.
   ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         brTables brFields brIndexes tgDebugMode btnFavourite fiTableDesc 
-         cbFavouriteGroup ficWhere btnClearTableFilter btnTableFilter 
+         brTables btnFavourite brFields brIndexes tgDebugMode fiTableDesc 
+         btnClearTableFilter cbFavouriteGroup ficWhere btnTableFilter 
          btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
@@ -8472,18 +8472,10 @@ PROCEDURE moveField :
   IF NOT AVAILABLE bField THEN RETURN.
   FIND FIRST bColumnOrg WHERE bColumnOrg.cFieldName = bField.cFieldName NO-ERROR.
 
-  {&_proparse_ prolint-nowarn(overflow)}
   IF AVAILABLE bColumnOrg THEN iOldOrder = bField.iOrder.
 
-  /* Change the order of the fields by 1.5
-   * This sets the field exactly where we want it
-
-    when 'top'    then bColumnOrg.iColumnNr = -1.
-    when 'up'     then bColumnOrg.iColumnNr = bColumnOrg.iColumnNr - 1.5.
-    when 'down'   then bColumnOrg.iColumnNr = bColumnOrg.iColumnNr + 1.5.
-    when 'bottom' then bColumnOrg.iColumnNr = 999999999.
-
-   */
+  /* Change the order of the fields 
+  */
   CASE pcDirection:
     WHEN 'top' THEN bField.iOrder = -1.
 
@@ -11248,15 +11240,15 @@ PROCEDURE showHint :
 /* Show a small window with a hint
    */
   DEFINE INPUT PARAMETER phWidget AS HANDLE    NO-UNDO.
-  DEFINE INPUT PARAMETER piLayout AS INTEGER   NO-UNDO.
+  DEFINE INPUT PARAMETER piLayout AS INT64     NO-UNDO.
   DEFINE INPUT PARAMETER pcText   AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE iStep     AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iOffsetX  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iOffsetY  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iTargetX  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iTargetY  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE hMyWidget AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iStep     AS INT64  NO-UNDO.
+  DEFINE VARIABLE iOffsetX  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iOffsetY  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iTargetX  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iTargetY  AS INT64  NO-UNDO.
+  DEFINE VARIABLE hMyWidget AS HANDLE NO-UNDO.
 
   /* If we are in the start phase of DD, ignore hints */
   IF glInitializing THEN RETURN.
@@ -11278,34 +11270,29 @@ PROCEDURE showHint :
     FRAME frHint:PRIVATE-DATA = STRING(phWidget).
     FRAME frHint:VISIBLE = FALSE.
     FRAME frHint:MOVE-TO-TOP().
-
+                               
     CASE piLayout:
       /* point nowhere */
-      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-NONE} THEN ASSIGN
                     iOffsetX = (phWidget:WIDTH-PIXELS - FRAME frHint:WIDTH-PIXELS) / 2
                     iOffsetY = (phWidget:HEIGHT-PIXELS - FRAME frHint:HEIGHT-PIXELS) / 2.
 
       /* point left up */
-      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-LEFT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right up */
-      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-RIGHT-UP} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 * 2.
 
       /* point right down */
-      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-RIGHT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 - FRAME frHint:WIDTH-PIXELS
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.
 
       /* point left down */
-      {&_proparse_ prolint-nowarn(overflow)}
       WHEN {&ARROW-LEFT-DOWN} THEN ASSIGN
                     iOffsetX = phWidget:WIDTH-PIXELS / 3 * 2
                     iOffsetY = phWidget:HEIGHT-PIXELS / 3 - FRAME frHint:HEIGHT-PIXELS.

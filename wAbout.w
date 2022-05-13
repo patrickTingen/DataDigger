@@ -510,21 +510,18 @@ END PROCEDURE.
 PROCEDURE initializeObject :
 /* Init frame
   */
-  DEFINE VARIABLE xx AS INTEGER NO-UNDO.
-  DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+  DEFINE VARIABLE xx AS INT64 NO-UNDO.
+  DEFINE VARIABLE yy AS INT64 NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
     wAbout:VISIBLE = FALSE.
 
     /* Position frame relative to main window */
-    xx = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
-    yy = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
+    xx = MAXIMUM(0, INT64(getRegistry('DataDigger', 'Window:x' )) - 50).
+    yy = MAXIMUM(0, INT64(getRegistry('DataDigger', 'Window:y' )) - 20).
 
     /* Or centered on the screen */
-    {&_proparse_ prolint-nowarn(overflow)}
     IF xx = ? THEN xx = (SESSION:WIDTH-PIXELS - FRAME {&FRAME-NAME}:WIDTH-PIXELS) / 2.
-
-    {&_proparse_ prolint-nowarn(overflow)}
     IF yy = ? THEN yy = (SESSION:HEIGHT-PIXELS - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 2.
 
     wAbout:X = xx.
