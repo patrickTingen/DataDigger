@@ -402,7 +402,10 @@ PROCEDURE blinkLogo :
     END.
     IF xx <= 5 THEN LEAVE #Bounce.
 
+    {&_proparse_ prolint-nowarn(overflow)}
     btnDataDigger:X = xx.
+
+    {&_proparse_ prolint-nowarn(overflow)}
     btnDataDigger:Y = yy.
 
     RUN justWait(9).

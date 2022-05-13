@@ -107,7 +107,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO
   FIELD cFormatOrg    AS CHARACTER                   LABEL "Format"                      /* original format           */
   FIELD iWidth        AS INTEGER                     LABEL "Width"                       /* SQL width                 */
   FIELD cLabel        AS CHARACTER                   LABEL "Label"     FORMAT "X(50)"
-  FIELD iOrderOrg     AS DECIMAL                                                         /* original order            */
+  FIELD iOrderOrg     AS INTEGER                                                         /* original order            */
   FIELD iExtent       AS INTEGER                     LABEL "Extent"    FORMAT ">>>>9"
   FIELD lPrimary      AS LOGICAL                     LABEL "Prim"                        /* part of prim index?       */
   FIELD lMandatory    AS LOGICAL                     LABEL "Man"                         /* mandatory?                */
