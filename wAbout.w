@@ -527,7 +527,10 @@ PROCEDURE initializeObject :
     IF xx = ? THEN xx = (SESSION:WIDTH-PIXELS - FRAME {&FRAME-NAME}:WIDTH-PIXELS) / 2.
     IF yy = ? THEN yy = (SESSION:HEIGHT-PIXELS - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 2.
 
+    {&_proparse_ prolint-nowarn(overflow)}
     wAbout:X = xx.
+
+    {&_proparse_ prolint-nowarn(overflow)}
     wAbout:Y = yy.
 
     /* Prepare frame */
