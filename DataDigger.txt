@@ -6,7 +6,7 @@
 
 =====================================================================================
 
-DataDigger version 26
+DataDigger version 26 - 19 may 2022 (Iron Man)
 
 - New   : Option for abbreviated datatypes in generate temp-table include (Baltazar Oliveira)
 - New   : Option for abbreviated datatypes in generate active record class
@@ -27,6 +27,7 @@ DataDigger version 26
 - Solved: Cannot type umlaut in filter row #83 (movedoa)
 - Solved: Inactivated index shows as active #75
 - Solved: Active index shown as inactive #86 (Richard Kelters)
+- Solved: Failed to start in v10
 
 - Changed: Starting the libraries is simplified, contact me when you have errors
 - Changed: When dumping to Excel, assume codepage 1252 when current is ISO8859

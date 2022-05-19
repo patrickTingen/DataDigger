@@ -5056,9 +5056,19 @@ FUNCTION resolveOsVars RETURNS CHARACTER
   DEFINE VARIABLE i AS INTEGER NO-UNDO.
 
   DO i = 1 TO NUM-ENTRIES(pcString,'%'):
+
+    &IF PROVERSION < "11" &THEN
+    /* Old style for v10 */
+    IF i MODULO 2 = 0
+      AND OS-GETENV(ENTRY(i,pcString,'%')) <> ? THEN
+      ENTRY(i,pcString,'%') = OS-GETENV(ENTRY(i,pcString,'%')).
+    
+    &ELSE
+    
     IF i MODULO 2 = 0
       AND System.Environment:GetEnvironmentVariable(ENTRY(i,pcString,'%')) <> ? THEN
       ENTRY(i,pcString,'%') = System.Environment:GetEnvironmentVariable(ENTRY(i,pcString,'%')).
+    &ENDIF
   END.
   
   pcString = REPLACE(pcString,'%','').

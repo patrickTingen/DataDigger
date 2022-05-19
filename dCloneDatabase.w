@@ -275,10 +275,15 @@ PROCEDURE cloneDatabase :
     RETURN.
   END.
 
-  cDlc = System.Environment:GetEnvironmentVariable('DLC':U).
+  &IF PROVERSION < "11" &THEN
+  cDlc = OS-GETENV('DLC').
+  &ELSE
+  cDlc = System.Environment:GetEnvironmentVariable('DLC').
+  &ENDIF
+  
   IF cDlc = ? THEN
-    ASSIGN cDlc = SEARCH('empty.db':U)
-           cDlc = SUBSTRING(cDlc,1,LENGTH(cDlc,'CHARACTER':U) - 9,'CHARACTER':U).
+    ASSIGN cDlc = SEARCH('empty.db')
+           cDlc = SUBSTRING(cDlc,1,LENGTH(cDlc,'CHARACTER') - 9,'CHARACTER').
 
   /* Point to the proper database */
   CREATE ALIAS 'dictdb' FOR DATABASE VALUE(pcDbName).

@@ -11,7 +11,7 @@
 /*----------------------------------------------------------------------*/
 
 &GLOBAL-DEFINE version {version.i}
-&GLOBAL-DEFINE edition Rudolf
+&GLOBAL-DEFINE edition Ironman
 &GLOBAL-DEFINE build {build.i}
 
 &GLOBAL-DEFINE QUERYSEP CHR(2, SESSION:CPINTERNAL, "UTF-8")
