@@ -20,10 +20,8 @@
 &GLOBAL-DEFINE field-maxLength 2000
 
 /* FINALLY statement was introduced in 10.1C */
-&IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN
-  &GLOBAL-DEFINE timerStart ~{timerStart.i~}
-  &GLOBAL-DEFINE timerStop  ~{timerStop.i~}
-&ENDIF
+&GLOBAL-DEFINE timerStart ~{timerStart.i~}
+&GLOBAL-DEFINE timerStop  ~{timerStop.i~}
 
 /* Constant values for update channels */
 &GLOBAL-DEFINE CHECK-MANUAL 0

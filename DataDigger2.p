@@ -373,10 +373,10 @@ END PROCEDURE. /* getSourceFiles */
 PROCEDURE initializeObject :
 /* Initialize all kind of things.
   */
-  /* Are we at least 10.1B ? */
-  IF PROVERSION < "10.1B" THEN
+  /* Are we at least 10.1C ? */
+  IF PROVERSION < "10.1C" THEN
   DO:
-    MESSAGE "You need at least Progress 10.1B to run DataDigger" SKIP(1)
+    MESSAGE "You need at least Progress 10.1C to run DataDigger" SKIP(1)
             "The program will now quit."
             VIEW-AS ALERT-BOX INFORMATION.
     QUIT.
