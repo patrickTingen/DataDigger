@@ -68,22 +68,6 @@ DEFINE VARIABLE giCurrentLevel   AS INTEGER   NO-UNDO INITIAL 1.
 DEFINE VARIABLE glLevelComplete  AS LOGICAL   NO-UNDO.
 DEFINE VARIABLE giLockCounter    AS INTEGER   NO-UNDO.
 
-PROCEDURE SendMessageA EXTERNAL "user32.dll":
-  DEFINE INPUT  PARAMETER hwnd   AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER wmsg   AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER wparam AS long NO-UNDO.
-  DEFINE INPUT  PARAMETER lparam AS long NO-UNDO.
-  DEFINE RETURN PARAMETER rc     AS long NO-UNDO.
-END PROCEDURE.
-
-PROCEDURE RedrawWindow EXTERNAL "user32.dll":
-  DEFINE INPUT PARAMETER v-hwnd  AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-rect  AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-rgn   AS LONG NO-UNDO.
-  DEFINE INPUT PARAMETER v-flags AS LONG NO-UNDO.
-  DEFINE RETURN PARAMETER v-ret  AS LONG NO-UNDO.
-END PROCEDURE.
-
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
@@ -142,11 +126,11 @@ DEFINE VARIABLE fiFocus AS INTEGER FORMAT "->,>>>,>>9":U INITIAL 0
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL WIDGET-ID 4
+     fiFocus AT ROW 1.24 COL 4 COLON-ALIGNED NO-LABEL
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 160 BY 28.57 WIDGET-ID 100.
+         SIZE 160 BY 28.57.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -496,6 +480,7 @@ PROCEDURE calcBlockSize :
   END.
 
   /* Calculate new size for buttons */
+  {&_proparse_ prolint-nowarn(overflow)}
   ASSIGN
     giMaxWidth    = (iMaxX - iMinX)
     giMaxHeight   = (iMaxY - iMinY)
@@ -751,19 +736,9 @@ PROCEDURE lockWindow :
   IF phWindow:HWND <> ? THEN 
   DO:
     IF giLockCounter > 0 THEN
-    DO:
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 0, 0, OUTPUT iRet).
-    END.
-    
+      RUN lockWindowUpdate (INPUT phWindow:HWND, OUTPUT iRet).
     ELSE
-    DO:
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN SendMessageA(phWindow:HWND, {&WM_SETREDRAW}, 1, 0, OUTPUT iRet).
-      
-      {&_proparse_prolint-nowarn(varusage)}
-      RUN RedrawWindow(phWindow:HWND, 0, 0, {&RDW_ALLCHILDREN} + {&RDW_ERASE} + {&RDW_INVALIDATE}, OUTPUT iRet).
-    END.
+      RUN lockWindowUpdate (INPUT 0, OUTPUT iRet).
   END.
 END PROCEDURE. /* lockWindow */
 
@@ -1066,8 +1041,10 @@ PROCEDURE resizeWindow :
   hParent = {&WINDOW-NAME}:HANDLE.
 
   /* Adjust screen size to make blocks fit nicely */
-  hParent:WIDTH-PIXELS  = (INTEGER(hParent:WIDTH-PIXELS / 20) * 20).
-  hParent:HEIGHT-PIXELS = (INTEGER(hParent:HEIGHT-PIXELS / 20) * 20).
+  {&_proparse_ prolint-nowarn(overflow)}
+  ASSIGN
+    hParent:WIDTH-PIXELS  = (INTEGER(hParent:WIDTH-PIXELS / 20) * 20)
+    hParent:HEIGHT-PIXELS = (INTEGER(hParent:HEIGHT-PIXELS / 20) * 20).
 
   ASSIGN
     hFrame:SCROLLABLE            = TRUE
@@ -1137,9 +1114,9 @@ PROCEDURE showLevel :
   DEFINE VARIABLE cLine    AS CHARACTER          NO-UNDO.
   DEFINE VARIABLE cElement AS CHARACTER          NO-UNDO.
   DEFINE VARIABLE iMinX    AS INTEGER INITIAL 20 NO-UNDO.
-  DEFINE VARIABLE iMaxX    AS INTEGER INITIAL 0  NO-UNDO.
+  DEFINE VARIABLE iMaxX    AS INTEGER            NO-UNDO.
   DEFINE VARIABLE iMinY    AS INTEGER INITIAL 20 NO-UNDO.
-  DEFINE VARIABLE iMaxY    AS INTEGER INITIAL 0  NO-UNDO.
+  DEFINE VARIABLE iMaxY    AS INTEGER            NO-UNDO.
 
   DEFINE BUFFER bMove  FOR ttMove.
   DEFINE BUFFER bBlock FOR ttBlock.

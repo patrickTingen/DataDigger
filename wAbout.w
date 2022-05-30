@@ -106,19 +106,19 @@ DEFINE RECTANGLE rcCord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     btnDataDigger AT ROW 1.71 COL 3 WIDGET-ID 324
-     BtnOK AT Y 10 X 540 WIDGET-ID 48
-     edChangelog AT Y 60 X 5 NO-LABEL WIDGET-ID 72
-     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 74
-     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL WIDGET-ID 76
-     fiWebsite AT Y 425 X 227 NO-LABEL WIDGET-ID 298
-     imgPlayer AT ROW 2.43 COL 61.2 WIDGET-ID 328
-     imgBall AT ROW 5.43 COL 59.8 WIDGET-ID 330
-     rcCord AT ROW 4.05 COL 60.6 WIDGET-ID 332
+     btnDataDigger AT ROW 1.71 COL 3
+     BtnOK AT Y 10 X 540
+     edChangelog AT Y 60 X 5 NO-LABEL
+     fiDataDigger-1 AT Y 15 X 45 COLON-ALIGNED NO-LABEL
+     fiDataDigger-2 AT Y 32 X 45 COLON-ALIGNED NO-LABEL
+     fiWebsite AT Y 425 X 227 NO-LABEL
+     imgPlayer AT ROW 2.43 COL 61.2
+     imgBall AT ROW 5.43 COL 59.8
+     rcCord AT ROW 4.05 COL 60.6
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 126.4 BY 21.71 WIDGET-ID 100.
+         SIZE 126.4 BY 21.71.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -201,7 +201,6 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
        COLUMN          = 85
        HEIGHT          = 1.67
        WIDTH           = 7
-       WIDGET-ID       = 336
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
@@ -258,13 +257,17 @@ END.
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wAbout
 ON CHOOSE OF btnDataDigger IN FRAME DEFAULT-FRAME /* D */
 DO:
-  DEFINE VARIABLE iResult AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iResult AS INT64 NO-UNDO.
 
   {&WINDOW-NAME}:SENSITIVE = FALSE.
   chCtrlFrame:PSTimer:ENABLED = FALSE.
 
   IF LOGICAL(getRegistry('DataDigger:Update','PingBack')) = TRUE THEN 
-    RUN urlDownloadToFileA (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+  DO:
+    IF SESSION:CPINTERNAL = 'UTF8' 
+      THEN RUN urlDownloadToFileW (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+      ELSE RUN urlDownloadToFileA (0, '{&EASTEREGG}', '', 0, 0, OUTPUT iResult).
+  END.
 
   RUN SokoDigger.w.
   {&WINDOW-NAME}:SENSITIVE = TRUE.
@@ -309,7 +312,7 @@ END PROCEDURE.
 ON MOUSE-SELECT-CLICK OF fiWebsite IN FRAME DEFAULT-FRAME
 DO:
 
-  OS-COMMAND NO-WAIT START VALUE(SELF:SCREEN-VALUE).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", SELF:SCREEN-VALUE)).
 
 END.
 
@@ -362,7 +365,7 @@ PROCEDURE blinkLogo :
   DEFINE VARIABLE xx   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE yy   AS DECIMAL NO-UNDO.
   DEFINE VARIABLE dx   AS DECIMAL NO-UNDO INITIAL -5. /* hor speed */
-  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO INITIAL 0.  /* ver speed */
+  DEFINE VARIABLE dy   AS DECIMAL NO-UNDO.            /* ver speed */
   DEFINE VARIABLE grav AS DECIMAL NO-UNDO INITIAL .2. /* gravity acceleration */
 
   DO WITH FRAME {&FRAME-NAME}:
@@ -399,7 +402,10 @@ PROCEDURE blinkLogo :
     END.
     IF xx <= 5 THEN LEAVE #Bounce.
 
+    {&_proparse_ prolint-nowarn(overflow)}
     btnDataDigger:X = xx.
+
+    {&_proparse_ prolint-nowarn(overflow)}
     btnDataDigger:Y = yy.
 
     RUN justWait(9).
@@ -507,21 +513,24 @@ END PROCEDURE.
 PROCEDURE initializeObject :
 /* Init frame
   */
-  DEFINE VARIABLE xx AS INTEGER NO-UNDO.
-  DEFINE VARIABLE yy AS INTEGER NO-UNDO.
+  DEFINE VARIABLE xx AS INT64 NO-UNDO.
+  DEFINE VARIABLE yy AS INT64 NO-UNDO.
 
   DO WITH FRAME {&FRAME-NAME}:
     wAbout:VISIBLE = FALSE.
 
     /* Position frame relative to main window */
-    xx = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:x' )) - 50).
-    yy = MAXIMUM(0, INTEGER(getRegistry('DataDigger', 'Window:y' )) - 20).
+    xx = MAXIMUM(0, INT64(getRegistry('DataDigger', 'Window:x' )) - 50).
+    yy = MAXIMUM(0, INT64(getRegistry('DataDigger', 'Window:y' )) - 20).
 
     /* Or centered on the screen */
     IF xx = ? THEN xx = (SESSION:WIDTH-PIXELS - FRAME {&FRAME-NAME}:WIDTH-PIXELS) / 2.
     IF yy = ? THEN yy = (SESSION:HEIGHT-PIXELS - FRAME {&FRAME-NAME}:HEIGHT-PIXELS) / 2.
 
+    {&_proparse_ prolint-nowarn(overflow)}
     wAbout:X = xx.
+
+    {&_proparse_ prolint-nowarn(overflow)}
     wAbout:Y = yy.
 
     /* Prepare frame */
@@ -541,8 +550,6 @@ PROCEDURE initializeObject :
     /* Load changelog */
     edChangeLog:INSERT-FILE(getProgramDir() + 'DataDigger.txt').
     edChangeLog:CURSOR-OFFSET = 1.
-
-    RUN setTransparency(INPUT FRAME {&FRAME-NAME}:HANDLE, 1).
 
     /* For some reasons, these #*$&# scrollbars keep coming back */
     RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO). /* KILL KILL KILL */
@@ -586,7 +593,7 @@ PROCEDURE justWait :
 /* Wait a few miliseconds
  */
   DEFINE INPUT PARAMETER piWait AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStart AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStart AS INT64 NO-UNDO.
 
   iStart = ETIME.
 

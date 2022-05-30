@@ -6,7 +6,36 @@
 
 =====================================================================================
 
-DataDigger version 25
+DataDigger version 26 - 19 may 2022 (Iron Man)
+
+- New   : Option for abbreviated datatypes in generate temp-table include (Baltazar Oliveira)
+- New   : Option for abbreviated datatypes in generate active record class
+- New   : Option to set border color via myDataDigger.p (Johan Geerts)
+- New   : Automagically complete query with missing quotes #74 (Johan Geerts)
+
+- Solved: Call-stack error on getCursorPos (Jay Farr)
+- Solved: Window position not saved on exit (Johan Geerts)
+- Solved: Shift-del does not work in query editor
+- Solved: Generate include fails when all labels are undefined #77 (Dirk Vreken)
+- Solved: Generate include file abbreviates table name when longer than 20 chars #78 (Dirk Vreken)
+- Solved: CTRL-A or CTRL-D on empty browse gives error #76
+- Solved: Export to 4GL does not escape curly braces #80 (Rob Willoughby)
+- Solved: Data dictionary no longer resizable #81 (Dirk Vreken)
+- Solved: Error when downloading file
+- Solved: Error when starting datadigger with UTF-8 and windows username with special characters #84 (movedoa)
+- Solved: Function resolveOsVars is returning invalid values with cpinternal UTF-8 #85 (movedoa)
+- Solved: Cannot type umlaut in filter row #83 (movedoa)
+- Solved: Inactivated index shows as active #75
+- Solved: Active index shown as inactive #86 (Richard Kelters)
+- Solved: Failed to start in v10
+
+- Changed: Starting the libraries is simplified, contact me when you have errors
+- Changed: When dumping to Excel, assume codepage 1252 when current is ISO8859
+- Changed: All widget-id attributes removed from UI elements #82 (Simi Slegian)
+
+=====================================================================================
+
+DataDigger version 25 - 29 dec 2020 (Rudolf)
 
 - Solved: Error when deleting record while in edit mode (Johan Geerts)
 - Solved: User defined color '?' was reset to default value after restart

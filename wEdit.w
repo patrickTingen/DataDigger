@@ -202,25 +202,25 @@ DEFINE BROWSE brRecord
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     brRecord AT Y 25 X 0 WIDGET-ID 200
-     tgSelAll AT Y 27 X 5 WIDGET-ID 38
-     fiNumRecords AT Y 425 X 78 COLON-ALIGNED WIDGET-ID 10
-     btnDecrease AT Y 0 X 210 WIDGET-ID 26
-     btnOk AT Y 425 X 505 WIDGET-ID 6
-     btnClose AT Y 425 X 585 WIDGET-ID 4
-     tgWriteTrigger AT Y 427 X 145 WIDGET-ID 16
-     btnIncrease AT Y 0 X 180 WIDGET-ID 24
-     btnDatePicker AT Y 0 X 240 WIDGET-ID 34
-     btnEditor AT Y 0 X 0 WIDGET-ID 36
-     btnEncode AT Y 0 X 60 WIDGET-ID 12
-     btnListEdit AT Y 0 X 30 WIDGET-ID 14
-     btnLowerCase AT Y 0 X 120 WIDGET-ID 20
-     btnUpperCase AT Y 0 X 90 WIDGET-ID 18
-     btnWordCase AT Y 0 X 150 WIDGET-ID 22
+     brRecord AT Y 25 X 0
+     tgSelAll AT Y 27 X 5
+     fiNumRecords AT Y 425 X 78 COLON-ALIGNED
+     btnDecrease AT Y 0 X 210
+     btnOk AT Y 425 X 505
+     btnClose AT Y 425 X 585
+     tgWriteTrigger AT Y 427 X 145
+     btnIncrease AT Y 0 X 180
+     btnDatePicker AT Y 0 X 240
+     btnEditor AT Y 0 X 0
+     btnEncode AT Y 0 X 60
+     btnListEdit AT Y 0 X 30
+     btnLowerCase AT Y 0 X 120
+     btnUpperCase AT Y 0 X 90
+     btnWordCase AT Y 0 X 150
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnClose WIDGET-ID 100.
+         CANCEL-BUTTON btnClose.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -578,7 +578,7 @@ DO:
 
     RUN VALUE(getProgramDir() + 'wViewAsEditor.w')(INPUT-OUTPUT cValue).
 
-    ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord = STRING(cValue).
+    ttColumn.cNewValue:SCREEN-VALUE IN BROWSE brRecord = SUBSTRING(cValue,1,20000).
     APPLY 'value-changed' TO ttColumn.cNewValue IN BROWSE brRecord.
   END.
 END.
@@ -877,8 +877,11 @@ DO:
     brRecord:TOOLTIP = "use CTRL-PGUP / CTRL-PGDN to~nbrowse through existing values".
 
     /* Make sure we are looking at the right field. It might have changed due to a sort */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     IF ttField.cDataType = "character" THEN
     DO:
@@ -905,8 +908,11 @@ ON "SHIFT-DEL" OF ttColumn.cNewValue IN BROWSE brRecord
 DO:
   DO WITH FRAME {&FRAME-NAME}:
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+      
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     CASE ttField.cDataType:
       WHEN "date"      THEN SELF:SCREEN-VALUE = ?.
@@ -927,8 +933,11 @@ DO:
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Make sure we are looking at the right field. */
-    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE.
-    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName.
+    FIND ttColumn WHERE ttColumn.cFullName = brRecord:GET-BROWSE-COLUMN( {&field-cFullName} ):SCREEN-VALUE NO-ERROR.
+    IF NOT AVAILABLE ttColumn THEN RETURN NO-APPLY.
+
+    FIND ttField WHERE ttField.cFieldname = ttColumn.cFieldName NO-ERROR.
+    IF NOT AVAILABLE ttField THEN RETURN NO-APPLY.
 
     /* If it is a date or looks like a date, treat it like a date */
     dValue = DATE(SELF:SCREEN-VALUE) NO-ERROR.
@@ -974,7 +983,7 @@ PROCEDURE btnGoChoose :
   DEFINE VARIABLE hSourceBuffer   AS HANDLE  NO-UNDO.
   DEFINE VARIABLE iNumRecs        AS INTEGER NO-UNDO.
   DEFINE VARIABLE iRow            AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iStartTime      AS INTEGER NO-UNDO.
+  DEFINE VARIABLE iStartTime      AS INT64   NO-UNDO.
   DEFINE VARIABLE lDisableTrigger AS LOGICAL NO-UNDO.
   DEFINE VARIABLE lCommit         AS LOGICAL NO-UNDO.
 
@@ -1154,7 +1163,7 @@ PROCEDURE btnGoChoose :
         IF NOT plSuccess THEN UNDO #CommitLoop, LEAVE #CommitLoop.
       END.
       ELSE
-        hBuffer:BUFFER-RELEASE.
+        hBuffer:BUFFER-RELEASE().
 
       /* Set nr of processed records in field "Num records" */
       IF ETIME - iStartTime > 500 THEN
@@ -1683,7 +1692,7 @@ PROCEDURE reopenFieldBrowse :
 
   hQuery:QUERY-PREPARE(cQuery).
   hQuery:QUERY-OPEN().
-  hQuery:GET-FIRST.
+  hQuery:GET-FIRST().
 
   /* Attach query to the browse */
   brRecord:QUERY IN FRAME {&FRAME-NAME} = hQuery.
@@ -1785,3 +1794,4 @@ END FUNCTION. /* increaseCharValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

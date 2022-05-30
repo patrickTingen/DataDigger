@@ -22,7 +22,7 @@ DEFINE VARIABLE winMessage  AS HANDLE      NO-UNDO.
 
 DEFINE IMAGE imgMessage SIZE 4.8 BY 1.14.
 DEFINE FRAME infoFrame
-  imgMessage AT ROW 1.3 COL 2 WIDGET-ID 2
+  imgMessage AT ROW 1.3 COL 2  
   cMessage VIEW-AS FILL-IN SIZE 1 BY 1 AT ROW 1.4 COLUMN 1.5 NO-LABEL
   WITH 1 DOWN NO-BOX OVERLAY SIDE-LABELS THREE-D AT COLUMN 1 ROW 1 SIZE-PIXELS 50 BY 40.
 
@@ -69,8 +69,10 @@ cMessage:SCREEN-VALUE = cMessage.
 FRAME infoFrame:WIDTH-PIXELS = winMessage:WIDTH-PIXELS.
 
 /* Center the window */
-winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS - winMessage:WIDTH-PIXELS) / 2.
-winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
+{&_proparse_ prolint-nowarn(overflow)}
+ASSIGN 
+  winMessage:X = (SESSION:WORK-AREA-WIDTH-PIXELS  - winMessage:WIDTH-PIXELS ) / 2
+  winMessage:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - winMessage:HEIGHT-PIXELS) / 2.
 
 /* Showtime! */
 VIEW FRAME infoFrame IN WINDOW winMessage.
@@ -80,3 +82,4 @@ VIEW winMessage.
 IF PROGRAM-NAME(2) <> "getDataserver.p" THEN PROCESS EVENTS.
 
 phWindow = winMessage:HANDLE.
+

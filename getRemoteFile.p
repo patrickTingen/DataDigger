@@ -9,8 +9,8 @@ DEFINE INPUT  PARAMETER pcRemoteFile AS CHARACTER NO-UNDO.
 DEFINE OUTPUT PARAMETER pcContents   AS LONGCHAR  NO-UNDO.
 
 {&_proparse_prolint-nowarn(varusage)}
-DEFINE VARIABLE iResult   AS INTEGER   NO-UNDO.
-DEFINE VARIABLE cTempFile AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE iResult   AS INT64     NO-UNDO.
+DEFINE VARIABLE cTempFile AS CHARACTER NO-UNDO.
 
 /* Figure out a temp name */
 #GetName:
@@ -23,7 +23,9 @@ END.
 RUN DeleteURLCacheEntry (INPUT pcRemoteFile).
 
 {&_proparse_prolint-nowarn(varusage)}
-RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
+IF SESSION:CPINTERNAL = 'UTF8' 
+  THEN RUN urlDownloadToFileW (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
+  ELSE RUN urlDownloadToFileA (0, pcRemoteFile, cTempFile, 0, 0, OUTPUT iResult).
 
 /* Read */
 IF SEARCH(cTempFile) <> ? THEN COPY-LOB FILE cTempFile TO pcContents.

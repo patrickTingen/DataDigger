@@ -15,13 +15,16 @@
 DEFINE INPUT PARAMETER piChannel     AS INTEGER NO-UNDO.
 DEFINE INPUT PARAMETER plManualCheck AS LOGICAL NO-UNDO.
 
-{ DataDigger.i }
+{DataDigger.i}
 
 DEFINE VARIABLE cLocalBuild    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cRemoteBuild   AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE cNewVersionUrl AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE lVisit         AS LOGICAL     NO-UNDO INITIAL TRUE.
 DEFINE VARIABLE cStableBuild   AS CHARACTER   NO-UNDO.
+
+&GLOBAL-DEFINE STABLE-RELEASES-URL https://github.com/patrickTingen/DataDigger/releases/latest
+&GLOBAL-DEFINE BETA-RELEASES-URL   https://github.com/patrickTingen/DataDigger/releases/
 
 /* Might be spaces in the include file */
 cLocalBuild = TRIM('{build.i}').
@@ -62,14 +65,20 @@ setRegistry('DataDigger:Update', 'RemoteBuildNr', cRemoteBuild).
 IF cRemoteBuild > cLocalBuild THEN
 DO:
   IF piChannel = {&CHECK-MANUAL} OR piChannel = {&CHECK-STABLE} THEN 
-    cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/latest'.
+    cNewVersionUrl = '{&STABLE-RELEASES-URL}'.
   ELSE 
-    cNewVersionUrl = 'https://github.com/patrickTingen/DataDigger/releases/'.
+    cNewVersionUrl = '{&BETA-RELEASES-URL}'.
   
   IF plManualCheck THEN
   DO:
     MESSAGE 'A new version is available on the DataDigger website~n~nDo you want to check it?' VIEW-AS ALERT-BOX INFORMATION BUTTONS YES-NO-CANCEL UPDATE lVisit.
-    IF lVisit = TRUE THEN OS-COMMAND NO-WAIT START VALUE(cNewVersionUrl).
+    IF lVisit = TRUE THEN 
+    DO:
+      CASE cNewVersionUrl:
+        WHEN '{&STABLE-RELEASES-URL}' THEN OS-COMMAND NO-WAIT "START {&STABLE-RELEASES-URL}".
+        WHEN '{&BETA-RELEASES-URL}'   THEN OS-COMMAND NO-WAIT "START {&BETA-RELEASES-URL}".
+      END CASE.
+    END.
   END.
   ELSE 
     setRegistry('DataDigger:Update', 'NewVersionURL', cNewVersionUrl).

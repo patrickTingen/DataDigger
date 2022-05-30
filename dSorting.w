@@ -182,35 +182,35 @@ DEFINE VARIABLE tgDescending-9 AS LOGICAL INITIAL NO
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frSorting
-     tgDescending-1 AT Y 10 X 269 WIDGET-ID 16
-     cbSortField-2 AT Y 36 X 80 COLON-ALIGNED WIDGET-ID 78
-     tgDescending-2 AT Y 36 X 269 WIDGET-ID 80
-     cbSortField-3 AT Y 61 X 80 COLON-ALIGNED WIDGET-ID 82
-     tgDescending-3 AT Y 61 X 269 WIDGET-ID 84
-     cbSortField-4 AT Y 86 X 80 COLON-ALIGNED WIDGET-ID 86
-     tgDescending-4 AT Y 86 X 269 WIDGET-ID 88
-     cbSortField-5 AT Y 111 X 80 COLON-ALIGNED WIDGET-ID 90
-     tgDescending-5 AT Y 111 X 269 WIDGET-ID 92
-     cbSortField-6 AT Y 136 X 80 COLON-ALIGNED WIDGET-ID 94
-     tgDescending-6 AT Y 136 X 269 WIDGET-ID 96
-     cbSortField-7 AT Y 161 X 80 COLON-ALIGNED WIDGET-ID 98
-     tgDescending-7 AT Y 161 X 269 WIDGET-ID 100
-     cbSortField-8 AT Y 186 X 80 COLON-ALIGNED WIDGET-ID 102
+     tgDescending-1 AT Y 10 X 269   
+     cbSortField-2 AT Y 36 X 80 COLON-ALIGNED   
+     tgDescending-2 AT Y 36 X 269   
+     cbSortField-3 AT Y 61 X 80 COLON-ALIGNED   
+     tgDescending-3 AT Y 61 X 269   
+     cbSortField-4 AT Y 86 X 80 COLON-ALIGNED   
+     tgDescending-4 AT Y 86 X 269   
+     cbSortField-5 AT Y 111 X 80 COLON-ALIGNED   
+     tgDescending-5 AT Y 111 X 269   
+     cbSortField-6 AT Y 136 X 80 COLON-ALIGNED   
+     tgDescending-6 AT Y 136 X 269   
+     cbSortField-7 AT Y 161 X 80 COLON-ALIGNED   
+     tgDescending-7 AT Y 161 X 269    
+     cbSortField-8 AT Y 186 X 80 COLON-ALIGNED    
      btnOk AT Y 185 X 405
-     tgDescending-8 AT Y 186 X 269 WIDGET-ID 104
-     cbSortField-9 AT Y 211 X 80 COLON-ALIGNED WIDGET-ID 106
-     tgDescending-9 AT Y 211 X 269 WIDGET-ID 108
+     tgDescending-8 AT Y 186 X 269    
+     cbSortField-9 AT Y 211 X 80 COLON-ALIGNED    
+     tgDescending-9 AT Y 211 X 269    
      Btn_Cancel AT Y 211 X 405
-     btnClearAll AT Y 100 X 405 WIDGET-ID 110
-     cbSortField-1 AT Y 10 X 80 COLON-ALIGNED WIDGET-ID 2
+     btnClearAll AT Y 100 X 405    
+     cbSortField-1 AT Y 10 X 80 COLON-ALIGNED  
      "ALT-S also opens this screen" VIEW-AS TEXT
-          SIZE-PIXELS 205 BY 18 AT Y 247 X 155 WIDGET-ID 112
+          SIZE-PIXELS 205 BY 18 AT Y 247 X 155    
           FGCOLOR 7
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER
          SIDE-LABELS NO-UNDERLINE THREE-D
          SIZE-PIXELS 504 BY 300
          TITLE "Set Sorting"
-         DEFAULT-BUTTON btnOk CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
+         DEFAULT-BUTTON btnOk CANCEL-BUTTON Btn_Cancel    .
 
 
 /* *********************** Procedure Settings ************************ */

@@ -75,15 +75,15 @@ DEFINE RECTANGLE RECT-1
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     fiGroupname AT Y 35 X 80 COLON-ALIGNED WIDGET-ID 2
+     fiGroupname AT Y 35 X 80 COLON-ALIGNED  
      Btn_OK AT Y 90 X 230
      Btn_Cancel AT Y 90 X 310
-     RECT-1 AT Y 0 X 0 WIDGET-ID 4
+     RECT-1 AT Y 0 X 0  
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 405 BY 168
          TITLE "Favourites Group Name"
-         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel WIDGET-ID 100.
+         DEFAULT-BUTTON Btn_OK CANCEL-BUTTON Btn_Cancel    .
 
 
 /* *********************** Procedure Settings ************************ */

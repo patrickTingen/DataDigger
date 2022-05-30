@@ -133,25 +133,25 @@ DEFINE VARIABLE EdQuery-5 AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btDelQuery-1 AT Y 5 X 420 WIDGET-ID 56
-     EdQuery-1 AT Y 5 X 5 NO-LABEL WIDGET-ID 2
-     btUp AT Y 5 X 480 WIDGET-ID 52
-     EdQuery-2 AT Y 80 X 5 NO-LABEL WIDGET-ID 4
-     btDown AT Y 5 X 510 WIDGET-ID 54
-     EdQuery-3 AT Y 155 X 5 NO-LABEL WIDGET-ID 6
-     EdQuery-4 AT Y 230 X 5 NO-LABEL WIDGET-ID 12
-     EdQuery-5 AT Y 305 X 5 NO-LABEL WIDGET-ID 10
-     BtnOK AT Y 322 X 465 WIDGET-ID 48
+     btDelQuery-1 AT Y 5 X 420   
+     EdQuery-1 AT Y 5 X 5 NO-LABEL  
+     btUp AT Y 5 X 480   
+     EdQuery-2 AT Y 80 X 5 NO-LABEL  
+     btDown AT Y 5 X 510   
+     EdQuery-3 AT Y 155 X 5 NO-LABEL  
+     EdQuery-4 AT Y 230 X 5 NO-LABEL   
+     EdQuery-5 AT Y 305 X 5 NO-LABEL   
+     BtnOK AT Y 322 X 465   
      BtnCancel AT Y 352 X 465
-     btDelQuery-2 AT Y 80 X 420 WIDGET-ID 58
-     btDelQuery-3 AT Y 155 X 420 WIDGET-ID 60
-     btDelQuery-4 AT Y 230 X 420 WIDGET-ID 62
-     btDelQuery-5 AT Y 305 X 420 WIDGET-ID 64
+     btDelQuery-2 AT Y 80 X 420   
+     btDelQuery-3 AT Y 155 X 420   
+     btDelQuery-4 AT Y 230 X 420   
+     btDelQuery-5 AT Y 305 X 420   
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 560 BY 420
          TITLE "Previous Queries"
-         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel WIDGET-ID 100.
+         DEFAULT-BUTTON BtnOK CANCEL-BUTTON BtnCancel    .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -807,4 +807,5 @@ END PROCEDURE. /* showQueries */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+
 

@@ -210,28 +210,28 @@ ttConnection.lConnected
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME Dialog-Frame
-     btnBrowse AT Y 90 X 825 WIDGET-ID 56
-     btnDelete AT Y 5 X 560 WIDGET-ID 14
-     btnTest AT Y 325 X 790 WIDGET-ID 42
-     btnConnect AT Y 5 X 310 WIDGET-ID 48
-     fiLogicalName AT Y 40 X 390 COLON-ALIGNED WIDGET-ID 4
-     btnDisconnect AT Y 5 X 335 WIDGET-ID 52
-     cbSection AT Y 40 X 655 COLON-ALIGNED WIDGET-ID 54
-     btnAdd AT Y 5 X 385 WIDGET-ID 2
-     fiDescription AT Y 65 X 390 COLON-ALIGNED WIDGET-ID 38
-     fiDatabaseName AT Y 92 X 390 COLON-ALIGNED WIDGET-ID 6
-     brConnections AT Y 1 X 1 WIDGET-ID 200
-     btnClone AT Y 5 X 410 WIDGET-ID 46
-     edParameters AT Y 145 X 310 NO-LABEL WIDGET-ID 10
-     btnEdit AT Y 5 X 435 WIDGET-ID 12
-     btnSave AT Y 5 X 485 WIDGET-ID 22
-     btnUndo AT Y 5 X 510 WIDGET-ID 24
+     btnBrowse AT Y 90 X 825
+     btnDelete AT Y 5 X 560
+     btnTest AT Y 325 X 790
+     btnConnect AT Y 5 X 310
+     fiLogicalName AT Y 40 X 390 COLON-ALIGNED
+     btnDisconnect AT Y 5 X 335
+     cbSection AT Y 40 X 655 COLON-ALIGNED
+     btnAdd AT Y 5 X 385
+     fiDescription AT Y 65 X 390 COLON-ALIGNED
+     fiDatabaseName AT Y 92 X 390 COLON-ALIGNED
+     brConnections AT Y 1 X 1
+     btnClone AT Y 5 X 410
+     edParameters AT Y 145 X 310 NO-LABEL
+     btnEdit AT Y 5 X 435
+     btnSave AT Y 5 X 485
+     btnUndo AT Y 5 X 510
      "Parameters:" VIEW-AS TEXT
-          SIZE-PIXELS 120 BY 13 AT Y 130 X 310 WIDGET-ID 18
+          SIZE-PIXELS 120 BY 13 AT Y 130 X 310
     WITH VIEW-AS DIALOG-BOX KEEP-TAB-ORDER 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          SIZE-PIXELS 873 BY 382
-         TITLE "Database Connections" DROP-TARGET WIDGET-ID 100.
+         TITLE "Database Connections" DROP-TARGET.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -614,7 +614,7 @@ PROCEDURE addConnections :
         ELSE
         DO:
           COPY-LOB FROM FILE cFile TO cContents NO-CONVERT.
-          ttConnection.cParameters = STRING(cContents).
+          ttConnection.cParameters = SUBSTRING(cContents,1,20000).
         END.
 
         /* Save to registry */
@@ -1183,7 +1183,7 @@ PROCEDURE openConnectionQuery :
     cQuery = SUBSTITUTE("&1 by &2 &3", cQuery, cNewSort, STRING(lAscending,'/descending')).
     hQuery:QUERY-PREPARE(cQuery).
     hQuery:QUERY-OPEN().
-    hQuery:GET-FIRST.
+    hQuery:GET-FIRST().
 
     /* Attach query to the browse */
     brConnections:query IN FRAME {&frame-name} = hQuery.

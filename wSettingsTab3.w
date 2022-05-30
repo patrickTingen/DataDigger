@@ -193,68 +193,68 @@ DEFINE FRAME DEFAULT-FRAME
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 586 BY 556 WIDGET-ID 100.
+         SIZE-PIXELS 586 BY 556    .
 
 DEFINE FRAME FRAME-K
-     tgBackupOnCreate AT Y 5 X 31 WIDGET-ID 126
-     tgBackupOnUpdate AT Y 5 X 215 WIDGET-ID 130
-     tgBackupOnDelete AT Y 5 X 395 WIDGET-ID 132
-     RECT-17 AT Y 0 X 0 WIDGET-ID 134
+     tgBackupOnCreate AT Y 5 X 31    
+     tgBackupOnUpdate AT Y 5 X 215    
+     tgBackupOnDelete AT Y 5 X 395    
+     RECT-17 AT Y 0 X 0    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 5 Y 0
          SIZE-PIXELS 565 BY 60
-         TITLE "3" WIDGET-ID 1300.
+         TITLE "3"     .
 
 DEFINE FRAME FRAME-O
-     btnSeq AT Y 298 X 450 WIDGET-ID 210
-     btnAction AT Y 298 X 240 WIDGET-ID 196
-     btnDb AT Y 232 X 345 WIDGET-ID 200
-     btnDumpName AT Y 276 X 450 WIDGET-ID 204
-     btnExt AT Y 298 X 345 WIDGET-ID 198
-     fiDirTemplate AT Y 23 X 30 NO-LABEL WIDGET-ID 166
-     btnLastDir AT Y 254 X 450 WIDGET-ID 208
-     fiFileTemplate AT Y 48 X 30 NO-LABEL WIDGET-ID 176
-     fiFileExample AT Y 74 X 30 NO-LABEL WIDGET-ID 212
-     btnProgDir AT Y 232 X 450 WIDGET-ID 206
-     fiDumpDirTemplate AT Y 127 X 30 NO-LABEL WIDGET-ID 178
-     btnTable AT Y 254 X 345 WIDGET-ID 202
-     fiDumpFileTemplate AT Y 152 X 30 NO-LABEL WIDGET-ID 182
-     btnUserid AT Y 276 X 345 WIDGET-ID 194
-     btnWeekday AT Y 298 X 30 WIDGET-ID 148
-     fiDumpFileExample AT Y 176 X 30 NO-LABEL WIDGET-ID 214
-     btnDate AT Y 254 X 30 WIDGET-ID 140
-     btnDay AT Y 276 X 135 WIDGET-ID 156
-     btnDayName AT Y 298 X 135 WIDGET-ID 150
-     btnHH AT Y 232 X 240 WIDGET-ID 158
-     btnMM AT Y 254 X 240 WIDGET-ID 160
-     btnMonth AT Y 254 X 135 WIDGET-ID 154
-     btnSS AT Y 276 X 240 WIDGET-ID 162
-     btnTime AT Y 276 X 30 WIDGET-ID 142
-     btnTimestamp AT Y 232 X 30 WIDGET-ID 138
-     btnYear AT Y 232 X 135 WIDGET-ID 152
+     btnSeq AT Y 298 X 450    
+     btnAction AT Y 298 X 240    
+     btnDb AT Y 232 X 345    
+     btnDumpName AT Y 276 X 450    
+     btnExt AT Y 298 X 345    
+     fiDirTemplate AT Y 23 X 30 NO-LABEL    
+     btnLastDir AT Y 254 X 450    
+     fiFileTemplate AT Y 48 X 30 NO-LABEL    
+     fiFileExample AT Y 74 X 30 NO-LABEL    
+     btnProgDir AT Y 232 X 450    
+     fiDumpDirTemplate AT Y 127 X 30 NO-LABEL    
+     btnTable AT Y 254 X 345    
+     fiDumpFileTemplate AT Y 152 X 30 NO-LABEL    
+     btnUserid AT Y 276 X 345    
+     btnWeekday AT Y 298 X 30    
+     fiDumpFileExample AT Y 176 X 30 NO-LABEL    
+     btnDate AT Y 254 X 30    
+     btnDay AT Y 276 X 135    
+     btnDayName AT Y 298 X 135    
+     btnHH AT Y 232 X 240    
+     btnMM AT Y 254 X 240    
+     btnMonth AT Y 254 X 135    
+     btnSS AT Y 276 X 240    
+     btnTime AT Y 276 X 30    
+     btnTimestamp AT Y 232 X 30    
+     btnYear AT Y 232 X 135    
      "File:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 158 X 5 WIDGET-ID 184
+          SIZE-PIXELS 23 BY 13 AT Y 158 X 5    
      "Dir:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 131 X 5 WIDGET-ID 186
+          SIZE-PIXELS 23 BY 13 AT Y 131 X 5    
      "Dump template" VIEW-AS TEXT
-          SIZE-PIXELS 100 BY 13 AT Y 109 X 10 WIDGET-ID 190
+          SIZE-PIXELS 100 BY 13 AT Y 109 X 10    
      "Dir:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 28 X 7 WIDGET-ID 168
+          SIZE-PIXELS 23 BY 13 AT Y 28 X 7    
      "Backup template" VIEW-AS TEXT
-          SIZE-PIXELS 111 BY 13 AT Y 2 X 14 WIDGET-ID 172
+          SIZE-PIXELS 111 BY 13 AT Y 2 X 14    
      "Use these fields for templates :" VIEW-AS TEXT
-          SIZE-PIXELS 185 BY 13 AT Y 210 X 10 WIDGET-ID 146
+          SIZE-PIXELS 185 BY 13 AT Y 210 X 10    
      "File:" VIEW-AS TEXT
-          SIZE-PIXELS 23 BY 13 AT Y 56 X 7 WIDGET-ID 174
-     RECT-14 AT Y 11 X 0 WIDGET-ID 170
-     RECT-15 AT Y 117 X 0 WIDGET-ID 188
-     RECT-16 AT Y 218 X 0 WIDGET-ID 192
+          SIZE-PIXELS 23 BY 13 AT Y 56 X 7    
+     RECT-14 AT Y 11 X 0    
+     RECT-15 AT Y 117 X 0    
+     RECT-16 AT Y 218 X 0    
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 5 Y 59
          SIZE-PIXELS 565 BY 368
-         TITLE "3" WIDGET-ID 1600.
+         TITLE "3"     .
 
 
 /* *********************** Procedure Settings ************************ */

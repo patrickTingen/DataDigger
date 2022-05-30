@@ -88,14 +88,14 @@ DEFINE VARIABLE tgWriteTrigger AS LOGICAL INITIAL yes
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnBack AT Y 460 X 535 WIDGET-ID 6
-     btnFinish AT Y 460 X 615 WIDGET-ID 4
-     tgWriteTrigger AT Y 463 X 15 WIDGET-ID 16
-     rctData AT Y 0 X 1 WIDGET-ID 52
+     btnBack AT Y 460 X 535
+     btnFinish AT Y 460 X 615
+     tgWriteTrigger AT Y 463 X 15
+     rctData AT Y 0 X 1
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1 SCROLLABLE 
-         CANCEL-BUTTON btnBack WIDGET-ID 100.
+         CANCEL-BUTTON btnBack.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -299,7 +299,7 @@ DO:
 
   IF VALID-HANDLE(ghXmlQuery) THEN
   DO:
-    ghXmlQuery:QUERY-CLOSE.
+    ghXmlQuery:QUERY-CLOSE().
     DELETE OBJECT ghXmlQuery.
   END.
 
@@ -762,7 +762,7 @@ PROCEDURE loadData :
       /* If nothing found, then the record from the tt is a new one */
       IF NOT hDbBuffer:AVAILABLE THEN
       DO:
-        hDbBuffer:BUFFER-CREATE NO-ERROR.
+        hDbBuffer:BUFFER-CREATE() NO-ERROR.
         IF ERROR-STATUS:ERROR THEN NEXT XmlLoop.
 
         /* Save backup file when not a testrun */
@@ -792,10 +792,10 @@ PROCEDURE loadData :
       IF porRepositionId = ? THEN porRepositionId = hDbBuffer:ROWID.
 
       /* Let it go ... */
-      hXmlBuffer:BUFFER-RELEASE.
+      hXmlBuffer:BUFFER-RELEASE().
     END. /* XmlLoop */
 
-    hXmlQuery:QUERY-CLOSE.
+    hXmlQuery:QUERY-CLOSE().
     DELETE OBJECT hXmlQuery.
     DELETE OBJECT hDbBuffer.
 

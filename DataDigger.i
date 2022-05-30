@@ -11,13 +11,13 @@
 /*----------------------------------------------------------------------*/
 
 &GLOBAL-DEFINE version {version.i}
-&GLOBAL-DEFINE edition Rudolf
+&GLOBAL-DEFINE edition Ironman
 &GLOBAL-DEFINE build {build.i}
 
-&GLOBAL-DEFINE QUERYSEP CHR(1, SESSION:CPINTERNAL, "UTF-8")
+&GLOBAL-DEFINE QUERYSEP CHR(2, SESSION:CPINTERNAL, "UTF-8")
 
 /* Maximum field length for editing char fields */
-&GLOBAL-DEFINE field-maxLength 200
+&GLOBAL-DEFINE field-maxLength 2000
 
 /* FINALLY statement was introduced in 10.1C */
 &IF PROVERSION >= "10.1C" AND DEFINED(UIB_IS_RUNNING) = 0 &THEN
@@ -48,8 +48,6 @@
 &IF PROVERSION >= '11' &THEN
   &GLOBAL-DEFINE TABLE-SCAN TABLE-SCAN
 &ENDIF
-
-DEFINE VARIABLE gcThisProcedure AS CHARACTER   NO-UNDO.
 
 /* TT for field data to link DataDiggers to each other */
 DEFINE TEMP-TABLE ttLinkInfo NO-UNDO
@@ -101,7 +99,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO
 
   FIELD cFullName     AS CHARACTER                   LABEL "Name"      FORMAT "X(40)"    /* fieldname incl extent     */
   FIELD cXmlNodeName  AS CHARACTER                   LABEL "Xml Name"  FORMAT "X(40)"    /* name for usage in XML     */
-  FIELD iOrder        AS DECIMAL                     LABEL "Order"     FORMAT ">>>>>9"   /* user defined order        */
+  FIELD iOrder        AS INTEGER                     LABEL "Order"     FORMAT ">>>>>9"   /* user defined order        */
   FIELD lShow         AS LOGICAL                     LABEL ""                            /* toggle box                */
   FIELD cDataType     AS CHARACTER                   LABEL "Type"      FORMAT "X(16)"
   FIELD cInitial      AS CHARACTER                   LABEL "Initial"                     /* initial value from dict   */
@@ -109,7 +107,7 @@ DEFINE TEMP-TABLE ttField NO-UNDO
   FIELD cFormatOrg    AS CHARACTER                   LABEL "Format"                      /* original format           */
   FIELD iWidth        AS INTEGER                     LABEL "Width"                       /* SQL width                 */
   FIELD cLabel        AS CHARACTER                   LABEL "Label"     FORMAT "X(50)"
-  FIELD iOrderOrg     AS DECIMAL                                                         /* original order            */
+  FIELD iOrderOrg     AS INTEGER                                                         /* original order            */
   FIELD iExtent       AS INTEGER                     LABEL "Extent"    FORMAT ">>>>9"
   FIELD lPrimary      AS LOGICAL                     LABEL "Prim"                        /* part of prim index?       */
   FIELD lMandatory    AS LOGICAL                     LABEL "Man"                         /* mandatory?                */
@@ -176,7 +174,7 @@ DEFINE TEMP-TABLE ttColumnCache NO-UNDO LIKE ttColumn
 DEFINE DATASET dsFields FOR ttField, ttColumn.
 DEFINE DATASET dsFieldCache FOR ttFieldCache, ttColumnCache.
 
-/* TT for the indexfields of a table */
+/* TT for the index fields of a table */
 DEFINE TEMP-TABLE ttIndex NO-UNDO
   FIELD cIndexName   AS CHARACTER          LABEL "Name"        FORMAT "x(20)"
   FIELD cIndexFlags  AS CHARACTER          LABEL "Flags"       FORMAT "x(14)"
@@ -470,6 +468,9 @@ FUNCTION isDefaultFontsChanged RETURNS LOGICAL IN SUPER.
 FUNCTION isFileLocked RETURNS LOGICAL
   ( pcFileName AS CHARACTER ) IN SUPER.
 
+FUNCTION isIndexActive RETURNS LOGICAL
+  ( pcFile AS CHARACTER, pcIndex AS CHARACTER ) IN SUPER.
+
 FUNCTION isMouseOver RETURNS LOGICAL
   ( INPUT phWidget AS HANDLE ) IN SUPER.
 
@@ -495,37 +496,13 @@ FUNCTION setLinkInfo RETURNS LOGICAL
   ) IN SUPER.
 
 FUNCTION setRegistry RETURNS CHARACTER
-    ( pcSection AS CHARACTER
-    , pcKey     AS CHARACTER
-    , pcValue   AS CHARACTER
-    ) IN SUPER.
+  ( pcSection AS CHARACTER
+  , pcKey     AS CHARACTER
+  , pcValue   AS CHARACTER
+  ) IN SUPER.
 
 FUNCTION isValidCodePage RETURNS LOGICAL
-  (pcCodepage AS CHARACTER) IN SUPER.
-
-/* Initialize */
-gcThisProcedure = THIS-PROCEDURE:FILE-NAME.
-gcThisProcedure = ENTRY(NUM-ENTRIES(gcThisProcedure,"\"),gcThisProcedure,"\").
-gcThisProcedure = ENTRY(1,gcThisProcedure,".").
-
-SUBSCRIBE TO gcThisProcedure ANYWHERE RUN-PROCEDURE "getProcHandle".
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-/* **********************  Internal Procedures  *********************** */
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getProcHandle Include 
-PROCEDURE getProcHandle :
-/*
- * Name : getProcHandle
- * Desc : Return the handle of the procedure this include is in
- */
-DEFINE OUTPUT PARAMETER phHandle AS HANDLE NO-UNDO.
-phHandle = THIS-PROCEDURE:HANDLE.
-
-END PROCEDURE. /* getProcHandle */
+  ( pcCodepage AS CHARACTER ) IN SUPER.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME

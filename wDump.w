@@ -271,50 +271,50 @@ DEFINE RECTANGLE rcBorder
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     ficFileName AT Y 15 X 97 COLON-ALIGNED WIDGET-ID 2
-     btnChooseDumpFile AT Y 15 X 682 WIDGET-ID 4
-     cbDumpType AT Y 45 X 97 COLON-ALIGNED WIDGET-ID 6
-     cbCodePage AT Y 45 X 384 COLON-ALIGNED WIDGET-ID 54
-     tbUseCustomizedFormats AT Y 66 X 576 WIDGET-ID 52
-     cbSeparator AT Y 70 X 97 COLON-ALIGNED WIDGET-ID 64
-     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED WIDGET-ID 48
-     tbExportSchema AT Y 85 X 576 WIDGET-ID 20
-     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED WIDGET-ID 8
-     cbDateFormat AT Y 95 X 384 COLON-ALIGNED WIDGET-ID 50
-     tbMinimalSchema AT Y 104 X 576 WIDGET-ID 22
-     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED WIDGET-ID 30
-     btnViewLastDump AT Y 200 X 750 WIDGET-ID 28
-     btnOpenLastDumpDir AT Y 200 X 773 WIDGET-ID 32
-     btnDump AT Y 265 X 649 WIDGET-ID 62
-     btnClose AT Y 265 X 729 WIDGET-ID 60
-     tbDumpReadyClose AT Y 270 X 15 WIDGET-ID 36
-     tbDumpReadyExplore AT Y 270 X 145 WIDGET-ID 38
-     tbDumpReadyView AT Y 270 X 282 WIDGET-ID 40
-     tbDumpReadyClipboard AT Y 270 X 406 WIDGET-ID 56
-     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 18
-     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 16
+     ficFileName AT Y 15 X 97 COLON-ALIGNED
+     btnChooseDumpFile AT Y 15 X 682
+     cbDumpType AT Y 45 X 97 COLON-ALIGNED
+     cbCodePage AT Y 45 X 384 COLON-ALIGNED
+     tbUseCustomizedFormats AT Y 66 X 576
+     cbSeparator AT Y 70 X 97 COLON-ALIGNED
+     cbNumericFormat AT Y 70 X 384 COLON-ALIGNED
+     tbExportSchema AT Y 85 X 576
+     cbiRecordSelection AT Y 95 X 97 COLON-ALIGNED
+     cbDateFormat AT Y 95 X 384 COLON-ALIGNED
+     tbMinimalSchema AT Y 104 X 576
+     cbiFieldSelection AT Y 120 X 97 COLON-ALIGNED
+     btnViewLastDump AT Y 200 X 750
+     btnOpenLastDumpDir AT Y 200 X 773
+     btnDump AT Y 265 X 649
+     btnClose AT Y 265 X 729
+     tbDumpReadyClose AT Y 270 X 15
+     tbDumpReadyExplore AT Y 270 X 145
+     tbDumpReadyView AT Y 270 X 282
+     tbDumpReadyClipboard AT Y 270 X 406
+     ficMessageNow AT Y 184 X 0 COLON-ALIGNED NO-LABEL
+     ficMessage AT Y 203 X 0 COLON-ALIGNED NO-LABEL
      "Last dump" VIEW-AS TEXT
-          SIZE-PIXELS 87 BY 13 AT Y 163 X 13 WIDGET-ID 26
+          SIZE-PIXELS 87 BY 13 AT Y 163 X 13
      "After the dump ..." VIEW-AS TEXT
-          SIZE-PIXELS 103 BY 13 AT Y 248 X 12 WIDGET-ID 44
-     RECT-2 AT Y 5 X 10 WIDGET-ID 14
-     RECT-3 AT Y 169 X 5 WIDGET-ID 24
-     RECT-4 AT Y 254 X 5 WIDGET-ID 34
+          SIZE-PIXELS 103 BY 13 AT Y 248 X 12
+     RECT-2 AT Y 5 X 10
+     RECT-3 AT Y 169 X 5
+     RECT-4 AT Y 254 X 5
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 810 BY 301
-         DEFAULT-BUTTON btnDump WIDGET-ID 100.
+         DEFAULT-BUTTON btnDump.
 
 DEFINE FRAME infoFrame
-     btAbort AT Y 58 X 60 WIDGET-ID 54
-     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL WIDGET-ID 46
-     rcBorder AT Y 30 X 10 WIDGET-ID 2
-     rcBody AT Y 29 X 10 WIDGET-ID 6
+     btAbort AT Y 58 X 60
+     fcInfoLine AT Y 10 X 0 COLON-ALIGNED NO-LABEL
+     rcBorder AT Y 30 X 10
+     rcBody AT Y 29 X 10
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 280 Y 84
-         SIZE-PIXELS 188 BY 103 WIDGET-ID 200.
+         SIZE-PIXELS 188 BY 103.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -730,9 +730,15 @@ PROCEDURE btnDumpChoose :
     /* For Excel, we need a 12-something codepage */
     IF cbDumpType:SCREEN-VALUE = "XLSX" THEN 
     DO:
+      /* Use 12* codepage for Excel */
       IF cbCodePage:SCREEN-VALUE = ? AND SESSION:CPSTREAM BEGINS '12' THEN 
         cbCodePage:SCREEN-VALUE = SESSION:CPSTREAM.
 
+      /* ISO88591 can almost always be mapped to 1252 */
+      IF SESSION:CPSTREAM BEGINS 'ISO8859' THEN
+        cbCodePage:SCREEN-VALUE = '1252'.
+
+      /* Otherwise nag about it */
       IF NOT cbCodePage:SCREEN-VALUE BEGINS '12' THEN 
       DO:
         MESSAGE 'For Excel, use a Windows codepage like 1250,1251,1252 etc' SKIP
@@ -797,7 +803,7 @@ PROCEDURE btnOpenLastDumpDirChoose :
     FILE-INFO:FILE-NAME = cDumpDir.
 
     IF FILE-INFO:FULL-PATHNAME <> ? THEN
-      OS-COMMAND NO-WAIT explorer /n, /e, VALUE(FILE-INFO:FULL-PATHNAME).
+      OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("explorer /n, /e, &1", FILE-INFO:FULL-PATHNAME)).
     ELSE
       MESSAGE SUBSTITUTE("Last used dir '&1' not found.", cDumpDir)
         VIEW-AS ALERT-BOX INFORMATION BUTTONS OK TITLE "Invalid Dir" .
@@ -1107,7 +1113,7 @@ PROCEDURE dumpData :
 
   DEFINE VARIABLE iCurSelectedRow AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iCurIndex       AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted    AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted    AS INT64       NO-UNDO.
   DEFINE VARIABLE cStatus         AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cIndexInfo      AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cIndexName      AS CHARACTER   NO-UNDO.
@@ -1211,7 +1217,7 @@ PROCEDURE dumpData :
           IF glAborted THEN LEAVE #CollectData.
         END.
 
-        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-CREATE().
         hBuffer:BUFFER-COPY(hQuery:GET-BUFFER-HANDLE(1)).
       END.
       hQuery:QUERY-CLOSE().
@@ -1225,7 +1231,7 @@ PROCEDURE dumpData :
       #DumpSelectedRow:
       DO iCurSelectedRow = 1 TO phDdBrowse:NUM-SELECTED-ROWS:
         phDdBrowse:FETCH-SELECTED-ROW(iCurSelectedRow).
-        hBuffer:BUFFER-CREATE.
+        hBuffer:BUFFER-CREATE().
         hBuffer:BUFFER-COPY(phDdBrowse:QUERY:get-buffer-handle()).
 
         ASSIGN iNumRecs = iNumRecs + 1.
@@ -1316,7 +1322,7 @@ PROCEDURE dumpData4GL :
   DEFINE VARIABLE iNumRecords         AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iMaxLength          AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNumFields          AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cBufName            AS CHARACTER   NO-UNDO.
@@ -1342,9 +1348,9 @@ PROCEDURE dumpData4GL :
   PUT STREAM strDump UNFORMATTED
          SUBSTITUTE("/* Data-create procedure for &1.&2 ", gcDB, gcTable)
     SKIP SUBSTITUTE(" * Generated &1 by &2", STRING(NOW,"99-99-9999 HH:MM"), getUsername() )
-    SKIP SUBSTITUTE(" */" )
+    SKIP            " */"
     SKIP SUBSTITUTE("DEFINE BUFFER &1 FOR &2.&3.", cBufName, gcDB, gcTable)
-    SKIP SUBSTITUTE(" ")
+    SKIP            " "
     .
 
   /* Build query */
@@ -1431,9 +1437,9 @@ PROCEDURE dumpData4GL :
         IF iNumFields MODULO 100 = 0 THEN
         DO:
           /* Closing dot for previouse assign */
-          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("  .").
+          IF iNumFields > 0 THEN PUT STREAM strDump UNFORMATTED SKIP "  .".
           /* New assign */
-          PUT STREAM strDump UNFORMATTED SKIP SUBSTITUTE("ASSIGN").
+          PUT STREAM strDump UNFORMATTED SKIP "ASSIGN".
         END.
 
         cFieldName = SUBSTITUTE("&1&2",hField:NAME, IF iExtent > 0 THEN SUBSTITUTE("[&1]",iExtent) ELSE "").
@@ -1477,7 +1483,7 @@ PROCEDURE dumpDataCSV :
   DEFINE VARIABLE iField              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cSeparator          AS CHARACTER   NO-UNDO.
 
@@ -1786,7 +1792,7 @@ PROCEDURE dumpDataHtml :
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cData               AS CHARACTER   NO-UNDO.
 
@@ -1899,12 +1905,12 @@ PROCEDURE dumpDataProgressD :
   DEFINE VARIABLE cTimeStamp          AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE hQuery              AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hTTBuffer           AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iBack               AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iBack               AS INT64       NO-UNDO.
   DEFINE VARIABLE iCurField           AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTrailer            AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
+  DEFINE VARIABLE iTrailer            AS INT64       NO-UNDO.
   DEFINE VARIABLE lFirstFieldOfRecord AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE cCodePage           AS CHARACTER   NO-UNDO.
 
@@ -2033,7 +2039,7 @@ PROCEDURE dumpDataTxt :
   DEFINE VARIABLE iField              AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iNrOfRecords        AS INTEGER     NO-UNDO.
   DEFINE VARIABLE iExtent             AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iTimeStarted        AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iTimeStarted        AS INT64       NO-UNDO.
   DEFINE VARIABLE iLength             AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cDumpFormatList     AS CHARACTER   NO-UNDO.
   DEFINE VARIABLE cFieldFormatList    AS CHARACTER   NO-UNDO.
@@ -2471,10 +2477,11 @@ PROCEDURE showProgressBar :
     ENABLE btAbort WITH FRAME infoFrame.
     fcInfoLine:SCREEN-VALUE = pcInfoText.
 
-    iNewWidth = (MINIMUM(100,piPrcDone) / 100) * rcBorder:width-pixels.
+    {&_proparse_ prolint-nowarn(overflow)}
+    iNewWidth = (MINIMUM(100,piPrcDone) / 100) * rcBorder:WIDTH-PIXELS.
+
     rcBody:VISIBLE = (iNewWidth > 0).
-    IF iNewWidth > 0 THEN
-      rcBody:WIDTH-PIXELS = iNewWidth.
+    IF iNewWidth > 0 THEN rcBody:WIDTH-PIXELS = iNewWidth.
 
     PROCESS EVENTS.
   END.
@@ -2613,11 +2620,13 @@ FUNCTION getExcelCol RETURNS CHARACTER
   ( INPUT iColumnNr AS INTEGER ) :
   /* Transform a column nr to Excel Column name (27 -> AA)
   */
-  DEFINE VARIABLE ifirst  AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE isecond AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iFirst  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iSecond AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cCols   AS CHARACTER NO-UNDO.
 
+  {&_proparse_ prolint-nowarn(overflow)}
   iFirst  = INTEGER(TRUNCATE((iColumnNr - 1) / 26, 0)).
+
   iSecond = iColumnNr - (26 * iFirst).
   cCols   = CHR(64 + iSecond).
   IF iFirst > 0 THEN cCols = CHR(64 + iFirst) + cCols.
@@ -2707,3 +2716,4 @@ END FUNCTION. /* getFieldValue */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

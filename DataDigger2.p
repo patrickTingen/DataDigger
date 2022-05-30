@@ -406,7 +406,7 @@ PROCEDURE initializeObject :
       SKIP "Please download and reinstall DataDigger again" 
       SKIP(1) "The program will now quit"
            VIEW-AS ALERT-BOX INFORMATION.
-    OS-COMMAND NO-WAIT START VALUE("https://datadigger.wordpress.com/download/").
+    OS-COMMAND NO-WAIT VALUE("START https://datadigger.wordpress.com/download/").
     QUIT.
   END.
 
@@ -475,7 +475,7 @@ PROCEDURE recompileDataDigger :
       DO:
         MESSAGE "Cannot create dummy database in folder" cDummyDb SKIP 
                 "DataDigger needs at least 1 connected db to compile." VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-        OS-COMMAND NO-WAIT START 'https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
+        OS-COMMAND NO-WAIT 'START https://github.com/patrickTingen/DataDigger/wiki/Problem-CannotCreateDummyDB'.
         STOP.
       END.
     END.
@@ -591,7 +591,10 @@ PROCEDURE recompileSelf :
   PUT UNFORMATTED SKIP(0) "  Windows version    : " SESSION:WINDOW-SYSTEM " " cSystem + ", " getProcessorArchitecture() "bit".
   PUT UNFORMATTED SKIP(0) "  System memory      : " cMemory.
   PUT UNFORMATTED SKIP(0) "  Display size       : " SESSION:WORK-AREA-WIDTH-PIXELS " x " SESSION:WORK-AREA-HEIGHT-PIXELS.
-  PUT UNFORMATTED SKIP(0) "  Logged in as       : " OS-GETENV("username").
+
+  &IF PROVERSION >= "11" &THEN
+  PUT UNFORMATTED SKIP(0) "  Logged in as       : " System.Environment:GetEnvironmentVariable("username").
+  &ENDIF
 
   PUT UNFORMATTED SKIP(1) "SESSION INFO".
   PUT UNFORMATTED SKIP(0) "  Program dir        : " gcProgramDir.
@@ -721,7 +724,7 @@ PROCEDURE recompileSelf :
   DO:
     MESSAGE "An error occurred while recompiling. ~n~nPlease check 'DataDigger.log' in the DataDigger directory."
       VIEW-AS ALERT-BOX INFORMATION BUTTONS OK.
-    OS-COMMAND NO-WAIT START VALUE(cLogFile).
+    OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cLogFile)).
   END.
 
   /* Clean up */
@@ -877,12 +880,13 @@ FUNCTION getTimeStamp RETURNS CHARACTER
   ( INPUT pDateTime AS DATETIME ) :
   /* Return a timestamp in the form "YYYY-MM-DD HH:MM:SS"
   */
+  {&_proparse_ prolint-nowarn(overflow)}
   RETURN
     SUBSTITUTE('&1-&2-&3 &4'
               , STRING(YEAR(pDateTime),'9999')
               , STRING(MONTH(pDateTime),'99')
               , STRING(DAY(pDateTime),'99')
-              , STRING( INTEGER( TRUNCATE( MTIME( pDateTime ) / 1000, 0 ) ),'HH:MM:SS' )
+              , STRING(INTEGER( TRUNCATE( MTIME( pDateTime ) / 1000, 0 ) ),'HH:MM:SS' )
               ).
 
 END FUNCTION. /* getTimeStamp */
@@ -1010,3 +1014,4 @@ END FUNCTION. /* setRegistry */
 &ANALYZE-RESUME
 
 &ENDIF
+

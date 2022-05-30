@@ -2,8 +2,8 @@
 &ANALYZE-RESUME
 /* Connected Databases 
 */
-&Scoped-define WINDOW-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS C-Win 
+&Scoped-define WINDOW-NAME wDataDigger
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _DEFINITIONS wDataDigger 
 /*
  * Main program for DataDigger
  */
@@ -77,47 +77,46 @@ DEFINE TEMP-TABLE ttColumnHandle NO-UNDO
   .
 
 /* Local Variable Definitions --- */
-DEFINE VARIABLE glReadOnlyDigger           AS LOGICAL     NO-UNDO. /* org value of plReadOnlyDigger */
-DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
-DEFINE VARIABLE gcCurrentTable             AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcCurrentDatabase          AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcFieldFilterHandles       AS CHARACTER   NO-UNDO. /* To save Handles to the filter widgets */
-DEFINE VARIABLE gcFieldFilterList          AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumnNames    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE gcDataBrowseColumns        AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE gcQueryEditorState         AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcDatabase                 AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcFavouriteTables          AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcFieldFilterHandles       AS CHARACTER   NO-UNDO. /* To save Handles to the filter widgets */
+DEFINE VARIABLE gcFieldFilterList          AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
+DEFINE VARIABLE gcRecordMode               AS CHARACTER   NO-UNDO.
+DEFINE VARIABLE gcTable                    AS CHARACTER   NO-UNDO.
 DEFINE VARIABLE ghDataBrowse               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghDataBuffer               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghDataQuery                AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghTableQuery               AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghTableBuffer              AS HANDLE      NO-UNDO.
-DEFINE VARIABLE ghLockTable                AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghFieldBrowse              AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghFieldMenu                AS HANDLE      NO-UNDO. /* Popup menu on brFields */
 DEFINE VARIABLE ghLastFilterField          AS HANDLE      NO-UNDO.
 DEFINE VARIABLE ghLastIndexFilter          AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghLockTable                AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghTableBuffer              AS HANDLE      NO-UNDO.
+DEFINE VARIABLE ghTableQuery               AS HANDLE      NO-UNDO.
 DEFINE VARIABLE giCurrentPage              AS INTEGER     NO-UNDO. /* 1=fields 2=indexes */
-DEFINE VARIABLE giQueryPointer             AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glRowEditActive            AS LOGICAL     NO-UNDO.
-DEFINE VARIABLE glFormatChanged            AS LOGICAL     NO-UNDO. /* When user changes a format */
-DEFINE VARIABLE glHintCancelled            AS LOGICAL     NO-UNDO. /* When user presses ESC during hint */
-DEFINE VARIABLE giMaxQueryTime             AS INTEGER     NO-UNDO.
-DEFINE VARIABLE gcRecordMode               AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE giDataOddRowColor          AS INTEGER     NO-UNDO EXTENT 2.
 DEFINE VARIABLE giDataEvenRowColor         AS INTEGER     NO-UNDO EXTENT 2.
+DEFINE VARIABLE giDataOddRowColor          AS INTEGER     NO-UNDO EXTENT 2.
 DEFINE VARIABLE giDefaultFont              AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giFixedFont                AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxColumns               AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxExtent                AS INTEGER     NO-UNDO.
 DEFINE VARIABLE giMaxFilterHistory         AS INTEGER     NO-UNDO.
-DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO INITIAL FALSE.
-DEFINE VARIABLE giLastDataColumnX          AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giMaxQueryTime             AS INTEGER     NO-UNDO.
+DEFINE VARIABLE giQueryPointer             AS INTEGER     NO-UNDO.
+DEFINE VARIABLE glDebugMode                AS LOGICAL     NO-UNDO.
+DEFINE VARIABLE glFormatChanged            AS LOGICAL     NO-UNDO. /* When user changes a format */
+DEFINE VARIABLE glHintCancelled            AS LOGICAL     NO-UNDO. /* When user presses ESC during hint */
+DEFINE VARIABLE glInitializing             AS LOGICAL     NO-UNDO. /* to indicate init is running */
+DEFINE VARIABLE glReadOnlyDigger           AS LOGICAL     NO-UNDO. /* org value of plReadOnlyDigger */
+DEFINE VARIABLE glRowEditActive            AS LOGICAL     NO-UNDO.
 DEFINE VARIABLE glShowFavourites           AS LOGICAL     NO-UNDO. /* show table list of Favourite tables */
-DEFINE VARIABLE gcFavouriteTables          AS CHARACTER   NO-UNDO.
-DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 DEFINE VARIABLE glShowTour                 AS LOGICAL     NO-UNDO. /* to override 'ShowHints=no' setting */
-
-DEFINE VARIABLE gcPreviousValues           AS CHARACTER   NO-UNDO. /* used in DataRowDisplay for row coloring */
 DEFINE VARIABLE glUseEvenRowColorSet       AS LOGICAL     NO-UNDO. /* used in DataRowDisplay for row coloring */
+DEFINE VARIABLE glUseTimer                 AS LOGICAL     NO-UNDO. /* use PSTimer? */
 
 /* Vars to keep the values for the colors */
 DEFINE VARIABLE giColorFieldFilterFG    AS INTEGER NO-UNDO.
@@ -190,11 +189,11 @@ DEFINE VARIABLE glUseColorsFavouriteTable AS LOGICAL     NO-UNDO.
     ~{&OPEN-QUERY-brIndexes}
 
 /* Standard List Definitions                                            */
-&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnFavourite fiTableFilter ~
+&Scoped-Define ENABLED-OBJECTS rctQuery rctEdit btnWhere fiTableFilter ~
 cbDatabaseFilter tgSelAll fiIndexNameFilter fiFlagsFilter fiFieldsFilter ~
-btnClearIndexFilter btnClearTableFilter brTables brFields brIndexes ~
-tgDebugMode btnTableFilter fiTableDesc cbFavouriteGroup btnAddFavGroup ~
-ficWhere btnWhere btnQueries btnView btnTools btnTabTables btnClear ~
+btnClearIndexFilter brTables btnFavourite brFields brIndexes tgDebugMode ~
+fiTableDesc btnClearTableFilter cbFavouriteGroup ficWhere btnTableFilter ~
+btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear ~
 btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop ~
 btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes btnNextQuery ~
 btnPrevQuery btnDump btnLoad btnDelete btnResizeVer btnClone btnAdd btnEdit ~
@@ -205,9 +204,6 @@ ficWhere fiFeedback
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
-&Scoped-define List-1 btnBegins rctQueryButtons cbAndOr cbFields cbOperator ~
-ficValue btnInsert btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT ~
-btnMatches btnNE btnQt btnToday 
 &Scoped-define List-2 rcFieldFilter tgSelAll brFields btnClearFieldFilter ~
 btnMoveBottom btnMoveDown btnMoveTop btnMoveUp btnReset 
 &Scoped-define List-3 rcIndexFilter fiIndexNameFilter fiFlagsFilter ~
@@ -219,14 +215,14 @@ fiFieldsFilter btnClearIndexFilter brIndexes
 
 /* ************************  Function Prototypes ********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenu C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenu wDataDigger 
 FUNCTION createMenu RETURNS HANDLE
   ( phParent AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenuItem C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD createMenuItem wDataDigger 
 FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
@@ -237,7 +233,7 @@ FUNCTION createMenuItem RETURNS HANDLE
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD FilterModified C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD FilterModified wDataDigger 
 FUNCTION FilterModified RETURNS LOGICAL
   ( phFilterField AS HANDLE
   , plModified    AS LOGICAL )  FORWARD.
@@ -245,42 +241,35 @@ FUNCTION FilterModified RETURNS LOGICAL
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getActiveQueryEditor C-Win 
-FUNCTION getActiveQueryEditor RETURNS HANDLE
-  ( /* parameter-definitions */ )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDroppedFiles C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getDroppedFiles wDataDigger 
 FUNCTION getDroppedFiles RETURNS CHARACTER
   ( phDropTarget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getFieldList wDataDigger 
 FUNCTION getFieldList RETURNS CHARACTER
   ( pcSortBy AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMatchesValue C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getMatchesValue wDataDigger 
 FUNCTION getMatchesValue RETURNS CHARACTER
   ( phFilterField AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQueryFromFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getQueryFromFields wDataDigger 
 FUNCTION getQueryFromFields RETURNS CHARACTER
   ( INPUT pcFieldList AS CHARACTER ) FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSafeFormat C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSafeFormat wDataDigger 
 FUNCTION getSafeFormat RETURNS CHARACTER
   ( pcFormat   AS CHARACTER 
   , pcDataType AS CHARACTER )  FORWARD.
@@ -288,70 +277,63 @@ FUNCTION getSafeFormat RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedFields wDataDigger 
 FUNCTION getSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedText C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getSelectedText wDataDigger 
 FUNCTION getSelectedText RETURNS CHARACTER
   ( INPUT hWidget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD getTableFilter wDataDigger 
 FUNCTION getTableFilter RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD killMenu C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD killMenu wDataDigger 
 FUNCTION killMenu RETURNS LOGICAL
   ( phMenu AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD saveSelectedFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD saveSelectedFields wDataDigger 
 FUNCTION saveSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setDebugMode C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setDebugMode wDataDigger 
 FUNCTION setDebugMode RETURNS LOGICAL
   ( plDebugMode AS LOGICAL )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setFilterFieldColor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setFilterFieldColor wDataDigger 
 FUNCTION setFilterFieldColor RETURNS LOGICAL
   ( phWidget AS HANDLE )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQuery wDataDigger 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setQueryEditor C-Win 
-FUNCTION setQueryEditor RETURNS LOGICAL
-  ( pcQueryEditorState AS CHARACTER )  FORWARD.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setRegistry wDataDigger 
 FUNCTION setRegistry RETURNS CHARACTER
   ( pcSection AS CHARACTER
   , pcKey     AS CHARACTER
@@ -361,21 +343,21 @@ FUNCTION setRegistry RETURNS CHARACTER
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setUpdatePanel wDataDigger 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setWindowFreeze C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD setWindowFreeze wDataDigger 
 FUNCTION setWindowFreeze RETURNS LOGICAL
   ( plWindowsLocked AS LOGICAL )  FORWARD.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD trimList C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION-FORWARD trimList wDataDigger 
 FUNCTION trimList RETURNS CHARACTER
   ( pcList  AS CHARACTER
   , pcSep   AS CHARACTER
@@ -389,7 +371,7 @@ FUNCTION trimList RETURNS CHARACTER
 /* ***********************  Control Definitions  ********************** */
 
 /* Define the widget handle for the window                              */
-DEFINE VAR C-Win AS WIDGET-HANDLE NO-UNDO.
+DEFINE VAR wDataDigger AS WIDGET-HANDLE NO-UNDO.
 
 /* Menu Definitions                                                     */
 DEFINE MENU POPUP-MENU-btnHelp 
@@ -583,7 +565,7 @@ DEFINE BUTTON btnViewData  NO-FOCUS FLAT-BUTTON
 
 DEFINE BUTTON btnWhere  NO-FOCUS FLAT-BUTTON
      LABEL "&Where" 
-     SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(ALT-DOWN)".
+     SIZE-PIXELS 20 BY 23 TOOLTIP "show expanded query editor  #(ALT-CURSOR-DOWN)".
 
 DEFINE VARIABLE cbDatabaseFilter AS CHARACTER FORMAT "X(256)":U 
      CONTEXT-HELP-ID 950
@@ -600,7 +582,7 @@ DEFINE VARIABLE cbFavouriteGroup AS CHARACTER FORMAT "X(256)":U
 DEFINE VARIABLE ficWhere AS CHARACTER 
      CONTEXT-HELP-ID 110
      VIEW-AS EDITOR NO-WORD-WRAP
-     SIZE-PIXELS 595 BY 21 TOOLTIP "query on your table  #(CTRL-CURSOR-DOWN)"
+     SIZE-PIXELS 595 BY 21 TOOLTIP "query on your table  #(ALT-CURSOR-DOWN)"
      FONT 2 NO-UNDO.
 
 DEFINE VARIABLE fiFeedback AS CHARACTER FORMAT "X(256)":U INITIAL "Got a question or feedback?" 
@@ -661,9 +643,8 @@ DEFINE RECTANGLE rctEdit
      SIZE-PIXELS 265 BY 35.
 
 DEFINE RECTANGLE rctQuery
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 789 BY 290
-     BGCOLOR 17 .
+     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   ROUNDED 
+     SIZE-PIXELS 789 BY 289.
 
 DEFINE VARIABLE tgDebugMode AS LOGICAL INITIAL yes 
      LABEL "" 
@@ -772,144 +753,6 @@ DEFINE BUTTON btnTools-txt  NO-FOCUS FLAT-BUTTON
      LABEL "Show / Hide" 
      SIZE-PIXELS 100 BY 30 TOOLTIP "show or hide the toolbar".
 
-DEFINE BUTTON btnAnd  NO-FOCUS
-     LABEL "and" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnBegins  NO-FOCUS
-     LABEL "begins" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnBracket  NO-FOCUS
-     LABEL "()" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
-     FONT 0.
-
-DEFINE BUTTON btnCancel-2 DEFAULT 
-     LABEL "Cancel" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 75 BY 24
-     BGCOLOR 8 .
-
-DEFINE BUTTON btnClear-2 
-     LABEL "&C" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 20 BY 23 TOOLTIP "clear the where field".
-
-DEFINE BUTTON btnClipboard-2 
-     LABEL "Cp" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 20 BY 23 TOOLTIP "copy the expression to the clipboard".
-
-DEFINE BUTTON btnContains  NO-FOCUS
-     LABEL "contains" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnEq  NO-FOCUS
-     LABEL "=" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnGT  NO-FOCUS
-     LABEL ">" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnInsert 
-     LABEL "+" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 20 BY 23 TOOLTIP "insert the expression into the where field".
-
-DEFINE BUTTON btnLT  NO-FOCUS
-     LABEL "<" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnMatches  NO-FOCUS
-     LABEL "matches" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnNE  NO-FOCUS
-     LABEL "<>" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnOK AUTO-GO DEFAULT 
-     LABEL "OK" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 75 BY 24
-     BGCOLOR 8 .
-
-DEFINE BUTTON btnOr  NO-FOCUS
-     LABEL "or" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnQt  NO-FOCUS
-     LABEL "~"~"" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 40 BY 21 TOOLTIP "insert this text into the where field"
-     FONT 0.
-
-DEFINE BUTTON btnQueries-2 
-     LABEL "&Q" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 20 BY 23 TOOLTIP "show previous queries on this table".
-
-DEFINE BUTTON btnToday  NO-FOCUS
-     LABEL "today" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 80 BY 21 TOOLTIP "insert this text into the where field".
-
-DEFINE BUTTON btnViewData-2 
-     LABEL "->" 
-     CONTEXT-HELP-ID 1050
-     SIZE-PIXELS 20 BY 23 TOOLTIP "execute the query".
-
-DEFINE VARIABLE cbAndOr AS CHARACTER FORMAT "X(256)":U 
-     LABEL "&Where" 
-     CONTEXT-HELP-ID 1050
-     VIEW-AS COMBO-BOX INNER-LINES 5
-     LIST-ITEMS "","AND","OR" 
-     DROP-DOWN-LIST
-     SIZE-PIXELS 50 BY 21 TOOLTIP "preceding AND or OR for the expression" NO-UNDO.
-
-DEFINE VARIABLE cbFields AS CHARACTER FORMAT "X(256)":U 
-     CONTEXT-HELP-ID 1050
-     VIEW-AS COMBO-BOX SORT INNER-LINES 10
-     DROP-DOWN-LIST
-     SIZE-PIXELS 186 BY 21 TOOLTIP "field used in the expression"
-     FONT 2 NO-UNDO.
-
-DEFINE VARIABLE cbOperator AS CHARACTER FORMAT "X(256)":U 
-     CONTEXT-HELP-ID 1050
-     VIEW-AS COMBO-BOX INNER-LINES 10
-     LIST-ITEMS "","=","<>",">",">=","<","<=","begins","matches","contains" 
-     DROP-DOWN-LIST
-     SIZE-PIXELS 85 BY 21 TOOLTIP "operator used in the expression"
-     FONT 2 NO-UNDO.
-
-DEFINE VARIABLE ficWhere2 AS CHARACTER 
-     CONTEXT-HELP-ID 1050
-     VIEW-AS EDITOR SCROLLBAR-VERTICAL
-     SIZE-PIXELS 501 BY 175 TOOLTIP "alt-cursor-up / down to view/hide query editor"
-     FONT 2 NO-UNDO.
-
-DEFINE VARIABLE ficValue AS CHARACTER FORMAT "X(256)":U 
-     CONTEXT-HELP-ID 1050
-     VIEW-AS FILL-IN 
-     SIZE-PIXELS 210 BY 23 TOOLTIP "the literal value for the expression"
-     FONT 2 NO-UNDO.
-
-DEFINE RECTANGLE rctQueryButtons
-     EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 610 BY 190.
-
 /* Query definitions                                                    */
 &ANALYZE-SUSPEND
 DEFINE QUERY brFields FOR 
@@ -924,7 +767,7 @@ DEFINE QUERY brTables FOR
 
 /* Browse definitions                                                   */
 DEFINE BROWSE brFields
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brFields C-Win _FREEFORM
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brFields wDataDigger _FREEFORM
   QUERY brFields DISPLAY
       ttField.lShow VIEW-AS TOGGLE-BOX
   ttField.iOrder
@@ -959,7 +802,7 @@ DEFINE BROWSE brFields
          CONTEXT-HELP-ID 80.
 
 DEFINE BROWSE brIndexes
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brIndexes C-Win _FREEFORM
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brIndexes wDataDigger _FREEFORM
   QUERY brIndexes DISPLAY
       ttIndex.cIndexName
       ttIndex.cIndexFlags
@@ -972,7 +815,7 @@ DEFINE BROWSE brIndexes
          CONTEXT-HELP-ID 90.
 
 DEFINE BROWSE brTables
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brTables C-Win _FREEFORM
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _DISPLAY-FIELDS brTables wDataDigger _FREEFORM
   QUERY brTables DISPLAY
       ttTable.cTableName
 ttTable.cDatabase
@@ -988,150 +831,114 @@ ttTable.iNumQueries
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     btnFavourite AT Y 236 X 269 WIDGET-ID 310
+     btnWhere AT Y 265 X 683
      fiTableFilter AT Y 3 X 56 NO-LABEL
      cbDatabaseFilter AT Y 3 X 117 COLON-ALIGNED NO-LABEL
-     tgSelAll AT Y 5 X 345 WIDGET-ID 6
-     fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL WIDGET-ID 168
-     fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL WIDGET-ID 164
-     fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL WIDGET-ID 166
-     btnClearIndexFilter AT Y 5 X 1095 WIDGET-ID 160
-     btnClearTableFilter AT Y 3 X 237 WIDGET-ID 222
-     brTables AT Y 27 X 56 WIDGET-ID 300
-     brFields AT Y 27 X 325 WIDGET-ID 100
-     brIndexes AT Y 28 X 829 WIDGET-ID 200
-     tgDebugMode AT Y 29 X 38 WIDGET-ID 238 NO-TAB-STOP 
-     btnTableFilter AT Y 3 X 257 WIDGET-ID 38
-     fiTableDesc AT Y 236 X 57 NO-LABEL WIDGET-ID 90
-     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 316
-     btnAddFavGroup AT Y 236 X 248 WIDGET-ID 318
+     tgSelAll AT Y 5 X 345
+     fiIndexNameFilter AT Y 5 X 815 COLON-ALIGNED NO-LABEL
+     fiFlagsFilter AT Y 5 X 890 COLON-ALIGNED NO-LABEL
+     fiFieldsFilter AT Y 5 X 945 COLON-ALIGNED NO-LABEL
+     btnClearIndexFilter AT Y 5 X 1095
+     brTables AT Y 27 X 56
+     btnFavourite AT Y 236 X 269
+     brFields AT Y 27 X 325
+     brIndexes AT Y 28 X 829
+     tgDebugMode AT Y 29 X 38 NO-TAB-STOP 
+     fiTableDesc AT Y 236 X 57 NO-LABEL
+     btnClearTableFilter AT Y 3 X 237
+     cbFavouriteGroup AT Y 236 X 75 COLON-ALIGNED NO-LABEL
      ficWhere AT Y 266 X 80 NO-LABEL
-     btnWhere AT Y 265 X 683 WIDGET-ID 236
-     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL WIDGET-ID 172
-     btnQueries AT Y 265 X 745 WIDGET-ID 190
-     btnView AT Y 520 X 200 WIDGET-ID 4
-     btnTools AT Y 0 X 1 WIDGET-ID 264
-     btnTabTables AT Y 45 X 34 WIDGET-ID 300
-     btnClear AT Y 265 X 725 WIDGET-ID 30
-     btnClearFieldFilter AT Y 5 X 765 WIDGET-ID 232
-     btnClipboard AT Y 265 X 765 WIDGET-ID 178
-     btnMoveBottom AT Y 143 X 790 WIDGET-ID 200
-     btnMoveDown AT Y 121 X 790 WIDGET-ID 194
-     btnMoveTop AT Y 55 X 790 WIDGET-ID 198
-     btnMoveUp AT Y 77 X 790 WIDGET-ID 192
-     btnReset AT Y 99 X 790 WIDGET-ID 196
+     fiWarning AT Y 520 X 480 COLON-ALIGNED NO-LABEL
+     btnTableFilter AT Y 3 X 257
+     btnAddFavGroup AT Y 236 X 248
+     btnQueries AT Y 265 X 745
+     btnView AT Y 520 X 200
+     btnTools AT Y 0 X 1
+     btnTabTables AT Y 45 X 34
+     btnClear AT Y 265 X 725
+     btnClearFieldFilter AT Y 5 X 765
+     btnClipboard AT Y 265 X 765
+     btnMoveBottom AT Y 143 X 790
+     btnMoveDown AT Y 121 X 790
+     btnMoveTop AT Y 55 X 790
+     btnMoveUp AT Y 77 X 790
+     btnReset AT Y 99 X 790
      btnViewData AT Y 265 X 705
-     btnTabFavourites AT Y 122 X 33 WIDGET-ID 302
-     btnTabFields AT Y 45 X 303 WIDGET-ID 156
-     btnTabIndexes AT Y 122 X 303 WIDGET-ID 158
-     btnNextQuery AT Y 265 X 57 WIDGET-ID 314
-     btnPrevQuery AT Y 265 X 36 WIDGET-ID 312
+     btnTabFavourites AT Y 122 X 33
+     btnTabFields AT Y 45 X 303
+     btnTabIndexes AT Y 122 X 303
+     btnNextQuery AT Y 265 X 57
+     btnPrevQuery AT Y 265 X 36
      btnDump AT Y 520 X 175
-     btnLoad AT Y 520 X 225 WIDGET-ID 224
+     btnLoad AT Y 520 X 225
      btnDelete AT Y 520 X 280
-     btnResizeVer AT ROW 13.38 COL 7.6 WIDGET-ID 274
-     btnClone AT Y 520 X 80 WIDGET-ID 276
+     btnResizeVer AT ROW 13.38 COL 7.6
+     btnClone AT Y 520 X 80
      btnAdd AT Y 520 X 55
      btnEdit AT Y 520 X 105
-     fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL WIDGET-ID 308
-     rctQuery AT Y 0 X 30
+     fiFeedback AT Y 520 X 605 COLON-ALIGNED NO-LABEL
+     rctQuery AT Y 1 X 30
      rctEdit AT Y 515 X 50
-     rcTableFilter AT Y 24 X 53 WIDGET-ID 254
-     rcFieldFilter AT Y 24 X 322 WIDGET-ID 256
-     rcIndexFilter AT Y 24 X 825 WIDGET-ID 258
+     rcTableFilter AT Y 24 X 53
+     rcFieldFilter AT Y 24 X 322
+     rcIndexFilter AT Y 24 X 825
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
          SIZE-PIXELS 1498 BY 560 DROP-TARGET.
 
-DEFINE FRAME frSettings
-     btnQueries-txt AT Y 175 X 37 WIDGET-ID 294
-     btnDataDigger AT Y 35 X 1 WIDGET-ID 126
-     btnSettings AT Y 70 X 1 WIDGET-ID 210
-     btnDict AT Y 105 X 1 WIDGET-ID 224
-     btnDataAdmin AT Y 140 X 1 WIDGET-ID 214
-     btnQueries-3 AT Y 175 X 1 WIDGET-ID 190
-     btnQueryTester AT Y 210 X 1 WIDGET-ID 232
-     btnConnections AT Y 245 X 1 WIDGET-ID 212
-     btnEditor AT Y 280 X 1 WIDGET-ID 228
-     btnHelp AT Y 315 X 1 WIDGET-ID 260
-     btnAbout AT Y 350 X 1 WIDGET-ID 196
-     btnExpand AT Y 485 X 1 WIDGET-ID 306
-     btnExpand-txt AT Y 485 X 35 WIDGET-ID 308
-     btnEditor-txt AT Y 280 X 37 WIDGET-ID 290
-     btnQueryTester-txt AT Y 210 X 37 WIDGET-ID 298
-     btnAbout-txt AT Y 350 X 37 WIDGET-ID 266
-     btnConnections-txt AT Y 245 X 37 WIDGET-ID 270
-     btnDataAdmin-txt AT Y 140 X 37 WIDGET-ID 274
-     btnDataDigger-txt AT Y 35 X 37 WIDGET-ID 278
-     btnHelp-txt AT Y 315 X 37 WIDGET-ID 286
-     btnSettings-txt AT Y 70 X 37 WIDGET-ID 302
-     btnTools-2 AT Y 0 X 1 WIDGET-ID 264
-     btnDict-txt AT Y 105 X 37 WIDGET-ID 282
-     btnTools-txt AT Y 0 X 35 WIDGET-ID 304
+DEFINE FRAME frData
+     btnClearDataFilter AT Y 5 X 761
+     btnDataSort AT Y 4 X 5
+     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL
+     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL
+     rctData AT Y 0 X 0
+     rctDataFilter AT Y 1 X 0
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE 
-         AT COL 1 ROW 2.43
-         SIZE 28 BY 24.76
-         BGCOLOR 15  WIDGET-ID 500.
+         SIDE-LABELS NO-UNDERLINE THREE-D 
+         AT COL 7 ROW 15.05
+         SIZE 158 BY 10.24.
 
 DEFINE FRAME frHint
-     edHint AT Y 4 X 35 NO-LABEL WIDGET-ID 2
-     btGotIt AT Y 110 X 104 WIDGET-ID 4
-     imgArrow AT Y 0 X 0 WIDGET-ID 10
+     edHint AT Y 4 X 35 NO-LABEL
+     btGotIt AT Y 110 X 104
+     imgArrow AT Y 0 X 0
     WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
          AT X 1150 Y 15
          SIZE-PIXELS 285 BY 140
-         BGCOLOR 14  WIDGET-ID 600.
+         BGCOLOR 14 .
 
-DEFINE FRAME frWhere
-     btnBegins AT Y 123 X 17 WIDGET-ID 74
-     cbAndOr AT Y 5 X 46 COLON-ALIGNED WIDGET-ID 10
-     cbFields AT Y 5 X 100 COLON-ALIGNED NO-LABEL WIDGET-ID 12
-     cbOperator AT Y 5 X 286 COLON-ALIGNED NO-LABEL WIDGET-ID 14
-     ficValue AT Y 5 X 371 COLON-ALIGNED NO-LABEL WIDGET-ID 16
-     btnInsert AT Y 5 X 595 WIDGET-ID 18
-     ficWhere2 AT Y 35 X 110 NO-LABEL WIDGET-ID 130
-     btnViewData-2 AT Y 70 X 623 WIDGET-ID 216
-     btnClear-2 AT Y 95 X 623 WIDGET-ID 30
-     btnQueries-2 AT Y 120 X 623 WIDGET-ID 190
-     btnClipboard-2 AT Y 145 X 623 WIDGET-ID 178
-     btnOK AT Y 230 X 460 WIDGET-ID 132
-     btnCancel-2 AT Y 230 X 540 WIDGET-ID 134
-     btnOr AT Y 101 X 57 WIDGET-ID 24
-     btnAnd AT Y 101 X 17 WIDGET-ID 22
-     btnBracket AT Y 79 X 17 WIDGET-ID 28
-     btnContains AT Y 145 X 17 WIDGET-ID 116
-     btnEq AT Y 35 X 17 WIDGET-ID 62
-     btnGT AT Y 57 X 57 WIDGET-ID 66
-     btnLT AT Y 57 X 17 WIDGET-ID 64
-     btnMatches AT Y 167 X 17 WIDGET-ID 114
-     btnNE AT Y 35 X 57 WIDGET-ID 68
-     btnQt AT Y 79 X 57 WIDGET-ID 72
-     btnToday AT Y 189 X 17 WIDGET-ID 122
-     "Use CTRL-DOWN / UP to open or close this window" VIEW-AS TEXT
-          SIZE-PIXELS 340 BY 20 AT Y 235 X 10 WIDGET-ID 218
-          FGCOLOR 7 
-     rctQueryButtons AT Y 30 X 5 WIDGET-ID 128
-    WITH 1 DOWN KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS TOP-ONLY NO-UNDERLINE THREE-D 
-         AT X 830 Y 175
-         SIZE-PIXELS 656 BY 285
-         TITLE "Query Editor"
-         DEFAULT-BUTTON btnOK WIDGET-ID 400.
-
-DEFINE FRAME frData
-     btnClearDataFilter AT Y 5 X 761 WIDGET-ID 76
-     btnDataSort AT Y 4 X 5 WIDGET-ID 300
-     fiNumSelected AT Y 198 X 636 COLON-ALIGNED NO-LABEL WIDGET-ID 298
-     fiNumRecords AT Y 198 X 665 COLON-ALIGNED NO-LABEL WIDGET-ID 210
-     rctData AT Y 0 X 0 WIDGET-ID 272
-     rctDataFilter AT Y 1 X 0 WIDGET-ID 296
+DEFINE FRAME frSettings
+     btnQueries-txt AT Y 175 X 37
+     btnDataDigger AT Y 35 X 1
+     btnSettings AT Y 70 X 1
+     btnDict AT Y 105 X 1
+     btnDataAdmin AT Y 140 X 1
+     btnQueries-3 AT Y 175 X 1
+     btnQueryTester AT Y 210 X 1
+     btnConnections AT Y 245 X 1
+     btnEditor AT Y 280 X 1
+     btnHelp AT Y 315 X 1
+     btnAbout AT Y 350 X 1
+     btnExpand AT Y 485 X 1
+     btnExpand-txt AT Y 485 X 35
+     btnEditor-txt AT Y 280 X 37
+     btnQueryTester-txt AT Y 210 X 37
+     btnAbout-txt AT Y 350 X 37
+     btnConnections-txt AT Y 245 X 37
+     btnDataAdmin-txt AT Y 140 X 37
+     btnDataDigger-txt AT Y 35 X 37
+     btnHelp-txt AT Y 315 X 37
+     btnSettings-txt AT Y 70 X 37
+     btnTools-2 AT Y 0 X 1
+     btnDict-txt AT Y 105 X 37
+     btnTools-txt AT Y 0 X 35
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
-         SIDE-LABELS NO-UNDERLINE THREE-D 
-         AT COL 7 ROW 15.05
-         SIZE 158 BY 10.24 WIDGET-ID 700.
+         SIDE-LABELS NO-UNDERLINE 
+         AT COL 1 ROW 2.43
+         SIZE 28 BY 24.76
+         BGCOLOR 15 .
 
 
 /* *********************** Procedure Settings ************************ */
@@ -1148,11 +955,11 @@ DEFINE FRAME frData
 
 &ANALYZE-SUSPEND _CREATE-WINDOW
 IF SESSION:DISPLAY-TYPE = "GUI":U THEN
-  CREATE WINDOW C-Win ASSIGN
+  CREATE WINDOW wDataDigger ASSIGN
          HIDDEN             = YES
          TITLE              = "DataDigger"
-         HEIGHT-P           = 561
-         WIDTH-P            = 1450
+         HEIGHT-P           = 559
+         WIDTH-P            = 1280
          MAX-HEIGHT-P       = 1134
          MAX-WIDTH-P        = 1920
          VIRTUAL-HEIGHT-P   = 1134
@@ -1175,13 +982,12 @@ ELSE {&WINDOW-NAME} = CURRENT-WINDOW.
 /* ***********  Runtime Attributes and AppBuilder Settings  *********** */
 
 &ANALYZE-SUSPEND _RUN-TIME-ATTRIBUTES
-/* SETTINGS FOR WINDOW C-Win
+/* SETTINGS FOR WINDOW wDataDigger
   NOT-VISIBLE,,RUN-PERSISTENT                                           */
 /* REPARENT FRAME */
 ASSIGN FRAME frData:FRAME = FRAME frMain:HANDLE
        FRAME frHint:FRAME = FRAME frMain:HANDLE
-       FRAME frSettings:FRAME = FRAME frMain:HANDLE
-       FRAME frWhere:FRAME = FRAME frMain:HANDLE.
+       FRAME frSettings:FRAME = FRAME frMain:HANDLE.
 
 /* SETTINGS FOR FRAME frData
                                                                         */
@@ -1205,8 +1011,8 @@ ASSIGN
    NO-ENABLE                                                            */
 /* SETTINGS FOR FRAME frMain
    FRAME-NAME                                                           */
-/* BROWSE-TAB brTables btnClearTableFilter frMain */
-/* BROWSE-TAB brFields brTables frMain */
+/* BROWSE-TAB brTables frHint frMain */
+/* BROWSE-TAB brFields btnFavourite frMain */
 /* BROWSE-TAB brIndexes brFields frMain */
 /* SETTINGS FOR BROWSE brFields IN FRAME frMain
    2                                                                    */
@@ -1246,6 +1052,10 @@ ASSIGN
 
 /* SETTINGS FOR BUTTON btnViewData IN FRAME frMain
    NO-ENABLE                                                            */
+ASSIGN 
+       ficWhere:PRIVATE-DATA IN FRAME frMain     = 
+                "query on your table  ~n(ALT-CURSOR-DOWN)".
+
 ASSIGN 
        fiFeedback:READ-ONLY IN FRAME frMain        = TRUE
        fiFeedback:PRIVATE-DATA IN FRAME frMain     = 
@@ -1315,55 +1125,8 @@ ASSIGN
 ASSIGN 
        btnHelp:POPUP-MENU IN FRAME frSettings       = MENU POPUP-MENU-btnHelp:HANDLE.
 
-/* SETTINGS FOR FRAME frWhere
-                                                                        */
-ASSIGN 
-       FRAME frWhere:HIDDEN           = TRUE
-       FRAME frWhere:MOVABLE          = TRUE.
-
-/* SETTINGS FOR BUTTON btnAnd IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnBegins IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnBracket IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnContains IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnEq IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnGT IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnInsert IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnLT IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnMatches IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnNE IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnOr IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnQt IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnToday IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR BUTTON btnViewData-2 IN FRAME frWhere
-   NO-ENABLE                                                            */
-/* SETTINGS FOR COMBO-BOX cbAndOr IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR COMBO-BOX cbFields IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR COMBO-BOX cbOperator IN FRAME frWhere
-   1                                                                    */
-/* SETTINGS FOR FILL-IN ficValue IN FRAME frWhere
-   1                                                                    */
-ASSIGN 
-       ficWhere2:RETURN-INSERTED IN FRAME frWhere  = TRUE.
-
-/* SETTINGS FOR RECTANGLE rctQueryButtons IN FRAME frWhere
-   1                                                                    */
-IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-THEN C-Win:HIDDEN = yes.
+IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wDataDigger)
+THEN wDataDigger:HIDDEN = yes.
 
 /* _RUN-TIME-ATTRIBUTES-END */
 &ANALYZE-RESUME
@@ -1409,15 +1172,14 @@ OPEN QUERY {&SELF-NAME} FOR EACH ttTable.
 
 CREATE CONTROL-FRAME CtrlFrame ASSIGN
        FRAME           = FRAME frMain:HANDLE
-       ROW             = 1.29
+       ROW             = 1.19
        COLUMN          = 43
        HEIGHT          = .81
        WIDTH           = 4
-       WIDGET-ID       = 292
        HIDDEN          = yes
        SENSITIVE       = yes.
 /* CtrlFrame OCXINFO:CREATE-CONTROL from: {F0B88A90-F5DA-11CF-B545-0020AF6ED35A} type: PSTimer */
-      CtrlFrame:MOVE-AFTER(btnClearIndexFilter:HANDLE IN FRAME frMain).
+      CtrlFrame:MOVE-AFTER(cbDatabaseFilter:HANDLE IN FRAME frMain).
 
 &ENDIF
 
@@ -1426,9 +1188,9 @@ CREATE CONTROL-FRAME CtrlFrame ASSIGN
 
 /* ************************  Control Triggers  ************************ */
 
-&Scoped-define SELF-NAME C-Win
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ALT-CTRL-D OF C-Win /* DataDigger */
+&Scoped-define SELF-NAME wDataDigger
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ALT-CTRL-D OF wDataDigger /* DataDigger */
 ANYWHERE
 DO:
   RUN flushKeyBuffer. /* to eat strange characters */
@@ -1439,8 +1201,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ALT-F OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ALT-F OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   DEFINE BUFFER bFilter FOR ttFilter.
 
@@ -1456,8 +1218,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ALT-I OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ALT-I OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   RUN setPage({&PAGE-INDEXES}).
   APPLY 'entry' TO fiIndexNameFilter IN FRAME {&FRAME-NAME}.
@@ -1468,8 +1230,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ALT-T OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ALT-T OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   APPLY 'entry' TO fiTableFilter IN FRAME {&frame-name}.
   RETURN NO-APPLY.
@@ -1479,8 +1241,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ALT-W OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ALT-W OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   APPLY 'entry' TO ficWhere IN FRAME {&frame-name}.
   RETURN NO-APPLY.
@@ -1490,9 +1252,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-A OF C-Win /* DataDigger */
-OR "CTRL-SHIFT-A" OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-A OF wDataDigger /* DataDigger */
+OR "CTRL-SHIFT-A" OF wDataDigger ANYWHERE
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1504,8 +1266,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-B OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-B OF wDataDigger /* DataDigger */
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1517,9 +1279,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-C OF C-Win /* DataDigger */
-OR 'CTRL-SHIFT-C' OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-C OF wDataDigger /* DataDigger */
+OR 'CTRL-SHIFT-C' OF wDataDigger ANYWHERE
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1533,9 +1295,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-D OF C-Win /* DataDigger */
-OR 'CTRL-SHIFT-D' OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-D OF wDataDigger /* DataDigger */
+OR 'CTRL-SHIFT-D' OF wDataDigger ANYWHERE
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1547,9 +1309,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-N OF C-Win /* DataDigger */
-OR "CTRL-SHIFT-N" OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-N OF wDataDigger /* DataDigger */
+OR "CTRL-SHIFT-N" OF wDataDigger ANYWHERE
 DO:
 
   RUN flushKeyBuffer. /* to eat strange characters */
@@ -1562,9 +1324,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-P OF C-Win /* DataDigger */
-OR "CTRL-SHIFT-P" OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-P OF wDataDigger /* DataDigger */
+OR "CTRL-SHIFT-P" OF wDataDigger ANYWHERE
 DO:
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
     RUN btnQueriesChoose.
@@ -1574,9 +1336,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-Q OF C-Win /* DataDigger */
-OR "CTRL-SHIFT-Q" OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-Q OF wDataDigger /* DataDigger */
+OR "CTRL-SHIFT-Q" OF wDataDigger ANYWHERE
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1588,9 +1350,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-S OF C-Win /* DataDigger */
-OR 'CTRL-SHIFT-S' OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-S OF wDataDigger /* DataDigger */
+OR 'CTRL-SHIFT-S' OF wDataDigger ANYWHERE
 DO:
   RUN flushKeyBuffer. /* to eat strange characters */
 
@@ -1605,9 +1367,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON CTRL-W OF C-Win /* DataDigger */
-OR "CTRL-SHIFT-W" OF c-win ANYWHERE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON CTRL-W OF wDataDigger /* DataDigger */
+OR "CTRL-SHIFT-W" OF wDataDigger ANYWHERE
 DO:
 
   IF CAN-DO(GetKeyList(),'SHIFT') THEN
@@ -1619,8 +1381,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON END-ERROR OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON END-ERROR OF wDataDigger /* DataDigger */
 OR ENDKEY OF {&WINDOW-NAME} ANYWHERE
 DO:
   IF FRAME frHint:VISIBLE THEN
@@ -1647,12 +1409,6 @@ DO:
     RETURN NO-APPLY.
   END.
 
-  IF gcQueryEditorState = 'visible' THEN
-  DO:
-    setQueryEditor('Hidden').
-    RETURN NO-APPLY.
-  END.
-
   /* This case occurs when the user presses the "Esc" key.
      In a persistently run window, just ignore this.  If we did not, the
      application would exit. */
@@ -1664,8 +1420,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON ENTRY OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON ENTRY OF wDataDigger /* DataDigger */
 DO:
   SELF:MOVE-TO-TOP().
 END.
@@ -1674,8 +1430,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON F10 OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON F10 OF wDataDigger /* DataDigger */
 ANYWHERE DO:
 
   IF glReadOnlyDigger <> plReadOnlyDigger THEN
@@ -1690,8 +1446,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON F11 OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON F11 OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   /* Ability to set dark mode */
   &IF DEFINED (UIB_is_running) &THEN
@@ -1767,8 +1523,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON F12 OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON F12 OF wDataDigger /* DataDigger */
 ANYWHERE DO:
 
   /* Show position of focussed widget
@@ -1812,8 +1568,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON SHIFT-F12 OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON SHIFT-F12 OF wDataDigger /* DataDigger */
 ANYWHERE DO:
   RUN showNewFeatures.
 END.
@@ -1822,8 +1578,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON WINDOW-CLOSE OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON WINDOW-CLOSE OF wDataDigger /* DataDigger */
 DO:
   /* This event will close the window and terminate the procedure. */
   APPLY "CLOSE":U TO THIS-PROCEDURE.
@@ -1834,8 +1590,8 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON WINDOW-RESIZED OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON WINDOW-RESIZED OF wDataDigger /* DataDigger */
 OR "END-MOVE" OF btnResizeVer
 DO:
   RUN endResize.
@@ -1845,10 +1601,10 @@ END. /* window-resized */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL C-Win C-Win
-ON WINDOW-RESTORED OF C-Win /* DataDigger */
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL wDataDigger wDataDigger
+ON WINDOW-RESTORED OF wDataDigger /* DataDigger */
 DO:
-  APPLY 'entry' TO c-Win.
+  APPLY 'entry' TO wDataDigger.
   APPLY 'entry' TO FRAME {&frame-name}.
 END.
 
@@ -1857,7 +1613,7 @@ END.
 
 
 &Scoped-define SELF-NAME frMain
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frMain wDataDigger
 ON DROP-FILE-NOTIFY OF FRAME frMain
 DO:
   DEFINE VARIABLE lSuccess      AS LOGICAL     NO-UNDO.
@@ -1888,8 +1644,8 @@ DO:
   RUN VALUE(getProgramDir() + 'wImportCheck.w')
     ( INPUT glReadOnlyDigger
     , INPUT cDroppedFiles
-    , INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    , INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE ttField  /* do not use by-reference */
     , INPUT TABLE ttColumn /* do not use by-reference */
     , OUTPUT lSuccess
@@ -1911,30 +1667,9 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define SELF-NAME frWhere
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frWhere C-Win
-ON ALT-W OF FRAME frWhere /* Query Editor */
-ANYWHERE DO:
-  APPLY 'entry' TO cbAndOr.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL frWhere C-Win
-ON LEAVE OF FRAME frWhere /* Query Editor */
-DO:
-  setQueryEditor('Hidden').
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define BROWSE-NAME brFields
 &Scoped-define SELF-NAME brFields
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON DEFAULT-ACTION OF brFields IN FRAME frMain
 DO:
   DEFINE VARIABLE iRow      AS INTEGER NO-UNDO.
@@ -2008,7 +1743,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON MOUSE-MENU-CLICK OF brFields IN FRAME frMain
 DO:
   RUN dropFieldMenu.
@@ -2018,7 +1753,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON OFF-HOME OF brFields IN FRAME frMain
 DO:
   DEFINE BUFFER bFilter FOR ttFilter.
@@ -2039,7 +1774,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON RETURN OF brFields IN FRAME frMain
 OR " "           OF ttField.lShow IN BROWSE brFields
 OR VALUE-CHANGED OF ttField.lShow IN BROWSE brFields
@@ -2066,7 +1801,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON ROW-DISPLAY OF brFields IN FRAME frMain
 DO:
   DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
@@ -2110,7 +1845,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON SCROLL-NOTIFY OF brFields IN FRAME frMain
 , brIndexes, brTables
 DO:
@@ -2147,7 +1882,7 @@ END. /* scroll-notify */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brFields wDataDigger
 ON START-SEARCH OF brFields IN FRAME frMain
 DO:
   RUN reopenFieldBrowse(brFields:current-column:name,?).
@@ -2159,12 +1894,11 @@ END.
 
 &Scoped-define BROWSE-NAME brIndexes
 &Scoped-define SELF-NAME brIndexes
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes wDataDigger
 ON DEFAULT-ACTION OF brIndexes IN FRAME frMain
 DO:
   DEFINE VARIABLE cFieldList     AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cQuery         AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hEditor        AS HANDLE    NO-UNDO.
   {&_proparse_ prolint-nowarn(varusage)}
   DEFINE VARIABLE cColumnClicked AS CHARACTER NO-UNDO.
 
@@ -2179,18 +1913,13 @@ DO:
   cQuery = getQueryFromFields(cFieldList).
 
   /* Give custom code a chance to alter the query */
-  PUBLISH "customQuery" (INPUT gcCurrentDatabase, INPUT gcCurrentTable, INPUT-OUTPUT cQuery).
-
-  /* If needed, expand the query editor */
-  IF LOGICAL(getRegistry ("DataDigger", "AutoExpandQueryEditor")) <> NO THEN
-    setQueryEditor('visible').
+  PUBLISH "customQuery" (INPUT gcDatabase, INPUT gcTable, INPUT-OUTPUT cQuery).
 
   /* Fill in the query on the screen */
-  hEditor = getActiveQueryEditor().
-  hEditor:SCREEN-VALUE = formatQuerySTRING(cQuery, gcQueryEditorState = 'visible').
+  ficWhere:SCREEN-VALUE = formatQueryString(cQuery, NO).
 
-  APPLY "entry" TO hEditor.
-  hEditor:CURSOR-OFFSET = LENGTH(ENTRY(1,cQuery,'~n')) + 2.
+  APPLY "entry" TO ficWhere.
+  ficWhere:CURSOR-OFFSET = LENGTH(ENTRY(1,cQuery,'~n')) + 2.
 
 END.
 
@@ -2198,10 +1927,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes wDataDigger
 ON MOUSE-MENU-CLICK OF brIndexes IN FRAME frMain
 DO:
-  DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hIndexName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cIndex     AS CHARACTER   NO-UNDO.
   {&_proparse_ prolint-nowarn(varusage)}
@@ -2226,15 +1954,11 @@ DO:
      */
     IF hIndexName:BUFFER-VALUE = "default" THEN RETURN.
 
-    /* If the query editor is expanded, do actions to that field */
-    hEditor = getActiveQueryEditor().
-
-    /* If there already is an existing "USE-INDEX bladibla" then remove it */
-    cQuery = "".
-
+    /* If there already is an existing "USE-INDEX bladibla" then remove it 
+    */
     WhereLoop:
-    DO iWord = 1 TO NUM-ENTRIES(hEditor:SCREEN-VALUE," "):
-      cWord = ENTRY(iWord,hEditor:SCREEN-VALUE," ").
+    DO iWord = 1 TO NUM-ENTRIES(ficWhere:SCREEN-VALUE," "):
+      cWord = ENTRY(iWord,ficWhere:SCREEN-VALUE," ").
 
       /* Remember we have found the USE-INDEX keyword */
       IF cWord = "USE-INDEX" THEN
@@ -2253,28 +1977,28 @@ DO:
       cQuery = cQuery + " " + cWord.
     END.
 
-    hEditor:SCREEN-VALUE = cQuery.
+    ficWhere:SCREEN-VALUE = cQuery.
     cIndex = SUBSTITUTE("USE-INDEX &1", hIndexName:BUFFER-VALUE).
 
     /* No text selected */
-    IF hEditor:SELECTION-TEXT = "" THEN
+    IF ficWhere:SELECTION-TEXT = "" THEN
     DO:
       /* If ficQuery only holds the text <empty> then delete that */
-      IF hEditor:SCREEN-VALUE = '<empty>' THEN hEditor:SCREEN-VALUE = ''.
-      hEditor:SCREEN-VALUE = TRIM(SUBSTITUTE("&1 &2", hEditor:SCREEN-VALUE, cIndex)).
+      IF ficWhere:SCREEN-VALUE = '<empty>' THEN ficWhere:SCREEN-VALUE = ''.
+      ficWhere:SCREEN-VALUE = TRIM(SUBSTITUTE("&1 &2", ficWhere:SCREEN-VALUE, cIndex)).
     END.
     ELSE
     DO:
-      hEditor:REPLACE-SELECTION-TEXT(cIndex).
+      ficWhere:REPLACE-SELECTION-TEXT(cIndex).
     END.
 
     /* Give custom code a chance to alter the query */
-    cQuery = hEditor:SCREEN-VALUE.
-    PUBLISH "customQuery" (INPUT gcCurrentDatabase, INPUT gcCurrentTable, INPUT-OUTPUT cQuery).
-    hEditor:SCREEN-VALUE = cQuery.
+    cQuery = ficWhere:SCREEN-VALUE.
+    PUBLISH "customQuery" (INPUT gcDatabase, INPUT gcTable, INPUT-OUTPUT cQuery).
+    ficWhere:SCREEN-VALUE = cQuery.
 
-    APPLY "entry" TO hEditor.
-    hEditor:CURSOR-OFFSET = LENGTH(hEditor:SCREEN-VALUE) + 1.
+    APPLY "entry" TO ficWhere.
+    ficWhere:CURSOR-OFFSET = LENGTH(ficWhere:SCREEN-VALUE) + 1.
   END.
 END.
 
@@ -2282,7 +2006,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes wDataDigger
 ON OFF-HOME OF brIndexes IN FRAME frMain
 DO:
   IF NOT VALID-HANDLE(ghLastIndexFilter) THEN
@@ -2298,7 +2022,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes wDataDigger
 ON ROW-DISPLAY OF brIndexes IN FRAME frMain
 DO:
   DEFINE BUFFER bColumnHandle FOR ttColumnHandle.
@@ -2314,7 +2038,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brIndexes wDataDigger
 ON START-SEARCH OF brIndexes IN FRAME frMain
 DO:
   RUN reopenIndexBrowse(brIndexes:current-column:name,?).
@@ -2326,7 +2050,7 @@ END.
 
 &Scoped-define BROWSE-NAME brTables
 &Scoped-define SELF-NAME brTables
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON CTRL-CURSOR-DOWN OF brTables IN FRAME frMain
 DO:
   IF giCurrentPage = {&PAGE-FAVOURITES} THEN
@@ -2337,7 +2061,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON DELETE-CHARACTER OF brTables IN FRAME frMain
 OR "F8", "-",DELETE-CHARACTER OF cbDatabaseFilter
 OR "F8", "-",DELETE-CHARACTER OF brTables
@@ -2352,7 +2076,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON f OF brTables IN FRAME frMain
 DO:
 
@@ -2364,7 +2088,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON F5 OF brTables IN FRAME frMain
 DO:
   RUN reopenTableBrowse(?).
@@ -2374,7 +2098,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON INSERT-MODE OF brTables IN FRAME frMain
 OR "F3", '+', INSERT-MODE OF cbDatabaseFilter
 OR "F3", '+', INSERT-MODE OF brTables
@@ -2389,7 +2113,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON MOUSE-MENU-CLICK OF brTables IN FRAME frMain
 DO:
   IF NOT VALID-HANDLE(brTables:POPUP-MENU) THEN
@@ -2403,7 +2127,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON MOUSE-SELECT-CLICK OF brTables IN FRAME frMain
 DO:
   /* When we click on a table in the browse, we don't want
@@ -2412,8 +2136,8 @@ DO:
   DEFINE VARIABLE cOldTable AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cOldDatabase AS CHARACTER NO-UNDO.
 
-  cOldTable    = gcCurrentTable.
-  cOldDatabase = gcCurrentDatabase.
+  cOldTable    = gcTable.
+  cOldDatabase = gcDatabase.
 
   APPLY "value-changed" TO SELF.
 
@@ -2421,11 +2145,11 @@ DO:
   RUN setTimer("timedTableChange", 0).
 
   /* Apply the change immediately */
-  IF cOldTable <> gcCurrentTable
-    OR cOldDatabase <> gcCurrentDatabase THEN
+  IF cOldTable <> gcTable
+    OR cOldDatabase <> gcDatabase THEN
   DO:
     setWindowFreeze(YES).
-    RUN setTableContext(INPUT gcCurrentTable ).
+    RUN setTableContext(INPUT gcTable ).
     setWindowFreeze(NO).
   END.
 END.
@@ -2434,7 +2158,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON OFF-HOME OF brTables IN FRAME frMain
 DO:
   setFilterFieldColor(fiTableFilter:handle).
@@ -2447,7 +2171,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON ROW-DISPLAY OF brTables IN FRAME frMain
 DO:
   DEFINE VARIABLE lFavourite AS LOGICAL   NO-UNDO.
@@ -2471,7 +2195,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON START-SEARCH OF brTables IN FRAME frMain
 DO:
   RUN reopenTableBrowse(brTables:current-column:name).
@@ -2481,7 +2205,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL brTables wDataDigger
 ON VALUE-CHANGED OF brTables IN FRAME frMain
 DO:
   DEFINE VARIABLE hBuffer      AS HANDLE    NO-UNDO.
@@ -2492,14 +2216,14 @@ DO:
   setWindowFreeze(YES).
 
   hBuffer      = brTables:QUERY:GET-BUFFER-HANDLE(1).
-  cOldTable    = gcCurrentTable.
-  cOldDatabase = gcCurrentDatabase.
+  cOldTable    = gcTable.
+  cOldDatabase = gcDatabase.
   lTableFound = hBuffer:AVAILABLE.
 
   IF lTableFound THEN
   DO:
-    gcCurrentTable           = hBuffer::cTableName.
-    gcCurrentDatabase        = hBuffer::cDatabase.
+    gcTable           = hBuffer::cTableName.
+    gcDatabase        = hBuffer::cDatabase.
     fiTableDesc:SCREEN-VALUE = hBuffer::cTableDesc.
     fiTableDesc:TOOLTIP      = hBuffer::cTableDesc.
     brTables:TOOLTIP         = hBuffer::cTableDesc.
@@ -2510,21 +2234,21 @@ DO:
       RUN showFavouriteIcon(CAN-DO(gcFavouriteTables, hBuffer::cTableName)).
 
     /* Set dictdb alias always to currently selected table */
-    CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).  
+    CREATE ALIAS dictdb FOR DATABASE VALUE(gcDatabase).  
 
-    PUBLISH "debugInfo" (2,SUBSTITUTE("Select table &1.&2", gcCurrentDatabase, gcCurrentTable)).
+    PUBLISH "debugInfo" (2,SUBSTITUTE("Select table &1.&2", gcDatabase, gcTable)).
   END.
   ELSE
   DO:
     /* Make sure the data browse is empty. The easies way is redrawing it */
-    IF NUM-DBS > 0 AND gcCurrentTable <> "" THEN
+    IF NUM-DBS > 0 AND gcTable <> "" THEN
     DO:
-      RUN reopenDataBrowse-create(INPUT gcCurrentDatabase, INPUT gcCurrentTable).
+      RUN reopenDataBrowse-create(INPUT gcDatabase, INPUT gcTable).
       ghDataBrowse:SENSITIVE = FALSE.
     END.
 
-    gcCurrentTable           = ''.
-    gcCurrentDatabase        = ENTRY(1, getDatabaseList() ).
+    gcTable           = ''.
+    gcDatabase        = ENTRY(1, getDatabaseList() ).
     fiTableDesc:SCREEN-VALUE = "".
     fiTableDesc:TOOLTIP      = ''.
     brTables:TOOLTIP         = ''.
@@ -2541,7 +2265,6 @@ DO:
   btnDataSort:SENSITIVE IN FRAME frData = lTableFound.
   btnNextQuery:SENSITIVE = lTableFound.
   btnPrevQuery:SENSITIVE = lTableFound.
-  btnViewData-2:SENSITIVE IN FRAME frWhere = lTableFound.
   btnViewData:SENSITIVE  = lTableFound.
   btnWhere:SENSITIVE     = lTableFound.
   ficWhere:SENSITIVE     = lTableFound.
@@ -2553,11 +2276,11 @@ DO:
   btnAdd:SENSITIVE       = lTableFound.
   btnLoad:SENSITIVE      = lTableFound.
 
-  IF cOldTable <> gcCurrentTable
-    OR cOldDatabase <> gcCurrentDatabase THEN
+  IF cOldTable <> gcTable
+    OR cOldDatabase <> gcDatabase THEN
   DO:
     /* Report new table to listeners */
-    PUBLISH 'TableChange' (gcCurrentDatabase,gcCurrentTable).
+    PUBLISH 'TableChange' (gcDatabase,gcTable).
 
     EMPTY TEMP-TABLE ttField.
     EMPTY TEMP-TABLE ttIndex.
@@ -2584,7 +2307,7 @@ END. /* value-changed of brTables */
 
 &Scoped-define FRAME-NAME frHint
 &Scoped-define SELF-NAME btGotIt
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wDataDigger
 ON 1 OF btGotIt IN FRAME frHint /* I Got it */
 OR "2" OF btGotIt
 OR "3" OF btGotIt
@@ -2606,7 +2329,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btGotIt wDataDigger
 ON CHOOSE OF btGotIt IN FRAME frHint /* I Got it */
 DO:
   FRAME frHint:VISIBLE = FALSE.
@@ -2618,10 +2341,10 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnAbout
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout wDataDigger
 ON CHOOSE OF btnAbout IN FRAME frSettings /* Info */
 OR "CHOOSE" OF btnAbout-txt
-OR "CTRL-SHIFT-B" OF c-win ANYWHERE
+OR "CTRL-SHIFT-B" OF wDataDigger ANYWHERE
 DO:
 
   RUN btnAboutChoose.
@@ -2632,11 +2355,11 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAbout wDataDigger
 ON MOUSE-MENU-CLICK OF btnAbout IN FRAME frSettings /* Info */
 , btnAbout-txt
 DO:
-  OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
+  OS-COMMAND NO-WAIT "START DataDigger.txt".
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2645,7 +2368,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnAdd
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAdd C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAdd wDataDigger
 ON CHOOSE OF btnAdd IN FRAME frMain /* Add */
 DO:
   RUN btnAddChoose.
@@ -2656,7 +2379,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnAddFavGroup
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAddFavGroup C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAddFavGroup wDataDigger
 ON CHOOSE OF btnAddFavGroup IN FRAME frMain /* + */
 OR 'insert-mode' OF cbFavouriteGroup
 DO:
@@ -2667,75 +2390,11 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME btnAnd
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnAnd C-Win
-ON CHOOSE OF btnAnd IN FRAME frWhere /* and */
-, btnOr, btnEq, btnNe, btnGt, btnLt, btnToday, btnMatches, btnContains, btnBegins
-DO:
-  /* No text selected */
-  IF ficWhere2:SELECTION-TEXT = "" THEN
-    ficWhere2:INSERT-STRING(SUBSTITUTE(' &1 ', SELF:LABEL)).
-  ELSE
-    ficWhere2:REPLACE-SELECTION-TEXT(SUBSTITUTE(' &1 ', SELF:LABEL)).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnBracket
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnBracket C-Win
-ON CHOOSE OF btnBracket IN FRAME frWhere /* () */
-DO:
-  /* No text selected */
-  IF ficWhere2:SELECTION-TEXT = "" THEN
-  DO:
-    ficWhere2:INSERT-STRING(SUBSTITUTE(' &1 ', SELF:LABEL)).
-    ficWhere2:CURSOR-OFFSET = ficWhere2:CURSOR-OFFSET - 2.
-  END.
-  ELSE
-    ficWhere2:REPLACE-SELECTION-TEXT(SUBSTITUTE(' ( &1 ) ', ficWhere2:SELECTION-TEXT)).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnCancel-2
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnCancel-2 C-Win
-ON CHOOSE OF btnCancel-2 IN FRAME frWhere /* Cancel */
-DO:
-  ficWhere2:SCREEN-VALUE IN FRAME frWhere = ficWhere:SCREEN-VALUE IN FRAME frMain.
-  setQueryEditor('Hidden').
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnClear
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClear C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClear wDataDigger
 ON CHOOSE OF btnClear IN FRAME frMain /* C */
-OR SHIFT-DEL OF ficWhere  IN FRAME frMain
-OR SHIFT-DEL OF ficWhere2 IN FRAME frWhere
-OR 'CHOOSE' OF btnClear-2 IN FRAME frWhere
 DO:
-  DEFINE VARIABLE hEditor AS HANDLE      NO-UNDO.
-
-  hEditor = getActiveQueryEditor().
-
-  hEditor:SCREEN-VALUE = ''.
-  hEditor:BGCOLOR      = ?. /* default */
-  hEditor:FGCOLOR      = ?. /* default */
-  hEditor:TOOLTIP      = ''.
-
-  /* Clear query in ini file */
-  setRegistry ( SUBSTITUTE('DB:&1'   , gcCurrentDatabase )
-              , SUBSTITUTE('&1:query', gcCurrentTable )
-              , ''
-              ).
+  RUN clearQueryFilter.
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -2744,7 +2403,7 @@ END.
 
 &Scoped-define FRAME-NAME frData
 &Scoped-define SELF-NAME btnClearDataFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearDataFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearDataFilter wDataDigger
 ON CHOOSE OF btnClearDataFilter IN FRAME frData /* C */
 DO:
   RUN btnClearDataFilterChoose.
@@ -2756,7 +2415,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnClearFieldFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearFieldFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearFieldFilter wDataDigger
 ON CHOOSE OF btnClearFieldFilter IN FRAME frMain /* C */
 DO:
   RUN btnClearFieldFilterChoose.
@@ -2767,7 +2426,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnClearIndexFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearIndexFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearIndexFilter wDataDigger
 ON CHOOSE OF btnClearIndexFilter IN FRAME frMain /* C */
 DO:
   RUN btnClearIndexFilterChoose.
@@ -2778,7 +2437,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnClearTableFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClearTableFilter wDataDigger
 ON CHOOSE OF btnClearTableFilter IN FRAME frMain /* C */
 DO:
   IF glShowFavourites THEN
@@ -2801,38 +2460,32 @@ END.
 
 
 &Scoped-define SELF-NAME btnClipboard
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClipboard C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClipboard wDataDigger
 ON CHOOSE OF btnClipboard IN FRAME frMain /* Cp */
-/* or 'ctrl-c' of ficWhere  in frame frMain  */
-/* or 'ctrl-c' of ficWhere2 in frame frWhere */
-OR 'CHOOSE' OF btnClipboard-2 IN FRAME frWhere
 DO:
   DEFINE VARIABLE cQuery  AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hEditor AS HANDLE    NO-UNDO.
 
-  hEditor = getActiveQueryEditor().
-
-  IF LENGTH(hEditor:SELECTION-TEXT) > 0 THEN
-    cQuery = hEditor:SELECTION-TEXT.
+  IF LENGTH(ficWhere:SELECTION-TEXT) > 0 THEN
+    cQuery = ficWhere:SELECTION-TEXT.
   ELSE
   IF VALID-HANDLE(ghDataBrowse) THEN
     cQuery = getReadableQuery(ghDataBrowse:QUERY:prepare-string).
   ELSE
-  IF hEditor:SCREEN-VALUE = "" THEN
+  IF ficWhere:SCREEN-VALUE = "" THEN
       cQuery = SUBSTITUTE('for each &1.&2 no-lock'
-                         , gcCurrentDatabase
-                         , gcCurrentTable
+                         , gcDatabase
+                         , gcTable
                          ).
   ELSE
     cQuery = SUBSTITUTE('for each &1.&2 no-lock &3 &4'
-                       , gcCurrentDatabase
-                       , gcCurrentTable
-                       , (IF NOT hEditor:SCREEN-VALUE BEGINS 'where' THEN 'where' ELSE '')
-                       , TRIM(hEditor:SCREEN-VALUE)
+                       , gcDatabase
+                       , gcTable
+                       , (IF NOT ficWhere:SCREEN-VALUE BEGINS 'where' THEN 'where' ELSE '')
+                       , TRIM(ficWhere:SCREEN-VALUE)
                        ).
 
   /* Dont take the tooltip because that is not set until the query is executed */
-  cQuery = formatQuerySTRING(cQuery, YES).
+  cQuery = formatQueryString(cQuery, YES).
   CLIPBOARD:VALUE = cQuery.
 END.
 
@@ -2841,7 +2494,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnClone
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClone C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnClone wDataDigger
 ON CHOOSE OF btnClone IN FRAME frMain /* Clone */
 DO:
   RUN btnCloneChoose.
@@ -2853,7 +2506,7 @@ END. /* choose of btnDelete */
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnConnections
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnConnections wDataDigger
 ON CHOOSE OF btnConnections IN FRAME frSettings /* Con */
 OR "CHOOSE" OF btnConnections-txt
 DO:
@@ -2867,7 +2520,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnDataAdmin
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataAdmin C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataAdmin wDataDigger
 ON CHOOSE OF btnDataAdmin IN FRAME frSettings /* ADM */
 OR "CHOOSE" OF btnDataAdmin-txt
 DO:
@@ -2879,7 +2532,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnDataDigger
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataDigger wDataDigger
 ON CHOOSE OF btnDataDigger IN FRAME frSettings /* DD */
 OR "CHOOSE" OF btnDataDigger-txt
 OR "ALT-D" OF FRAME frMain ANYWHERE
@@ -2893,9 +2546,9 @@ END.
 
 &Scoped-define FRAME-NAME frData
 &Scoped-define SELF-NAME btnDataSort
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataSort C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDataSort wDataDigger
 ON CHOOSE OF btnDataSort IN FRAME frData /* S */
-OR 'ALT-S' OF c-win ANYWHERE
+OR 'ALT-S' OF wDataDigger ANYWHERE
 DO:
   RUN btnDataSortChoose.
 END.
@@ -2906,7 +2559,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnDelete
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDelete C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDelete wDataDigger
 ON CHOOSE OF btnDelete IN FRAME frMain /* Del */
 DO:
   RUN btnDeleteChoose.
@@ -2918,7 +2571,7 @@ END. /* choose of btnDelete */
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnDict
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDict wDataDigger
 ON CHOOSE OF btnDict IN FRAME frSettings /* Dict */
 OR "CHOOSE" OF btnDict-txt
 DO:
@@ -2938,7 +2591,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnDump
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDump C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnDump wDataDigger
 ON CHOOSE OF btnDump IN FRAME frMain /* Save */
 DO:
 
@@ -2951,7 +2604,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnEdit
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEdit C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEdit wDataDigger
 ON CHOOSE OF btnEdit IN FRAME frMain /* Edit */
 DO:
   RUN btnEditChoose.
@@ -2963,11 +2616,11 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnEditor
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEditor C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnEditor wDataDigger
 ON CHOOSE OF btnEditor IN FRAME frSettings /* Ed */
 OR "CHOOSE" OF btnEditor-txt
-OR "CTRL-SHIFT-E" OF c-win
-OR "SHIFT-F3" OF c-win ANYWHERE
+OR "CTRL-SHIFT-E" OF wDataDigger
+OR "SHIFT-F3" OF wDataDigger ANYWHERE
 DO:
 
   RUN btnEditorChoose.
@@ -2979,10 +2632,10 @@ END.
 
 
 &Scoped-define SELF-NAME btnExpand
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand wDataDigger
 ON CHOOSE OF btnExpand IN FRAME frSettings /* < > */
 OR "CHOOSE" OF btnExpand-txt
-OR "CTRL-ALT-T" OF c-win ANYWHERE
+OR "CTRL-ALT-T" OF wDataDigger ANYWHERE
 DO:
   DEFINE VARIABLE hFocus     AS HANDLE    NO-UNDO.
   DEFINE VARIABLE lExpanded  AS LOGICAL   NO-UNDO.
@@ -3006,19 +2659,9 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnExpand C-Win
-ON MOUSE-MENU-CLICK OF btnExpand IN FRAME frSettings /* < > */
-DO:
-  OS-COMMAND NO-WAIT START VALUE(getProgramDir() + '\DataDigger.txt').
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnFavourite
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavourite C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnFavourite wDataDigger
 ON CHOOSE OF btnFavourite IN FRAME frMain /* F */
 DO:
 
@@ -3035,7 +2678,7 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnHelp
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp wDataDigger
 ON CHOOSE OF btnHelp IN FRAME frSettings /* Help */
 DO:
   DEFINE VARIABLE iReturn AS INTEGER NO-UNDO.
@@ -3055,7 +2698,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnHelp-txt
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp-txt C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnHelp-txt wDataDigger
 ON CHOOSE OF btnHelp-txt IN FRAME frSettings /* Welcome */
 DO:
   APPLY 'choose' TO btnHelp.
@@ -3065,45 +2708,11 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME btnInsert
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnInsert C-Win
-ON CHOOSE OF btnInsert IN FRAME frWhere /* + */
-OR "return" OF /* cbAndOr, cbFields, cbOperator, */ ficValue
-DO:
-  DEFINE BUFFER bField FOR ttField.
-  DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
-
-  FIND bField WHERE bField.cFullName = cbFields:screen-value NO-ERROR.
-  IF NOT AVAILABLE bField THEN RETURN.
-  cField = bField.cFullName.
-
-  IF cField = 'RECID' OR cField = 'ROWID'
-    THEN cField = SUBSTITUTE('&1(&2)', cField, gcCurrentTable ).
-
-  ficWhere2:insert-STRING(LEFT-TRIM(SUBSTITUTE('&1 &2 &3 &4&5'
-                                        , (IF cbAndOr:SCREEN-VALUE = ? THEN '' ELSE cbAndOr:SCREEN-VALUE)
-                                        , cField
-                                        , cbOperator:SCREEN-VALUE
-                                        , IF bField.cDataType = 'character' THEN QUOTER(ficValue:SCREEN-VALUE) ELSE ficValue:SCREEN-VALUE
-                                        , CHR(13)
-                                        )
-                              )
-                         ).
-
-  APPLY "entry" TO cbAndOr.
-  RETURN NO-APPLY.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnLoad
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnLoad C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnLoad wDataDigger
 ON CHOOSE OF btnLoad IN FRAME frMain /* Load */
-OR "CTRL-L" OF c-win ANYWHERE
+OR "CTRL-L" OF wDataDigger ANYWHERE
 DO:
 
   IF btnLoad:SENSITIVE IN FRAME frMain THEN RUN btnLoadChoose.
@@ -3115,7 +2724,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnMoveBottom
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveBottom C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveBottom wDataDigger
 ON CHOOSE OF btnMoveBottom IN FRAME frMain /* Btm */
 OR 'ctrl-shift-cursor-down' OF brFields
 DO:
@@ -3127,7 +2736,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnMoveDown
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveDown C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveDown wDataDigger
 ON CHOOSE OF btnMoveDown IN FRAME frMain /* Dn */
 OR 'ctrl-cursor-down' OF brFields
 DO:
@@ -3139,7 +2748,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnMoveTop
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveTop C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveTop wDataDigger
 ON CHOOSE OF btnMoveTop IN FRAME frMain /* Top */
 OR 'ctrl-shift-cursor-up' OF brFields
 DO:
@@ -3151,7 +2760,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnMoveUp
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveUp C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnMoveUp wDataDigger
 ON CHOOSE OF btnMoveUp IN FRAME frMain /* Up */
 OR 'ctrl-cursor-up' OF brFields
 DO:
@@ -3162,43 +2771,10 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME btnOK
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnOK C-Win
-ON CHOOSE OF btnOK IN FRAME frWhere /* OK */
-DO:
-  setQueryEditor('Hidden').
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME btnQt
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQt C-Win
-ON CHOOSE OF btnQt IN FRAME frWhere /* "" */
-DO:
-  /* No text selected */
-  IF ficWhere2:SELECTION-TEXT = "" THEN
-  DO:
-    ficWhere2:INSERT-STRING(SUBSTITUTE(' &1 ', SELF:LABEL)).
-    ficWhere2:CURSOR-OFFSET = ficWhere2:CURSOR-OFFSET - 2.
-  END.
-  ELSE
-    ficWhere2:REPLACE-SELECTION-TEXT(SUBSTITUTE('"&1"', ficWhere2:SELECTION-TEXT)).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnQueries
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueries C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueries wDataDigger
 ON CHOOSE OF btnQueries IN FRAME frMain /* PQ */
 OR 'CTRL-INS'     OF ficWhere       IN FRAME frMain
-OR 'CTRL-INS'     OF ficWhere2      IN FRAME frWhere
-OR 'CHOOSE'       OF btnQueries-2   IN FRAME frWhere
 OR 'CHOOSE'       OF btnQueries-3   IN FRAME frSettings
 OR 'CHOOSE'       OF btnQueries-txt IN FRAME frSettings
 DO:
@@ -3211,7 +2787,7 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnQueryTester
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryTester C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnQueryTester wDataDigger
 ON CHOOSE OF btnQueryTester IN FRAME frSettings /* Q */
 OR "CHOOSE" OF btnQueryTester-txt
 DO:
@@ -3224,7 +2800,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnReset
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnReset C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnReset wDataDigger
 ON CHOOSE OF btnReset IN FRAME frMain /* R */
 OR "CTRL-SHIFT-HOME" OF brFields
 DO:
@@ -3238,7 +2814,7 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnSettings
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings wDataDigger
 ON CHOOSE OF btnSettings IN FRAME frSettings /* Set */
 OR "CHOOSE" OF btnSettings-txt
 DO:
@@ -3249,7 +2825,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnSettings wDataDigger
 ON MOUSE-MENU-CLICK OF btnSettings IN FRAME frSettings /* Set */
 DO:
   DEFINE VARIABLE cEnvironment AS CHARACTER   NO-UNDO.
@@ -3258,7 +2834,8 @@ DO:
   cEnvironment = SUBSTITUTE('&1DataDigger-&2.ini', getWorkfolder(), getUserName()).
 
   /* Start default editor for ini file */
-  OS-COMMAND NO-WAIT START VALUE( cEnvironment ).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cEnvironment)).
+   
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3267,13 +2844,23 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnTabFavourites
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFavourites C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFavourites wDataDigger
 ON CHOOSE OF btnTabFavourites IN FRAME frMain /* Fav */
 OR 'ctrl-2' OF FRAME {&frame-name} ANYWHERE
 DO:
   RUN setPage({&PAGE-FAVOURITES}).
   RUN setTableView(YES,NO).
   APPLY 'value-changed' TO fiTableFilter.
+
+  /* Show additional info on first use of favourites tab */
+  IF getRegistry("DataDigger:Hints", "setPage-{&PAGE-FAVOURITES}") = ? THEN
+  DO:
+    setRegistry("DataDigger:Hints", "setPage-{&PAGE-FAVOURITES}", "yes").
+    RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"(1/3)~n~nI created a default group for your favourites").
+    RUN showHint(btnAddFavGroup:HANDLE  ,{&ARROW-LEFT-DOWN},"(2/3)~n~nIf you like, you can create additional groups").
+    RUN showHint(brTables:HANDLE        ,{&ARROW-LEFT-UP}  ,"(3/3)~n~nBy removing all tables from a group, the group will be automatically deleted when you close DataDigger").
+  END.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3281,7 +2868,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnTabFields
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFields C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabFields wDataDigger
 ON CHOOSE OF btnTabFields IN FRAME frMain /* Fld */
 OR 'ctrl-3' OF FRAME {&frame-name} ANYWHERE
 DO:
@@ -3293,7 +2880,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnTabIndexes
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabIndexes C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabIndexes wDataDigger
 ON CHOOSE OF btnTabIndexes IN FRAME frMain /* Idx */
 OR 'ctrl-4' OF FRAME {&FRAME-NAME} ANYWHERE
 DO:
@@ -3305,7 +2892,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnTableFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTableFilter wDataDigger
 ON CHOOSE OF btnTableFilter IN FRAME frMain /* Y */
 OR "CTRL-CURSOR-DOWN" OF fiTableFilter
   OR "CTRL-CURSOR-DOWN" OF cbDatabaseFilter
@@ -3334,7 +2921,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnTabTables
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabTables C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTabTables wDataDigger
 ON CHOOSE OF btnTabTables IN FRAME frMain /* Tbl */
 OR 'ctrl-1' OF FRAME {&frame-name} ANYWHERE
 DO:
@@ -3348,7 +2935,7 @@ END.
 
 
 &Scoped-define SELF-NAME btnTools
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools wDataDigger
 ON CHOOSE OF btnTools IN FRAME frMain /* Tools */
 OR "CHOOSE" OF btnTools-txt IN FRAME frSettings
 OR "CHOOSE" OF btnTools-2   IN FRAME frSettings
@@ -3394,7 +2981,7 @@ END.
 
 &Scoped-define FRAME-NAME frSettings
 &Scoped-define SELF-NAME btnTools-2
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 wDataDigger
 ON CURSOR-DOWN OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
 , btnSettings, btnEditor
@@ -3409,7 +2996,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 wDataDigger
 ON CURSOR-LEFT OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
 , btnSettings, btnEditor
@@ -3424,7 +3011,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 wDataDigger
 ON CURSOR-RIGHT OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
 , btnSettings, btnEditor
@@ -3439,7 +3026,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 wDataDigger
 ON CURSOR-UP OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
 , btnSettings, btnEditor
@@ -3454,7 +3041,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnTools-2 wDataDigger
 ON END-ERROR OF btnTools-2 IN FRAME frSettings /* Tools */
 , btnDataDigger, btnConnections
 , btnSettings, btnEditor
@@ -3473,7 +3060,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME btnView
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnView C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnView wDataDigger
 ON CHOOSE OF btnView IN FRAME frMain /* View */
 DO:
   RUN btnViewChoose.
@@ -3484,15 +3071,13 @@ END.
 
 
 &Scoped-define SELF-NAME btnViewData
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnViewData C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnViewData wDataDigger
 ON CHOOSE OF btnViewData IN FRAME frMain /* -> */
-OR 'ctrl-j' OF cbAndOr, cbFields, cbOperator, ficValue, ficWhere, fiTableFilter, brTables, brFields
+OR 'ctrl-j' OF ficWhere, fiTableFilter, brTables, brFields
 OR MOUSE-SELECT-DBLCLICK, RETURN OF brTables
-OR 'ctrl-j' OF ficWhere2 IN FRAME frWhere
 OR 'F2' OF ficWhere
-OR 'F2' OF ficWhere2 IN FRAME frWhere
+OR 'RETURN' OF ficWhere
 OR 'CTRL-J' OF ttField.cFormat IN BROWSE brFields
-OR 'CHOOSE' OF btnViewData-2 IN FRAME frWhere
 DO:
   DEFINE BUFFER bTimer FOR ttTimer.
 
@@ -3534,47 +3119,47 @@ END.
 
 
 &Scoped-define SELF-NAME btnWhere
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL btnWhere wDataDigger
 ON CHOOSE OF btnWhere IN FRAME frMain /* Where */
-OR 'CTRL-ALT-W' OF c-win ANYWHERE
+OR 'ALT-CURSOR-DOWN' OF ficWhere 
+OR 'CTRL-CURSOR-DOWN' OF ficWhere 
+OR 'CTRL-ALT-W' OF wDataDigger ANYWHERE
 DO:
-  CASE gcQueryEditorState:
-    WHEN 'visible' THEN
-    DO:
-      setQueryEditor('hidden').
-      APPLY 'entry' TO ficWhere IN FRAME frMain.
-    END.
+  DEFINE VARIABLE cQuery AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE lOk    AS LOGICAL     NO-UNDO.
 
-    WHEN 'hidden'  THEN
-    DO:
-      setQueryEditor('visible').
-      APPLY 'entry' TO ficWhere2 IN FRAME frWhere.
-    END.
+  FRAME frMain    :SENSITIVE = FALSE.
+  FRAME frSettings:SENSITIVE = FALSE.
+  FRAME frData    :SENSITIVE = FALSE.
 
-  END CASE.
+  cQuery = ficWhere:SCREEN-VALUE.
 
-  RETURN NO-APPLY.
+  RUN wQueryEditor.w 
+      ( INPUT wDataDigger:HANDLE
+      , INPUT TABLE ttField BY-REFERENCE
+      , INPUT-OUTPUT cQuery
+      , OUTPUT lOk
+      ).
+
+  FRAME frMain    :SENSITIVE = TRUE.
+  FRAME frSettings:SENSITIVE = TRUE.
+  FRAME frData    :SENSITIVE = TRUE.
+
+  IF lOk THEN 
+  DO:
+    ficWhere:SCREEN-VALUE = formatQueryString(cQuery, NO).
+    ficWhere:CURSOR-OFFSET = LENGTH(cQuery) + 1.
+    APPLY "ENTRY" TO ficWhere.
+  END.
+
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME cbAndOr
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbAndOr C-Win
-ON RETURN OF cbAndOr IN FRAME frWhere /* Where */
-DO:
-  APPLY 'entry' TO cbFields.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME cbFavouriteGroup
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup wDataDigger
 ON RETURN OF cbFavouriteGroup IN FRAME frMain
 DO:
   APPLY 'entry' TO brTables.
@@ -3584,7 +3169,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFavouriteGroup wDataDigger
 ON VALUE-CHANGED OF cbFavouriteGroup IN FRAME frMain
 DO:
   DEFINE BUFFER bFavGroup FOR ttFavGroup.
@@ -3602,32 +3187,8 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME cbFields
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbFields C-Win
-ON RETURN OF cbFields IN FRAME frWhere
-DO:
-  APPLY 'entry' TO cbOperator.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define SELF-NAME cbOperator
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL cbOperator C-Win
-ON RETURN OF cbOperator IN FRAME frWhere
-DO:
-  APPLY 'entry' TO ficValue.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME CtrlFrame
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame C-Win OCX.Tick
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL CtrlFrame wDataDigger OCX.Tick
 PROCEDURE CtrlFrame.PSTimer.Tick .
 /*------------------------------------------------------------------------------
     Name : pstimer.ocx.tick
@@ -3665,36 +3226,11 @@ END PROCEDURE. /* OCX.psTimer.Tick */
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME ficValue
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficValue C-Win
-ON ENTRY OF ficValue IN FRAME frWhere
-DO:
-  IF SELF:screen-value = "" THEN
-    SELF:screen-value = getLinkInfo(cbFields:screen-value).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME ficWhere
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
-ON ALT-CURSOR-DOWN OF ficWhere IN FRAME frMain
-OR 'CTRL-CURSOR-DOWN' OF ficWhere
-DO:
-  setQueryEditor('visible').
-  APPLY 'entry' TO ficWhere2 IN FRAME frWhere.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON CTRL-A OF ficWhere IN FRAME frMain
 DO:
+  /* Select all */
   SELF:SET-SELECTION(1,LENGTH(SELF:SCREEN-VALUE) + 1).
 END.
 
@@ -3702,10 +3238,12 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON CTRL-D OF ficWhere IN FRAME frMain
 DO:
-  DEFINE VARIABLE i AS INTEGER     NO-UNDO.
+  /* Deselect all */
+  DEFINE VARIABLE i AS INTEGER NO-UNDO.
+
   i = SELF:CURSOR-OFFSET.
   SELF:SET-SELECTION(0,0).
   SELF:CURSOR-OFFSET = i.
@@ -3715,7 +3253,17 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
+ON CTRL-DEL OF ficWhere IN FRAME frMain
+DO:
+  SELF:EDIT-CUT().
+END.
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON CTRL-INS OF ficWhere IN FRAME frMain
 DO:
   SELF:EDIT-COPY().
@@ -3725,7 +3273,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON PAGE-DOWN OF ficWhere IN FRAME frMain
 OR "CHOOSE" OF btnPrevQuery
 OR "ALT-CURSOR-LEFT" OF ficWhere
@@ -3738,7 +3286,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON PAGE-UP OF ficWhere IN FRAME frMain
 OR "CHOOSE" OF btnNextQuery
 OR "ALT-CURSOR-RIGHT" OF ficWhere
@@ -3751,34 +3299,17 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
-ON RETURN OF ficWhere IN FRAME frMain
-DO:
-  /* If the editor is small, interpret an ENTER as CTRL-ENTER */
-  IF gcQueryEditorState = 'hidden' THEN
-  DO:
-    APPLY 'choose' TO btnViewData.
-    RETURN NO-APPLY.
-  END.
-  ELSE
-    SELF:insert-string ( '~n' ) .
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON SHIFT-DEL OF ficWhere IN FRAME frMain
 DO:
-  SELF:EDIT-CUT().
+  RUN clearQueryFilter.
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere wDataDigger
 ON SHIFT-INS OF ficWhere IN FRAME frMain
 DO:
   SELF:EDIT-PASTE().
@@ -3788,49 +3319,11 @@ END.
 &ANALYZE-RESUME
 
 
-&Scoped-define FRAME-NAME frWhere
-&Scoped-define SELF-NAME ficWhere2
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
-ON ALT-CURSOR-UP OF ficWhere2 IN FRAME frWhere
-OR 'CTRL-CURSOR-UP' OF ficWhere2
-DO:
-  setQueryEditor('hidden').
-  APPLY 'entry' TO ficWhere IN FRAME frMain.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
-ON CTRL-A OF ficWhere2 IN FRAME frWhere
-DO:
-  SELF:SET-SELECTION(1,LENGTH(SELF:SCREEN-VALUE) + NUM-ENTRIES(SELF:SCREEN-VALUE,'~n')).
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL ficWhere2 C-Win
-ON CTRL-D OF ficWhere2 IN FRAME frWhere
-DO:
-  DEFINE VARIABLE i AS INTEGER     NO-UNDO.
-  i = SELF:CURSOR-OFFSET.
-  SELF:SET-SELECTION(0,0).
-  SELF:CURSOR-OFFSET = i.
-END.
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-
-&Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME fiFeedback
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFeedback C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiFeedback wDataDigger
 ON MOUSE-SELECT-CLICK OF fiFeedback IN FRAME frMain
 DO:
-  OS-COMMAND NO-WAIT START VALUE(SELF:PRIVATE-DATA).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", SELF:PRIVATE-DATA)).
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -3838,7 +3331,7 @@ END.
 
 
 &Scoped-define SELF-NAME fiIndexNameFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON ANY-PRINTABLE OF fiIndexNameFilter IN FRAME frMain
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
@@ -3850,7 +3343,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON CURSOR-DOWN OF fiIndexNameFilter IN FRAME frMain
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
 DO:
@@ -3865,7 +3358,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON ENTRY OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
@@ -3879,7 +3372,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON LEAVE OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
@@ -3893,7 +3386,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON RETURN OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
@@ -3905,22 +3398,18 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON SHIFT-DEL OF fiIndexNameFilter IN FRAME frMain
 , fiFlagsFilter, fiFieldsFilter
 DO:
   RUN filterFieldClearAll(SELF,btnClearIndexFilter).
-/*   APPLY 'choose' TO btnClearIndexFilter. */
-/* /*   SELF:SCREEN-VALUE = ''. */          */
-/*   APPLY 'value-changed' TO SELF.         */
-/*   APPLY 'entry' TO SELF.                 */
 END.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiIndexNameFilter wDataDigger
 ON VALUE-CHANGED OF fiIndexNameFilter IN FRAME frMain
 , fiTableFilter
 , fiFlagsFilter, fiFieldsFilter
@@ -3934,7 +3423,7 @@ END.
 
 &Scoped-define FRAME-NAME frData
 &Scoped-define SELF-NAME fiNumRecords
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiNumRecords C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiNumRecords wDataDigger
 ON MOUSE-SELECT-DBLCLICK OF fiNumRecords IN FRAME frData
 DO:
   DEFINE VARIABLE hQuery  AS HANDLE      NO-UNDO.
@@ -3953,7 +3442,7 @@ DO:
 
   hQuery:SET-BUFFERS(hBuffer).
   hQuery:QUERY-PREPARE(cQuery).
-  hQuery:QUERY-OPEN.
+  hQuery:QUERY-OPEN().
 
   SESSION:SET-WAIT-STATE('').
 
@@ -3961,7 +3450,7 @@ DO:
   RUN showNumRecords(hQuery:NUM-RESULTS, YES).
   RUN showNumSelected.
 
-  hQuery:QUERY-CLOSE.
+  hQuery:QUERY-CLOSE().
 
   DELETE OBJECT hQuery.
   DELETE OBJECT hBuffer.
@@ -3972,7 +3461,7 @@ END.
 
 
 &Scoped-define SELF-NAME fiNumSelected
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiNumSelected C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiNumSelected wDataDigger
 ON MOUSE-SELECT-DBLCLICK OF fiNumSelected IN FRAME frData
 DO:
 
@@ -3989,7 +3478,7 @@ END.
 
 &Scoped-define FRAME-NAME frMain
 &Scoped-define SELF-NAME fiTableFilter
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter wDataDigger
 ON ANY-PRINTABLE OF fiTableFilter IN FRAME frMain
 DO:
   FilterModified(SELF,YES).
@@ -3999,7 +3488,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter wDataDigger
 ON CURSOR-DOWN OF fiTableFilter IN FRAME frMain
 DO:
   setFilterFieldColor(SELF:HANDLE).
@@ -4011,7 +3500,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter wDataDigger
 ON RETURN OF fiTableFilter IN FRAME frMain
 , cbDatabaseFilter, brTables
 DO:
@@ -4044,7 +3533,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter wDataDigger
 ON SHIFT-DEL OF fiTableFilter IN FRAME frMain
 , cbDatabaseFilter, cbDatabaseFilter
 DO:
@@ -4058,7 +3547,7 @@ END.
 &ANALYZE-RESUME
 
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL fiTableFilter wDataDigger
 ON VALUE-CHANGED OF fiTableFilter IN FRAME frMain
 , cbDatabaseFilter
 , fiIndexNameFilter, fiFlagsFilter, fiFieldsFilter
@@ -4091,10 +3580,10 @@ END.
 
 
 &Scoped-define SELF-NAME m_Create_an_issue_on_GitHub
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Create_an_issue_on_GitHub C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Create_an_issue_on_GitHub wDataDigger
 ON CHOOSE OF MENU-ITEM m_Create_an_issue_on_GitHub /* Create an issue on GitHub */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/issues/new'). 
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger/issues/new'). 
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4102,10 +3591,10 @@ END.
 
 
 &Scoped-define SELF-NAME m_DataDigger_blog
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_blog C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_blog wDataDigger
 ON CHOOSE OF MENU-ITEM m_DataDigger_blog /* Blog on wordpress.com */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com').
+  OS-COMMAND NO-WAIT VALUE('START https://datadigger.wordpress.com').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4113,10 +3602,10 @@ END.
 
 
 &Scoped-define SELF-NAME m_DataDigger_on_GitHub
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_on_GitHub C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_on_GitHub wDataDigger
 ON CHOOSE OF MENU-ITEM m_DataDigger_on_GitHub /* Source code on GitHub */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger').
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4124,10 +3613,10 @@ END.
 
 
 &Scoped-define SELF-NAME m_DataDigger_Wiki
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_Wiki C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_DataDigger_Wiki wDataDigger
 ON CHOOSE OF MENU-ITEM m_DataDigger_Wiki /* Wiki with How-To and docu */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://github.com/patrickTingen/DataDigger/wiki'). 
+  OS-COMMAND NO-WAIT VALUE('START https://github.com/patrickTingen/DataDigger/wiki'). 
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4135,9 +3624,9 @@ END.
 
 
 &Scoped-define SELF-NAME m_Introduction_DataDigger
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Introduction_DataDigger C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_Introduction_DataDigger wDataDigger
 ON CHOOSE OF MENU-ITEM m_Introduction_DataDigger /* Introduction to DataDigger */
-OR "HELP" OF c-win
+OR "HELP" OF wDataDigger
 DO:
 
   glShowTour = TRUE.
@@ -4151,7 +3640,7 @@ END.
 
 
 &Scoped-define SELF-NAME m_New_in_this_version
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_New_in_this_version C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_New_in_this_version wDataDigger
 ON CHOOSE OF MENU-ITEM m_New_in_this_version /* New in this version */
 DO:
   
@@ -4166,10 +3655,10 @@ END.
 
 
 &Scoped-define SELF-NAME m_questions_and_feedback
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_questions_and_feedback C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_questions_and_feedback wDataDigger
 ON CHOOSE OF MENU-ITEM m_questions_and_feedback /* Questions and feedback */
 DO:
-  OS-COMMAND NO-WAIT START VALUE('https://datadigger.wordpress.com/contact').
+  OS-COMMAND NO-WAIT VALUE('START https://datadigger.wordpress.com/contact').
 END.
 
 /* _UIB-CODE-BLOCK-END */
@@ -4177,7 +3666,7 @@ END.
 
 
 &Scoped-define SELF-NAME m_View_as_Excel
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_Excel C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_Excel wDataDigger
 ON CHOOSE OF MENU-ITEM m_View_as_Excel /* View as Excel */
 DO:
   RUN setViewType('XLS').
@@ -4188,7 +3677,7 @@ END.
 
 
 &Scoped-define SELF-NAME m_View_as_HTML
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_HTML C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_HTML wDataDigger
 ON CHOOSE OF MENU-ITEM m_View_as_HTML /* View as HTML */
 DO:
   RUN setViewType('HTML').
@@ -4199,7 +3688,7 @@ END.
 
 
 &Scoped-define SELF-NAME m_View_as_text
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_text C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL m_View_as_text wDataDigger
 ON CHOOSE OF MENU-ITEM m_View_as_text /* View as TEXT */
 DO:
   RUN setViewType('TXT').
@@ -4210,7 +3699,7 @@ END.
 
 
 &Scoped-define SELF-NAME tgDebugMode
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgDebugMode C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgDebugMode wDataDigger
 ON VALUE-CHANGED OF tgDebugMode IN FRAME frMain
 DO:
 
@@ -4223,7 +3712,7 @@ END.
 
 
 &Scoped-define SELF-NAME tgSelAll
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelAll C-Win
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelAll wDataDigger
 ON VALUE-CHANGED OF tgSelAll IN FRAME frMain
 DO:
 
@@ -4238,14 +3727,14 @@ END.
 &Scoped-define BROWSE-NAME brFields
 &UNDEFINE SELF-NAME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _CUSTOM _MAIN-BLOCK wDataDigger 
 
 
 SESSION:DEBUG-ALERT = YES.
 
 /* ***************************  Main Block  *************************** */
 glReadOnlyDigger = plReadOnlyDigger.
-RUN startDiggerLib.
+RUN startDiggerLib.p.
 
 /* More than one DataDigger window can be open. The
  * startup procedure can demand that all windows are
@@ -4275,14 +3764,10 @@ SUBSCRIBE TO "refreshConnections" ANYWHERE.
 {&WINDOW-NAME}:HEIGHT-PIXELS = 100.
 
 /* For initializing, center the main window */
-{&WINDOW-NAME}:X = (SESSION:WORK-AREA-WIDTH-PIXELS - {&WINDOW-NAME}:WIDTH-PIXELS) / 2.
-{&WINDOW-NAME}:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - {&WINDOW-NAME}:HEIGHT-PIXELS) / 2.
-
-/* Show a message that we're busy setting stuff up */
-DEFINE VARIABLE winWait AS HANDLE NO-UNDO.
-RUN showMessage.p("DataDigger", "Digging the schema, please wait", OUTPUT winWait).
-
-setWindowFreeze(YES).
+{&_proparse_ prolint-nowarn(overflow)}
+ASSIGN 
+  {&WINDOW-NAME}:X = (SESSION:WORK-AREA-WIDTH-PIXELS - {&WINDOW-NAME}:WIDTH-PIXELS) / 2
+  {&WINDOW-NAME}:Y = (SESSION:WORK-AREA-HEIGHT-PIXELS - {&WINDOW-NAME}:HEIGHT-PIXELS) / 2.
 
 /* Set CURRENT-WINDOW: this will parent dialog-boxes and frames.        */
 ASSIGN CURRENT-WINDOW                = {&WINDOW-NAME}
@@ -4308,7 +3793,7 @@ DO:
   setRegistry("DataDigger", "Database", cSetting ).
 
   /* Make sure all settings are saved */
-  RUN flushRegistry.
+  RUN saveConfigFileSorted.
 
   /* Notify launcher that the window closes */
   PUBLISH 'DataDigger'(-1).
@@ -4360,7 +3845,7 @@ DO:
     fiWarning:VISIBLE = NO.
     fiWarning:X = 1.
 
-    cTable          = gcCurrentTable.
+    cTable          = gcTable.
     cField          = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFieldName'):BUFFER-VALUE.
     cOrgValue       = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cFormatOrg'):BUFFER-VALUE.
     cFieldDatatype  = brFields:QUERY:GET-BUFFER-HANDLE(1):BUFFER-FIELD('cDatatype'):BUFFER-VALUE.
@@ -4383,7 +3868,7 @@ DO:
 
     #SetFormat:
     FOR EACH bColumn 
-      WHERE bColumn.cDatabase  = gcCurrentDatabase
+      WHERE bColumn.cDatabase  = gcDatabase
         AND bColumn.cTableName = cTable
         AND bColumn.cFieldName = cField:
 
@@ -4407,17 +3892,17 @@ DO:
     IF ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
     /* Save changed format. If it is blank, it will be deleted from registry */
-    setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
+    setRegistry( SUBSTITUTE("DB:&1",gcDatabase)
                , SUBSTITUTE("&1.&2:format",cTable,cField)
                , IF SELF:SCREEN-VALUE <> cOrgValue THEN SELF:SCREEN-VALUE ELSE ?
                ).
-
+               
     setWindowFreeze(NO).
   END.
 END. /* on leave of ttField.cFormat */
 
 
-ON CTRL-TAB OF C-Win ANYWHERE /* DataDigger */
+ON CTRL-TAB OF wDataDigger ANYWHERE /* DataDigger */
 DO:
   CASE giCurrentPage:
     WHEN {&PAGE-TABLES} THEN RUN setPage({&PAGE-FAVOURITES}).
@@ -4425,7 +3910,7 @@ DO:
   END CASE.
 
   RUN setTableView(glShowFavourites,NO).
-END. /* CTRL-TAB OF C-Win anywhere */
+END. /* CTRL-TAB OF wDataDigger anywhere */
 
 /* Best default for GUI applications is...                              */
 PAUSE 0 BEFORE-HIDE.
@@ -4436,18 +3921,24 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
+  /* Show a message that we're busy setting stuff up */
+  DEFINE VARIABLE winWait AS HANDLE NO-UNDO.
+  setWindowFreeze(YES).
+  RUN showMessage.p("DataDigger", "Digging the schema, please wait", OUTPUT winWait).
+
   /* Notify launcher that the window started */
   PUBLISH 'DataDigger'(+1).
 
+  glInitializing = TRUE.
   RUN initUI.
   RUN initObjects.
+  glInitializing = FALSE.
 
   /* Clear wait-message */
   DELETE WIDGET winWait.
   {&WINDOW-NAME}:HIDDEN = NO.
 
-  RUN startSession.
-
+  RUN startSession. 
   APPLY 'entry' TO fiTableFilter.
 
   /* Auto-start DD on selected text */
@@ -4469,7 +3960,7 @@ END.
 
 /* **********************  Internal Procedures  *********************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAboutChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAboutChoose wDataDigger 
 PROCEDURE btnAboutChoose :
 /* About DataDigger
 */
@@ -4480,7 +3971,7 @@ END PROCEDURE. /* btnAboutChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddChoose wDataDigger 
 PROCEDURE btnAddChoose :
 /* Add new record
  */
@@ -4494,8 +3985,8 @@ PROCEDURE btnAddChoose :
     ( INPUT glReadOnlyDigger
     , INPUT 'Add'
     , INPUT ghDataBrowse
-    , INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    , INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE ttField  /* do not use by-reference */
     , INPUT TABLE ttColumn /* do not use by-reference */
     , OUTPUT lRecordsUpdated
@@ -4513,7 +4004,7 @@ END PROCEDURE. /* btnAddChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddFavGroupChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnAddFavGroupChoose wDataDigger 
 PROCEDURE btnAddFavGroupChoose :
 /* Add favourites group
 */
@@ -4553,7 +4044,7 @@ END PROCEDURE. /* btnAddFavGroupChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearDataFilterChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearDataFilterChoose wDataDigger 
 PROCEDURE btnClearDataFilterChoose :
 /* Clear filters and reopen data browse
  */
@@ -4575,7 +4066,7 @@ END PROCEDURE. /* btnClearDataFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearFieldFilterChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearFieldFilterChoose wDataDigger 
 PROCEDURE btnClearFieldFilterChoose :
 /* Clear field filters and set focus to field browse
  */
@@ -4588,7 +4079,7 @@ END PROCEDURE. /* btnClearFieldFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearIndexFilterChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearIndexFilterChoose wDataDigger 
 PROCEDURE btnClearIndexFilterChoose :
 /* Clear index filters
  */
@@ -4602,7 +4093,7 @@ END PROCEDURE. /* btnClearIndexFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearTableFilterChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnClearTableFilterChoose wDataDigger 
 PROCEDURE btnClearTableFilterChoose :
 /*
  * Clear table filters and set focus to table browse
@@ -4649,7 +4140,7 @@ END PROCEDURE. /* btnClearTableFilterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnCloneChoose wDataDigger 
 PROCEDURE btnCloneChoose :
 /* Copy the current record and edit it.
  */
@@ -4680,8 +4171,8 @@ PROCEDURE btnCloneChoose :
     ( INPUT glReadOnlyDigger
     , INPUT 'Clone'
     , INPUT ghDataBrowse
-    , INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    , INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE ttField  /* do not use by-reference ! */
     , INPUT TABLE ttColumn /* do not use by-reference ! */
     , OUTPUT lRecordsUpdated
@@ -4700,7 +4191,7 @@ END PROCEDURE. /* btnCloneChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnConnectionsChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnConnectionsChoose wDataDigger 
 PROCEDURE btnConnectionsChoose :
 /* Maintenance of database connection settings
  */
@@ -4721,7 +4212,7 @@ END PROCEDURE. /* btnConnectionsChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataDiggerChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataDiggerChoose wDataDigger 
 PROCEDURE btnDataDiggerChoose :
 /* Start new instance
 */
@@ -4729,8 +4220,8 @@ PROCEDURE btnDataDiggerChoose :
   IF FRAME frHint:VISIBLE THEN RETURN NO-APPLY.
 
   /* Set the X and Y a little higher so the new window appears cascaded */
-  setRegistry("DataDigger", "Window:x", STRING(c-win:X + 20) ).
-  setRegistry("DataDigger", "Window:y", STRING(c-win:Y + 20) ).
+  setRegistry("DataDigger", "Window:x", STRING(wDataDigger:X + 20) ).
+  setRegistry("DataDigger", "Window:y", STRING(wDataDigger:Y + 20) ).
 
   RUN VALUE(getProgramDir() + 'wDataDigger.w') PERSISTENT (INPUT glReadOnlyDigger) .
 
@@ -4739,7 +4230,7 @@ END PROCEDURE. /* btnDataDiggerChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataSortChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDataSortChoose wDataDigger 
 PROCEDURE btnDataSortChoose :
 /* Set sorting for data browse
  */
@@ -4758,7 +4249,7 @@ END PROCEDURE. /* btnDataSortChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDeleteChoose wDataDigger 
 PROCEDURE btnDeleteChoose :
 /* Delete selected records
  */
@@ -4771,14 +4262,14 @@ PROCEDURE btnDeleteChoose :
   DEFINE VARIABLE lEnableTriggers AS LOGICAL NO-UNDO.
 
   /* In read-only mode, or -RO connection, return */
-  IF glReadOnlyDigger OR (CAN-DO(DBRESTRICTIONS(gcCurrentDatabase), "READ-ONLY") = YES) THEN RETURN. 
+  IF glReadOnlyDigger OR (CAN-DO(DBRESTRICTIONS(gcDatabase), "READ-ONLY") = YES) THEN RETURN. 
   
   /* If nothing selected, go back */
   IF ghDataBrowse:NUM-SELECTED-ROWS = 0
     OR NOT CAN-FIND(FIRST ttField WHERE ttField.lShow = TRUE) THEN RETURN.
 
   /* Prohibit editing of VST records */
-  IF gcCurrentTable BEGINS '_' THEN
+  IF gcTable BEGINS '_' THEN
   DO:
     RUN showHelp('CannotEditVst', '').
     RETURN.
@@ -4826,8 +4317,8 @@ PROCEDURE btnDeleteChoose :
       DO:
         /* That is, if you have a full version of Progress */
         IF PROGRESS = "FULL" THEN
-          RUN deleteRecord( gcCurrentDatabase
-                          , gcCurrentTable
+          RUN deleteRecord( gcDatabase
+                          , gcTable
                           , hBuffer:ROWID
                           , lEnableTriggers
                           , OUTPUT lDeleted
@@ -4850,11 +4341,11 @@ PROCEDURE btnDeleteChoose :
   IF lError THEN
     IF PROGRESS <> "FULL" THEN
     DO:
-      CREATE BUFFER hFileBuffer FOR TABLE gcCurrentDatabase + "._file".
-      hFileBuffer:FIND-UNIQUE(SUBSTITUTE("WHERE _file-name = &1", QUOTER(gcCurrentTable))).
+      CREATE BUFFER hFileBuffer FOR TABLE gcDatabase + "._file".
+      hFileBuffer:FIND-UNIQUE(SUBSTITUTE("WHERE _file-name = &1", QUOTER(gcTable))).
 
       MESSAGE
-        SUBSTITUTE("Your table &1.&2 contains a validation expression:", gcCurrentDatabase, gcCurrentTable)
+        SUBSTITUTE("Your table &1.&2 contains a validation expression:", gcDatabase, gcTable)
         SKIP(1) hFileBuffer::_valexp
         SKIP(1) "Therefore, it cannot be dynamically deleted. Normally,"
         SKIP    "DataDigger would generate a small program and compile "
@@ -4874,7 +4365,7 @@ END PROCEDURE. /* btnDeleteChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnDumpChoose wDataDigger 
 PROCEDURE btnDumpChoose :
 /* Dump selected records
  */
@@ -4931,7 +4422,7 @@ END PROCEDURE. /* btnDumpChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditChoose wDataDigger 
 PROCEDURE btnEditChoose :
 /* Edit one or more records in a separate window
  */
@@ -4956,7 +4447,7 @@ PROCEDURE btnEditChoose :
   END.
 
   /* Support dataservers */
-  IF   isDataserver(gcCurrentDatabase)
+  IF   isDataserver(gcDatabase)
    AND NOT ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE
    AND ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):ROWID = ? THEN
   DO:
@@ -4970,9 +4461,9 @@ PROCEDURE btnEditChoose :
                   "knowledgebase.progress.com/articles/Article/20306."  + "~n" +
                   "Change this and repull schema."                      + "~n" +
                   "", "~n")
-                , getDataserverType(gcCurrentDatabase)
-                , gcCurrentDatabase
-                , gcCurrentTable
+                , getDataserverType(gcDatabase)
+                , gcDatabase
+                , gcTable
                 )
       VIEW-AS ALERT-BOX ERROR BUTTONS OK.
     RETURN.
@@ -4989,8 +4480,8 @@ PROCEDURE btnEditChoose :
       ( INPUT glReadOnlyDigger
       , INPUT 'Edit'
       , INPUT ghDataBrowse
-      , INPUT gcCurrentDatabase
-      , INPUT gcCurrentTable
+      , INPUT gcDatabase
+      , INPUT gcTable
       , INPUT TABLE ttField  /* do not use by-reference ! */
       , INPUT TABLE ttColumn /* do not use by-reference ! */
       , OUTPUT lRecordsUpdated
@@ -5000,7 +4491,7 @@ PROCEDURE btnEditChoose :
     IF lRecordsUpdated
       AND ghDataBrowse:QUERY:NUM-RESULTS > 0 THEN ghDataBrowse:REFRESH().
 
-    c-win:MOVE-TO-TOP().
+    wDataDigger:MOVE-TO-TOP().
   END.
 
 END PROCEDURE. /* btnEditChoose */
@@ -5008,7 +4499,7 @@ END PROCEDURE. /* btnEditChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditorChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnEditorChoose wDataDigger 
 PROCEDURE btnEditorChoose :
 /* Open procedure editor
 */
@@ -5022,7 +4513,7 @@ END PROCEDURE. /* btnEditorChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnHelpChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnHelpChoose wDataDigger 
 PROCEDURE btnHelpChoose :
 /* Show welcome tour
 */
@@ -5033,7 +4524,7 @@ END PROCEDURE. /* btnHelpChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnLoadChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnLoadChoose wDataDigger 
 PROCEDURE btnLoadChoose :
 /* Load data into table
  */
@@ -5042,8 +4533,8 @@ PROCEDURE btnLoadChoose :
 
   RUN VALUE(getProgramDir() + 'wImportSel.w')
     ( INPUT glReadOnlyDigger
-    , INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    , INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE ttField  /* do not use by-reference */
     , INPUT TABLE ttColumn /* do not use by-reference */
     , OUTPUT lRecordsUpdated
@@ -5061,34 +4552,32 @@ END PROCEDURE. /* btnLoadChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueriesChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueriesChoose wDataDigger 
 PROCEDURE btnQueriesChoose :
-/* Maintenance of database connection settings
+/* Previous queries
  */
-  DEFINE VARIABLE iQuery  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE hEditor AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iQuery AS INTEGER NO-UNDO.
 
-  hEditor = getActiveQueryEditor().
+  DO WITH FRAME frMain:
 
-  RUN VALUE(getProgramDir() + 'dQueries.w')
-    ( INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
-    , INPUT hEditor:SCREEN-VALUE
-    , OUTPUT iQuery
-    ).
+    RUN VALUE(getProgramDir() + 'dQueries.w')
+      ( INPUT gcDatabase
+      , INPUT gcTable
+      , INPUT ficWhere:SCREEN-VALUE
+      , OUTPUT iQuery
+      ).
 
-  IF iQuery = ? THEN RETURN.
+    IF iQuery = ? THEN RETURN.
 
-  /* Queries might be changed, so reload them */
-  RUN collectQueryInfo(gcCurrentDatabase, gcCurrentTable).
+    /* Queries might be changed, so reload them */
+    RUN collectQueryInfo(gcDatabase, gcTable).
 
-  giQueryPointer = iQuery.
-  setQuery(0).
+    giQueryPointer = iQuery.
+    setQuery(0).
 
-  DO WITH FRAME {&FRAME-NAME}:
     ficWhere:BGCOLOR = 15. /* default */
     ficWhere:FGCOLOR = ?. /* default */
-    ficWhere:TOOLTIP = ''.
+    ficWhere:TOOLTIP = ficWhere:PRIVATE-DATA.
   END.
 
 END PROCEDURE. /* btnQueriesChoose */
@@ -5096,7 +4585,7 @@ END PROCEDURE. /* btnQueriesChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueryTesterChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnQueryTesterChoose wDataDigger 
 PROCEDURE btnQueryTesterChoose :
 /* Start Marius' query tester
 */
@@ -5107,7 +4596,7 @@ END PROCEDURE. /* btnQueryTesterChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSettingsChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnSettingsChoose wDataDigger 
 PROCEDURE btnSettingsChoose :
 /* Show DataDigger settings window
  */
@@ -5130,16 +4619,21 @@ PROCEDURE btnSettingsChoose :
 
   IF lOkClicked THEN
   DO:
+    glInitializing = TRUE.
     setWindowFreeze(YES).
 
     RUN clearRegistryCache.
     RUN clearColorCache.
     RUN clearFontCache.
+    RUN loadSettings.
+
     RUN initObjects.
 
-    gcCurrentTable = ?.
+    gcTable = ?.
     APPLY "value-changed" TO brTables IN FRAME frMain.
+
     setWindowFreeze(NO).
+    glInitializing = FALSE.
   END.
 
 END PROCEDURE. /* btnSettingsChoose */
@@ -5147,7 +4641,7 @@ END PROCEDURE. /* btnSettingsChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE btnViewChoose wDataDigger 
 PROCEDURE btnViewChoose :
 /* Show a record in a more readable format in a new window.
  */
@@ -5321,7 +4815,7 @@ PROCEDURE btnViewChoose :
   OUTPUT CLOSE.
 
   /* Start associated program for the txt file */
-  OS-COMMAND NO-WAIT START VALUE(cFilename).
+  OS-COMMAND NO-WAIT VALUE(SUBSTITUTE("START &1", cFilename)).
 
   /* Cleanup */
   EMPTY TEMP-TABLE bView.
@@ -5332,7 +4826,7 @@ END PROCEDURE. /* btnViewChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFonts C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE checkFonts wDataDigger 
 PROCEDURE checkFonts :
 /* If the default fonts have been messed up, try to set the fonts to reasonable settings.
    */
@@ -5417,7 +4911,7 @@ END PROCEDURE. /* checkFonts */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataFilter wDataDigger 
 PROCEDURE clearDataFilter :
 /* clear the Data Filters
  */
@@ -5427,8 +4921,8 @@ PROCEDURE clearDataFilter :
 
   FIND bColumn WHERE bColumn.hFilter = phFilterField NO-ERROR.
   IF AVAILABLE bColumn THEN
-    setRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase )
-               , SUBSTITUTE("&1.&2:FilterHistory", gcCurrentTable, bColumn.cFullName)
+    setRegistry( SUBSTITUTE("DB:&1",gcDatabase )
+               , SUBSTITUTE("&1.&2:FilterHistory", gcTable, bColumn.cFullName)
                , ?
                ).
 
@@ -5439,7 +4933,7 @@ END PROCEDURE. /* clearDataFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataSort C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearDataSort wDataDigger 
 PROCEDURE clearDataSort :
 /*
  * Remove data column sorting and reopen browse
@@ -5455,7 +4949,7 @@ END PROCEDURE. /* clearDataSort */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearField C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearField wDataDigger 
 PROCEDURE clearField :
 /* Clear a field
  */
@@ -5467,7 +4961,7 @@ END PROCEDURE. /* clearField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearFieldFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearFieldFilter wDataDigger 
 PROCEDURE clearFieldFilter :
 /* Reset the field filters to the blank values
  */
@@ -5490,7 +4984,7 @@ END PROCEDURE. /* clearFieldFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearIndexFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearIndexFilter wDataDigger 
 PROCEDURE clearIndexFilter :
 /* Reset the index filters to the blank values
  */
@@ -5513,7 +5007,30 @@ END PROCEDURE. /* clearIndexFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cloneDatabase C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE clearQueryFilter wDataDigger 
+PROCEDURE clearQueryFilter :
+/* Clear WHERE-box 
+*/
+  DO WITH FRAME {&FRAME-NAME}:
+    
+    ficWhere:SCREEN-VALUE = ''.
+    ficWhere:BGCOLOR      = ?. /* default */
+    ficWhere:FGCOLOR      = ?. /* default */
+    ficWhere:TOOLTIP      = ficWhere:PRIVATE-DATA.
+  
+    /* Clear query in ini file */
+    setRegistry ( SUBSTITUTE('DB:&1'   , gcDatabase )
+                , SUBSTITUTE('&1:query', gcTable )
+                , ''
+                ).
+  END.
+
+END PROCEDURE. /* clearQueryFilter */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cloneDatabase wDataDigger 
 PROCEDURE cloneDatabase :
 /* Clone the structure + definitions of the current
  * database into a new, empty one.
@@ -5521,10 +5038,10 @@ PROCEDURE cloneDatabase :
   DEFINE VARIABLE cLogicalName     AS CHARACTER   NO-UNDO.
 
   DO WITH FRAME frMain:
-    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
+    CREATE ALIAS dictdb FOR DATABASE VALUE( gcDatabase ).
 
     RUN VALUE(getProgramDir() + 'dCloneDatabase.w')
-     ( INPUT-OUTPUT gcCurrentDatabase
+     ( INPUT-OUTPUT gcDatabase
      , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
      , OUTPUT cLogicalName
      ).
@@ -5545,128 +5062,30 @@ END PROCEDURE. /* cloneDatabase */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo C-Win 
-PROCEDURE collectFieldInfo PRIVATE :
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectFieldInfo wDataDigger 
+PROCEDURE collectFieldInfo :
 /* Fill the fields temp-table
  */
   DEFINE INPUT PARAMETER pcTableName AS CHARACTER NO-UNDO.
   DEFINE BUFFER bTable FOR ttTable.
-  {&timerStart}
 
   /* Collect fields from target table */
-  RUN getFields( INPUT gcCurrentDatabase
+  RUN getFields( INPUT gcDatabase
                , INPUT pcTableName
                , OUTPUT DATASET dsFields
                ).
 
   FIND bTable
-    WHERE bTable.cDatabase  = gcCurrentDatabase
+    WHERE bTable.cDatabase  = gcDatabase
       AND bTable.cTableName = pcTableName  NO-ERROR.
   IF AVAILABLE bTable THEN ASSIGN bTable.lCached = TRUE.
-
-  {&timerStop}
 
 END PROCEDURE. /* collectFieldInfo */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE collectIndexInfo C-Win 
-PROCEDURE collectIndexInfo :
-/* Fill the index temp-table
- */
-  {&timerStart}
-  DEFINE INPUT PARAMETER pcTableName   AS CHARACTER   NO-UNDO.
-
-  DEFINE VARIABLE hBufferFile       AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferIndex      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferIndexField AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hBufferField      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cQuery            AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hQuery            AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE cCurrentDatabase  AS CHARACTER   NO-UNDO. /* NelsonAlcala */
-
-  DEFINE BUFFER bIndex FOR ttIndex.
-
-  /* Return if no db connected */
-  IF NUM-DBS = 0 THEN RETURN.
-
-  /* NelsonAlcala */
-  cCurrentDatabase = SDBNAME(gcCurrentDatabase).  /*use DB schemaholder name*/
-  /* Fill the tt with _Fields */
-                                           /* NelsonAlcala */
-  CREATE BUFFER hBufferFile       FOR TABLE /*g*/ cCurrentDatabase + "._File".
-  CREATE BUFFER hBufferIndex      FOR TABLE /*g*/ cCurrentDatabase + "._Index".
-  CREATE BUFFER hBufferIndexField FOR TABLE /*g*/ cCurrentDatabase + "._Index-Field".
-  CREATE BUFFER hBufferField      FOR TABLE /*g*/ cCurrentDatabase + "._Field".
-
-  CREATE QUERY hQuery.
-  hQuery:SET-BUFFERS(hBufferFile,hBufferIndex,hBufferIndexField,hBufferField).
-
-  cQuery = SUBSTITUTE("for each &1._File  where &1._file._file-name = '&2' no-lock " +
-                      "  , each &1._Index       of &1._File        no-lock " +
-                      "  , each &1._Index-field of &1._Index       no-lock " +
-                      "  , each &1._Field       of &1._Index-field no-lock where true "
-                     , cCurrentDatabase /* NelsonAlcala */
-                     , pcTableName
-                     ).
-
-  hQuery:QUERY-PREPARE(cQuery).
-  EMPTY TEMP-TABLE bIndex.
-  hQuery:QUERY-OPEN().
-  hQuery:GET-FIRST().
-
-  REPEAT WHILE NOT hQuery:QUERY-OFF-END:
-
-    FIND bIndex WHERE bIndex.cIndexName = hBufferIndex:BUFFER-FIELD('_index-name'):BUFFER-VALUE NO-ERROR.
-    IF NOT AVAILABLE bIndex THEN
-    DO:
-      CREATE bIndex.
-
-      bIndex.cIndexName  = hBufferIndex:BUFFER-FIELD('_index-name'):BUFFER-VALUE.
-
-      {&_proparse_ prolint-nowarn(recidkeyword)}
-      bIndex.cIndexFlags = STRING( hBufferFile:BUFFER-FIELD('_prime-index'):BUFFER-VALUE = hBufferIndex:RECID, 'P/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_unique'):BUFFER-VALUE, ' U/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_WordIdx'):BUFFER-VALUE <> ?, ' W/')
-                          + STRING( hBufferIndex:BUFFER-FIELD('_Active'):BUFFER-VALUE , ' /INACTIVE')
-                          .
-      bIndex.cIndexFlags  = TRIM(bIndex.cIndexFlags).
-      bIndex.lIndexActive = hBufferIndex:BUFFER-FIELD('_Active'):BUFFER-VALUE.
-    END.
-
-    /* Add field */
-    bIndex.cIndexFields = SUBSTITUTE('&1  &2&3'
-                                     , bIndex.cIndexFields
-                                     , hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE
-                                     , STRING( hBufferIndexField:BUFFER-FIELD('_Ascending'):BUFFER-VALUE, '+/-')
-                                     ).
-    bIndex.cIndexFields = TRIM(bIndex.cIndexFields,' ').
-
-    /* Naked list of just fieldnames */
-    bIndex.cFieldList   = SUBSTITUTE('&1,&2'
-                                     , bIndex.cFieldList
-                                     , hBufferField:BUFFER-FIELD('_field-name'):BUFFER-VALUE
-                                     ).
-    bIndex.cFieldList   = TRIM(bIndex.cFieldList,', ').
-
-    hQuery:GET-NEXT().
-  END.
-  hQuery:QUERY-CLOSE().
-
-  DELETE OBJECT hQuery.
-  DELETE OBJECT hBufferFile.
-  DELETE OBJECT hBufferIndex.
-  DELETE OBJECT hBufferIndexField.
-  DELETE OBJECT hBufferField.
-
-  {&timerStop}
-END PROCEDURE. /* collectIndexInfo */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDatabase wDataDigger 
 PROCEDURE connectDatabase :
 /* Quick-Connect to a database via the context menu
  */
@@ -5697,7 +5116,7 @@ END PROCEDURE. /* connectDatabase */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDroppedDatabase C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectDroppedDatabase wDataDigger 
 PROCEDURE connectDroppedDatabase :
 /* Quick-Connect to a drag-and-dropped database
  */
@@ -5747,7 +5166,7 @@ END PROCEDURE. /* connectDroppedDatabase */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectParamFile C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE connectParamFile wDataDigger 
 PROCEDURE connectParamFile :
 /* Quick-Connect to a drag-and-dropped database
  */
@@ -5780,7 +5199,7 @@ END PROCEDURE. /* connectParamFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load C-Win  _CONTROL-LOAD
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE control_load wDataDigger  _CONTROL-LOAD
 PROCEDURE control_load :
 /*------------------------------------------------------------------------------
   Purpose:     Load the OCXs    
@@ -5818,7 +5237,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyDataToClipboard C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyDataToClipboard wDataDigger 
 PROCEDURE copyDataToClipboard :
 /* Copy the value of the column to the clipboard
  */
@@ -5833,7 +5252,7 @@ END PROCEDURE. /* copyDataToClipboard */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyToClipboard C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE copyToClipboard wDataDigger 
 PROCEDURE copyToClipboard :
 /* Copy value to clipboard
  */
@@ -5845,7 +5264,7 @@ END PROCEDURE. /* copyToClipboard */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuDataBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuDataBrowse wDataDigger 
 PROCEDURE createMenuDataBrowse :
 /* Rebuild the connection submenu of the 'add' button
  */
@@ -5853,6 +5272,7 @@ PROCEDURE createMenuDataBrowse :
   DEFINE VARIABLE hMenuItem AS HANDLE NO-UNDO.
 
   hMenu = createMenu(ghDataBrowse).
+  ON "menu-drop" OF hMenu PERSISTENT RUN menuDropDataBrowse IN THIS-PROCEDURE. /* enable/disable menu-items */
 
   /* Copy to clipboard */
   hMenuItem = createMenuItem(hMenu,"Item","Copy to clipboard","copyDataToClipboard").
@@ -5932,7 +5352,7 @@ END PROCEDURE. /* createMenuDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuTableBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createMenuTableBrowse wDataDigger 
 PROCEDURE createMenuTableBrowse :
 /* Rebuild the connection submenu of the 'add' button
  */
@@ -6038,7 +5458,7 @@ END PROCEDURE. /* createMenuTableBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE createSortTable wDataDigger 
 PROCEDURE createSortTable :
 /* Create a newly arranged sort table for all sort options
    * from both query and user selected sorts */
@@ -6086,7 +5506,7 @@ END PROCEDURE. /* createSortTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE cutToClipboard wDataDigger 
 PROCEDURE cutToClipboard :
 /* Copy value to clipboard and delete current value
  */
@@ -6098,14 +5518,14 @@ END PROCEDURE. /* cutToClipboard */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnResize C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnResize wDataDigger 
 PROCEDURE dataColumnResize :
 /* Resize a data column
  */
   DEFINE INPUT  PARAMETER phColumn AS HANDLE NO-UNDO.
 
-  setRegistry( SUBSTITUTE('DB:&1',gcCurrentDatabase)
-             , SUBSTITUTE('&1.&2:width', gcCurrentTable, phColumn:NAME)
+  setRegistry( SUBSTITUTE('DB:&1',gcDatabase)
+             , SUBSTITUTE('&1.&2:width', gcTable, phColumn:NAME)
              , STRING(phColumn:WIDTH-PIXELS)
              ).
 
@@ -6116,7 +5536,7 @@ END PROCEDURE. /* dataColumnResize */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnSort C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataColumnSort wDataDigger 
 PROCEDURE dataColumnSort PRIVATE :
 /* Sort on a datacolumn
    */
@@ -6180,7 +5600,7 @@ END PROCEDURE. /* dataColumnSort */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDiggerClose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE DataDiggerClose wDataDigger 
 PROCEDURE DataDiggerClose :
 /* Close DataDigger after event 'DataDiggerClose'
  */
@@ -6191,7 +5611,7 @@ END PROCEDURE. /* DataDiggerClose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataDoubleClick C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataDoubleClick wDataDigger 
 PROCEDURE dataDoubleClick :
 /* Double click on databrowse might result in EDIT / VIEW / DUMP
   */
@@ -6206,7 +5626,7 @@ END PROCEDURE. /* dataDoubleClick */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataGotoFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataGotoFilter wDataDigger 
 PROCEDURE dataGotoFilter :
 /* Jump from browse straight to the filter fields
  */
@@ -6235,7 +5655,7 @@ END PROCEDURE. /* dataGotoFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataOffHome wDataDigger 
 PROCEDURE dataOffHome :
 /* Use CTRL-CURSOR-UP / DOWN to jump from filter fields to browse and back
 */
@@ -6246,7 +5666,7 @@ END PROCEDURE. /* dataOffHome */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowDisplay C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowDisplay wDataDigger 
 PROCEDURE dataRowDisplay :
 /* Set the background color to another color to get an odd/even coloring of the rows.
  */
@@ -6322,7 +5742,7 @@ END PROCEDURE. /* dataRowDisplay */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowValueChanged C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataRowValueChanged wDataDigger 
 PROCEDURE dataRowValueChanged :
 /* Save the content of the fields in linkinfo
   */
@@ -6348,7 +5768,7 @@ END PROCEDURE. /* dataRowValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataScrollNotify C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataScrollNotify wDataDigger 
 PROCEDURE dataScrollNotify :
 /* Adjust size and position of the filterfields to browse
  */
@@ -6404,7 +5824,7 @@ END PROCEDURE.  /* dataScrollNotify */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectAll C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectAll wDataDigger 
 PROCEDURE dataSelectAll :
 /* Select all records in the browse
   */
@@ -6418,7 +5838,7 @@ PROCEDURE dataSelectAll :
   DO:
     setWindowFreeze(YES).
     SESSION:SET-WAIT-STATE('general').
-    phBrowse:SELECT-ALL().
+    phBrowse:SELECT-ALL() NO-ERROR.
     RUN showNumSelected.
     setUpdatePanel('display'). /* Activate buttons */
     setWindowFreeze(NO).
@@ -6431,7 +5851,7 @@ END PROCEDURE. /* dataSelectAll */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectNone C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dataSelectNone wDataDigger 
 PROCEDURE dataSelectNone :
 /* Deselect all records in the browse
   */
@@ -6439,7 +5859,7 @@ PROCEDURE dataSelectNone :
   {&timerStart}
 
   setWindowFreeze(YES).
-  phBrowse:DESELECT-ROWS().
+  phBrowse:DESELECT-ROWS() NO-ERROR.
   RUN showNumSelected.
   setUpdatePanel('display'). /* Activate buttons */
   setWindowFreeze(NO).
@@ -6450,7 +5870,7 @@ END PROCEDURE. /* dataSelectNone */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteDataFilters C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteDataFilters wDataDigger 
 PROCEDURE deleteDataFilters :
 /* Kill the data filters and its menu
  */
@@ -6471,7 +5891,7 @@ END PROCEDURE. /* deleteDataFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteRecord C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE deleteRecord wDataDigger 
 PROCEDURE deleteRecord :
 /* Generate a program to delete a record with dictionary validations
  */
@@ -6487,23 +5907,23 @@ PROCEDURE deleteRecord :
 
   OUTPUT to value(cTempFile).
   PUT UNFORMATTED
-         SUBSTITUTE('/* ' )
-    SKIP SUBSTITUTE(' * Name: delrecord.p ')
+                    '/* '
+    SKIP            ' * Name: delrecord.p '
     SKIP SUBSTITUTE(' * Desc: generated by DataDigger to delete &1.&2 ', pcDataBase, pcTable)
     SKIP SUBSTITUTE(' * Date: &1 ', NOW )
-    SKIP SUBSTITUTE(' */  ' )
-    SKIP SUBSTITUTE('     ' )
-    SKIP SUBSTITUTE('DEFINE INPUT  PARAMETER prRowid   AS ROWID   NO-UNDO. ' )
-    SKIP SUBSTITUTE('DEFINE OUTPUT PARAMETER plDeleted AS LOGICAL NO-UNDO. ' )
-    SKIP SUBSTITUTE('  ' ).
+    SKIP            ' */  '
+    SKIP            '     '
+    SKIP            'DEFINE INPUT  PARAMETER prRowid   AS ROWID   NO-UNDO. '
+    SKIP            'DEFINE OUTPUT PARAMETER plDeleted AS LOGICAL NO-UNDO. '
+    SKIP            '  ' .
 
   IF NOT plEnableTrigger THEN
     PUT UNFORMATTED
     SKIP SUBSTITUTE('DISABLE TRIGGERS FOR DUMP OF &1.&2.', pcDataBase, pcTable).
 
   PUT UNFORMATTED
-    SKIP SUBSTITUTE('  ' )
-    SKIP SUBSTITUTE('/* Find the record to delete */' )
+    SKIP            '  '
+    SKIP            '/* Find the record to delete */'
     SKIP SUBSTITUTE('FIND &1.&2 WHERE ROWID(&1.&2) = prRowid EXCLUSIVE-LOCK NO-ERROR NO-WAIT.', pcDataBase, pcTable)
     SKIP SUBSTITUTE('IF NOT AVAILABLE &1.&2 THEN RETURN.                                     ', pcDataBase, pcTable).
 
@@ -6517,21 +5937,21 @@ PROCEDURE deleteRecord :
     SKIP SUBSTITUTE('DELETE &1.&2 NO-ERROR. ', pcDataBase, pcTable).
 
   PUT UNFORMATTED
-    SKIP SUBSTITUTE('  ' )
-    SKIP SUBSTITUTE('/* See if its really gone */' )
+    SKIP            '  '
+    SKIP            '/* See if its really gone */'
     SKIP SUBSTITUTE('plDeleted = NOT CAN-FIND(&1.&2 WHERE ROWID(&1.&2) = prRowid).           ', pcDataBase, pcTable)
     SKIP .
-  OUTPUT close.
+  OUTPUT CLOSE.
 
   RUN VALUE(cTempFile) (INPUT prRowid, OUTPUT plDeleted).
-  OS-DELETE value(cTempFile).
+  OS-DELETE VALUE(cTempFile).
 
 END PROCEDURE. /* deleteRecord */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI C-Win  _DEFAULT-DISABLE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disable_UI wDataDigger  _DEFAULT-DISABLE
 PROCEDURE disable_UI :
 /*------------------------------------------------------------------------------
   Purpose:     DISABLE the User Interface
@@ -6542,31 +5962,31 @@ PROCEDURE disable_UI :
                we are ready to "clean-up" after running.
 ------------------------------------------------------------------------------*/
   /* Delete the WINDOW we created */
-  IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(C-Win)
-  THEN DELETE WIDGET C-Win.
+  IF SESSION:DISPLAY-TYPE = "GUI":U AND VALID-HANDLE(wDataDigger)
+  THEN DELETE WIDGET wDataDigger.
   IF THIS-PROCEDURE:PERSISTENT THEN DELETE PROCEDURE THIS-PROCEDURE.
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disconnectDatabase C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE disconnectDatabase wDataDigger 
 PROCEDURE disconnectDatabase :
 /* Disconnect the current database and rebuild table table
   */
   /* Confirm by user */
-  RUN showHelp("Disconnect", gcCurrentDatabase).
+  RUN showHelp("Disconnect", gcDatabase).
   IF getRegistry("DataDigger:Help", "Disconnect:answer") <> "1" THEN RETURN.
 
-  DISCONNECT VALUE(gcCurrentDatabase).
+  DISCONNECT VALUE(gcDatabase).
 
   /* Wipe database filter when it's the one that was just disconnected */
-  IF cbDatabaseFilter:SCREEN-VALUE IN FRAME {&FRAME-NAME} = gcCurrentDatabase THEN
+  IF cbDatabaseFilter:SCREEN-VALUE IN FRAME {&FRAME-NAME} = gcDatabase THEN
     cbDatabaseFilter:SCREEN-VALUE = "".
 
   ASSIGN
-    gcCurrentDatabase = ""
-    gcCurrentTable    = "".
+    gcDatabase = ""
+    gcTable    = "".
 
   /* If we have no db connected, kill the fields tt */
   IF NUM-DBS = 0 THEN
@@ -6594,12 +6014,12 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE doNothing C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE doNothing wDataDigger 
 PROCEDURE doNothing :
 /* Wait for an amount of msec
  */
-  DEFINE INPUT  PARAMETER piMilliSeconds AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStartTime AS INTEGER     NO-UNDO.
+  DEFINE INPUT PARAMETER piMilliSeconds AS INTEGER     NO-UNDO.
+  DEFINE VARIABLE iStartTime AS INT64 NO-UNDO.
 
   iStartTime = ETIME.
   DO WHILE ETIME < iStartTime + piMilliSeconds:
@@ -6611,11 +6031,10 @@ END PROCEDURE. /* doNothing */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dropFieldMenu C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dropFieldMenu wDataDigger 
 PROCEDURE dropFieldMenu :
 /* Event for opening the field popup-menu on brFields
  */
-  DEFINE VARIABLE hEditor    AS HANDLE      NO-UNDO.
   DEFINE VARIABLE hFieldName AS HANDLE      NO-UNDO.
   DEFINE VARIABLE cField     AS CHARACTER   NO-UNDO.
   {&_proparse_ prolint-nowarn(varusage)}
@@ -6631,6 +6050,7 @@ PROCEDURE dropFieldMenu :
   /* See if we clicked on the browse column */
   {&_proparse_ prolint-nowarn(varusage)}
   RUN getMouseXY(INPUT brFields:HANDLE IN FRAME frMain, OUTPUT iMouseX, OUTPUT iMouseY).
+
   IF iMouseY < 18 THEN
   DO:
     {&_proparse_ prolint-nowarn(varusage)}
@@ -6656,8 +6076,8 @@ PROCEDURE dropFieldMenu :
       IF LOOKUP("CTRL", GetKeyList() ) <> 0 OR getLinkInfo(cField) = "" THEN
       DO:
         CASE cField:
-          WHEN "RECID" THEN cField = SUBSTITUTE('RECID(&1)', gcCurrentTable).
-          WHEN "ROWID" THEN cField = SUBSTITUTE('ROWID(&1)', gcCurrentTable).
+          WHEN "RECID" THEN cField = SUBSTITUTE('RECID(&1)', gcTable).
+          WHEN "ROWID" THEN cField = SUBSTITUTE('ROWID(&1)', gcTable).
           OTHERWISE cField  = hFieldName:BUFFER-VALUE.
         END CASE.
       END.
@@ -6666,34 +6086,31 @@ PROCEDURE dropFieldMenu :
       DO:
         /* In case of RECID / ROWID insert proper syntax */
         CASE cField:
-          WHEN "RECID" THEN cField = SUBSTITUTE('RECID(&1) = &2', gcCurrentTable, QUOTER(getLinkInfo(cField))).
-          WHEN "ROWID" THEN cField = SUBSTITUTE('ROWID(&1) = TO-ROWID(&2)', gcCurrentTable, QUOTER(getLinkInfo(cField))).
+          WHEN "RECID" THEN cField = SUBSTITUTE('RECID(&1) = &2', gcTable, QUOTER(getLinkInfo(cField))).
+          WHEN "ROWID" THEN cField = SUBSTITUTE('ROWID(&1) = TO-ROWID(&2)', gcTable, QUOTER(getLinkInfo(cField))).
           OTHERWISE cField = SUBSTITUTE('&1 = &2', cField, QUOTER(getLinkInfo(cField))).
         END CASE.
       END.
 
       iLength = LENGTH(cField).
 
-      /* If the query editor is expanded, do actions to that field */
-      hEditor = getActiveQueryEditor().
-
       /* Remember old position for positioning cursor */
-      iOldPos = hEditor:CURSOR-OFFSET.
+      iOldPos = ficWhere:CURSOR-OFFSET.
 
       /* No text selected */
-      IF hEditor:SELECTION-TEXT = "" THEN
+      IF ficWhere:SELECTION-TEXT = "" THEN
       DO:
         /* If ficWhere only holds the text <empty> then delete that */
-        IF hEditor:SCREEN-VALUE = '<empty>' THEN hEditor:SCREEN-VALUE = ''.
-        hEditor:INSERT-STRING(cField).
+        IF ficWhere:SCREEN-VALUE = '<empty>' THEN ficWhere:SCREEN-VALUE = ''.
+        ficWhere:INSERT-STRING(cField).
       END.
       ELSE
       DO:
-        hEditor:REPLACE-SELECTION-TEXT(cField).
+        ficWhere:REPLACE-SELECTION-TEXT(cField).
       END.
 
-      APPLY "entry" TO hEditor.
-      hEditor:CURSOR-OFFSET = iOldPos + iLength.
+      APPLY "entry" TO ficWhere.
+      ficWhere:CURSOR-OFFSET = iOldPos + iLength.
     END.
 
     RETURN NO-APPLY.
@@ -6704,17 +6121,17 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDefinitions C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE dumpDefinitions wDataDigger 
 PROCEDURE dumpDefinitions :
 /* Dump a .df of this table
 */
   DO WITH FRAME frMain:
 
-    CREATE ALIAS dictdb FOR DATABASE VALUE( gcCurrentDatabase ).
+    CREATE ALIAS dictdb FOR DATABASE VALUE( gcDatabase ).
 
     RUN VALUE(getProgramDir() + 'dDumpDf.w')
-     ( INPUT gcCurrentDatabase
-     , INPUT gcCurrentTable
+     ( INPUT gcDatabase
+     , INPUT gcTable
      , INPUT SUBSTITUTE("x=&1,y=&2", brTables:x + 10, brTables:y + 50)
      ).
   END.
@@ -6724,7 +6141,7 @@ END PROCEDURE. /* dumpDefinitions */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE editFavourites C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE editFavourites wDataDigger 
 PROCEDURE editFavourites :
 /* Edit favourites group
 */
@@ -6753,7 +6170,7 @@ END PROCEDURE. /* editFavourites */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI C-Win  _DEFAULT-ENABLE
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE enable_UI wDataDigger  _DEFAULT-ENABLE
 PROCEDURE enable_UI :
 /*------------------------------------------------------------------------------
   Purpose:     ENABLE the User Interface
@@ -6768,50 +6185,41 @@ PROCEDURE enable_UI :
   DISPLAY fiTableFilter cbDatabaseFilter tgSelAll fiIndexNameFilter 
           fiFlagsFilter fiFieldsFilter fiTableDesc cbFavouriteGroup ficWhere 
           fiFeedback 
-      WITH FRAME frMain IN WINDOW C-Win.
-  ENABLE rctQuery rctEdit btnFavourite fiTableFilter cbDatabaseFilter tgSelAll 
+      WITH FRAME frMain IN WINDOW wDataDigger.
+  ENABLE rctQuery rctEdit btnWhere fiTableFilter cbDatabaseFilter tgSelAll 
          fiIndexNameFilter fiFlagsFilter fiFieldsFilter btnClearIndexFilter 
-         btnClearTableFilter brTables brFields brIndexes tgDebugMode 
-         btnTableFilter fiTableDesc cbFavouriteGroup btnAddFavGroup ficWhere 
-         btnWhere btnQueries btnView btnTools btnTabTables btnClear 
+         brTables btnFavourite brFields brIndexes tgDebugMode fiTableDesc 
+         btnClearTableFilter cbFavouriteGroup ficWhere btnTableFilter 
+         btnAddFavGroup btnQueries btnView btnTools btnTabTables btnClear 
          btnClearFieldFilter btnClipboard btnMoveBottom btnMoveDown btnMoveTop 
          btnMoveUp btnReset btnTabFavourites btnTabFields btnTabIndexes 
          btnNextQuery btnPrevQuery btnDump btnLoad btnDelete btnResizeVer 
          btnClone btnAdd btnEdit fiFeedback 
-      WITH FRAME frMain IN WINDOW C-Win.
+      WITH FRAME frMain IN WINDOW wDataDigger.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   DISPLAY edHint 
-      WITH FRAME frHint IN WINDOW C-Win.
+      WITH FRAME frHint IN WINDOW wDataDigger.
   ENABLE edHint btGotIt 
-      WITH FRAME frHint IN WINDOW C-Win.
+      WITH FRAME frHint IN WINDOW wDataDigger.
   {&OPEN-BROWSERS-IN-QUERY-frHint}
   ENABLE btnQueries-txt btnDataDigger btnSettings btnDict btnDataAdmin 
          btnQueries-3 btnQueryTester btnConnections btnEditor btnHelp btnAbout 
          btnExpand btnExpand-txt btnEditor-txt btnQueryTester-txt btnAbout-txt 
          btnConnections-txt btnDataAdmin-txt btnDataDigger-txt btnHelp-txt 
          btnSettings-txt btnTools-2 btnDict-txt btnTools-txt 
-      WITH FRAME frSettings IN WINDOW C-Win.
+      WITH FRAME frSettings IN WINDOW wDataDigger.
   {&OPEN-BROWSERS-IN-QUERY-frSettings}
-  DISPLAY cbAndOr cbFields cbOperator ficValue ficWhere2 
-      WITH FRAME frWhere IN WINDOW C-Win.
-  ENABLE btnBegins rctQueryButtons cbAndOr cbFields cbOperator ficValue 
-         btnInsert ficWhere2 btnClear-2 btnQueries-2 btnClipboard-2 btnOK 
-         btnCancel-2 btnOr btnAnd btnBracket btnContains btnEq btnGT btnLT 
-         btnMatches btnNE btnQt btnToday 
-      WITH FRAME frWhere IN WINDOW C-Win.
-  VIEW FRAME frWhere IN WINDOW C-Win.
-  {&OPEN-BROWSERS-IN-QUERY-frWhere}
   DISPLAY fiNumSelected fiNumRecords 
-      WITH FRAME frData IN WINDOW C-Win.
+      WITH FRAME frData IN WINDOW wDataDigger.
   ENABLE btnClearDataFilter rctData btnDataSort fiNumSelected fiNumRecords 
-      WITH FRAME frData IN WINDOW C-Win.
+      WITH FRAME frData IN WINDOW wDataDigger.
   {&OPEN-BROWSERS-IN-QUERY-frData}
 END PROCEDURE.
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE endResize C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE endResize wDataDigger 
 PROCEDURE endResize :
 /* Event handler for resize of window
    */
@@ -6834,15 +6242,15 @@ PROCEDURE endResize :
     RUN setTimer('timedScrollNotify',0).
 
     /* Set max width */
-    C-Win:WIDTH-PIXELS = MINIMUM(C-Win:WIDTH-PIXELS, SESSION:WORK-AREA-WIDTH-PIXELS).    
+    wDataDigger:WIDTH-PIXELS = MINIMUM(wDataDigger:WIDTH-PIXELS, SESSION:WORK-AREA-WIDTH-PIXELS).    
 
     /* Set frame width */
-    FRAME {&FRAME-NAME}:WIDTH-PIXELS = C-Win:FULL-WIDTH-PIXELS NO-ERROR.
-    FRAME {&FRAME-NAME}:HEIGHT-PIXELS = C-Win:FULL-HEIGHT-PIXELS NO-ERROR.
+    FRAME {&FRAME-NAME}:WIDTH-PIXELS = wDataDigger:FULL-WIDTH-PIXELS NO-ERROR.
+    FRAME {&FRAME-NAME}:HEIGHT-PIXELS = wDataDigger:FULL-HEIGHT-PIXELS NO-ERROR.
 
     /* Sanity checks */
     IF btnResizeVer:Y < 150 THEN btnResizeVer:Y = 150.
-    IF btnResizeVer:Y > (C-Win:HEIGHT-PIXELS - 200) THEN btnResizeVer:Y = C-Win:HEIGHT-PIXELS - 200.
+    IF btnResizeVer:Y > (wDataDigger:HEIGHT-PIXELS - 200) THEN btnResizeVer:Y = wDataDigger:HEIGHT-PIXELS - 200.
 
     /* Feedback (bottom right) */
     fiFeedback:X = 1.
@@ -6852,24 +6260,24 @@ PROCEDURE endResize :
     iSettingsWidth = (IF FRAME frSettings:VISIBLE THEN FRAME frSettings:WIDTH-PIXELS ELSE 0).
     FRAME frSettings:Y = 0.
     FRAME frSettings:X = 0.
-    FRAME frSettings:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS.
+    FRAME frSettings:HEIGHT-PIXELS = wDataDigger:HEIGHT-PIXELS.
     btnExpand:Y = FRAME frSettings:HEIGHT-PIXELS - btnExpand:HEIGHT-PIXELS - 5.
     btnExpand-txt:Y = btnExpand:Y.
 
     /* Set width of main rectangles */
     ASSIGN
-      rctQuery:WIDTH-PIXELS  = C-Win:WIDTH-PIXELS - iSettingsWidth - 4
+      rctQuery:WIDTH-PIXELS  = wDataDigger:WIDTH-PIXELS - iSettingsWidth - 4
       rctQuery:X             = iSettingsWidth
-      rctQuery:Y             = 0
-      rctQuery:HEIGHT-PIXELS = btnResizeVer:Y + 32
+      rctQuery:Y             = 1
+      rctQuery:HEIGHT-PIXELS = btnResizeVer:Y + 31
       NO-ERROR.
 
     tgDebugMode:X = rctQuery:X + 8.
 
     /* Resize button */
     ASSIGN
-      btnResizeVer:WIDTH-PIXELS = rctQuery:WIDTH-PIXELS
-      btnResizeVer:X = iSettingsWidth
+      btnResizeVer:WIDTH-PIXELS = rctQuery:WIDTH-PIXELS - 4
+      btnResizeVer:X = iSettingsWidth + 2
       NO-ERROR.
 
     /* Table browse */
@@ -6927,7 +6335,7 @@ PROCEDURE endResize :
         FRAME frData:X = iSettingsWidth
         FRAME frData:Y = rctQuery:Y + rctQuery:HEIGHT-PIXELS + 2
         FRAME frData:WIDTH-PIXELS  = rctQuery:WIDTH-PIXELS + 4
-        FRAME frData:HEIGHT-PIXELS = C-Win:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34
+        FRAME frData:HEIGHT-PIXELS = wDataDigger:HEIGHT-PIXELS - rctQuery:HEIGHT-PIXELS - 34
         FRAME frData:VIRTUAL-WIDTH-PIXELS = FRAME frData:WIDTH-PIXELS
         FRAME frData:VIRTUAL-HEIGHT-PIXELS = FRAME frData:HEIGHT-PIXELS
         NO-ERROR.
@@ -7084,7 +6492,7 @@ PROCEDURE endResize :
     RUN resizeFilters(INPUT {&PAGE-FIELDS}).
     RUN resizeFilters(INPUT {&PAGE-INDEXES}).
 
-    RUN fixTooltips(c-win:HANDLE).
+    RUN fixTooltips(wDataDigger:HANDLE).
 
     RUN saveWindow.
     RUN showScrollBars(FRAME frData:HANDLE, NO, NO).
@@ -7095,17 +6503,16 @@ PROCEDURE endResize :
   END.
 
   /* If something goes wrong with resizing we end up here */
-  RUN unlockWindow(C-Win:HANDLE).
+  RUN unlockWindow(wDataDigger:HANDLE).
 
   /* Hide rectangles */
   rctEdit:VISIBLE  = FALSE.
-  rctQuery:VISIBLE = FALSE.
   rctData:VISIBLE  = FALSE.
 
   /* Restore suppress-warnings setting */
   SESSION:SUPPRESS-WARNINGS = lSuppressWarnings.
 
-  APPLY "entry" TO c-win.
+  APPLY "entry" TO wDataDigger.
   {&timerStop}
 
 END PROCEDURE.
@@ -7113,7 +6520,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE expandToolbar C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE expandToolbar wDataDigger 
 PROCEDURE expandToolbar :
 /* Expand or collapse the toolbar
 */
@@ -7140,13 +6547,13 @@ END PROCEDURE. /* expandToolbar */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE feelingLucky C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE feelingLucky wDataDigger 
 PROCEDURE feelingLucky :
 /* Feeling lucky
  * Start link https://is.gd/FeelingLucky
  */
   setRegistry("DataDigger", "FeelingLucky", ISO-DATE(TODAY)).
-  OS-COMMAND NO-WAIT START VALUE("{&FEELINGLUCKY}").
+  OS-COMMAND NO-WAIT VALUE("START {&FEELINGLUCKY}").
   RUN createMenuTableBrowse.
 
 END PROCEDURE. /* feelingLucky */
@@ -7154,7 +6561,7 @@ END PROCEDURE. /* feelingLucky */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fillFavouritesCombo C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fillFavouritesCombo wDataDigger 
 PROCEDURE fillFavouritesCombo :
 /* Fill combo box for favourite groups
  */
@@ -7183,7 +6590,7 @@ END PROCEDURE. /* fillFavouritesCombo */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterDataBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterDataBrowse wDataDigger 
 PROCEDURE filterDataBrowse :
 /*
  * Apply the filter to the data browse
@@ -7195,7 +6602,7 @@ END PROCEDURE. /* filterDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldAnyPrintable C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldAnyPrintable wDataDigger 
 PROCEDURE filterFieldAnyPrintable :
 /* Set modified flag if character is typed
  */
@@ -7208,7 +6615,7 @@ END PROCEDURE. /* filterFieldAnyPrintable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldClearAll C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldClearAll wDataDigger 
 PROCEDURE filterFieldClearAll :
 /* Wipe contents of all filter fields in the same group
  */
@@ -7218,7 +6625,6 @@ PROCEDURE filterFieldClearAll :
   setWindowFreeze(YES).
 
   APPLY "choose"        TO phClearButton. /* clear them all */
-/*   APPLY "value-changed" TO phFilterField. /* force recolor of current filterfield */ */
   APPLY "entry"         TO phFilterField. /* set focus */
 
   setWindowFreeze(NO).
@@ -7228,7 +6634,7 @@ END PROCEDURE. /* filterFieldClearAll */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldCursorDown C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldCursorDown wDataDigger 
 PROCEDURE filterFieldCursorDown :
 /* Jump from filter field to browse on cursor down
  */
@@ -7243,7 +6649,7 @@ END PROCEDURE. /* filterFieldCursorDown */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldEntry C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldEntry wDataDigger 
 PROCEDURE filterFieldEntry :
 /* Set the color for the text in the filter to black
  */
@@ -7269,7 +6675,7 @@ END PROCEDURE. /* filterFieldEntry */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldLeave C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldLeave wDataDigger 
 PROCEDURE filterFieldLeave :
 /* Set the color for the text in the filter to gray
  */
@@ -7298,7 +6704,7 @@ END PROCEDURE. /* filterFieldLeave */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldsBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldsBrowse wDataDigger 
 PROCEDURE filterFieldsBrowse :
 /* Apply the filter to the fields browse
  */
@@ -7309,7 +6715,7 @@ END PROCEDURE. /* filterFieldsBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldShow C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldShow wDataDigger 
 PROCEDURE filterFieldShow :
 /* Show or hide a filter field
   */
@@ -7327,7 +6733,7 @@ END PROCEDURE. /* filterFieldShow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldValueChanged C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterFieldValueChanged wDataDigger 
 PROCEDURE filterFieldValueChanged :
 /* Save current filter value
  */
@@ -7349,7 +6755,7 @@ END PROCEDURE. /* filterFieldValueChanged */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterIndexBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterIndexBrowse wDataDigger 
 PROCEDURE filterIndexBrowse :
 /* Apply the filter to the index browse
  */
@@ -7360,7 +6766,7 @@ END PROCEDURE. /* filterIndexBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterTables C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE filterTables wDataDigger 
 PROCEDURE filterTables :
 /*
  * Apply the filter to the table browse
@@ -7376,7 +6782,41 @@ END PROCEDURE. /* filterTables */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fixTooltips C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fixMissingQuotes wDataDigger 
+PROCEDURE fixMissingQuotes :
+/* Fix obvious missing quotes in query
+*/
+  DEFINE INPUT-OUTPUT PARAMETER pcQuery AS CHARACTER   NO-UNDO.
+
+  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cField AS CHARACTER NO-UNDO.
+
+  DEFINE BUFFER bField FOR ttField.
+
+  DO i = 2 TO NUM-ENTRIES(pcQuery,' '):
+
+    IF ENTRY(i,pcQuery,' ') = '=' THEN 
+    DO:
+      cField = TRIM(ENTRY(i - 1,pcQuery,' ')).
+      cField = ENTRY(NUM-ENTRIES(cField,'.'),cField,'.').
+
+      FIND bField WHERE bField.cFieldName = cField NO-ERROR. 
+      IF AVAILABLE bField AND bField.cDatatype = 'CHARACTER' THEN
+      DO:
+        ENTRY(i + 1,pcQuery,' ') = '"' + ENTRY(i + 1,pcQuery,' ').
+        pcQuery = pcQuery + '"'.
+        RETURN. 
+      END.
+    END.
+
+  END.
+
+END PROCEDURE. /* fixMissingQuotes */
+
+/* _UIB-CODE-BLOCK-END */
+&ANALYZE-RESUME
+
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE fixTooltips wDataDigger 
 PROCEDURE fixTooltips :
 /* Replace # in tooltips with a CHR(10)
  */
@@ -7396,7 +6836,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushKeyBuffer C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushKeyBuffer wDataDigger 
 PROCEDURE flushKeyBuffer :
 /* Make sure the keyboard buffer is empty
 */
@@ -7410,7 +6850,7 @@ END PROCEDURE. /* flushKeyBuffer */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushRegistry C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE flushRegistry wDataDigger 
 PROCEDURE flushRegistry :
 /* Local version to extend super */
 
@@ -7422,10 +6862,11 @@ END PROCEDURE. /* flushRegistry */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDataQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getDataQuery wDataDigger 
 PROCEDURE getDataQuery :
 /* Return the query that belongs to the currently shown data
  */
+  DEFINE INPUT  PARAMETER pcWhere AS CHARACTER NO-UNDO.
   DEFINE OUTPUT PARAMETER pcQuery AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE cAndWhere AS CHARACTER   NO-UNDO.
@@ -7440,17 +6881,26 @@ PROCEDURE getDataQuery :
   DEFINE VARIABLE iWord     AS INTEGER     NO-UNDO.
   DEFINE VARIABLE lUseIndex AS LOGICAL     NO-UNDO.
 
-  cDatabase = gcCurrentDatabase.
-  cTable    = gcCurrentTable.
+  cDatabase = gcDatabase.
+  cTable    = gcTable.
   RUN getFilterQuery(OUTPUT cFilter).
 
   /* Get query from editor */
-  cWhere = TRIM(ficWhere:SCREEN-VALUE IN FRAME {&FRAME-NAME}).
-  cWhere = REPLACE(cWhere, {&QUERYSEP}, '~n').
+  cWhere = TRIM(pcWhere).
+  cWhere = formatQueryString(cWhere, YES).
 
   /* If a query starts with 'AND' or 'OR' or 'WHERE', strip it */
   IF LOOKUP(ENTRY(1,cWhere,' '),'AND,OR,WHERE') > 0 THEN
     ENTRY(1,cWhere,' ') = ''.
+
+  /* If we have a full query that starts with 'FOR EACH', strip until 'WHERE' 
+  ** Also eliminate queries like "FOR EACH <table> NO-LOCK"
+  */
+  IF TRIM(cWhere) MATCHES 'FOR*EACH*' THEN
+    IF LOOKUP('WHERE', cWhere, ' ') > 0 THEN
+      cWhere = SUBSTRING(cWhere, INDEX(cWhere," WHERE ") + 7).
+    ELSE 
+      cWhere = ''.
 
   /* Extract USE-INDEX */
   WhereLoop:
@@ -7515,7 +6965,7 @@ END PROCEDURE. /* getDataQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFilterQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getFilterQuery wDataDigger 
 PROCEDURE getFilterQuery :
 /* Return a query built from fields in the filter fields
    */
@@ -7544,8 +6994,8 @@ PROCEDURE getFilterQuery :
 
     /* Save last x values used for a filter */
     RUN saveFilterValue
-      ( INPUT gcCurrentDatabase
-      , INPUT gcCurrentTable
+      ( INPUT gcDatabase
+      , INPUT gcTable
       , INPUT bColumn.cFullName
       , INPUT cValue
       ).
@@ -7553,8 +7003,8 @@ PROCEDURE getFilterQuery :
     /* Save the new list since the order of items might have changed */
     IF giMaxFilterHistory > 0 THEN
     DO:
-      cValueList = getRegistry( SUBSTITUTE("DB:&1",gcCurrentDatabase)
-                              , SUBSTITUTE("&1.&2:FilterHistory",gcCurrentTable,bColumn.cFullName)
+      cValueList = getRegistry( SUBSTITUTE("DB:&1",gcDatabase)
+                              , SUBSTITUTE("&1.&2:FilterHistory",gcTable,bColumn.cFullName)
                               ).
       bColumn.hFilter:LIST-ITEMS = cValueList.
       bColumn.hFilter:SCREEN-VALUE = cValue.
@@ -7607,7 +7057,7 @@ PROCEDURE getFilterQuery :
                         , pcFilterQuery
                         , IF pcFilterQuery = "" THEN "" ELSE "AND"
                         , bColumn.cFullName
-                        , gcCurrentTable
+                        , gcTable
                         , QUOTER(cValue)
                         ).
     ELSE
@@ -7616,7 +7066,7 @@ PROCEDURE getFilterQuery :
                         , pcFilterQuery
                         , IF pcFilterQuery = "" THEN "" ELSE "AND"
                         , bColumn.cFullName
-                        , gcCurrentTable
+                        , gcTable
                         , QUOTER(cValue)
                         ).
     ELSE
@@ -7625,7 +7075,7 @@ PROCEDURE getFilterQuery :
                         , IF pcFilterQuery = "" THEN "" ELSE "AND"
                         , bColumn.cFullName
                         , cOperator
-                        , (IF isDataserver(gcCurrentDatabase) 
+                        , (IF isDataserver(gcDatabase) 
                             THEN (IF bField.cDataType = "CHARACTER" THEN QUOTER(cValue) ELSE cValue)
                             ELSE QUOTER(cValue) )
                         ).
@@ -7638,7 +7088,7 @@ END PROCEDURE. /* getFilterQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getLdbsFromParamFile C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getLdbsFromParamFile wDataDigger 
 PROCEDURE getLdbsFromParamFile :
 /* Analyze a param file and return a list of all logical
  * names from it that are currently connected
@@ -7708,7 +7158,7 @@ END PROCEDURE. /* getLdbsFromParamFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortedQuery wDataDigger 
 PROCEDURE getSortedQuery :
 /* Process the query and insert the BY-phrases at the proper place
  */
@@ -7732,8 +7182,8 @@ PROCEDURE getSortedQuery :
     BREAK BY bfQuerySort.iSortNr:
 
     CASE bfQuerySort.cSortField:
-      WHEN 'RECID' THEN cField = SUBSTITUTE('RECID(&1)', gcCurrentTable).
-      WHEN 'ROWID' THEN cField = SUBSTITUTE('ROWID(&1)', gcCurrentTable).
+      WHEN 'RECID' THEN cField = SUBSTITUTE('RECID(&1)', gcTable).
+      WHEN 'ROWID' THEN cField = SUBSTITUTE('ROWID(&1)', gcTable).
       OTHERWISE cField = bfQuerySort.cSortField.
     END CASE.
 
@@ -7752,7 +7202,7 @@ END PROCEDURE. /* getSortedQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE getSortFromQuery wDataDigger 
 PROCEDURE getSortFromQuery :
 /* Extract sorting from user query
  */
@@ -7791,7 +7241,7 @@ END PROCEDURE. /* getSortFromQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideColumn C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE hideColumn wDataDigger 
 PROCEDURE hideColumn :
 /* Hide the current column
    */
@@ -7807,7 +7257,7 @@ END PROCEDURE. /* hideColumn */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesOfTable C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesOfTable wDataDigger 
 PROCEDURE incQueriesOfTable :
 /* Increment the number of queries served for a table.
  * NOTE: This must be done in one move by fetching the nr
@@ -7858,7 +7308,7 @@ END PROCEDURE. /* incQueriesOfTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesServed C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE incQueriesServed wDataDigger 
 PROCEDURE incQueriesServed :
 /*
  * Increment the number of queries served. We need to do
@@ -7884,7 +7334,7 @@ END PROCEDURE. /* incQueriesServed */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initColors C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initColors wDataDigger 
 PROCEDURE initColors :
 /* Set color nrs in vars so we don"t have to call the function
    * inside the ROW-DISPLAY trigger
@@ -7915,7 +7365,7 @@ END PROCEDURE. /* initColors */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFilters C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFilters wDataDigger 
 PROCEDURE initFilters :
 /* Create filter widgets
  */
@@ -8003,40 +7453,42 @@ END PROCEDURE. /* initFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFrameColor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initFrameColor wDataDigger 
 PROCEDURE initFrameColor :
 /* Set background color for main window. First use 
  * customized color, if none defined check startup param
 */
-  DEFINE VARIABLE i      AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE cParam AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE cColor AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE i            AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE cParam       AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cFrameColor  AS CHARACTER NO-UNDO.
+  DEFINE VARIABLE cBorderColor AS CHARACTER NO-UNDO.
 
   /* Customization */
-  PUBLISH 'customFrameColor' (OUTPUT cColor).
+  PUBLISH 'customFrameColor' (OUTPUT cFrameColor).
+  PUBLISH 'customBorderColor' (OUTPUT cBorderColor).
 
   /* From startup parameter */
-  IF cColor = '' THEN 
+  IF cFrameColor = '' THEN 
   DO:
     #ParamLoop:
     DO i = 1 TO NUM-ENTRIES(SESSION:PARAMETER,' '):
       cParam = ENTRY(i,SESSION:PARAMETER,' ').
       IF cParam BEGINS 'color=' THEN 
       DO:
-        cColor = ENTRY(2,cParam,'=').
+        cFrameColor = ENTRY(2,cParam,'=').
         LEAVE #ParamLoop.
       END.
     END. /* do i */
   END.
 
-  RUN setFrameColor(cColor).
+  RUN setFrameColor(cFrameColor, cBorderColor).
 
-END PROCEDURE. /* initFrameColor */
+END PROCEDURE. /* initcFrameColor */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initObjects C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initObjects wDataDigger 
 PROCEDURE initObjects :
 /* General setup of the window
  */
@@ -8282,27 +7734,27 @@ PROCEDURE initObjects :
     IF LOGICAL(getRegistry("DataDigger","StartOnPrimaryMonitor")) = YES
       AND (iValue < 0 OR iValue > SESSION:WORK-AREA-WIDTH-PIXELS) THEN iValue = 200.
 
-    ASSIGN c-win:X = iValue NO-ERROR.
+    ASSIGN wDataDigger:X = iValue NO-ERROR.
 
     /* Window has been parked at y=-1000 TO get it out OF sight */
     iValue = INTEGER(getRegistry("DataDigger", "Window:Y" )).
     PUBLISH "debugInfo" (1, SUBSTITUTE("window:y from reg = &1", iValue)).
     IF iValue < 0 OR iValue = ? OR iValue > SESSION:WORK-AREA-HEIGHT-PIXELS THEN iValue = 200.
-    ASSIGN c-win:Y = iValue NO-ERROR.
+    ASSIGN wDataDigger:Y = iValue NO-ERROR.
     PUBLISH "debugInfo" (1, SUBSTITUTE("Reset window to y = &1", iValue)).
 
     iValue = INTEGER(getRegistry("DataDigger", "Window:height" )).
     IF iValue = ? OR iValue = 0 THEN iValue = 600.
-    ASSIGN c-win:HEIGHT-PIXELS = iValue NO-ERROR.
+    ASSIGN wDataDigger:HEIGHT-PIXELS = iValue NO-ERROR.
 
     iValue = INTEGER(getRegistry("DataDigger", "Window:width" )).
     IF iValue = ? OR iValue = 0 THEN iValue = 800.
-    ASSIGN c-win:WIDTH-PIXELS = iValue NO-ERROR.
+    ASSIGN wDataDigger:WIDTH-PIXELS = iValue NO-ERROR.
 
     /* Resize bar */
     iValue = INTEGER(getRegistry("DataDigger", "ResizeBar:Y" )).
     IF iValue = ? OR iValue < 150 THEN iValue = 150.
-    IF iValue > (C-Win:HEIGHT-PIXELS - 200) THEN iValue = C-Win:HEIGHT-PIXELS - 200.
+    IF iValue > (wDataDigger:HEIGHT-PIXELS - 200) THEN iValue = wDataDigger:HEIGHT-PIXELS - 200.
     ASSIGN btnResizeVer:Y = iValue NO-ERROR.
 
     /* Get all connected databases */
@@ -8337,11 +7789,6 @@ PROCEDURE initObjects :
     glShowFavourites = (cSetting BEGINS "F").
     IF glShowFavourites THEN RUN setPage({&PAGE-FAVOURITES}).
     RUN setTableView(glShowFavourites,YES).
-
-    /* Hide or view the query editor */
-    cSetting = getRegistry("DataDigger", "QueryEditorState").
-    IF cSetting = ? THEN cSetting = "Hidden".
-    setQueryEditor(cSetting).
     /* < Restore  */
 
     /* KeepAlive timer */
@@ -8378,7 +7825,7 @@ END PROCEDURE. /* initObjects */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initSettingsFile C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initSettingsFile wDataDigger 
 PROCEDURE initSettingsFile :
 /* Initialize the settings file
  */
@@ -8596,7 +8043,7 @@ END PROCEDURE. /* initSettingsFile */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initUI C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initUI wDataDigger 
 PROCEDURE initUI :
 /* Enable the user interface
    */
@@ -8633,7 +8080,7 @@ PROCEDURE initUI :
   DISPLAY
     fiIndexNameFilter fiFlagsFilter fiFieldsFilter tgSelAll fiTableFilter
     cbDatabaseFilter fiTableDesc ficWhere fiFeedback
-    WITH FRAME frMain IN WINDOW C-Win.
+    WITH FRAME frMain IN WINDOW wDataDigger.
 
   ENABLE
     rctQuery btnDelete rctEdit
@@ -8646,37 +8093,20 @@ PROCEDURE initUI :
     btnPrevQuery btnNextQuery ficWhere btnWhere btnClear btnQueries btnClipboard /* query */
     btnTools btnTabFields btnTabIndexes btnResizeVer btnClone
     btnDump btnView btnAdd btnEdit fiFeedback
-    WITH FRAME frMain IN WINDOW C-Win.
+    WITH FRAME frMain IN WINDOW wDataDigger.
 
   /* FRAME frHint */
   DISPLAY
     edHint
-    WITH FRAME frHint IN WINDOW C-Win.
+    WITH FRAME frHint IN WINDOW wDataDigger.
 
   ENABLE
     edHint btGotIt
-    WITH FRAME frHint IN WINDOW C-Win.
-
-  /* FRAME frWhere */
-  FRAME frWhere:FONT = giDefaultFont.
-  DISPLAY
-    cbAndOr cbFields cbOperator ficValue ficWhere2
-    WITH FRAME frWhere IN WINDOW C-Win.
-
-  ENABLE
-    btnAnd rctQueryButtons cbAndOr cbFields cbOperator ficValue btnInsert
-    ficWhere2 btnClear-2 btnQueries-2
-    btnClipboard-2 btnOK btnCancel-2 btnBegins btnBracket btnContains
-    btnEq btnGT btnLT btnMatches btnNE btnOr btnQt btnToday
-    WITH FRAME frWhere IN WINDOW C-Win.
-
-  /* FRAME frWhere */
-  VIEW FRAME frWhere IN WINDOW C-Win.
-  DISPLAY fiNumRecords WITH FRAME frData IN WINDOW C-Win.
+    WITH FRAME frHint IN WINDOW wDataDigger.
 
   ENABLE
     rctData btnClearDataFilter btnDataSort fiNumRecords
-    WITH FRAME frData IN WINDOW C-Win.
+    WITH FRAME frData IN WINDOW wDataDigger.
 
   /* FRAME frSettings */
   ENABLE ALL WITH FRAME frSettings.
@@ -8688,7 +8118,7 @@ END PROCEDURE. /* initUI */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initVisuals C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE initVisuals wDataDigger 
 PROCEDURE initVisuals :
 /* Initialize all kind of visual things
  */
@@ -8725,7 +8155,7 @@ PROCEDURE initVisuals :
   /* RGB 90,90,90 = even darker gray */
 
   /* Set icon */
-  C-Win:LOAD-ICON(getImagePath("DataDigger.ico")).
+  wDataDigger:LOAD-ICON(getImagePath("DataDigger.ico")).
 
   /* Where-FRAME */
   DO WITH FRAME frWhere:
@@ -8736,25 +8166,6 @@ PROCEDURE initVisuals :
     BROWSE brFields:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
     BROWSE brIndexes:ROW-HEIGHT-PIXELS = FONT-TABLE:GET-TEXT-HEIGHT-PIXELS(giDefaultFont).
 
-    cbAnDOr:FONT     = giFixedFont.
-    cbFields:FONT    = giFixedFont.
-    cbOperator:FONT  = giFixedFont.
-    ficValue:FONT    = giFixedFont.
-    ficWhere2:FONT   = giFixedFont.
-    btnEq:FONT       = giFixedFont.
-    btnNe:FONT       = giFixedFont.
-    btnGt:FONT       = giFixedFont.
-    btnLt:FONT       = giFixedFont.
-    btnBracket:FONT  = giFixedFont.
-    btnQt:FONT       = giFixedFont.
-    btnAnd:FONT      = giFixedFont.
-    btnOr:FONT       = giFixedFont.
-    btnBegins:FONT   = giFixedFont.
-    btnCONtains:FONT = giFixedFont.
-    btnMatches:FONT  = giFixedFont.
-    btnToday:FONT    = giFixedFont.
-
-    btnInsert:LOAD-IMAGE(getImagePath("Add.gif")).
   END.
 
   /* Main FRAME */
@@ -8768,13 +8179,12 @@ PROCEDURE initVisuals :
     RUN initFrameColor.
 
     /* Fonts */
-    c-win:FONT = giDefaultFont.
+    wDataDigger:FONT = giDefaultFont.
     FRAME frMain:FONT = giDefaultFont.
     ficWhere:FONT = giFixedFont.
     fiTableFilter:TOOLTIP = fiTableFilter:TOOLTIP + "~n~n(CTRL-ENTER) execute".
 
     /* Additional tooltips */
-    ficValue     :TOOLTIP = ficValue:TOOLTIP + "~n~n(CTRL-ENTER) execute".
     ficWhere     :TOOLTIP = ficWhere:TOOLTIP + "~n~n(CTRL-ENTER) execute".
     brFields     :TOOLTIP = "fields of selected table" + "~n~n(RIGHT-CLICK) insert field+value".
     brFields     :TOOLTIP = brFields:TOOLTIP + "~n(CTRL-RIGHT-CLICK) insert field".
@@ -8846,12 +8256,6 @@ PROCEDURE initVisuals :
     btnQueries:LOAD-IMAGE         (getImagePath("SavedQueries_small.gif")).
     btnClipboard:LOAD-IMAGE       (getImagePath("Clipboard.gif")).
 
-    /* Same buttons on editor FRAME */
-    btnViewData-2:LOAD-IMAGE      (getImagePath("Execute.gif")).
-    btnClear-2:LOAD-IMAGE         (getImagePath("Clear.gif")).
-    btnQueries-2:LOAD-IMAGE       (getImagePath("SavedQueries_small.gif")).
-    btnClipboard-2:LOAD-IMAGE     (getImagePath("Clipboard.gif")).
-
     /* Buttons for field ordering */
     btnMoveTop:LOAD-IMAGE         (getImagePath("First.gif")).
     btnMoveUp:LOAD-IMAGE          (getImagePath("Up.gif")).
@@ -8876,8 +8280,8 @@ PROCEDURE initVisuals :
     btnMoveBottom:MOVE-TO-TOP().
 
     /* Set minimum size of the window */
-    C-Win:MIN-WIDTH-PIXELS  = 200.
-    C-Win:MIN-HEIGHT-PIXELS = 330.
+    wDataDigger:MIN-WIDTH-PIXELS  = 200.
+    wDataDigger:MIN-HEIGHT-PIXELS = 330.
 
     /* To avoid scrollbars on the frame */
     FRAME {&FRAME-NAME}:SCROLLABLE = FALSE.
@@ -8890,7 +8294,7 @@ END PROCEDURE. /* initVisuals */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE keepAlive C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE keepAlive wDataDigger 
 PROCEDURE keepAlive :
 /* Query all databases to keep connection alive
    */
@@ -8946,7 +8350,7 @@ PROCEDURE keepAlive :
       /* If we cannot find the table name, simply use database name */
       IF cChangedTable <> "" THEN
       DO:
-        RUN unlockWindow(C-Win:HANDLE).
+        RUN unlockWindow(wDataDigger:HANDLE).
         RUN showHelp("SchemaRestart", cChangedTable ).
         IF getRegistry("DataDigger:Help", "SchemaRestart:answer") = "1" THEN QUIT.
       END.
@@ -8967,7 +8371,7 @@ END PROCEDURE. /* keepAlive */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE menuDropDataBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE menuDropDataBrowse wDataDigger 
 PROCEDURE menuDropDataBrowse :
 /* Enable / disable items in the context menu
    */
@@ -9026,7 +8430,7 @@ END PROCEDURE. /* menuDropDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveField C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE moveField wDataDigger 
 PROCEDURE moveField :
 /* Move a field up or down in the field browse.
    */
@@ -9067,17 +8471,11 @@ PROCEDURE moveField :
   FIND bField WHERE ROWID(bField) = rCurrentField NO-ERROR.
   IF NOT AVAILABLE bField THEN RETURN.
   FIND FIRST bColumnOrg WHERE bColumnOrg.cFieldName = bField.cFieldName NO-ERROR.
+
   IF AVAILABLE bColumnOrg THEN iOldOrder = bField.iOrder.
 
-  /* Change the order of the fields by 1.5
-   * This sets the field exactly where we want it
-
-    when 'top'    then bColumnOrg.iColumnNr = -1.
-    when 'up'     then bColumnOrg.iColumnNr = bColumnOrg.iColumnNr - 1.5.
-    when 'down'   then bColumnOrg.iColumnNr = bColumnOrg.iColumnNr + 1.5.
-    when 'bottom' then bColumnOrg.iColumnNr = 999999999.
-
-   */
+  /* Change the order of the fields 
+  */
   CASE pcDirection:
     WHEN 'top' THEN bField.iOrder = -1.
 
@@ -9133,15 +8531,15 @@ PROCEDURE moveField :
   END.
 
   /* Save changed order of the field. If it is blank, it will be deleted from registry */
-  setRegistry( SUBSTITUTE('DB:&1',gcCurrentDatabase)
-             , SUBSTITUTE('&1:fieldOrder', gcCurrentTable )
+  setRegistry( SUBSTITUTE('DB:&1',gcDatabase)
+             , SUBSTITUTE('&1:fieldOrder', gcTable )
              , IF cFieldOrder <> getFieldList('iOrderOrg') THEN cFieldOrder ELSE ?
              ).
 
   /* Update field cache */
   RUN updateMemoryCache
-    ( INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    ( INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE bField
     , INPUT TABLE bColumn
     ).
@@ -9162,7 +8560,7 @@ END PROCEDURE. /* moveField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pasteFromClipboard C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE pasteFromClipboard wDataDigger 
 PROCEDURE pasteFromClipboard :
 /* Paste value from clipboard to a widget
  */
@@ -9173,7 +8571,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE preCache C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE preCache wDataDigger 
 PROCEDURE preCache :
 /* Pre-cache tables that have been queried at least once in the last month
    */
@@ -9200,7 +8598,7 @@ PROCEDURE preCache :
     bTable.lCached = TRUE.
 
     /* Thanks, but not needed anymore */
-    DATASET dsFieldCache:EMPTY-DATASET.
+    DATASET dsFieldCache:EMPTY-DATASET().
 
     /* One table at a time */
     LEAVE #TableCache.
@@ -9212,7 +8610,7 @@ PROCEDURE preCache :
   IF NOT lDoneSomething THEN
   DO:
     RUN setTimer("PreCache",0).
-    PUBLISH "debugInfo" (1, SUBSTITUTE("Pre-Caching complete")).
+    PUBLISH "debugInfo" (1, "Pre-Caching complete").
   END.
 
   {&timerStop}
@@ -9221,7 +8619,7 @@ END PROCEDURE. /* preCache */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE processQuery wDataDigger 
 PROCEDURE processQuery :
 /* Move a field up or down in the field browse.
  */
@@ -9280,7 +8678,7 @@ END PROCEDURE. /* processQuery */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE quickConnect C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE quickConnect wDataDigger 
 PROCEDURE quickConnect :
 /* Quick connect to database
 */
@@ -9305,7 +8703,7 @@ END PROCEDURE. /* QuickConnect */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE refreshConnections C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE refreshConnections wDataDigger 
 PROCEDURE refreshConnections :
 /* If you have multiple windows open in the same 
  * session and connect or disconnect a db, we want 
@@ -9332,7 +8730,7 @@ PROCEDURE refreshConnections :
       RUN reopenTableBrowse(?).
       RUN initFrameColor. /* set bg color */
 
-      APPLY "value-changed" TO brTables.  /* this sets the gcCurrentDatabase */
+      APPLY "value-changed" TO brTables.  /* this sets the gcDatabase */
     END.
   END.
 
@@ -9341,7 +8739,7 @@ END PROCEDURE. /* refreshConnections */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilterField C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilterField wDataDigger 
 PROCEDURE registerFilterField :
 /**/
   DEFINE INPUT PARAMETER phFilterField  AS HANDLE NO-UNDO.
@@ -9365,7 +8763,7 @@ END PROCEDURE. /* registerFilterField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilters C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE registerFilters wDataDigger 
 PROCEDURE registerFilters :
 /* Register filter fields for table and index browse
   */
@@ -9386,23 +8784,25 @@ END PROCEDURE. /* registerFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse wDataDigger 
 PROCEDURE reopenDataBrowse :
 /* Build the query, based on where-box and filter fields
    */
-  DEFINE VARIABLE cFullTable     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cQuery         AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE cUserQuery     AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hBufferDB      AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE hQuery         AS HANDLE      NO-UNDO.
-  DEFINE VARIABLE iNumRecords    AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE iStartTime     AS INTEGER     NO-UNDO.
-  DEFINE VARIABLE lPrepare       AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE rCurrentRecord AS ROWID       NO-UNDO.
-  DEFINE VARIABLE lQueryComplete AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE cOldWhere      AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cFullTable      AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cQuery          AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cBaseQuery      AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE cUserQuery      AS CHARACTER  NO-UNDO.
+  DEFINE VARIABLE hBufferDB       AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE hQuery          AS HANDLE     NO-UNDO.
+  DEFINE VARIABLE iNumRecords     AS INTEGER    NO-UNDO.
+  DEFINE VARIABLE iStartTime      AS INT64      NO-UNDO.
+  DEFINE VARIABLE lPrepare        AS LOGICAL    NO-UNDO.
+  DEFINE VARIABLE rCurrentRecord  AS ROWID      NO-UNDO.
+  DEFINE VARIABLE lQueryComplete  AS LOGICAL    NO-UNDO.
+  DEFINE VARIABLE cOldWhere       AS CHARACTER  NO-UNDO.
   DEFINE VARIABLE cTestQuery      AS CHARACTER  NO-UNDO.  
   DEFINE VARIABLE cFileCompCheck  AS CHARACTER  NO-UNDO.  
+  DEFINE VARIABLE iPrepareAttempt AS INTEGER    NO-UNDO.
 
   DEFINE BUFFER bColumn FOR ttColumn.
   DEFINE BUFFER bOldFilter FOR ttOldFilter.
@@ -9413,10 +8813,10 @@ PROCEDURE reopenDataBrowse :
   SESSION:SET-WAIT-STATE('general').
   setWindowFreeze(YES).
 
-  cFullTable = gcCurrentDatabase + '.' + gcCurrentTable.
+  cFullTable = gcDatabase + '.' + gcTable.
 
   /* Increase query counter */
-  RUN incQueriesOfTable(gcCurrentDatabase, gcCurrentTable, +1).
+  RUN incQueriesOfTable(gcDatabase, gcTable, +1).
   RUN incQueriesServed(+1).
 
   /* If the user has changed a format in the field browse, then rebuild the data browse 
@@ -9434,7 +8834,7 @@ PROCEDURE reopenDataBrowse :
       IF VALID-HANDLE(bColumn.hFilter) AND bColumn.hFilter:SCREEN-VALUE <> bColumn.hFilter:PRIVATE-DATA THEN bOldFilter.cValue = bColumn.hFilter:SCREEN-VALUE.
     END.
 
-    RUN reopenDataBrowse-create(INPUT gcCurrentDatabase, INPUT gcCurrentTable).
+    RUN reopenDataBrowse-create(INPUT gcDatabase, INPUT gcTable).
 
     /* Restore old values */
     ficWhere:SCREEN-VALUE IN FRAME frMain = cOldWhere.
@@ -9452,18 +8852,18 @@ PROCEDURE reopenDataBrowse :
     rCurrentRecord = ghDataBrowse:QUERY:GET-BUFFER-HANDLE(1):ROWID.
 
   /* If we do a query on the _lock table then create and fill a temp-table */
-  IF gcCurrentTable = '_lock' THEN
+  IF gcTable = '_lock' THEN
   DO:
     cFullTable = '_Lock'.
 
     /* Empty the Lock TT */
     ghDataBuffer:EMPTY-TEMP-TABLE().
 
-    CREATE BUFFER hBufferDB FOR TABLE gcCurrentDatabase + '._lock'.
+    CREATE BUFFER hBufferDB FOR TABLE gcDatabase + '._lock'.
 
     CREATE QUERY hQuery.
     hQuery:ADD-BUFFER(hBufferDB).
-    hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', gcCurrentDatabase)).
+    hQuery:QUERY-PREPARE(SUBSTITUTE('for each &1._lock no-lock', gcDatabase)).
 
     hQuery:QUERY-OPEN().
 
@@ -9484,28 +8884,46 @@ PROCEDURE reopenDataBrowse :
 
   /* Reset query pointer */
   giQueryPointer = 1.
-  RUN getDataQuery(OUTPUT cQuery).
+
   cUserQuery = ficWhere:SCREEN-VALUE IN FRAME {&FRAME-NAME}. /* this one will be saved if it has no errors */
-  cQuery = REPLACE(cQuery, SUBSTITUTE("&1._lock", gcCurrentDatabase), cFullTable).
+  cBaseQuery = cUserQuery. /* this one might get auto-fixed */
 
-  /* Extract sorting from query */
-  RUN getSortFromQuery(cQuery).
+  #PrepareAttempt:
+  DO iPrepareAttempt = 1 TO 2:
+  
+    RUN getDataQuery(cBaseQuery, OUTPUT cQuery).
+    cQuery = REPLACE(cQuery, SUBSTITUTE("&1._lock", gcDatabase), cFullTable).
+  
+    /* Extract sorting from query */
+    RUN getSortFromQuery(cQuery).
+  
+    /* Create a new sort table */
+    RUN createSortTable.
+  
+    /* Rewrite query to include sorting */
+    RUN getSortedQuery(INPUT-OUTPUT cQuery).
+  
+    /* Show sorts in the browse */
+    RUN setSortArrows(ghDataBrowse).
+  
+    /* for DWP query tester */
+    PUBLISH "debugInfo" (INPUT 1, "cQuery = " + cQuery ).
+    PUBLISH 'query' (INPUT cQuery).
+  
+    /* Try to open it */
+    lPrepare = ghDataQuery:QUERY-PREPARE(cQuery) NO-ERROR.
 
-  /* Create a new sort table */
-  RUN createSortTable.
+    /* Try to fix missing quotes */
+    IF NOT lPrepare AND iPrepareAttempt = 1 THEN 
+      RUN fixMissingQuotes(INPUT-OUTPUT cBaseQuery).
+    ELSE 
+      LEAVE #PrepareAttempt.
+  END. /* do iPrepareAttempt */
 
-  /* Rewrite query to include sorting */
-  RUN getSortedQuery(INPUT-OUTPUT cQuery).
-
-  /* Show sorts in the browse */
-  RUN setSortArrows(ghDataBrowse).
-
-  /* for DWP query tester */
-  PUBLISH "debugInfo" (INPUT 1, "cQuery = " + cQuery ).
-  PUBLISH 'query' (INPUT cQuery).
-
-  /* Try to open it */
-  lPrepare = ghDataQuery:QUERY-PREPARE(cQuery) NO-ERROR.
+  /* Missing quotes might have been fixed. Show this to the user. 
+  ** Especially important when the query still cannot be prepared
+  */
+  ficWhere:SCREEN-VALUE = cBaseQuery.
 
   /* if the QUERY-PREPARE failed because of the where-clause, don't open it */
   IF NOT lPrepare THEN
@@ -9523,7 +8941,7 @@ PROCEDURE reopenDataBrowse :
     ficWhere:TOOLTIP = getReadableQuery(cQuery).
 
     /* Save the user-query and set the pointer to 1 */
-    RUN saveQuery(gcCurrentDatabase, gcCurrentTable, cUserQuery).
+    RUN saveQuery(gcDatabase, gcTable, cUserQuery).
 
     /* Try to grab as many records as we can in a limited time.
      * This will give an indication of the amount of records.
@@ -9531,7 +8949,7 @@ PROCEDURE reopenDataBrowse :
     ghDataQuery:QUERY-OPEN().
     iStartTime = ETIME.
     DO WHILE (ETIME - iStartTime) < giMaxQueryTime AND NOT ghDataQuery:QUERY-OFF-END:
-      ghDataQuery:GET-NEXT.
+      ghDataQuery:GET-NEXT().
       iNumRecords = iNumRecords + 1.
     END.
     lQueryComplete = ghDataQuery:QUERY-OFF-END.
@@ -9560,7 +8978,7 @@ PROCEDURE reopenDataBrowse :
   END.
 
   /* Support dataservers - Dataservers are very strict in types, formats etc so extra check */
-  IF isDataserver(gcCurrentDatabase) AND LOOKUP(PROGRESS, "Full,Query") > 0 THEN
+  IF isDataserver(gcDatabase) AND LOOKUP(PROGRESS, "Full,Query") > 0 THEN
   DO:
     ASSIGN
       cTestQuery     = cQuery
@@ -9617,7 +9035,7 @@ END PROCEDURE. /* reopenDataBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse-create C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenDataBrowse-create wDataDigger 
 PROCEDURE reopenDataBrowse-create :
 /* Create the browse and open the query
  */
@@ -9772,7 +9190,7 @@ PROCEDURE reopenDataBrowse-create :
          */
         IF ERROR-STATUS:ERROR THEN
         DO:
-          RUN unlockWindow(C-Win:HANDLE).
+          RUN unlockWindow(wDataDigger:HANDLE).
           RUN showHelp("SchemaRestart", SUBSTITUTE("&1.&2", bColumn.cDatabase, bColumn.cTableName)).
           IF getRegistry("DataDigger:Help", "SchemaRestart:answer") = "1" THEN QUIT.
         END.
@@ -9796,10 +9214,10 @@ PROCEDURE reopenDataBrowse-create :
           IF ERROR-STATUS:ERROR THEN
           DO:
             /* If there is something wrong the the format, just reset it to the original format */
-            RUN unlockWindow(C-Win:HANDLE).
+            RUN unlockWindow(wDataDigger:HANDLE).
 
             /* Delete wrong format from ini file */
-            setRegistry(SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1.&2:format",pcTable,bField.cFieldName), ?).
+            setRegistry(SUBSTITUTE("DB:&1",gcDatabase), SUBSTITUTE("&1.&2:format",pcTable,bField.cFieldName), ?).
             bField.cFormat = bField.cFormatOrg.
             BROWSE brFields:REFRESH().
 
@@ -9924,13 +9342,16 @@ PROCEDURE reopenDataBrowse-create :
       ON "CTRL-D"           OF hFilterField PERSISTENT RUN dataSelectNone          IN THIS-PROCEDURE (ghDataBrowse).
       ON "ENTRY"            OF hFilterField PERSISTENT RUN filterFieldEntry        IN THIS-PROCEDURE (hFilterField, YES).
       ON "LEAVE"            OF hFilterField PERSISTENT RUN filterFieldLeave        IN THIS-PROCEDURE (hFilterField, YES).
-      ON "ANY-PRINTABLE"    OF hFilterField PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField).
       ON "VALUE-CHANGED"    OF hFilterField PERSISTENT RUN filterFieldValueChanged IN THIS-PROCEDURE (hFilterField,NO).
       ON "SHIFT-DEL"        OF hFilterField PERSISTENT RUN filterFieldClearAll     IN THIS-PROCEDURE (hFilterField, btnClearDataFilter:HANDLE).
       ON "RETURN"           OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F2"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "F5"               OF hFilterField PERSISTENT RUN filterDataBrowse        IN THIS-PROCEDURE.
       ON "CTRL-CURSOR-DOWN" OF hFilterField PERSISTENT RUN filterFieldCursorDown   IN THIS-PROCEDURE (hFilterField, bColumn.hColumn).
+
+      /* This one does not play nice with UTF-8 session */
+      IF SESSION:CPINTERNAL <> "UTF-8" THEN
+        ON "ANY-PRINTABLE" OF hFilterField PERSISTENT RUN filterFieldAnyPrintable IN THIS-PROCEDURE (hFilterField). 
 
       /* Keep track of filters */
       CREATE bFilter.
@@ -10008,7 +9429,7 @@ PROCEDURE reopenDataBrowse-create :
   /* Show warning when too much columns */
   IF ghDataBrowse:NUM-COLUMNS >= giMaxColumns THEN
   DO:
-    RUN unlockWindow(C-Win:HANDLE).
+    RUN unlockWindow(wDataDigger:HANDLE).
     RUN showHelp("TooManyColumns", giMaxColumns).
   END.
   ELSE
@@ -10018,7 +9439,7 @@ PROCEDURE reopenDataBrowse-create :
   IF giMaxExtent > 0
     AND CAN-FIND(FIRST ttField WHERE ttField.iExtent > giMaxExtent) THEN
   DO:
-    RUN unlockWindow(C-Win:HANDLE).
+    RUN unlockWindow(wDataDigger:HANDLE).
     RUN showHelp("TooManyExtents", giMaxExtent).
   END.
 
@@ -10028,7 +9449,7 @@ END PROCEDURE. /* reopenDataBrowse-create */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenFieldBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenFieldBrowse wDataDigger 
 PROCEDURE reopenFieldBrowse :
 /* Open the field browse again, taking into account the filter values the user has entered.
  */
@@ -10044,7 +9465,6 @@ PROCEDURE reopenFieldBrowse :
   DEFINE VARIABLE hQuery           AS HANDLE      NO-UNDO.
   DEFINE VARIABLE lAscending       AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE lFieldsFound     AS LOGICAL     NO-UNDO.
-  DEFINE VARIABLE lAllVisible      AS LOGICAL     NO-UNDO.
   DEFINE VARIABLE rCurrentRecord   AS ROWID       NO-UNDO.
   DEFINE VARIABLE iCurrentRow      AS INTEGER     NO-UNDO.
 
@@ -10148,22 +9568,9 @@ PROCEDURE reopenFieldBrowse :
     hQuery:QUERY-PREPARE(cQuery).
     hQuery:QUERY-OPEN().
 
-    /* Find out if all visible fields have the same 'visibility flags'. If they are all
-     * the same, set the "toggle all" toggle-box to this same value.
-     */
-    lAllVisible = TRUE.
-
-    hQuery:GET-FIRST.
-    REPEAT WHILE NOT hQuery:QUERY-OFF-END:
-      lFieldsFound = TRUE.
-      IF NOT hBuffer::lShow THEN lAllVisible = FALSE.
-      hQuery:GET-NEXT.
-    END.
-
-    .tgSelAll:CHECKED = lAllVisible.
-
     /* Attach query to the browse */
-    hQuery:GET-FIRST.
+    hQuery:GET-FIRST().
+    lFieldsFound = NOT hQuery:QUERY-OFF-END.
     brFields:QUERY = hQuery.
 
     /* Jump back to selected row */
@@ -10189,7 +9596,7 @@ END PROCEDURE. /* reopenFieldBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenIndexBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenIndexBrowse wDataDigger 
 PROCEDURE reopenIndexBrowse :
 /* Reopen the browse with indexes.
    */
@@ -10286,7 +9693,7 @@ END PROCEDURE. /* reopenIndexBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenTableBrowse C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE reopenTableBrowse wDataDigger 
 PROCEDURE reopenTableBrowse :
 /* Open the table browse again, taking into account the filter values the user has entered.
  */
@@ -10318,8 +9725,8 @@ PROCEDURE reopenTableBrowse :
 
     /* Remember currently selected record */
     FIND bTable
-      WHERE bTable.cDatabase   = gcCurrentDatabase
-        AND bTable.cTableName  = gcCurrentTable NO-ERROR.
+      WHERE bTable.cDatabase   = gcDatabase
+        AND bTable.cTableName  = gcTable NO-ERROR.
     IF AVAILABLE bTable THEN rCurrentRecord = ROWID(bTable).
 
     /* If we have entered the name of a table that exactly matches the name of a table
@@ -10426,7 +9833,7 @@ END PROCEDURE. /* reopenTableBrowse */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resetFields wDataDigger 
 PROCEDURE resetFields :
 /* Reset the field order of all fields and reset databrowse
  */
@@ -10451,15 +9858,15 @@ PROCEDURE resetFields :
   RUN setDataBrowseColumns.
 
   /* Remove field order from settings */
-  setRegistry( SUBSTITUTE('DB:&1',gcCurrentDatabase)
-             , SUBSTITUTE('&1:fieldOrder', gcCurrentTable )
+  setRegistry( SUBSTITUTE('DB:&1',gcDatabase)
+             , SUBSTITUTE('&1:fieldOrder', gcTable )
              , ?
              ).
 
   /* Update field cache */
   RUN updateMemoryCache
-    ( INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    ( INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE bField
     , INPUT TABLE bColumn
     ).
@@ -10473,7 +9880,7 @@ END PROCEDURE. /* resetFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilters C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE resizeFilters wDataDigger 
 PROCEDURE resizeFilters :
 /* Redraw the filters. This is needed when the window resizes, one of
  * the columns resizes or the user scrolls in the browse.
@@ -10564,7 +9971,7 @@ END PROCEDURE. /* resizeFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveFilterValue C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveFilterValue wDataDigger 
 PROCEDURE saveFilterValue :
 /* Save the last x filter values to registry
    */
@@ -10593,7 +10000,7 @@ PROCEDURE saveFilterValue :
 
   /* Add old entries to the list */
   #AddEntry:
-  DO iPos = 1 TO NUM-ENTRIES(cOldList,CHR(1)).
+  DO iPos = 1 TO NUM-ENTRIES(cOldList,CHR(1)):
     cThisValue = ENTRY(iPos,cOldList,CHR(1)).
 
     /* Skip empty */
@@ -10619,24 +10026,15 @@ END PROCEDURE. /* saveFilterValue */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindow C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE saveWindow wDataDigger 
 PROCEDURE saveWindow :
 /* Save size and position of the window.
  */
-
-  IF c-win:WINDOW-STATE = 3 THEN /* normal state */
-  DO:
-    /* Upper left corner of window */
-    setRegistry("DataDigger", "Window:x", STRING(c-win:X) ).
-    setRegistry("DataDigger", "Window:y", STRING(c-win:Y) ).
-  END.
-
-  /* Width and height */
-  setRegistry("DataDigger", "Window:height", STRING(c-win:HEIGHT-PIXELS) ).
-  setRegistry("DataDigger", "Window:width", STRING(c-win:WIDTH-PIXELS) ).
-
-  /* Position of the resize bar */
   DO WITH FRAME frMain:
+
+    RUN saveWindowPos(wDataDigger:HANDLE, "DataDigger").
+
+    /* Position of the resize bar */
     setRegistry("DataDigger", "ResizeBar:Y", STRING(btnResizeVer:Y) ).
   END.
 
@@ -10645,7 +10043,7 @@ END PROCEDURE. /* saveWindow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectClickedRow C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE selectClickedRow wDataDigger 
 PROCEDURE selectClickedRow :
 /* Select the row the user last clicked on
    */
@@ -10653,15 +10051,15 @@ PROCEDURE selectClickedRow :
   DEFINE OUTPUT PARAMETER pcColumnName    AS CHARACTER NO-UNDO.
 
   DEFINE VARIABLE dRow             AS DECIMAL   NO-UNDO.
+  DEFINE VARIABLE iColumn          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iMouseX          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iMouseY          AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iColumn          AS INTEGER   NO-UNDO.
   DEFINE VARIABLE iRow             AS INTEGER   NO-UNDO.
   DEFINE VARIABLE cColumnValue     AS CHARACTER NO-UNDO.
   DEFINE VARIABLE hBuffer          AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hBrowseColumn    AS HANDLE    NO-UNDO.
 
-  PUBLISH "debugInfo" (1, SUBSTITUTE("Select Clicked Row.")).
+  PUBLISH "debugInfo" (1, "Select Clicked Row.").
 
   /* Get mouse position (but not if we used SHIFT-F10 for the context menu */
   IF LAST-EVENT:LABEL = 'SHIFT-F10' THEN
@@ -10672,11 +10070,12 @@ PROCEDURE selectClickedRow :
 
   ELSE /* used mouse right click */
   DO:
-    RUN getMouseXY(INPUT phBrowse:FRAME, OUTPUT iMouseX, OUTPUT iMouseY).
-
     /* Find out what row number we clicked on */
-    dRow = (iMouseY - phBrowse:Y - 18) / (phBrowse:ROW-HEIGHT-PIXELS + 4).
-    iRow = (IF dRow = integer(dRow) THEN INTEGER(dRow) ELSE TRUNCATE(dRow,0) + 1). /* ceiling of dRow */
+    RUN getMouseXY(INPUT phBrowse, OUTPUT iMouseX, OUTPUT iMouseY).
+    dRow = (iMouseY / (phBrowse:ROW-HEIGHT-PIXELS + 4)) - 1.
+
+    {&_proparse_ prolint-nowarn(overflow)}
+    iRow = (IF dRow = INTEGER(dRow) THEN INTEGER(dRow) ELSE TRUNCATE(dRow,0) + 1). /* ceiling of dRow */
 
     /* Is it a valid row nr? (could be invalid if we clicked below last record) */
     PUBLISH "debugInfo" (2, SUBSTITUTE(" - Clicked row &1", iRow)).
@@ -10733,7 +10132,7 @@ END PROCEDURE. /* selectClickedRow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setCurrentTable C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setCurrentTable wDataDigger 
 PROCEDURE setCurrentTable :
 /* Save last used table to ini
    */
@@ -10742,7 +10141,7 @@ PROCEDURE setCurrentTable :
 
   DO WITH FRAME {&FRAME-NAME}:
     FIND bTable
-      WHERE bTable.cDatabase  = gcCurrentDatabase
+      WHERE bTable.cDatabase  = gcDatabase
         AND bTable.cTableName = pcTableName
             NO-ERROR.
     IF NOT AVAILABLE bTable THEN RETURN.
@@ -10756,7 +10155,7 @@ END PROCEDURE. /* setCurrentTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataBrowseColumns C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataBrowseColumns wDataDigger 
 PROCEDURE setDataBrowseColumns :
 /* Set all columns according to their iColumnNr
  */
@@ -10801,7 +10200,7 @@ END PROCEDURE. /* setDataBrowseColumns */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setDataFilter wDataDigger 
 PROCEDURE setDataFilter :
 /* Optionally clear the filters and set a filter value
  */
@@ -10857,7 +10256,7 @@ END PROCEDURE. /* setDataFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFilterFieldTabOrder wDataDigger 
 PROCEDURE setFilterFieldTabOrder :
 /* Reset the TAB order of the filter fields
    */
@@ -10878,39 +10277,38 @@ END PROCEDURE. /* setFilterFieldTabOrder */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFrameColor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setFrameColor wDataDigger 
 PROCEDURE setFrameColor :
 /* Set the main frame bg color 
 */
-  DEFINE INPUT PARAMETER pcColor AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcFrameColor  AS CHARACTER NO-UNDO.
+  DEFINE INPUT PARAMETER pcBorderColor AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE iColor AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iRed   AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iGreen AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iBlue  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iFrameColor  AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iBorderColor AS INTEGER   NO-UNDO.
 
-  IF pcColor = "" THEN RETURN. 
-
-  IF NUM-ENTRIES(pcColor) = 3 THEN 
-  DO:
-    ASSIGN 
-      iRed   = INTEGER(ENTRY(1,pcColor)) 
-      iGreen = INTEGER(ENTRY(2,pcColor)) 
-      iBlue  = INTEGER(ENTRY(3,pcColor)) NO-ERROR.
-
-    IF NOT ERROR-STATUS:ERROR THEN 
-      iColor = getColorByRGB(iRed, iGreen, iBlue).
-    ELSE 
-      iColor = ?.
-  END.
+  /* Color for whole frame */
+  IF pcFrameColor = '' THEN pcFrameColor = ?.
+  IF NUM-ENTRIES(pcFrameColor) = 3 THEN 
+    iFrameColor = getColorByRGB(INTEGER(ENTRY(1,pcFrameColor)), INTEGER(ENTRY(2,pcFrameColor)), INTEGER(ENTRY(3,pcFrameColor))) NO-ERROR.
   ELSE 
-  DO:
-    iColor = INTEGER(pcColor) NO-ERROR.
-    IF ERROR-STATUS:ERROR THEN iColor = ?.
-  END.
+    iFrameColor = INTEGER(pcFrameColor) NO-ERROR.
+  IF ERROR-STATUS:ERROR THEN iFrameColor = ?.
+
+  /* Color for frame border */
+  IF pcBorderColor = '' THEN pcBorderColor = ?.
+  IF NUM-ENTRIES(pcBorderColor) = 3 THEN 
+    iBorderColor = getColorByRGB(INTEGER(ENTRY(1,pcBorderColor)), INTEGER(ENTRY(2,pcBorderColor)), INTEGER(ENTRY(3,pcBorderColor))) NO-ERROR.
+  ELSE 
+    iBorderColor = INTEGER(pcBorderColor) NO-ERROR.
+  IF ERROR-STATUS:ERROR THEN iBorderColor = ?.
 
   DO WITH FRAME frMain:
-    FRAME frMain:BGCOLOR = iColor.
+  
+    rctQuery:HIDDEN = (iBorderColor = ?).
+    rctQuery:FGCOLOR = iBorderColor.
+      
+    FRAME frMain:BGCOLOR = iFrameColor.
 
     /* Set key elements to white for readability */
     BROWSE brTables:BGCOLOR  = 15.
@@ -10926,7 +10324,7 @@ END PROCEDURE. /* setFrameColor */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setPage wDataDigger 
 PROCEDURE setPage :
 /* Set active page: Tables/Pinned/Fields/Indexes
  */
@@ -11011,16 +10409,6 @@ PROCEDURE setPage :
   RUN showScrollBars(FRAME {&FRAME-NAME}:HANDLE, NO, NO).
   setWindowFreeze(NO).
 
-  /* Show additional info on first use of favourites tab */
-  IF piPage = {&PAGE-FAVOURITES} 
-    AND getRegistry("DataDigger:Hints", SUBSTITUTE("setPage-&1",piPage)) = ? THEN
-  DO:
-    setRegistry("DataDigger:Hints", SUBSTITUTE("setPage-&1",piPage), "yes").
-    RUN showHint(cbFavouriteGroup:HANDLE,{&ARROW-LEFT-UP}  ,"(1/3)~n~nI created a default group for your favourites").
-    RUN showHint(btnAddFavGroup:HANDLE  ,{&ARROW-LEFT-DOWN},"(2/3)~n~nIf you like, you can create additional groups").
-    RUN showHint(brTables:HANDLE        ,{&ARROW-LEFT-UP}  ,"(3/3)~n~nBy removing all tables from a group, the group will be automatically deleted when you close DataDigger").
-  END.
-
   {&timerStop}
 
 END PROCEDURE. /* setPage */
@@ -11028,33 +10416,36 @@ END PROCEDURE. /* setPage */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setQueryWhereAlert C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setQueryWhereAlert wDataDigger 
 PROCEDURE setQueryWhereAlert :
-DEFINE INPUT  PARAMETER pcFailedQuery AS CHARACTER  NO-UNDO.
-  DEFINE INPUT  PARAMETER pcExtraMsg    AS CHARACTER  NO-UNDO.
-  DEFINE INPUT  PARAMETER pcErrorMsg    AS CHARACTER  NO-UNDO.
+/* Set tooltip in the query editor to 
+** indicate the query failed to execute
+*/  
+  DEFINE INPUT PARAMETER pcFailedQuery AS CHARACTER  NO-UNDO.
+  DEFINE INPUT PARAMETER pcExtraMsg    AS CHARACTER  NO-UNDO.
+  DEFINE INPUT PARAMETER pcErrorMsg    AS CHARACTER  NO-UNDO.
   
-  DO WITH FRAME {&frame-name}:
+  DO WITH FRAME {&FRAME-NAME}:
     ASSIGN
-      ficWhere:BGCOLOR  = getColor('QueryError:bg')   /* red */
-      ficWhere:FGCOLOR  = getColor('QueryError:fg')   /* yellow */
-      ficWhere:tooltip  = SUBSTITUTE( "Open query failed due to this error:"  + "~n" +
-                                      ""                                      + "~n" +
-                                      "&1"                                    + "~n" +
-                                      ""                                      + "~n" +
-                                      "Failed query:"                         + "~n" +
-                                      ""                                      + "~n" +
-                                      "&2"                                    + "~n" +
-                                      ""                                      + "~n" +
-                                      "&3"                                    +
-                                      "Your WHERE-clause will be ignored."
-                                    , TRIM(pcErrorMsg)
-                                    , TRIM(pcFailedQuery)
-                                    , (IF pcExtraMsg <> "" THEN
-                                         pcExtraMsg + "~n"
-                                       ELSE
-                                         "")
-                                    ).
+      ficWhere:BGCOLOR = getColor('QueryError:bg')   /* red */
+      ficWhere:FGCOLOR = getColor('QueryError:fg')   /* yellow */
+      ficWhere:TOOLTIP = SUBSTITUTE( "Open query failed due to this error:"  + "~n" +
+                                     ""                                      + "~n" +
+                                     "&1"                                    + "~n" +
+                                     ""                                      + "~n" +
+                                     "Failed query:"                         + "~n" +
+                                     ""                                      + "~n" +
+                                     "&2"                                    + "~n" +
+                                     ""                                      + "~n" +
+                                     "&3"                                    +
+                                     "Your WHERE-clause will be ignored."
+                                   , TRIM(pcErrorMsg)
+                                   , TRIM(pcFailedQuery)
+                                   , (IF pcExtraMsg <> "" THEN
+                                        pcExtraMsg + "~n"
+                                      ELSE
+                                        "")
+                                   ).
     /* Activate buttons */
     setUpdatePanel('no-data').
 
@@ -11065,12 +10456,12 @@ END PROCEDURE.  /* setQueryWhereAlert */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRandomColor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRandomColor wDataDigger 
 PROCEDURE setRandomColor :
 /* Set a random bg color for the main frame
 ** (for the new-features wizard)
 */
-  RUN setFrameColor(RANDOM(1,15)).
+  RUN setFrameColor(?, RANDOM(1,15)).
   PROCESS EVENTS.
 
 END PROCEDURE. /* setRandomColor */
@@ -11078,24 +10469,7 @@ END PROCEDURE. /* setRandomColor */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRandomTitle C-Win 
-PROCEDURE setRandomTitle :
-/* Do a small animation for the window title
-** (for the new-features wizard)
-*/
-  CASE c-win:TITLE:
-    WHEN 'Hello world' THEN c-win:TITLE = 'H e l l o   w o r l d'.
-    OTHERWISE c-win:TITLE = 'Hello world'.
-  END CASE.
-
-  PROCESS EVENTS. 
-
-END PROCEDURE. /* setRandomTitle */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRedLines C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setRedLines wDataDigger 
 PROCEDURE setRedLines :
 /* Show red lines around browse when filtered
  */
@@ -11168,7 +10542,7 @@ END PROCEDURE. /* setRedLines */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrows C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setSortArrows wDataDigger 
 PROCEDURE setSortArrows :
 /* Set the sorting arrows on a browse
  */
@@ -11221,7 +10595,7 @@ END PROCEDURE. /* setSortArrow */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTable C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTable wDataDigger 
 PROCEDURE setTable :
 /* If some text is selected in the session or a text is on the clipboard, select the table with that name.
  */
@@ -11282,9 +10656,9 @@ PROCEDURE setTable :
 
       APPLY 'value-changed' TO brTables.
 
-      IF gcCurrentTable <> "" THEN
+      IF gcTable <> "" THEN
       DO:
-        RUN setTableContext(INPUT gcCurrentTable ).
+        RUN setTableContext(INPUT gcTable ).
         RUN reopenDataBrowse.
         RUN setTimer('timedTableChange',0).
       END.
@@ -11309,7 +10683,7 @@ END PROCEDURE. /* setTable */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableContext C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableContext wDataDigger 
 PROCEDURE setTableContext :
 /* Perform actions when a change of table has occurred.
  */
@@ -11317,7 +10691,6 @@ PROCEDURE setTableContext :
 
   DEFINE VARIABLE cFieldList AS CHARACTER NO-UNDO.
   DEFINE VARIABLE cQuery     AS CHARACTER NO-UNDO.
-  DEFINE VARIABLE hEditor    AS HANDLE    NO-UNDO.
 
   {&timerStart}
 
@@ -11344,22 +10717,19 @@ PROCEDURE setTableContext :
     setUpdatePanel('no-record').
 
     /* Refill the tt with fields of this table */
-    RUN collectFieldInfo(INPUT pcTable).
+    RUN collectFieldInfo(pcTable).
 
     /* Refill the index tt */
-    RUN collectIndexInfo(INPUT pcTable).
+    RUN collectIndexInfo(gcDatabase, pcTable, OUTPUT TABLE ttIndex).
 
     /* Get all saved queries of this table */
-    RUN collectQueryInfo( INPUT gcCurrentDatabase, INPUT pcTable ).
+    RUN collectQueryInfo( INPUT gcDatabase, INPUT pcTable ).
     ASSIGN giQueryPointer = 1.
 
-    /* If the query editor is expanded, do actions to that field */
-    hEditor = getActiveQueryEditor().
-
     /* Give custom code a chance to alter the query */
-    cQuery = hEditor:SCREEN-VALUE.
-    PUBLISH "customQuery" (INPUT gcCurrentDatabase, INPUT gcCurrentTable, INPUT-OUTPUT cQuery).
-    hEditor:SCREEN-VALUE = cQuery.
+    cQuery = ficWhere:SCREEN-VALUE.
+    PUBLISH "customQuery" (INPUT gcDatabase, INPUT gcTable, INPUT-OUTPUT cQuery).
+    ficWhere:SCREEN-VALUE = cQuery.
 
     /* Reopen the queries on Fields and Indexes */
     RUN reopenFieldBrowse(?,?).
@@ -11376,29 +10746,21 @@ PROCEDURE setTableContext :
       cFieldList = cFieldList + ',' + ttField.cFullname.
     END.
 
-    DO WITH FRAME frWhere:
-      /* Set list of fields in field combo */
-      cbFields:LIST-ITEMS     = cFieldList.
-      cbAndOr:SCREEN-VALUE    = ENTRY(1,cbAndOr:LIST-ITEMS).
-      cbFields:SCREEN-VALUE   = ENTRY(1,cbFields:LIST-ITEMS).
-      cbOperator:SCREEN-VALUE = ENTRY(1,cbOperator:LIST-ITEMS).
-    END.
-
     /* Reset query-pointer */
     ASSIGN giQueryPointer = 0.
 
     fiWarning:VISIBLE = NO.
     ficWhere:BGCOLOR = 15. /* default */
     ficWhere:FGCOLOR = ?. /* default */
-    ficWhere:TOOLTIP = ''.
+    ficWhere:TOOLTIP = ficWhere:PRIVATE-DATA.
 
     /* Save last used table and position in browse in registry */
-    setRegistry ("DB:" + gcCurrentDatabase, "table", pcTable ).
+    setRegistry ("DB:" + gcDatabase, "table", pcTable ).
 
     RUN setWindowTitle.
 
     /* Create a browse for this table */
-    RUN reopenDataBrowse-create(INPUT gcCurrentDatabase, INPUT pcTable).
+    RUN reopenDataBrowse-create(INPUT gcDatabase, INPUT pcTable).
 
     setWindowFreeze(NO).
   END.
@@ -11410,7 +10772,7 @@ END PROCEDURE. /* setTableContext */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableFilterOptions C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableFilterOptions wDataDigger 
 PROCEDURE setTableFilterOptions :
 /* Filter tables based on whether they hold certain fields
    */
@@ -11435,12 +10797,12 @@ PROCEDURE setTableFilterOptions :
   SESSION:SET-WAIT-STATE("general").
   setWindowFreeze(YES).
 
-  cOldTable = gcCurrentTable.
+  cOldTable = gcTable.
 
   RUN getTablesFiltered(INPUT TABLE ttTableFilter, OUTPUT TABLE ttTable).
   RUN reopenTableBrowse(?).
 
-  IF cOldTable <> gcCurrentTable THEN
+  IF cOldTable <> gcTable THEN
     APPLY 'value-changed' TO brTables IN FRAME frMain.
 
   RUN reopenFieldBrowse(?,?).
@@ -11457,7 +10819,7 @@ END PROCEDURE. /* setTableFilterOptions */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableView C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTableView wDataDigger 
 PROCEDURE setTableView :
 /* Set tables view to either 'tables' or 'favourites'
    */
@@ -11512,7 +10874,7 @@ END PROCEDURE. /* setTableView */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimer C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimer wDataDigger 
 PROCEDURE setTimer :
 /*
  * Enable or disable a named timer.
@@ -11557,7 +10919,7 @@ END PROCEDURE. /* setTimer */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimerInterval C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setTimerInterval wDataDigger 
 PROCEDURE setTimerInterval :
 /*
  * Set the interval of the timer so that it will tick exactly when the next timed event is due.
@@ -11587,7 +10949,7 @@ END PROCEDURE. /* setTimerInterval */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setToolbarNavigation C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setToolbarNavigation wDataDigger 
 PROCEDURE setToolbarNavigation :
 /*
  * Navigate between the buttons in the settings frame
@@ -11640,7 +11002,7 @@ END PROCEDURE. /* setToolbarNavigation */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setViewType C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setViewType wDataDigger 
 PROCEDURE setViewType :
 /* Set the type of view to view records (TXT HTML XLS)
  */
@@ -11663,7 +11025,7 @@ END PROCEDURE. /* setViewType */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setWindowTitle C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE setWindowTitle wDataDigger 
 PROCEDURE setWindowTitle :
 /* Set the title of the DataDigger window
    */
@@ -11707,17 +11069,17 @@ PROCEDURE setWindowTitle :
   /* Which DB name */
   CASE getRegistry('DataDigger','TitleBarDbName'):
     WHEN 'none'    THEN cDatabase = ''.
-    WHEN 'ldbname' THEN cDatabase = LDBNAME(gcCurrentDatabase) + '.'.
+    WHEN 'ldbname' THEN cDatabase = LDBNAME(gcDatabase) + '.'.
     WHEN 'pdbname' THEN DO:
       /* Ignore pathnames */
-      cDatabase = PDBNAME(gcCurrentDatabase) + '.'.
+      cDatabase = PDBNAME(gcDatabase) + '.'.
       cDatabase = ENTRY(NUM-ENTRIES(cDatabase,'/'),cDatabase,'/').
       cDatabase = ENTRY(NUM-ENTRIES(cDatabase,'\'),cDatabase,'\').
     END.
-    OTHERWISE cDatabase = gcCurrentDatabase + '.'.
+    OTHERWISE cDatabase = gcDatabase + '.'.
   END CASE.
 
-  cTableLabel = getTableLabel(gcCurrentDatabase, gcCurrentTable).
+  cTableLabel = getTableLabel(gcDatabase, gcTable).
 
   /* Optionally start title with the table instead of 'DataDigger xx'
    * this is more readable if you have lots of DD windows open
@@ -11738,7 +11100,7 @@ PROCEDURE setWindowTitle :
                      , "{&version}"
                      , (IF SESSION:PARAMETER <> '' THEN '- ' + SESSION:PARAMETER ELSE '')
                      , cDatabase
-                     , gcCurrentTable
+                     , gcTable
                      , (IF cFilter <> '' THEN '(' + cFilter + ')'  ELSE '')
                      , (IF cTableLabel <> '' THEN '(' + cTableLabel + ')'  ELSE '')
                      ).
@@ -11750,26 +11112,28 @@ PROCEDURE setWindowTitle :
   cTitle = TRIM(cTitle,'- ').
 
   /* Add warning for read-only mode */
-  IF (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcCurrentDataBase), "READ-ONLY") = YES) THEN cTitle = cTitle + " ** READ-ONLY **".
+  IF (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcDatabase), "READ-ONLY") = YES) THEN cTitle = cTitle + " ** READ-ONLY **".
 
   /* Add warning for debug-mode */
   IF glDebugMode THEN cTitle = cTitle + " ** DEBUG MODE **".
 
   /* Option to set your own title */
-  PUBLISH 'setWindowTitle' (INPUT gcCurrentDatabase, INPUT gcCurrentTable, INPUT-OUTPUT cTitle).
+  PUBLISH 'setWindowTitle' (INPUT gcDatabase, INPUT gcTable, INPUT-OUTPUT cTitle).
 
-  C-Win:TITLE = cTitle.
+  wDataDigger:TITLE = cTitle.
 
-  RUN GetParent (c-win:HWND, OUTPUT hParent).
+  RUN GetParent (wDataDigger:HWND, OUTPUT hParent).
   RUN GetWindow (hParent, 4, OUTPUT hOwner).
-  RUN SetWindowTextA ( hOwner, cTitle ).
+  IF SESSION:CPINTERNAL = 'UTF8' 
+    THEN RUN SetWindowTextW(hOwner, cTitle).
+    ELSE RUN SetWindowTextA(hOwner, cTitle).
 
 END PROCEDURE. /* setWindowTitle */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDataFilters C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showDataFilters wDataDigger 
 PROCEDURE showDataFilters :
 /* Show/hide the data filters
  */
@@ -11789,7 +11153,7 @@ END PROCEDURE. /* showDataFilters */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFavouriteIcon C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showFavouriteIcon wDataDigger 
 PROCEDURE showFavouriteIcon :
 /* Show Favourite icon
  */
@@ -11809,7 +11173,7 @@ END PROCEDURE. /* showFavouriteIcon */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showField C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showField wDataDigger 
 PROCEDURE showField :
 /* Toggle the selected status of a field.
   */
@@ -11832,7 +11196,7 @@ PROCEDURE showField :
 
       /* Customization option for the user to show/hide certain fields */
       IF NUM-ENTRIES(pcFieldList) > 1 THEN
-        PUBLISH 'customShowField' (gcCurrentDatabase, gcCurrentTable, bField.cFieldName, INPUT-OUTPUT bField.lShow).
+        PUBLISH 'customShowField' (gcDatabase, gcTable, bField.cFieldName, INPUT-OUTPUT bField.lShow).
 
       /* Hide data columns */
       IF VALID-HANDLE(bColumn.hColumn) THEN
@@ -11871,23 +11235,23 @@ END PROCEDURE. /* showField */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHint C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showHint wDataDigger 
 PROCEDURE showHint :
 /* Show a small window with a hint
    */
   DEFINE INPUT PARAMETER phWidget AS HANDLE    NO-UNDO.
-  DEFINE INPUT PARAMETER piLayout AS INTEGER   NO-UNDO.
+  DEFINE INPUT PARAMETER piLayout AS INT64     NO-UNDO.
   DEFINE INPUT PARAMETER pcText   AS CHARACTER NO-UNDO.
 
-  DEFINE VARIABLE iStep     AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iOffsetX  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iOffsetY  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iTargetX  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE iTargetY  AS INTEGER NO-UNDO.
-  DEFINE VARIABLE hMyWidget AS HANDLE  NO-UNDO.
+  DEFINE VARIABLE iStep     AS INT64  NO-UNDO.
+  DEFINE VARIABLE iOffsetX  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iOffsetY  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iTargetX  AS INT64  NO-UNDO.
+  DEFINE VARIABLE iTargetY  AS INT64  NO-UNDO.
+  DEFINE VARIABLE hMyWidget AS HANDLE NO-UNDO.
 
   /* If we are in the start phase of DD, ignore hints */
-  IF VALID-HANDLE(winWait) THEN RETURN.
+  IF glInitializing THEN RETURN.
   
   /* If user opted to NEVER see hints, just exit, except
    * when she pressed the 'help' button */
@@ -11906,7 +11270,7 @@ PROCEDURE showHint :
     FRAME frHint:PRIVATE-DATA = STRING(phWidget).
     FRAME frHint:VISIBLE = FALSE.
     FRAME frHint:MOVE-TO-TOP().
-
+                               
     CASE piLayout:
       /* point nowhere */
       WHEN {&ARROW-NONE} THEN ASSIGN
@@ -12027,8 +11391,11 @@ PROCEDURE showHint :
     /* Animation. Needless, but fun to program :) */
     DO iStep = 1 TO 25:
       RUN doNothing(10).
-      FRAME frHint:X = FRAME frHint:X + ((iTargetX - FRAME frHint:X) / 25 * iStep).
-      FRAME frHint:Y = FRAME frHint:Y + ((iTargetY - FRAME frHint:Y) / 25 * iStep).
+      
+      {&_proparse_ prolint-nowarn(overflow)}
+      ASSIGN 
+        FRAME frHint:X = FRAME frHint:X + ((iTargetX - FRAME frHint:X) / 25 * iStep)
+        FRAME frHint:Y = FRAME frHint:Y + ((iTargetY - FRAME frHint:Y) / 25 * iStep).
     END.
 
     WAIT-FOR "choose" OF btGotIt IN FRAME frHint
@@ -12044,12 +11411,10 @@ END PROCEDURE. /* showHint */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNewFeatures C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNewFeatures wDataDigger 
 PROCEDURE showNewFeatures :
 /* Highlight some new features
    */
-  DEFINE VARIABLE cOldTitle AS CHARACTER NO-UNDO.
-
   demoLoop:
   DO WITH FRAME frMain:
 
@@ -12062,52 +11427,24 @@ PROCEDURE showNewFeatures :
     END.
 
     /* Bug fixes */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n1/7~n~nWelcome to the new DataDigger~nWith >50 bug fixes and changes").
-
-    /* Title */
-    tgDebugMode:X = 130.
-    tgDebugMode:Y = -5 NO-ERROR.
-    tgDebugMode:HIDDEN = YES.
-    cOldTitle = c-win:TITLE.
-    c-win:TITLE = 'Hello world'.
-    RUN setTimer("SetRandomTitle", 400).
-    RUN showHint(tgDebugMode:HANDLE, {&ARROW-LEFT-UP}, "2/7~n~nOption to set your own custom title for the window~n~nSee the wiki on how to do this").
-    RUN setTimer("SetRandomTitle", 0).
-    c-win:TITLE = cOldTitle.
-    IF glHintCancelled THEN LEAVE demoLoop.
-    tgDebugMode:X = 38. 
-    tgDebugMode:Y = 29.
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "~n1/4~n~nWelcome to the new DataDigger~nWith loads of bug fixes and changes").
 
     /* BG Color */
     RUN setTimer("SetRandomColor", 400).
-    RUN showHint(c-win:HANDLE, {&ARROW-NONE}, "3/7~n~nOr set your own background color to indicate that you are in a production db~n~nAgain: check the wiki").
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "2/4~n~nSet a custom border color to differentiate between your environments~n~nCheck the wiki on how to do this").
     RUN setTimer("SetRandomColor",0).
-    RUN setFrameColor('?').
+    RUN setFrameColor(?,?).
     IF glHintCancelled THEN LEAVE demoLoop.
 
     /* Help options */
     RUN showToolbar(YES).
     DO WITH FRAME frSettings:
-      RUN showHint(btnHelp:HANDLE, {&ARROW-LEFT-DOWN}, "4/7~n~nWiki and other help options can be found here").
+      RUN showHint(btnHelp:HANDLE, {&ARROW-LEFT-DOWN}, "4/4~n~nWiki and other help options can be found here").
       IF glHintCancelled THEN LEAVE demoLoop.
     END.
 
-    /* Favourites */
-    RUN setPage({&PAGE-FAVOURITES}).
-    RUN showHint(cbFavouriteGroup:HANDLE, {&ARROW-LEFT-DOWN}, "5/7~n~nFavourites are now no longer per-database but act globally").
-    RUN setPage({&PAGE-TABLES}).
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* Bulk delete */
-    RUN showHint(brTables:HANDLE, {&ARROW-LEFT-UP}, "6/7~n~nCheck the new bulk delete routine that can be generated via right-click").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
-    /* feedback */
-    RUN showHint(fiFeedback:HANDLE, 3, "7/7~n~nGot some questions or feedback? ~nClick here to mail me").
-    IF glHintCancelled THEN LEAVE demoLoop.
-
     /* Done! */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~n~nHappy Digging!").
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "~n That's it.~n~n~nHappy Digging!").
   END.
 
   /* back to normal */
@@ -12127,7 +11464,7 @@ END PROCEDURE. /* showNewFeatures */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumRecords C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumRecords wDataDigger 
 PROCEDURE showNumRecords :
 /* Show nr of total and selected records
   */
@@ -12168,7 +11505,7 @@ END PROCEDURE. /* showNumRecords */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumSelected C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showNumSelected wDataDigger 
 PROCEDURE showNumSelected :
 /* Show nr of selected records
   */
@@ -12194,7 +11531,7 @@ END PROCEDURE. /* showNumSelected */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showToolbar C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showToolbar wDataDigger 
 PROCEDURE showToolbar :
 /* Make toolbar visible
 */
@@ -12214,7 +11551,7 @@ END PROCEDURE. /* showToolbar */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTour C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showTour wDataDigger 
 PROCEDURE showTour :
 /* Highlight some of the main features of DD
    */
@@ -12233,7 +11570,7 @@ PROCEDURE showTour :
    */
   hintBlock:
   DO WITH FRAME frMain:
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n       Welcome to ~n~n'DataDigger in 30 seconds'").
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "~n       Welcome to ~n~n'DataDigger in 30 seconds'").
     IF glHintCancelled THEN LEAVE hintBlock.
 
     /* Select a table and show data */
@@ -12263,7 +11600,7 @@ PROCEDURE showTour :
     END.
 
     /* Confess the lie */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~nOk, I lied :)~n~nIt's more than 30 seconds, but you're almost done!").
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "~nOk, I lied :)~n~nIt's more than 30 seconds, but you're almost done!").
 
     iColumn = 0.
     #Column:
@@ -12285,7 +11622,7 @@ PROCEDURE showTour :
     RUN showHint(btnEdit:HANDLE   , {&ARROW-LEFT-DOWN}, "10/{&t}~n~nEdit records easily via these buttons or a double click / right click on the data browse").
 
     /* Done! */
-    RUN showHint(C-Win:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
+    RUN showHint(wDataDigger:HANDLE, {&ARROW-NONE}, "~n That's it.~n~nHappy Digging!").
 
     FRAME frHint:VISIBLE = FALSE.
   END.
@@ -12298,7 +11635,7 @@ END PROCEDURE. /* showTour */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE showValue wDataDigger 
 PROCEDURE showValue :
 /* Show the sum of the fields of the selected rows
  */
@@ -12368,11 +11705,11 @@ END PROCEDURE. /* showValue */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE sortComboBox C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE sortComboBox wDataDigger 
 PROCEDURE sortComboBox :
 /* Sort the entries of a ComboBox
  */
-  DEFINE INPUT  PARAMETER phCombo AS HANDLE NO-UNDO.
+  DEFINE INPUT PARAMETER phCombo AS HANDLE NO-UNDO.
 
   DEFINE VARIABLE iItem  AS INTEGER     NO-UNDO.
   DEFINE VARIABLE cList  AS CHARACTER   NO-UNDO.
@@ -12382,7 +11719,7 @@ PROCEDURE sortComboBox :
   cList = phCombo:LIST-ITEMS.
   cDelim = phCombo:DELIMITER.
 
-  DO iItem = 1 TO NUM-ENTRIES(cList,cDelim).
+  DO iItem = 1 TO NUM-ENTRIES(cList,cDelim):
     CREATE ttItem.
     ASSIGN ttItem.cItem = ENTRY(iItem,cList,cDelim).
   END.
@@ -12394,69 +11731,21 @@ PROCEDURE sortComboBox :
   EMPTY TEMP-TABLE ttItem.
 
   phCombo:LIST-ITEMS = SUBSTRING(cList,2).
+
 END PROCEDURE. /* sortComboBox */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startDiggerLib C-Win 
-PROCEDURE startDiggerLib :
-/* Start DiggerLib if it has not already been started
- */
-  DEFINE VARIABLE cProgDir   AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hDiggerLib AS HANDLE      NO-UNDO.
-
-  FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"wdatadigger.w","wdatadigger.r").
-  IF FILE-INFO:FULL-PATHNAME = ? THEN
-    FILE-INFO:FILE-NAME = REPLACE(THIS-PROCEDURE:FILE-NAME,"wdatadigger.r","wdatadigger.w").
-
-  cProgDir = SUBSTRING(FILE-INFO:FULL-PATHNAME,1,R-INDEX(FILE-INFO:FULL-PATHNAME,'\')).
-
-  /* If we run in the UIB we know where we are running from */
-  IF "{&UIB_is_Running}" <> "" THEN cProgDir = '.\'.
-
-  /* Call out to see if the lib has been started for this build nr */
-  PUBLISH 'DataDiggerLib' (OUTPUT hDiggerLib).
-
-  /* If it is not, then start it */
-  IF NOT VALID-HANDLE(hDiggerLib) THEN
-  DO:
-    RUN VALUE(cProgDir + 'DataDiggerLib.p') PERSISTENT SET hDiggerLib.
-    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
-  END.
-
-  /* Start customizations in myDataDigger.p */
-  IF SEARCH(cProgDir + 'myDataDigger.p') <> ? THEN
-  DO:
-    RUN VALUE(cProgDir + 'myDataDigger.p') PERSISTENT SET hDiggerLib.
-    SESSION:ADD-SUPER-PROCEDURE(hDiggerLib, SEARCH-TARGET).
-
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customDump"   ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customFormat" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customQuery"  ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customShowField" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customGetFilterValue" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customSaveFilterValue" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "DataDigger" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "query" ANYWHERE RUN-PROCEDURE "QueryOpen".
-    SUBSCRIBE PROCEDURE hDiggerLib TO "setWindowTitle" ANYWHERE.
-    SUBSCRIBE PROCEDURE hDiggerLib TO "customFrameColor" ANYWHERE.
-
-  END.
-END PROCEDURE. /* startDiggerLib */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startGenerateProc C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startGenerateProc wDataDigger 
 PROCEDURE startGenerateProc :
 /* Start a generate-procedure
 */
   DEFINE INPUT PARAMETER pcProc AS CHARACTER   NO-UNDO.
 
   RUN VALUE(pcProc)
-    ( INPUT gcCurrentDatabase
-    , INPUT gcCurrentTable
+    ( INPUT gcDatabase
+    , INPUT gcTable
     , INPUT TABLE ttField
     , INPUT TABLE ttIndex
     ).
@@ -12466,7 +11755,7 @@ END PROCEDURE. /* startGenerateProc */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startSession C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startSession wDataDigger 
 PROCEDURE startSession :
 /* Show a welcome message to the user.
    */
@@ -12479,7 +11768,7 @@ PROCEDURE startSession :
   DEFINE VARIABLE lNewVersion    AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE lUpgraded      AS LOGICAL   NO-UNDO.
   DEFINE VARIABLE iChannel       AS INTEGER   NO-UNDO.
-  DEFINE VARIABLE iResult        AS INTEGER   NO-UNDO.
+  DEFINE VARIABLE iResult        AS INT64     NO-UNDO.
   DEFINE VARIABLE cRemoteBuildNr AS CHARACTER NO-UNDO.
 
   /* Set debug flag */
@@ -12550,11 +11839,18 @@ PROCEDURE startSession :
     AND getRegistry('DataDigger:Update','LastPingBack') <> ISO-DATE(TODAY) THEN
   DO:
     /* Pingback for total statistics across all versions */
-    RUN urlDownloadToFileA (0, '{&PINGBACKURL}', '', 0, 0, OUTPUT iResult).
-    setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)).
-    
-    /* Pingback for just the latest version */
-    RUN urlDownloadToFileA (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    IF SESSION:CPINTERNAL = 'UTF8' THEN 
+    DO:
+      RUN urlDownloadToFileW (0, '{&PINGBACKURL}'  , '', 0, 0, OUTPUT iResult).
+      RUN urlDownloadToFileW (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    END.
+    ELSE
+    DO:
+      RUN urlDownloadToFileA (0, '{&PINGBACKURL}'  , '', 0, 0, OUTPUT iResult).
+      RUN urlDownloadToFileA (0, '{&LATESTVERSION}', '', 0, 0, OUTPUT iResult).
+    END.
+
+    setRegistry('DataDigger:Update','LastPingBack',ISO-DATE(TODAY)). 
   END.
 
   /* Check for new version only once a day */
@@ -12589,7 +11885,7 @@ END PROCEDURE. /* startSession */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startTool C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE startTool wDataDigger 
 PROCEDURE startTool :
 /* Start Dictionary or Data Adminstration
  */
@@ -12601,13 +11897,21 @@ PROCEDURE startTool :
   /* Turn off KeepAlive timer to avoid "DB has changed warnings" */
   RUN setTimer("KeepAlive", 0).
 
-  CREATE ALIAS dictdb FOR DATABASE VALUE(gcCurrentDatabase).
+  CREATE ALIAS dictdb FOR DATABASE VALUE(gcDatabase).
 
   CASE pcTool:
-    WHEN "Dict" THEN RUN DICT.p.
+    WHEN "Dict" THEN 
+    DO: 
+      RUN setTimer("resizeDictWindow", 500).
+      RUN dict.p.
+      RUN setTimer("resizeDictWindow", 0).
+    END.
+
     WHEN "Admin" THEN RUN _admin.p.
   END CASE.
 
+  RUN KeepAlive. /* to track db changes */
+  
   /* re-enable KeepAlive timer */
   IF LOGICAL(getRegistry("DataDigger", "KeepAlive")) THEN
     RUN setTimer("KeepAlive", 60000). /* every 60 seconds */
@@ -12620,7 +11924,7 @@ END PROCEDURE.
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tgSelAllChoose C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE tgSelAllChoose wDataDigger 
 PROCEDURE tgSelAllChoose :
 /* Select/unselect all fields
   */
@@ -12630,7 +11934,7 @@ PROCEDURE tgSelAllChoose :
   DEFINE VARIABLE hQuery     AS HANDLE    NO-UNDO.
   DEFINE VARIABLE hBuffer    AS HANDLE    NO-UNDO.
   DEFINE BUFFER bColumn FOR ttColumn.
-  {&TimerStart}
+  {&timerStart}
 
   SESSION:SET-WAIT-STATE('general').
   setWindowFreeze(YES).
@@ -12641,7 +11945,7 @@ PROCEDURE tgSelAllChoose :
     CREATE BUFFER hBuffer FOR TABLE "ttField".
     hQuery:ADD-BUFFER(hBuffer).
     hQuery:QUERY-PREPARE(BROWSE brFields:QUERY:PREPARE-STRING).
-    hQuery:QUERY-OPEN.
+    hQuery:QUERY-OPEN().
 
     /* Walk thru all fields that are currently visible */
     #Field:
@@ -12659,7 +11963,7 @@ PROCEDURE tgSelAllChoose :
 
     RUN showField(INPUT cFieldList, INPUT plSelectAll).
 
-    hQuery:QUERY-CLOSE.
+    hQuery:QUERY-CLOSE().
     DELETE OBJECT hQuery.
     DELETE OBJECT hBuffer.
 
@@ -12679,7 +11983,7 @@ END PROCEDURE. /* tgSelAllChoose */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedFieldFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedFieldFilter wDataDigger 
 PROCEDURE timedFieldFilter :
 /* Activated by the timer to apply the filter
  */
@@ -12695,7 +11999,7 @@ END PROCEDURE. /* timedFieldFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedIndexFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedIndexFilter wDataDigger 
 PROCEDURE timedIndexFilter :
 /* Activated by the timer to apply the filter
  */
@@ -12711,7 +12015,7 @@ END PROCEDURE. /* timedIndexFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedScrollNotify C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedScrollNotify wDataDigger 
 PROCEDURE timedScrollNotify :
 /* When user scrolls using cursor keys, event scroll-notify does not fire
  */
@@ -12740,13 +12044,13 @@ END PROCEDURE. /* timedScrollNotify */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableChange C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableChange wDataDigger 
 PROCEDURE timedTableChange :
 /* Activated by the timer to change the browse
  */
   setWindowFreeze(YES).
   RUN setTimer("timedTableChange", 0).
-  RUN setTableContext(INPUT gcCurrentTable ).
+  RUN setTableContext(INPUT gcTable ).
   setWindowFreeze(NO).
 
 END PROCEDURE. /* timedTableChange */
@@ -12754,7 +12058,7 @@ END PROCEDURE. /* timedTableChange */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE timedTableFilter wDataDigger 
 PROCEDURE timedTableFilter :
 /* Activated by the timer to apply the filter
  */
@@ -12770,7 +12074,7 @@ END PROCEDURE. /* timedTableChange */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE toggleFavourite C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _PROCEDURE toggleFavourite wDataDigger 
 PROCEDURE toggleFavourite :
 /* Toggle a table's favourite status
  */
@@ -12782,7 +12086,7 @@ PROCEDURE toggleFavourite :
     IF NOT brTables:QUERY:GET-BUFFER-HANDLE(1):AVAILABLE THEN RETURN.
   
     /* Toggle fav-status */
-    RUN setFavourite(gcCurrentTable, cbFavouriteGroup:SCREEN-VALUE, ?).
+    RUN setFavourite(gcTable, cbFavouriteGroup:SCREEN-VALUE, ?).
     RUN getFavourites(OUTPUT TABLE ttFavGroup).
     FIND bFavGroup WHERE bFavGroup.cGroup = cbFavouriteGroup:SCREEN-VALUE NO-ERROR.
     gcFavouriteTables = (IF AVAILABLE bFavGroup THEN bFavGroup.cTables ELSE '').
@@ -12804,7 +12108,7 @@ END PROCEDURE. /* toggleFavourite */
 
 /* ************************  Function Implementations ***************** */
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenu C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenu wDataDigger 
 FUNCTION createMenu RETURNS HANDLE
   ( phParent AS HANDLE ) :
 
@@ -12820,10 +12124,7 @@ FUNCTION createMenu RETURNS HANDLE
   CREATE MENU hMenu
     ASSIGN
       POPUP-ONLY = TRUE
-      SENSITIVE  = TRUE
-    TRIGGERS:
-      ON "menu-drop" PERSISTENT RUN menuDropDataBrowse IN THIS-PROCEDURE. /* enable/disable menu-items */
-    END TRIGGERS.
+      SENSITIVE  = TRUE.
 
   IF VALID-HANDLE(phParent) THEN
     phParent:POPUP-MENU = hMenu.
@@ -12835,7 +12136,7 @@ END FUNCTION. /* createMenu */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenuItem C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION createMenuItem wDataDigger 
 FUNCTION createMenuItem RETURNS HANDLE
   ( phMenu    AS HANDLE
   , pcType    AS CHARACTER
@@ -12887,7 +12188,7 @@ END FUNCTION. /* createMenuItem */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION FilterModified C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION FilterModified wDataDigger 
 FUNCTION FilterModified RETURNS LOGICAL
   ( phFilterField AS HANDLE
   , plModified    AS LOGICAL ) :
@@ -12910,23 +12211,7 @@ END FUNCTION. /* FilterModified */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getActiveQueryEditor C-Win 
-FUNCTION getActiveQueryEditor RETURNS HANDLE
-  ( /* parameter-definitions */ ) :
-
-/* Return the handle of the active query editor
- */
-  IF gcQueryEditorState = 'hidden' THEN
-    RETURN ficWhere:HANDLE IN FRAME frMain.
-  ELSE
-    RETURN ficWhere2:HANDLE IN FRAME frWhere.
-
-END FUNCTION. /* getActiveQueryEditor */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDroppedFiles C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getDroppedFiles wDataDigger 
 FUNCTION getDroppedFiles RETURNS CHARACTER
   ( phDropTarget AS HANDLE ) :
   /* Return a list of dropped files onto a target.
@@ -12948,7 +12233,7 @@ END FUNCTION. /* getDroppedFiles */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getFieldList wDataDigger 
 FUNCTION getFieldList RETURNS CHARACTER
   ( pcSortBy AS CHARACTER ) :
   /* Return a comma separated list of all fields.
@@ -12966,18 +12251,18 @@ FUNCTION getFieldList RETURNS CHARACTER
   IF iMaxFields = ? THEN iMaxFields = 500.
 
   QUERY qField:QUERY-PREPARE(SUBSTITUTE('for each ttField by &1', pcSortBy)).
-  QUERY qField:QUERY-OPEN.
-  QUERY qField:GET-FIRST.
+  QUERY qField:QUERY-OPEN().
+  QUERY qField:GET-FIRST().
 
   /* All fields */
   #Field:
   REPEAT WHILE NOT QUERY qField:QUERY-OFF-END:
     cFieldList = cFieldList + ',' + ttField.cFieldName.
-    QUERY qField:GET-NEXT.
+    QUERY qField:GET-NEXT().
     iNumFields = iNumFields + 1.
     IF iNumFields > iMaxFields THEN LEAVE #Field.
   END.
-  QUERY qField:QUERY-CLOSE.
+  QUERY qField:QUERY-CLOSE().
 
   cFieldList = LEFT-TRIM(cFieldList, ",").
 
@@ -12989,7 +12274,7 @@ END FUNCTION. /* getFieldList */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMatchesValue C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getMatchesValue wDataDigger 
 FUNCTION getMatchesValue RETURNS CHARACTER
   ( phFilterField AS HANDLE ) :
 
@@ -13013,7 +12298,7 @@ END FUNCTION. /* getMatchesValue */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQueryFromFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getQueryFromFields wDataDigger 
 FUNCTION getQueryFromFields RETURNS CHARACTER
   ( INPUT pcFieldList AS CHARACTER ):
 
@@ -13049,7 +12334,7 @@ END FUNCTION. /* getQueryFromFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSafeFormat C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSafeFormat wDataDigger 
 FUNCTION getSafeFormat RETURNS CHARACTER
   ( pcFormat   AS CHARACTER 
   , pcDataType AS CHARACTER ) :
@@ -13100,7 +12385,7 @@ END FUNCTION. /* getSafeFormat */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedFields wDataDigger 
 FUNCTION getSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
 
@@ -13123,7 +12408,7 @@ END FUNCTION. /* getSelectedFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedText C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getSelectedText wDataDigger 
 FUNCTION getSelectedText RETURNS CHARACTER
   ( INPUT hWidget AS HANDLE ) :
   /* Return the currently selected text in a widget
@@ -13150,7 +12435,7 @@ END FUNCTION. /* getSelectedText */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableFilter C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION getTableFilter wDataDigger 
 FUNCTION getTableFilter RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
 
@@ -13171,7 +12456,7 @@ END FUNCTION. /* getTableFilter */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION killMenu C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION killMenu wDataDigger 
 FUNCTION killMenu RETURNS LOGICAL
   ( phMenu AS HANDLE ) :
 
@@ -13203,7 +12488,7 @@ END FUNCTION. /* killMenu */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION saveSelectedFields C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION saveSelectedFields wDataDigger 
 FUNCTION saveSelectedFields RETURNS CHARACTER
   ( /* parameter-definitions */ ) :
 
@@ -13215,7 +12500,7 @@ FUNCTION saveSelectedFields RETURNS CHARACTER
   DO WITH FRAME {&FRAME-NAME}:
 
     /* Get the selected fields to display in the browse */
-    cTable          = gcCurrentTable.
+    cTable          = gcTable.
     cSelectedFields = getSelectedFields().
 
     /* If no fields are selected, use a special marker */
@@ -13226,7 +12511,7 @@ FUNCTION saveSelectedFields RETURNS CHARACTER
       cSelectedFields = ?.
 
     /* Save selected fields */
-    setRegistry(SUBSTITUTE("DB:&1",gcCurrentDatabase), SUBSTITUTE("&1:Fields", cTable), cSelectedFields).
+    setRegistry(SUBSTITUTE("DB:&1",gcDatabase), SUBSTITUTE("&1:Fields", cTable), cSelectedFields).
   END.
 
   RETURN "".
@@ -13235,7 +12520,7 @@ END FUNCTION. /* saveSelectedFields */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setDebugMode C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setDebugMode wDataDigger 
 FUNCTION setDebugMode RETURNS LOGICAL
   ( plDebugMode AS LOGICAL ) :
 
@@ -13253,7 +12538,7 @@ END FUNCTION. /* setDebugMode */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setFilterFieldColor C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setFilterFieldColor wDataDigger 
 FUNCTION setFilterFieldColor RETURNS LOGICAL
   ( phWidget AS HANDLE ) :
 
@@ -13275,83 +12560,33 @@ END FUNCTION. /* setFilterFieldColor */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQuery C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQuery wDataDigger 
 FUNCTION setQuery RETURNS LOGICAL
   ( piPointerChange AS INTEGER ) :
 
-/* Fetches the previous or next query from the settings and fills it in in the query editor.
- */
+  /* Places previous or next query from settings in query-editor
+  */
   DEFINE VARIABLE cQuery  AS CHARACTER   NO-UNDO.
-  DEFINE VARIABLE hEditor AS HANDLE      NO-UNDO.
 
-  hEditor = getActiveQueryEditor().
+  DO WITH FRAME {&frame-name}:
+    /* See if the requested query exists */
+    cQuery = getQuery(gcDatabase, gcTable, giQueryPointer + piPointerChange).
 
-  /* See if the requested query exists */
-  cQuery = getQuery(gcCurrentDatabase, gcCurrentTable, giQueryPointer + piPointerChange).
-
-  IF cQuery <> ? THEN
-  DO:
-    giQueryPointer = giQueryPointer + piPointerChange.
-    hEditor:SCREEN-VALUE = formatQuerySTRING(cQuery, gcQueryEditorState = 'visible').
+    IF cQuery <> ? THEN
+    DO:
+      giQueryPointer = giQueryPointer + piPointerChange.
+      ficWhere:SCREEN-VALUE = formatQueryString(cQuery, NO).
+    END.
   END.
 
   RETURN cQuery <> ?.
+  
 END FUNCTION. /* setQuery */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setQueryEditor C-Win 
-FUNCTION setQueryEditor RETURNS LOGICAL
-  ( pcQueryEditorState AS CHARACTER ) :
-/* Show or hide the query editor and associated fields.
- */
-  /* If we try to set it to its current value, nothing will happen so: */
-  IF pcQueryEditorState = gcQueryEditorState THEN RETURN FALSE.
-
-  CASE pcQueryEditorState:
-    WHEN 'visible' THEN
-    DO:
-      IF (ficWhere:X IN FRAME frMain + FRAME frWhere:WIDTH-PIXELS) > c-win:WIDTH-PIXELS THEN
-        FRAME frWhere:X = (c-win:WIDTH-PIXELS - FRAME frWhere:WIDTH-PIXELS) / 2.
-      ELSE
-        FRAME frWhere:X = ficWhere:X.
-
-      IF (ficWhere:Y IN FRAME frMain + FRAME frWhere:HEIGHT-PIXELS) > rctEdit:Y IN FRAME frMain THEN
-        FRAME frWhere:Y = rctEdit:Y IN FRAME frMain - FRAME frWhere:HEIGHT-PIXELS - 20.
-      ELSE
-        FRAME frWhere:Y = ficWhere:Y.
-
-      VIEW FRAME frWhere.
-
-      gcQueryEditorState = pcQueryEditorState.
-      IF ficWhere:SCREEN-VALUE IN FRAME frMain <> '' THEN
-        ficWhere2:SCREEN-VALUE IN FRAME frWhere = formatQuerySTRING(ficWhere:SCREEN-VALUE IN FRAME frMain, YES).
-    END.
-
-    WHEN 'hidden'  THEN
-    DO:
-      HIDE FRAME frWhere.
-
-      gcQueryEditorState = pcQueryEditorState.
-      IF ficWhere2:SCREEN-VALUE IN FRAME frWhere <> '' THEN
-        ficWhere:SCREEN-VALUE IN FRAME frMain = formatQuerySTRING(ficWhere2:SCREEN-VALUE IN FRAME frWhere, NO).
-    END.
-
-    /* All other settings will be ignored */
-    OTHERWISE RETURN FALSE.
-  END CASE.
-
-  /* Save setting for query editor state */
-  setRegistry("DataDigger", "QueryEditorState", gcQueryEditorState).
-
-  RETURN TRUE.
-END FUNCTION. /* setQueryEditor */
-
-/* _UIB-CODE-BLOCK-END */
-&ANALYZE-RESUME
-
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setRegistry wDataDigger 
 FUNCTION setRegistry RETURNS CHARACTER
   ( pcSection AS CHARACTER
   , pcKey     AS CHARACTER
@@ -13367,7 +12602,7 @@ END FUNCTION. /* setRegistry */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setUpdatePanel C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setUpdatePanel wDataDigger 
 FUNCTION setUpdatePanel RETURNS LOGICAL
   ( INPUT pcMode AS CHARACTER ) :
 
@@ -13387,7 +12622,7 @@ FUNCTION setUpdatePanel RETURNS LOGICAL
   {&timerStart}
 
   /* Treat -RO database the same as read-only digger */
-  lReadOnly = (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcCurrentDataBase), "READ-ONLY") = YES).  
+  lReadOnly = (glReadOnlyDigger OR CAN-DO(DBRESTRICTIONS(gcDatabase), "READ-ONLY") = YES).  
   
   IF pcMode <> ? THEN gcRecordMode = pcMode.
 
@@ -13429,13 +12664,13 @@ END FUNCTION. /* setUpdatePanel */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setWindowFreeze C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION setWindowFreeze wDataDigger 
 FUNCTION setWindowFreeze RETURNS LOGICAL
   ( plWindowsLocked AS LOGICAL ) :
   /* Freeze updates to the screen
    */
   IF glDebugMode THEN RETURN NO.
-  RUN LockWindow (INPUT C-Win:HANDLE, INPUT plWindowsLocked).
+  RUN LockWindow (INPUT wDataDigger:HANDLE, INPUT plWindowsLocked).
 
   RETURN TRUE.
 END FUNCTION. /* setWindowFreeze */
@@ -13443,7 +12678,7 @@ END FUNCTION. /* setWindowFreeze */
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
 
-&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION trimList C-Win 
+&ANALYZE-SUSPEND _UIB-CODE-BLOCK _FUNCTION trimList wDataDigger 
 FUNCTION trimList RETURNS CHARACTER
   ( pcList  AS CHARACTER
   , pcSep   AS CHARACTER

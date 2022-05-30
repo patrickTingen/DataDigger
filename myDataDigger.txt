@@ -8,18 +8,21 @@
   More information on the DataDigger wiki on customization
   Check https://github.com/patrickTingen/DataDigger/wiki
   
-  tl;dr:   Create your own custom procedure by copying this program to
-           "myDataDigger.p". It will then be compiled and started when DD
-           starts. The file 'myDataDigger.p' (extension ".P") will never be
-           part of the distribution, so your version will not be overwritten.
-           Using QAD? Look for #QAD tags in this file.
+  tl;dr:   1) Create your own custom procedure by copying this program to
+              "myDataDigger.p". It will then be compiled and started when DD starts
 
-  HISTORY: DD18: customFilter added.
-           DD18: customDump moved here instead of having its own .p
-           DD20: customShowField added
-           DD21: customSaveFilterValue / customGetFilterValue added, customFilter removed
-           DD24: added support for events 'query' and 'datadigger'
-           DD25: added example for setFrameColor, updated with wiki links
+           2) All internal procedures are commented out by default.
+           
+           3) Using QAD? Look for #QAD tags in this file.
+
+  History:
+  DD18: customFilter added.
+  DD18: customDump moved here instead of having its own .p
+  DD20: customShowField added
+  DD21: customSaveFilterValue / customGetFilterValue added, customFilter removed
+  DD24: added support for events 'query' and 'datadigger'
+  DD25: added example for customFrameColor, updated with wiki links
+  DD26: added customBorderColor
 
  *************************************************************************/
 
@@ -90,6 +93,35 @@ PROCEDURE DataDigger:
   END.  
   
 END PROCEDURE. /* DataDigger */
+*/
+
+
+/*
+PROCEDURE customBorderColor:
+  /*
+   * Name: customBorderColor
+   * Desc: Change the border color of the main window
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-BorderColor
+   *
+   * This is handy if you want to make it clear that you have a certain
+   * database connected, eg production or test. This routine is called on startup
+   * and every time you connect or disconnect a database.
+   */
+  DEFINE OUTPUT PARAMETER pcColor AS CHARACTER   NO-UNDO.
+  DEFINE VARIABLE cDatabases AS CHARACTER NO-UNDO.
+
+  /* Set frame to green for SPORTS or yellow for production db  */
+  cDatabases = getDatabaseList().
+
+  IF cDatabases MATCHES '*prod*' THEN 
+    pcColor = '12'. /* Progress color nr for red  */
+  ELSE 
+  IF cDatabases MATCHES '*sports*' THEN 
+    pcColor = '0,0,255'. /* RGB for blue */
+  ELSE 
+    pcColor = ?. /* sets to default color */
+
+END PROCEDURE. /* customBorderColor */
 */
 
 
@@ -178,7 +210,7 @@ PROCEDURE customFrameColor:
   /*
    * Name: customFrameColor
    * Desc: Change the background color of the main window
-   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-FrameColor
+   * Wiki: https://github.com/patrickTingen/DataDigger/wiki/Customize-CustomFrameColor
    *
    * This is handy if you want to make it clear that you have a certain
    * database connected, eg production or test. This routine is called on startup
@@ -195,12 +227,11 @@ PROCEDURE customFrameColor:
     pcFrameColor = '14'. /* Progress color nr for yellow  */
   ELSE 
   IF cDatabases MATCHES '*sports*' THEN 
-    pcFrameColor = '200,255,200'. /* RGB for light green */
+    pcFrameColor = '150,250,250'. /* RGB for light blue */
   ELSE 
     pcFrameColor = ?. /* sets to default color */
 
 END PROCEDURE. /* customFrameColor */
-*/
 
 
 /*
@@ -327,6 +358,7 @@ PROCEDURE customGetFilterValue:
 END PROCEDURE. /* customGetFilterValue */
 */
 
+
 /*
 PROCEDURE customSaveFilterValue:
   /*
@@ -347,7 +379,6 @@ PROCEDURE customSaveFilterValue:
 
 END PROCEDURE. /* customSaveFilterValue */
 */
-
 
 
 /*
@@ -414,4 +445,3 @@ PROCEDURE setWindowTitle:
 
 END PROCEDURE. /* setWindowTitle */
 */
-

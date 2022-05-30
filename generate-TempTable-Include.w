@@ -47,10 +47,10 @@ CREATE WIDGET-POOL.
 /* Standard List Definitions                                            */
 &Scoped-Define ENABLED-OBJECTS RECT-2 RECT-3 RECT-4 RECT-5 edDefinition ~
 tgSelectedOnly tgLowerCase cbIndent tgSerial rsSerial fiReplace tgFormat ~
-tgLabel rsPrefix fiPrefix tgCamelCasing rsIndex btnSave 
+tgLabel tgShortTypes rsPrefix fiPrefix tgCamelCasing rsIndex btnSave 
 &Scoped-Define DISPLAYED-OBJECTS edDefinition tgSelectedOnly tgLowerCase ~
-cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel rsPrefix fiPrefix ~
-tgCamelCasing rsIndex 
+cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel tgShortTypes rsPrefix ~
+fiPrefix tgCamelCasing rsIndex 
 
 /* Custom List Definitions                                              */
 /* List-1,List-2,List-3,List-4,List-5,List-6                            */
@@ -182,7 +182,7 @@ DEFINE VARIABLE rsSerial AS INTEGER
 
 DEFINE RECTANGLE RECT-2
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
-     SIZE-PIXELS 160 BY 63.
+     SIZE-PIXELS 160 BY 78.
 
 DEFINE RECTANGLE RECT-3
      EDGE-PIXELS 2 GRAPHIC-EDGE  NO-FILL   
@@ -226,40 +226,46 @@ DEFINE VARIABLE tgSerial AS LOGICAL INITIAL no
      VIEW-AS TOGGLE-BOX
      SIZE-PIXELS 110 BY 17 NO-UNDO.
 
+DEFINE VARIABLE tgShortTypes AS LOGICAL INITIAL no 
+     LABEL "&Short datatypes" 
+     VIEW-AS TOGGLE-BOX
+     SIZE-PIXELS 130 BY 17 TOOLTIP "use abbreviated datatypes (e.g. INT instead of INTEGER)" NO-UNDO.
+
 
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME frMain
-     edDefinition AT Y 4 X 185 NO-LABEL WIDGET-ID 2
-     tgSelectedOnly AT Y 10 X 15 WIDGET-ID 8
-     tgLowerCase AT Y 30 X 15 WIDGET-ID 22
-     cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL WIDGET-ID 50
-     tgSerial AT Y 86 X 25 WIDGET-ID 66
-     rsSerial AT Y 106 X 30 NO-LABEL WIDGET-ID 62
-     fiReplace AT Y 142 X 125 COLON-ALIGNED NO-LABEL WIDGET-ID 56
-     tgFormat AT Y 205 X 30 WIDGET-ID 10
-     tgLabel AT Y 225 X 30 WIDGET-ID 12
-     rsPrefix AT Y 278 X 30 NO-LABEL WIDGET-ID 28
-     fiPrefix AT Y 329 X 75 COLON-ALIGNED NO-LABEL WIDGET-ID 34
-     tgCamelCasing AT Y 358 X 30 WIDGET-ID 70
-     rsIndex AT Y 413 X 30 NO-LABEL WIDGET-ID 42
-     btnSave AT Y 487 X 15 WIDGET-ID 36
+     edDefinition AT Y 4 X 185 NO-LABEL
+     tgSelectedOnly AT Y 10 X 15
+     tgLowerCase AT Y 30 X 15
+     cbIndent AT Y 55 X 60 COLON-ALIGNED NO-LABEL
+     tgSerial AT Y 86 X 25
+     rsSerial AT Y 106 X 30 NO-LABEL
+     fiReplace AT Y 142 X 125 COLON-ALIGNED NO-LABEL
+     tgFormat AT Y 197 X 30
+     tgLabel AT Y 217 X 30
+     tgShortTypes AT Y 237 X 30
+     rsPrefix AT Y 287 X 30 NO-LABEL
+     fiPrefix AT Y 338 X 75 COLON-ALIGNED NO-LABEL
+     tgCamelCasing AT Y 367 X 30
+     rsIndex AT Y 414 X 30 NO-LABEL
+     btnSave AT Y 486 X 15
      "Indent:" VIEW-AS TEXT
-          SIZE-PIXELS 40 BY 20 AT Y 56 X 25 WIDGET-ID 68
-     "Field Prefix" VIEW-AS TEXT
-          SIZE-PIXELS 75 BY 13 AT Y 261 X 25 WIDGET-ID 48
-     "Indexes" VIEW-AS TEXT
-          SIZE-PIXELS 50 BY 13 AT Y 394 X 25 WIDGET-ID 40
+          SIZE-PIXELS 40 BY 20 AT Y 56 X 25
      "Field Options" VIEW-AS TEXT
-          SIZE-PIXELS 90 BY 13 AT Y 180 X 25 WIDGET-ID 26
-     RECT-2 AT Y 187 X 15 WIDGET-ID 24
-     RECT-3 AT Y 400 X 15 WIDGET-ID 38
-     RECT-4 AT Y 266 X 15 WIDGET-ID 46
-     RECT-5 AT Y 93 X 15 WIDGET-ID 58
+          SIZE-PIXELS 90 BY 13 AT Y 178 X 25
+     "Indexes" VIEW-AS TEXT
+          SIZE-PIXELS 50 BY 13 AT Y 395 X 25
+     "Field Prefix" VIEW-AS TEXT
+          SIZE-PIXELS 75 BY 13 AT Y 270 X 25
+     RECT-2 AT Y 185 X 15
+     RECT-3 AT Y 401 X 15
+     RECT-4 AT Y 275 X 15
+     RECT-5 AT Y 93 X 15
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT COL 1 ROW 1
-         SIZE 180 BY 24.62 WIDGET-ID 100.
+         SIZE 180 BY 24.67.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -279,7 +285,7 @@ IF SESSION:DISPLAY-TYPE = "GUI":U THEN
   CREATE WINDOW C-Win ASSIGN
          HIDDEN             = YES
          TITLE              = "Generate TempTable Include"
-         HEIGHT             = 24.67
+         HEIGHT             = 24.71
          WIDTH              = 180
          MAX-HEIGHT         = 40
          MAX-WIDTH          = 320
@@ -425,7 +431,7 @@ END.
 &Scoped-define SELF-NAME tgSelectedOnly
 &ANALYZE-SUSPEND _UIB-CODE-BLOCK _CONTROL tgSelectedOnly C-Win
 ON VALUE-CHANGED OF tgSelectedOnly IN FRAME frMain /* Selected fields only */
-, tgLowerCase, cbIndent, fiReplace, tgFormat, tgLabel, fiPrefix, tgCamelCasing, rsIndex
+, tgLowerCase, cbIndent, fiReplace, tgFormat, tgLabel, tgShortTypes, fiPrefix, tgCamelCasing, rsIndex
 DO:
   RUN generateCode.
 END.
@@ -516,11 +522,12 @@ PROCEDURE enable_UI :
                Settings" section of the widget Property Sheets.
 ------------------------------------------------------------------------------*/
   DISPLAY edDefinition tgSelectedOnly tgLowerCase cbIndent tgSerial rsSerial 
-          fiReplace tgFormat tgLabel rsPrefix fiPrefix tgCamelCasing rsIndex 
+          fiReplace tgFormat tgLabel tgShortTypes rsPrefix fiPrefix 
+          tgCamelCasing rsIndex 
       WITH FRAME frMain IN WINDOW C-Win.
   ENABLE RECT-2 RECT-3 RECT-4 RECT-5 edDefinition tgSelectedOnly tgLowerCase 
-         cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel rsPrefix 
-         fiPrefix tgCamelCasing rsIndex btnSave 
+         cbIndent tgSerial rsSerial fiReplace tgFormat tgLabel tgShortTypes 
+         rsPrefix fiPrefix tgCamelCasing rsIndex btnSave 
       WITH FRAME frMain IN WINDOW C-Win.
   {&OPEN-BROWSERS-IN-QUERY-frMain}
   VIEW C-Win.
@@ -553,11 +560,11 @@ PROCEDURE generateCode :
     ASSIGN 
       tgSelectedOnly tgLowerCase cbIndent
       tgSerial rsSerial fiReplace
-      tgFormat tgLabel
+      tgFormat tgLabel tgShortTypes
       rsPrefix fiPrefix 
       rsIndex  .
 
-    cTable = TRIM(STRING('tt' + LC(pcTable), 'xx!x(20)')).
+    cTable = TRIM(STRING('tt' + LC(pcTable), 'xx!x(30)')).
     
     CASE cbIndent:
       WHEN 'tab' THEN cIndent = '~t'.
@@ -566,16 +573,16 @@ PROCEDURE generateCode :
       WHEN '4'   THEN cIndent = '    '.
     END CASE.
 
-    cHeader = SUBSTITUTE('/*---------------------------------------------------------------------- ~n' )
+    cHeader =            '/*---------------------------------------------------------------------- ~n' 
             + SUBSTITUTE('    File        : &1.i ~n', cTable )
             + SUBSTITUTE('    Description : TT definition for &1.&2 ~n', pcDatabase, pcTable )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('    History: ~n' )
+            +            ' ~n' 
+            +            '    History: ~n' 
             + SUBSTITUTE('    &1 &2 Created ~n', STRING(TODAY,'99-99-9999'), getUserName() )
-            + SUBSTITUTE(' ~n' )
-            + SUBSTITUTE('  ---------------------------------------------------------------------- ~n' )
-            + SUBSTITUTE('            This file was generated with the DataDigger                  ~n' )
-            + SUBSTITUTE('  ----------------------------------------------------------------------*/ ~n' )
+            +            ' ~n' 
+            +            '  ---------------------------------------------------------------------- ~n' 
+            +            '            This file was generated with the DataDigger                  ~n' 
+            +            '  ----------------------------------------------------------------------*/ ~n' 
             .
             
     cMask = '&1~nDEFINE TEMP-TABLE &2 NO-UNDO&3&4'.
@@ -593,11 +600,11 @@ PROCEDURE generateCode :
         AND (NOT tgSelectedOnly:CHECKED OR bField.lShow):        
         
       iMaxName   = MAXIMUM(iMaxName  , LENGTH(bField.cFieldName)).
-      iMaxType   = MAXIMUM(iMaxType  , LENGTH(getTypeString(bField.cDataType, bField.iExtent, iMaxFormat) )).
+      iMaxType   = MAXIMUM(iMaxType  , LENGTH(getTypeString(bField.cDataType, bField.iExtent, 0) )).
       iMaxFormat = MAXIMUM(iMaxFormat, LENGTH(bField.cFormat)).
-      IF bField.cLabel <> ? THEN iMaxLabel  = MAXIMUM(iMaxLabel , LENGTH(bField.cLabel)).
+      IF bField.cLabel <> ? THEN iMaxLabel = MAXIMUM(iMaxLabel, LENGTH(bField.cLabel)).
     END.
-    
+
     /* Inc name lenth when using prefix */
     CASE rsPrefix:
       WHEN 1 THEN iMaxName = iMaxName + 1.
@@ -617,7 +624,7 @@ PROCEDURE generateCode :
                         , cText
                         , cIndent
                         , getNameString(bField.cFieldName, bField.cDataType, iMaxName)
-                        , getTypeString(bField.cDataType, bField.iExtent, iMaxFormat) 
+                        , getTypeString(bField.cDataType, bField.iExtent, iMaxType) 
                         , getFormatString(bField.cFormat, iMaxFormat)
                         , getLabelString(bField.cLabel, iMaxLabel)
                         , getSerialString(bField.cFieldName, iMaxName)
@@ -707,6 +714,7 @@ PROCEDURE initObject :
     IF getRegistry('DataDigger:GenerateTT', 'SerialReplace') = ? THEN setRegistry('DataDigger:GenerateTT', 'SerialReplace','').
     IF getRegistry('DataDigger:GenerateTT', 'AddFormat')     = ? THEN setRegistry('DataDigger:GenerateTT', 'AddFormat','no').
     IF getRegistry('DataDigger:GenerateTT', 'AddLabel')      = ? THEN setRegistry('DataDigger:GenerateTT', 'AddLabel','no').
+    IF getRegistry('DataDigger:GenerateTT', 'ShortTypes')    = ? THEN setRegistry('DataDigger:GenerateTT', 'ShortTypes','no').
     IF getRegistry('DataDigger:GenerateTT', 'AddPrefix')     = ? THEN setRegistry('DataDigger:GenerateTT', 'AddPrefix','0').
     IF getRegistry('DataDigger:GenerateTT', 'FixedPrefix')   = ? THEN setRegistry('DataDigger:GenerateTT', 'FixedPrefix','').
     IF getRegistry('DataDigger:GenerateTT', 'CamelCasing')   = ? THEN setRegistry('DataDigger:GenerateTT', 'CamelCasing','no' ).
@@ -722,6 +730,7 @@ PROCEDURE initObject :
     IF fiReplace:SCREEN-VALUE = ? OR fiReplace:SCREEN-VALUE = '?' THEN fiReplace:SCREEN-VALUE = ''.
     tgFormat:CHECKED       = LOGICAL(getRegistry('DataDigger:GenerateTT', 'AddFormat')).
     tgLabel:CHECKED        = LOGICAL(getRegistry('DataDigger:GenerateTT', 'AddLabel')).
+    tgShortTypes:CHECKED   = LOGICAL(getRegistry('DataDigger:GenerateTT', 'ShortTypes')).
     rsPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateTT', 'AddPrefix').
     fiPrefix:SCREEN-VALUE  = getRegistry('DataDigger:GenerateTT', 'FixedPrefix').
     IF fiPrefix:SCREEN-VALUE = ? OR fiPrefix:SCREEN-VALUE = '?' THEN fiPrefix:SCREEN-VALUE = ''.
@@ -768,6 +777,7 @@ PROCEDURE saveSettings :
     setRegistry('DataDigger:GenerateTT', 'SerialReplace', fiReplace:SCREEN-VALUE         ). 
     setRegistry('DataDigger:GenerateTT', 'AddFormat'    , STRING(tgFormat:CHECKED      ) ).
     setRegistry('DataDigger:GenerateTT', 'AddLabel'     , STRING(tgLabel:CHECKED       ) ).
+    setRegistry('DataDigger:GenerateTT', 'ShortTypes'   , STRING(tgShortTypes:CHECKED  ) ).
     setRegistry('DataDigger:GenerateTT', 'AddPrefix'    , rsPrefix:SCREEN-VALUE          ).
     setRegistry('DataDigger:GenerateTT', 'FixedPrefix'  , fiPrefix:SCREEN-VALUE          ).
     setRegistry('DataDigger:GenerateTT', 'CamelCasing'  , STRING(tgCamelCasing:CHECKED ) ).
@@ -895,6 +905,7 @@ FUNCTION getLabelString RETURNS CHARACTER
   DO WITH FRAME {&FRAME-NAME}:
 
     IF NOT tgLabel:CHECKED THEN RETURN ''.
+    IF pcLabel = ? THEN pcLabel = ''.
 
     cReturnValue = SUBSTITUTE('&1 "&2"'
                              , (IF tgLowerCase:CHECKED THEN 'label' ELSE 'LABEL')
@@ -998,14 +1009,25 @@ FUNCTION getTypeString RETURNS CHARACTER
 
   DO WITH FRAME {&FRAME-NAME}:
 
+    IF tgShortTypes THEN 
+    DO:
+      CASE pcDataType:
+        WHEN 'INTEGER'   THEN pcDataType = 'int'.
+        WHEN 'CHARACTER' THEN pcDataType = 'char'.
+        WHEN 'DECIMAL'   THEN pcDataType = 'dec'.
+        WHEN 'LOGICAL'   THEN pcDataType = 'log'.
+      END CASE.
+    END.
+
     IF piExtent = 0 THEN
       cReturnValue = pcDataType.
     ELSE 
       cReturnValue = SUBSTITUTE('&1 extent &2', pcDataType, piExtent).
 
     cReturnValue = (IF tgLowerCase:CHECKED THEN LC(cReturnValue) ELSE CAPS(cReturnValue)).
-    cMask = SUBSTITUTE('X(&1)', piLength + 8).
-    cReturnValue = STRING(cReturnValue, cMask).
+
+    cMask = SUBSTITUTE('X(&1)', piLength).
+    cReturnValue = (IF piLength > 0 THEN STRING(cReturnValue, cMask) ELSE cReturnValue).
 
   END.
 
@@ -1015,3 +1037,4 @@ END FUNCTION. /* getTypeString */
 
 /* _UIB-CODE-BLOCK-END */
 &ANALYZE-RESUME
+

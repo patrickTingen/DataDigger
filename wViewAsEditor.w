@@ -71,13 +71,13 @@ DEFINE VARIABLE edValue AS CHARACTER
 /* ************************  Frame Definitions  *********************** */
 
 DEFINE FRAME DEFAULT-FRAME
-     edValue AT Y 0 X 0 NO-LABEL WIDGET-ID 36
-     btnOk AT Y 140 X 234 WIDGET-ID 34
-     btnCancel AT Y 140 X 314 WIDGET-ID 32
+     edValue AT Y 0 X 0 NO-LABEL
+     btnOk AT Y 140 X 234
+     btnCancel AT Y 140 X 314
     WITH 1 DOWN NO-BOX KEEP-TAB-ORDER OVERLAY 
          SIDE-LABELS NO-UNDERLINE THREE-D 
          AT X 0 Y 0
-         SIZE-PIXELS 400 BY 170 WIDGET-ID 100.
+         SIZE-PIXELS 400 BY 170.
 
 
 /* *********************** Procedure Settings ************************ */
@@ -283,7 +283,7 @@ MAIN-BLOCK:
 DO ON ERROR   UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK
    ON END-KEY UNDO MAIN-BLOCK, LEAVE MAIN-BLOCK:
 
-  ASSIGN edValue = pcValue.
+  ASSIGN edValue = SUBSTRING(pcValue,1,{&field-maxLength}).
   edValue:MAX-CHARS = {&field-maxLength}.
 
   RUN enable_UI.
