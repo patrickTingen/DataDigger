@@ -30,6 +30,7 @@ In 2008 I needed a tool like this and ended up with DataHack made by Richard Tar
 
 Full changelog can be found [here](https://raw.githubusercontent.com/patrickTingen/DataDigger/master/DataDigger.txt)
 
+- DataDigger 26 - 19 may 2022 (Iron Man)
 - DataDigger 25 - 24 dec 2020 (Rudolf)
 - DataDigger 24 -  3 oct 2018 (Pure Gold)
 - DataDigger 23 - 15 apr 2017 (Easter Egg Edition)
