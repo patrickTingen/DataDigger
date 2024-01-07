@@ -51,11 +51,15 @@ DEFINE TEMP-TABLE ttFont NO-UNDO
  * See for more info:
  * https://knowledgebase.progress.com/articles/Article/Windows-API-call-fails-with-error-13712-in-11-7-64-bit
  */
+&IF DEFINED(PROC-ARCH)=0
+    &THEN &SCOPED-DEFINE PROC-ARCH PROCESS-ARCHITECTURE
+&ENDIF
+
 &IF PROVERSION >= '11.3' &THEN   /* PROCESS-ARCHITECTURE function is available */
-  &IF PROCESS-ARCHITECTURE = 32 &THEN /* 32-bit pointers */
+  &IF {&PROC-ARCH} = 32 &THEN /* 32-bit pointers */
     &GLOBAL-DEFINE POINTERTYPE LONG
     &GLOBAL-DEFINE POINTERBYTES 4
-  &ELSEIF PROCESS-ARCHITECTURE = 64 &THEN /* 64-bit pointers */
+  &ELSEIF {&PROC-ARCH} = 64 &THEN /* 64-bit pointers */
     &GLOBAL-DEFINE POINTERTYPE INT64
     &GLOBAL-DEFINE POINTERBYTES 8
   &ENDIF  /* PROCESS-ARCHITECTURE */

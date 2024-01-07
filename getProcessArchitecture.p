@@ -1,0 +1,2 @@
+DEFINE OUTPUT PARAMETER iProcessArchitecture AS INTEGER     NO-UNDO.
+iProcessArchitecture = PROCESS-ARCHITECTURE.

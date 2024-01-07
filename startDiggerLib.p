@@ -7,6 +7,7 @@
 
 DEFINE VARIABLE hDiggerLib AS HANDLE    NO-UNDO.
 DEFINE VARIABLE hCustomLib AS HANDLE    NO-UNDO.
+DEFINE VARIABLE iProcArch  AS INTEGER  NO-UNDO.
 
 /* Call out to see if the libraries have been started 
 */
@@ -16,7 +17,22 @@ IF NOT VALID-HANDLE(hDiggerLib) THEN
 DO:
   /* Start main library 
   */
-  RUN DataDiggerLib.p PERSISTENT SET hDiggerLib.
+  DO ON ERROR UNDO, LEAVE
+   ON STOP UNDO, LEAVE:
+   /* this file won't compile and won't run on version < 11.3,
+      only 11.3 and higher can be 64 bit
+      this will give an error or stop condition on versions under 11.3
+      catch this error and assume 32 bit as the first 64 bit client is 11.3
+   */
+   IF SEARCH("getProcessArchitecture.r") <> ?
+     THEN RUN 'getProcessArchitecture'(OUTPUT iProcArch) NO-ERROR.
+  END.
+  /* progress r-files are not bit dependent,
+     however calls to the Windows API require other variable types
+     select the correct veriabled types by starting the correct file */
+  IF iProcArch = 64
+      THEN RUN DataDiggerLib64.p PERSISTENT SET hDiggerLib.
+      ELSE RUN DataDiggerLib32.p PERSISTENT SET hDiggerLib.
   SESSION:ADD-SUPER-PROCEDURE(hDiggerLib,SEARCH-TARGET).
 
   /* Populate the ttConfig table. Must only be done when the lib is started 
