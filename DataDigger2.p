@@ -669,7 +669,9 @@ PROCEDURE recompileSelf :
     
     IF COMPILER:ERROR THEN
     DO:
-      ASSIGN lCompileError = TRUE.
+        /* this file doesn't need to compile/run on versions under 11.3 */
+        IF bOsFile.cFileName <> "getProcessArchitecture.p"
+            THEN ASSIGN lCompileError = TRUE.
       IF bOsFile.cFileName <> "myDataDigger.p" THEN lCoreFileError = TRUE.
     END.
   END.
